@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/hooks/useAuth'
 import {
   TicketIcon,
   Clock,
@@ -123,7 +123,7 @@ const PriorityBadge = ({ priority }: { priority: string }) => {
 }
 
 export default function DashboardPage() {
-  const { data: session } = useSession()
+  const { session } = useAuth()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {

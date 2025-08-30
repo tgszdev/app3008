@@ -47,7 +47,8 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
 
-  const isAdmin = session?.user?.role === 'admin'
+  const userRole = (session?.user as any)?.role
+  const isAdmin = userRole === 'admin'
   const allNavigation = isAdmin ? [...navigation, ...adminNavigation] : navigation
 
   return (
