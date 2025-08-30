@@ -1,12 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Search, Edit, Trash2, UserCheck, UserX, Shield, User as UserIcon } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, UserCheck, UserX, Shield, User as UserIcon, X, Save } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 
-// Mock data
-const users = [
+// Mock data inicial
+const initialUsers = [
   {
     id: '1',
     name: 'Administrador do Sistema',
@@ -96,11 +96,30 @@ const StatusBadge = ({ isActive }: { isActive: boolean }) => {
   )
 }
 
+interface UserFormData {
+  name: string
+  email: string
+  role: string
+  department: string
+  phone: string
+  password?: string
+}
+
 export default function UsersPage() {
+  const [users, setUsers] = useState(initialUsers)
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
   const [showModal, setShowModal] = useState(false)
+  const [editingUser, setEditingUser] = useState<any>(null)
+  const [formData, setFormData] = useState<UserFormData>({
+    name: '',
+    email: '',
+    role: 'user',
+    department: '',
+    phone: '',
+    password: '',
+  })
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -114,13 +133,101 @@ export default function UsersPage() {
   })
 
   const handleToggleStatus = (userId: string) => {
-    toast.success('Status do usuário atualizado!')
+    setUsers(prevUsers => 
+      prevUsers.map(user => 
+        user.id === userId 
+          ? { ...user, is_active: !user.is_active }
+          : user
+      )
+    )
+    const user = users.find(u => u.id === userId)
+    toast.success(`Usuário ${user?.is_active ? 'desativado' : 'ativado'} com sucesso!`)
   }
 
   const handleDeleteUser = (userId: string) => {
-    if (confirm('Tem certeza que deseja excluir este usuário?')) {
+    const user = users.find(u => u.id === userId)
+    
+    if (user?.email === 'admin@example.com') {
+      toast.error('Não é possível excluir o administrador principal!')
+      return
+    }
+    
+    if (confirm(`Tem certeza que deseja excluir o usuário ${user?.name}?`)) {
+      setUsers(prevUsers => prevUsers.filter(user => user.id !== userId))
       toast.success('Usuário excluído com sucesso!')
     }
+  }
+
+  const handleEditUser = (user: any) => {
+    setEditingUser(user)
+    setFormData({
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      department: user.department,
+      phone: user.phone,
+    })
+    setShowModal(true)
+  }
+
+  const handleOpenNewUserModal = () => {
+    setEditingUser(null)
+    setFormData({
+      name: '',
+      email: '',
+      role: 'user',
+      department: '',
+      phone: '',
+      password: '',
+    })
+    setShowModal(true)
+  }
+
+  const handleSaveUser = () => {
+    // Validação
+    if (!formData.name || !formData.email) {
+      toast.error('Nome e email são obrigatórios!')
+      return
+    }
+
+    if (!editingUser && !formData.password) {
+      toast.error('Senha é obrigatória para novo usuário!')
+      return
+    }
+
+    if (editingUser) {
+      // Editar usuário existente
+      setUsers(prevUsers =>
+        prevUsers.map(user =>
+          user.id === editingUser.id
+            ? { ...user, ...formData }
+            : user
+        )
+      )
+      toast.success('Usuário atualizado com sucesso!')
+    } else {
+      // Criar novo usuário
+      const newUser = {
+        id: String(Date.now()),
+        ...formData,
+        is_active: true,
+        last_login: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+      }
+      setUsers(prevUsers => [...prevUsers, newUser])
+      toast.success('Usuário criado com sucesso!')
+    }
+
+    setShowModal(false)
+    setEditingUser(null)
+    setFormData({
+      name: '',
+      email: '',
+      role: 'user',
+      department: '',
+      phone: '',
+      password: '',
+    })
   }
 
   return (
@@ -136,7 +243,7 @@ export default function UsersPage() {
           </p>
         </div>
         <button
-          onClick={() => setShowModal(true)}
+          onClick={handleOpenNewUserModal}
           className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
         >
           <Plus className="h-5 w-5 mr-2" />
@@ -238,17 +345,22 @@ export default function UsersPage() {
                     <div className="flex items-center justify-end gap-2">
                       <button 
                         onClick={() => handleToggleStatus(user.id)}
-                        className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                        className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
                         title={user.is_active ? 'Desativar' : 'Ativar'}
                       >
                         {user.is_active ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
                       </button>
-                      <button className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+                      <button 
+                        onClick={() => handleEditUser(user)}
+                        className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+                        title="Editar"
+                      >
                         <Edit className="h-4 w-4" />
                       </button>
                       <button 
                         onClick={() => handleDeleteUser(user.id)}
-                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                        title="Excluir"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -260,7 +372,7 @@ export default function UsersPage() {
           </table>
         </div>
 
-        {/* Pagination */}
+        {/* Pagination - Simplificada sem funcionalidade real */}
         <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-700 dark:text-gray-300">
@@ -268,19 +380,138 @@ export default function UsersPage() {
               <span className="font-medium">{users.length}</span> usuários
             </p>
             <div className="flex gap-2">
-              <button className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700">
+              <button className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50" disabled>
                 Anterior
               </button>
               <button className="px-3 py-1 bg-blue-600 text-white rounded-lg text-sm">
                 1
               </button>
-              <button className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700">
+              <button className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50" disabled>
                 Próximo
               </button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Modal de Criar/Editar Usuário */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                {editingUser ? 'Editar Usuário' : 'Novo Usuário'}
+              </h2>
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Nome Completo *
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Digite o nome completo"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="email@exemplo.com"
+                />
+              </div>
+
+              {!editingUser && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Senha *
+                  </label>
+                  <input
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Mínimo 6 caracteres"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Perfil *
+                </label>
+                <select
+                  value={formData.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="user">Usuário</option>
+                  <option value="analyst">Analista</option>
+                  <option value="admin">Administrador</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Departamento
+                </label>
+                <input
+                  type="text"
+                  value={formData.department}
+                  onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Ex: Tecnologia da Informação"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Telefone
+                </label>
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="(11) 99999-9999"
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSaveUser}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                {editingUser ? 'Salvar' : 'Criar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
