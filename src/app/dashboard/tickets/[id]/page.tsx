@@ -90,7 +90,8 @@ const PriorityBadge = ({ priority }: { priority: string }) => {
   )
 }
 
-export default function TicketDetailPage({ params }: { params: { id: string } }) {
+// Remover o tipo params do Next.js 15 que está causando erro
+export default function TicketDetailPage() {
   const router = useRouter()
   const [newComment, setNewComment] = useState('')
   const [isInternal, setIsInternal] = useState(false)
