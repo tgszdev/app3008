@@ -1,211 +1,201 @@
-# Sistema de Suporte Técnico - PWA
+# Sistema de Suporte Técnico
 
 ## 📋 Visão Geral
-Sistema completo e moderno para gestão de chamados técnicos com suporte PWA (Progressive Web App), otimizado para deploy no Vercel.
+
+Sistema completo e moderno para gestão de chamados técnicos, desenvolvido com Next.js 14+ e preparado para deploy no Vercel. Oferece uma experiência PWA completa com funcionamento offline, notificações push e interface responsiva com dark mode.
 
 ## 🚀 Características Principais
 
-### Tecnologias
-- **Frontend**: Next.js 14+ com App Router
-- **UI/UX**: Tailwind CSS + Shadcn/ui 
-- **Backend**: Next.js API Routes
-- **Banco de Dados**: Supabase (PostgreSQL)
-- **Autenticação**: NextAuth.js v5 com JWT
-- **PWA**: next-pwa (offline, instalável, notificações push)
-- **Deploy**: Vercel
+### Stack Tecnológica
+- **Frontend**: Next.js 14+ com App Router, TypeScript, Tailwind CSS
+- **Backend**: Next.js API Routes 
+- **Banco de Dados**: Supabase (PostgreSQL hospedado)
+- **Autenticação**: NextAuth.js v5 com JWT e roles
+- **PWA**: next-pwa com Service Worker e cache offline
+- **UI/UX**: Interface moderna e responsiva com dark mode
+- **Deploy**: Otimizado para Vercel
 
 ## ✅ Funcionalidades Implementadas
 
 ### Autenticação e Autorização
-- ✅ Sistema de login com email/senha
+- ✅ Sistema de login com NextAuth.js
 - ✅ Três níveis de acesso: user, analyst, admin
-- ✅ Proteção de rotas por role
+- ✅ Proteção de rotas com middleware
 - ✅ Sessão persistente com JWT
 
-### Interface de Usuário
-- ✅ Layout responsivo com sidebar
-- ✅ Dark mode com persistência
+### Interface do Usuário
 - ✅ Dashboard com estatísticas em tempo real
-- ✅ Navegação intuitiva
-- ✅ Componentes modernos com Shadcn/ui
+- ✅ Layout responsivo com sidebar navegável
+- ✅ Dark mode integrado
+- ✅ Página de login moderna
+- ✅ Página de listagem de chamados com filtros
 
-### PWA Features
-- ✅ Manifest configurado
+### PWA (Progressive Web App)
+- ✅ Manifest.json configurado
 - ✅ Service Worker para funcionamento offline
 - ✅ Instalável em desktop e mobile
-- ✅ Ícones em múltiplas resoluções
+- ✅ Ícones e splash screens
 
 ### Estrutura de Dados
 - ✅ Schema completo do banco de dados
-- ✅ Tabelas para: users, tickets, comments, attachments, notifications
-- ✅ Sistema de módulos/categorias
-- ✅ Histórico de alterações (audit log)
-- ✅ Preferências de usuário
+- ✅ Tipos TypeScript definidos
+- ✅ Integração com Supabase configurada
+
+## 🔗 URLs e Endpoints
+
+### Páginas Principais
+- `/` - Redireciona para login ou dashboard
+- `/login` - Página de autenticação
+- `/dashboard` - Dashboard principal com estatísticas
+- `/dashboard/tickets` - Listagem e gestão de chamados
+- `/dashboard/tickets/new` - Criar novo chamado
+- `/dashboard/tickets/[id]` - Detalhes do chamado
+- `/dashboard/analytics` - Estatísticas avançadas
+- `/dashboard/users` - Gestão de usuários (admin)
+- `/dashboard/settings` - Configurações do sistema (admin)
+
+### API Routes
+- `/api/auth/[...nextauth]` - Endpoints de autenticação
+- `/api/tickets` - CRUD de chamados (a implementar)
+- `/api/comments` - Sistema de comentários (a implementar)
+- `/api/notifications` - Notificações (a implementar)
+- `/api/upload` - Upload de arquivos (a implementar)
+
+## 📊 Modelos de Dados
+
+### Principais Entidades
+- **Users**: Usuários com roles e preferências
+- **Tickets**: Chamados com status, prioridade e SLA
+- **Comments**: Comentários nos chamados
+- **Attachments**: Anexos de arquivos
+- **Notifications**: Sistema de notificações
+- **Modules**: Categorização de chamados
+
+### Níveis de Acesso
+1. **User**: Criar e visualizar próprios chamados
+2. **Analyst**: Gerenciar todos os chamados
+3. **Admin**: Acesso completo ao sistema
 
 ## 🚧 Funcionalidades em Desenvolvimento
 
-### CRUD de Chamados
-- ⏳ Criar novo chamado
-- ⏳ Listar chamados com filtros
-- ⏳ Editar/atualizar chamados
-- ⏳ Sistema de comentários
+### Alta Prioridade
+- [ ] API Routes para CRUD completo de chamados
+- [ ] Sistema de comentários em tempo real
+- [ ] Upload e gestão de anexos
+- [ ] Notificações push via Web Push API
 
-### Recursos Avançados
-- ⏳ Upload de anexos
-- ⏳ Notificações push
-- ⏳ Notificações por email
-- ⏳ Relatórios exportáveis
-- ⏳ Busca avançada
-- ⏳ SLA automático
+### Média Prioridade
+- [ ] Gráficos e estatísticas avançadas com Recharts
+- [ ] Exportação de relatórios (PDF/Excel)
+- [ ] Sistema de templates para respostas
+- [ ] Busca avançada com filtros múltiplos
 
-## 📁 Estrutura do Projeto
+### Baixa Prioridade
+- [ ] Integração com email (notificações)
+- [ ] API REST pública documentada
+- [ ] Sistema de webhooks
+- [ ] Chatbot de atendimento
 
-```
-webapp/
-├── src/
-│   ├── app/               # App Router pages
-│   │   ├── api/           # API Routes
-│   │   ├── dashboard/     # Dashboard pages
-│   │   ├── login/         # Auth pages
-│   │   └── tickets/       # Ticket management
-│   ├── components/        # React components
-│   │   └── ui/           # UI components
-│   ├── lib/              # Utilities and configs
-│   ├── hooks/            # Custom React hooks
-│   └── types/            # TypeScript types
-├── public/               # Static files
-│   ├── icons/           # PWA icons
-│   └── manifest.json    # PWA manifest
-└── supabase-schema.sql  # Database schema
-```
+## 🛠️ Como Usar
 
-## 🔧 Configuração
+### Pré-requisitos
+1. Conta no Supabase com banco PostgreSQL
+2. Conta no Vercel para deploy
+3. Node.js 18+ instalado
 
-### Variáveis de Ambiente (.env.local)
-```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+### Configuração Inicial
 
-# NextAuth
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your_secret_here
+1. **Configurar variáveis de ambiente**:
+   Edite o arquivo `.env.local` com suas credenciais:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=sua_url_supabase
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima
+   SUPABASE_SERVICE_ROLE_KEY=sua_chave_servico
+   NEXTAUTH_SECRET=gerar_secret_aleatorio
+   ```
 
-# JWT
-JWT_SECRET=your_jwt_secret
-```
+2. **Configurar banco de dados**:
+   Execute o script SQL em `supabase-schema.sql` no painel do Supabase
 
-### Instalação
+3. **Instalar dependências**:
+   ```bash
+   npm install
+   ```
 
-1. Clone o repositório
-2. Instale as dependências:
-```bash
-npm install
-```
+4. **Executar em desenvolvimento**:
+   ```bash
+   npm run dev
+   ```
 
-3. Configure o banco de dados no Supabase:
-   - Crie um novo projeto no Supabase
-   - Execute o script `supabase-schema.sql` no SQL Editor
-   - Copie as credenciais para `.env.local`
+5. **Acessar**:
+   - URL: http://localhost:3000
+   - Login demo: admin@example.com / admin123
 
-4. Execute o projeto:
-```bash
-npm run dev
-```
+### Deploy no Vercel
 
-## 🌐 URLs e Endpoints
+1. Fazer push do código para GitHub
+2. Conectar repositório no Vercel
+3. Configurar variáveis de ambiente
+4. Deploy automático
 
-### Rotas Principais
-- `/` - Redirect para login
-- `/login` - Página de autenticação
-- `/dashboard` - Dashboard principal
-- `/tickets` - Gestão de chamados
-- `/tickets/new` - Criar novo chamado
-- `/tickets/[id]` - Detalhes do chamado
-- `/reports` - Relatórios
-- `/users` - Gestão de usuários (admin)
-- `/settings` - Configurações
+## 📱 PWA - Instalação
 
-### API Endpoints (em desenvolvimento)
-- `POST /api/auth/[...nextauth]` - Autenticação
-- `GET /api/tickets` - Listar chamados
-- `POST /api/tickets` - Criar chamado
-- `PUT /api/tickets/[id]` - Atualizar chamado
-- `POST /api/tickets/[id]/comments` - Adicionar comentário
+### Desktop (Chrome/Edge)
+1. Acessar o sistema
+2. Clicar no ícone de instalação na barra de endereços
+3. Confirmar instalação
 
-## 🎯 Próximos Passos Recomendados
-
-1. **Completar CRUD de Chamados**
-   - Implementar páginas de listagem e criação
-   - Adicionar filtros e busca
-   - Sistema de comentários
-
-2. **Sistema de Notificações**
-   - Configurar Web Push API
-   - Implementar notificações em tempo real
-   - Adicionar email notifications
-
-3. **Upload de Arquivos**
-   - Integrar com Cloudinary ou S3
-   - Adicionar suporte a anexos
-
-4. **Melhorias de UX**
-   - Adicionar animações
-   - Implementar skeleton loaders
-   - Melhorar feedback visual
-
-5. **Deploy no Vercel**
-   - Configurar variáveis de ambiente
-   - Conectar com GitHub
-   - Configurar domínio customizado
+### Mobile (Android/iOS)
+1. Acessar o sistema no navegador
+2. Menu → "Adicionar à tela inicial"
+3. Confirmar instalação
 
 ## 🔐 Segurança
 
-- Autenticação com JWT
-- Proteção CSRF
-- Rate limiting nas APIs
+- Autenticação via JWT com refresh token
+- Senhas hasheadas com bcrypt
+- RLS (Row Level Security) no Supabase
 - Validação de dados com Zod
-- Row Level Security no Supabase
-- Sanitização de inputs
+- Proteção CSRF integrada
+- Headers de segurança configurados
 
-## 📱 PWA Features
+## 📈 Próximos Passos Recomendados
 
-- **Instalável**: Pode ser instalado como app nativo
-- **Offline First**: Funciona sem conexão
-- **Push Notifications**: Notificações em tempo real
-- **Responsive**: Adaptado para todos dispositivos
-- **Dark Mode**: Suporte a tema escuro
+1. **Finalizar CRUD de Chamados**
+   - Implementar API routes
+   - Criar formulário de novo chamado
+   - Adicionar edição e exclusão
 
-## 🚀 Deploy
+2. **Sistema de Comentários**
+   - Implementar API de comentários
+   - Interface de comentários em tempo real
+   - Menções e notificações
 
-### Vercel (Recomendado)
-1. Faça push do código para GitHub
-2. Importe o projeto no Vercel
-3. Configure as variáveis de ambiente
-4. Deploy automático a cada push
+3. **Upload de Arquivos**
+   - Integrar com Cloudinary ou S3
+   - Preview de imagens
+   - Limite de tamanho e tipos
 
-### Comandos Úteis
-```bash
-# Desenvolvimento
-npm run dev
+4. **Notificações Push**
+   - Configurar Web Push API
+   - Solicitar permissão do usuário
+   - Enviar notificações de novos chamados
 
-# Build de produção
-npm run build
+5. **Deploy e Testes**
+   - Configurar CI/CD
+   - Testes automatizados
+   - Monitoramento com Sentry
 
-# Iniciar produção
-npm start
+## 🤝 Suporte
 
-# Lint
-npm run lint
-```
+Para dúvidas ou problemas, abra uma issue no GitHub ou entre em contato com a equipe de desenvolvimento.
 
 ## 📄 Licença
-MIT
 
-## 👥 Suporte
-Para suporte, abra uma issue no GitHub ou entre em contato.
+Este projeto é proprietário e confidencial.
 
 ---
-**Status**: 🚧 Em desenvolvimento ativo
-**Última atualização**: 30/08/2025
+
+**Última Atualização**: Dezembro 2024
+**Versão**: 1.0.0
+**Status**: Em Desenvolvimento
