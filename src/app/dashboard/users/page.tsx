@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, Search, Edit, Trash2, UserCheck, UserX, Shield, User as UserIcon, X, Save } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
@@ -121,6 +121,11 @@ export default function UsersPage() {
     password: '',
   })
 
+  // Debug useEffect
+  useEffect(() => {
+    console.log('Modal state changed:', showModal)
+  }, [showModal])
+
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -171,6 +176,7 @@ export default function UsersPage() {
   }
 
   const handleOpenNewUserModal = () => {
+    console.log('Abrindo modal de novo usuário')
     setEditingUser(null)
     setFormData({
       name: '',
@@ -243,7 +249,11 @@ export default function UsersPage() {
           </p>
         </div>
         <button
-          onClick={handleOpenNewUserModal}
+          onClick={() => {
+            console.log('Botão clicado!')
+            alert('Botão funcionando!')
+            handleOpenNewUserModal()
+          }}
           className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
         >
           <Plus className="h-5 w-5 mr-2" />
@@ -395,9 +405,18 @@ export default function UsersPage() {
       </div>
 
       {/* Modal de Criar/Editar Usuário */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
+      {showModal ? (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center p-4"
+          style={{ zIndex: 9999 }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowModal(false)
+            }
+          }}
+        >
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-2xl"
+               onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                 {editingUser ? 'Editar Usuário' : 'Novo Usuário'}
@@ -511,7 +530,7 @@ export default function UsersPage() {
             </div>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   )
 }
