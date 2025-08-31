@@ -27,22 +27,7 @@ export async function GET() {
     const resolvedTickets = tickets?.filter(t => t.status === 'resolved').length || 0
     const cancelledTickets = tickets?.filter(t => t.status === 'cancelled').length || 0
 
-    // Calculate average resolution time (in hours)
-    const resolvedTicketsWithTime = tickets?.filter(t => t.status === 'resolved') || []
-    let averageResolutionTime = '0h 0m'
-    
-    if (resolvedTicketsWithTime.length > 0) {
-      const totalTime = resolvedTicketsWithTime.reduce((acc, ticket) => {
-        const created = new Date(ticket.created_at).getTime()
-        const updated = new Date(ticket.updated_at).getTime()
-        return acc + (updated - created)
-      }, 0)
-      
-      const avgTimeMs = totalTime / resolvedTicketsWithTime.length
-      const hours = Math.floor(avgTimeMs / (1000 * 60 * 60))
-      const minutes = Math.floor((avgTimeMs % (1000 * 60 * 60)) / (1000 * 60))
-      averageResolutionTime = `${hours}h ${minutes}m`
-    }
+    // Removed average resolution time calculation - not needed anymore
 
     // Calculate trends (comparing with last 30 days)
     const thirtyDaysAgo = new Date()
@@ -64,23 +49,7 @@ export async function GET() {
       ? `${((recentTickets - previousTickets) / previousTickets * 100).toFixed(0)}%`
       : '+0%'
 
-    // Get active users count
-    const { data: users, error: usersError } = await supabase
-      .from('users')
-      .select('id')
-      .eq('is_active', true)
-
-    if (usersError) {
-      console.error('Error fetching users:', usersError)
-    }
-
-    const activeUsers = users?.length || 0
-
-    // Calculate users trend (simplified - would need more data in production)
-    const usersTrend = '+5%' // Placeholder for now
-
-    // Calculate satisfaction rate (simplified - would need feedback system in production)
-    const satisfactionRate = 94.5 // Placeholder for now
+    // Removed active users, users trend and satisfaction rate - not needed anymore
 
     // Get recent tickets with user information
     const { data: recentTicketsList, error: recentError } = await supabase
@@ -129,11 +98,7 @@ export async function GET() {
         inProgressTickets,
         resolvedTickets,
         cancelledTickets,
-        averageResolutionTime,
-        satisfactionRate,
-        ticketsTrend: ticketsTrend.startsWith('-') ? ticketsTrend : `+${ticketsTrend}`,
-        usersTrend,
-        activeUsers
+        ticketsTrend: ticketsTrend.startsWith('-') ? ticketsTrend : `+${ticketsTrend}`
       },
       recentTickets: formattedRecentTickets
     })

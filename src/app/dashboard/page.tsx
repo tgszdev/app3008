@@ -36,11 +36,7 @@ interface Stats {
   inProgressTickets: number
   resolvedTickets: number
   cancelledTickets: number
-  averageResolutionTime: string
-  satisfactionRate: number
   ticketsTrend: string
-  usersTrend: string
-  activeUsers: number
 }
 
 interface CategoryStat {
@@ -251,11 +247,7 @@ export default function DashboardPage() {
     inProgressTickets: 0,
     resolvedTickets: 0,
     cancelledTickets: 0,
-    averageResolutionTime: '0h 0m',
-    satisfactionRate: 0,
-    ticketsTrend: '+0%',
-    usersTrend: '+0%',
-    activeUsers: 0
+    ticketsTrend: '+0%'
   })
   
   const [categoryStats, setCategoryStats] = useState<{
@@ -448,22 +440,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Category Stats Grid */}
-      {categoryStats && categoryStats.categorias.length > 0 && (
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <PieChartIcon className="h-5 w-5" />
-            Tickets por Categoria
-          </h2>
-          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {categoryStats.categorias.map((category) => (
-              <CategoryCard key={category.id} category={category} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Status Stats Grid (using filtered data) */}
+      {/* Status Stats Grid - MOVED TO TOP */}
       {categoryStats && (
         <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-5">
           <StatCard
@@ -499,56 +476,20 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Additional Stats */}
-      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
-                Tempo Médio de Resolução (Período)
-              </p>
-              <p className="mt-2 text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                {categoryStats?.average_resolution_time || '0h 0m'}
-              </p>
-            </div>
-            <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600" />
+      {/* Category Stats Grid - MOVED AFTER STATUS STATS */}
+      {categoryStats && categoryStats.categorias.length > 0 && (
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <PieChartIcon className="h-5 w-5" />
+            Tickets por Categoria
+          </h2>
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {categoryStats.categorias.map((category) => (
+              <CategoryCard key={category.id} category={category} />
+            ))}
           </div>
         </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
-                Taxa de Satisfação
-              </p>
-              <p className="mt-2 text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                {stats.satisfactionRate}%
-              </p>
-            </div>
-            <BarChart className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-600" />
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
-                Usuários Ativos
-              </p>
-              <p className="mt-2 text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                {stats.activeUsers}
-              </p>
-              <p className={`mt-1 text-xs sm:text-sm flex items-center ${
-                stats.usersTrend.startsWith('+') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-              }`}>
-                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                {stats.usersTrend}
-              </p>
-            </div>
-            <Users className="h-6 w-6 sm:h-8 sm:w-8 text-cyan-600" />
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* Recent Tickets (not affected by filter) */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
@@ -676,7 +617,27 @@ export default function DashboardPage() {
 }
 
 function formatDateShort(date: string) {
-  // Parse the date string and add timezone offset to avoid timezone issues
-  const [year, month, day] = date.split('-').map(Number)
+  // Handle invalid dates
+  if (!date) return 'N/A'
+  
+  // Parse the date string safely
+  const parts = date.split('-')
+  if (parts.length !== 3) {
+    // Try to parse as ISO date
+    const dateObj = new Date(date)
+    if (!isNaN(dateObj.getTime())) {
+      const day = String(dateObj.getDate()).padStart(2, '0')
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0')
+      const year = dateObj.getFullYear()
+      return `${day}/${month}/${year}`
+    }
+    return 'N/A'
+  }
+  
+  const [year, month, day] = parts.map(Number)
+  if (isNaN(year) || isNaN(month) || isNaN(day)) {
+    return 'N/A'
+  }
+  
   return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`
 }
