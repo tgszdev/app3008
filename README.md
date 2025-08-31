@@ -65,6 +65,36 @@
 - updated_at: TIMESTAMP
 ```
 
+### Tabela: `tickets`
+```sql
+- id: UUID (PK)
+- ticket_number: SERIAL (unique)
+- title: TEXT
+- description: TEXT
+- status: TEXT (open|in_progress|resolved|closed)
+- priority: TEXT (low|medium|high|critical)
+- category: TEXT
+- created_by: UUID (FK users)
+- assigned_to: UUID (FK users)
+- resolution_notes: TEXT
+- resolved_at: TIMESTAMP
+- closed_at: TIMESTAMP
+- due_date: TIMESTAMP
+- created_at: TIMESTAMP
+- updated_at: TIMESTAMP
+```
+
+### Tabela: `ticket_comments`
+```sql
+- id: UUID (PK)
+- ticket_id: UUID (FK tickets)
+- user_id: UUID (FK users)
+- content: TEXT
+- is_internal: BOOLEAN
+- created_at: TIMESTAMP
+- updated_at: TIMESTAMP
+```
+
 ## 🔐 Credenciais de Teste
 ```
 Admin:
@@ -110,14 +140,25 @@ pm2 start ecosystem.config.cjs
 - `npm run db:seed` - Popular banco com dados de teste
 - `npm run db:setup` - Configurar banco de dados
 
+### 6. **Gestão de Chamados (CRUD Completo)**
+- ✅ **Listagem**: Visualização de todos os chamados
+- ✅ **Criação**: Novo chamado com título, descrição, prioridade
+- ✅ **Edição**: Atualizar status e informações
+- ✅ **Exclusão**: Remover chamados
+- ✅ **Filtros**: Por status e prioridade
+- ✅ **Busca**: Por título, número ou solicitante
+- ✅ **Atribuição**: Designar para analistas/admin
+- ✅ **Prioridades**: Baixa, Média, Alta, Crítica
+- ✅ **Status**: Aberto, Em Andamento, Resolvido, Fechado
+- ✅ **Categorias**: Geral, Técnico, Financeiro, Bug, etc
+- ✅ **Histórico**: Registro de todas as alterações
+
 ## 🔄 Funcionalidades Pendentes
 
-### 1. **Gestão de Chamados**
-- [ ] CRUD completo de tickets
-- [ ] Sistema de prioridades (Alta/Média/Baixa)
-- [ ] Status dinâmicos (Aberto/Em andamento/Resolvido)
-- [ ] Atribuição para analistas
-- [ ] Histórico de alterações
+### 1. **Página de Detalhes do Ticket**
+- [ ] Visualização completa do chamado
+- [ ] Timeline de atividades
+- [ ] Edição inline de campos
 
 ### 2. **Sistema de Comentários**
 - [ ] Adicionar comentários aos chamados
@@ -174,8 +215,11 @@ pm2 start ecosystem.config.cjs
 5. **Deploy no Vercel**: Configurar variáveis de ambiente e deploy
 
 ## 📊 Status do Projeto
-- **Versão**: 1.0.0
+- **Versão**: 1.1.0
 - **Status**: ✅ Em Desenvolvimento
 - **Última Atualização**: 31/08/2025
 - **Ambiente**: Sandbox E2B
 - **Banco de Dados**: ✅ Conectado e Funcional
+- **Total de Usuários**: 6
+- **Total de Chamados**: Aguardando criação
+- **Deploy**: Pronto para Vercel
