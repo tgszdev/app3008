@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import {
   Plus,
   Search,
@@ -106,6 +107,7 @@ const categoryLabels: Record<string, string> = {
 
 export default function TicketsPage() {
   const router = useRouter()
+  const { data: session } = useSession()
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -480,13 +482,16 @@ export default function TicketsPage() {
                           >
                             <Edit className="h-4 w-4" />
                           </button>
-                          <button
-                            onClick={() => handleDeleteTicket(ticket.id)}
-                            className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-                            title="Excluir"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
+                          {/* Apenas admin e analyst podem excluir tickets */}
+                          {(session?.user?.role === 'admin' || session?.user?.role === 'analyst') && (
+                            <button
+                              onClick={() => handleDeleteTicket(ticket.id)}
+                              className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                              title="Excluir"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>

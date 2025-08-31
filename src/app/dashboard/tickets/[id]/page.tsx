@@ -319,9 +319,9 @@ export default function TicketDetailsPage() {
           </div>
           
           <div className="flex gap-2">
-            {/* Status */}
+            {/* Status - Apenas admin e analyst podem alterar */}
             <div className="relative">
-              {editingStatus ? (
+              {editingStatus && (session?.user?.role === 'admin' || session?.user?.role === 'analyst') ? (
                 <div className="flex gap-2">
                   <select
                     value={newStatus}
@@ -348,8 +348,16 @@ export default function TicketDetailsPage() {
                 </div>
               ) : (
                 <button
-                  onClick={() => setEditingStatus(true)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white ${statusConfig[ticket.status].color} hover:opacity-90`}
+                  onClick={() => {
+                    // Apenas admin e analyst podem alterar status
+                    if (session?.user?.role === 'admin' || session?.user?.role === 'analyst') {
+                      setEditingStatus(true)
+                    }
+                  }}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white ${statusConfig[ticket.status].color} ${
+                    session?.user?.role === 'admin' || session?.user?.role === 'analyst' ? 'hover:opacity-90 cursor-pointer' : 'cursor-default'
+                  }`}
+                  disabled={session?.user?.role === 'user'}
                 >
                   <StatusIcon size={16} />
                   {statusConfig[ticket.status].label}
@@ -497,10 +505,10 @@ export default function TicketDetailsPage() {
                 <p className="text-sm text-gray-500">{ticket.created_by_user?.email}</p>
               </div>
 
-              {/* Responsável */}
+              {/* Responsável - Apenas admin e analyst podem alterar */}
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Responsável</p>
-                {editingAssignee ? (
+                {editingAssignee && (session?.user?.role === 'admin' || session?.user?.role === 'analyst') ? (
                   <div className="space-y-2">
                     <select
                       value={newAssignee}
@@ -531,8 +539,17 @@ export default function TicketDetailsPage() {
                   </div>
                 ) : (
                   <div 
-                    onClick={() => setEditingAssignee(true)}
-                    className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 p-2 -m-2 rounded"
+                    onClick={() => {
+                      // Apenas admin e analyst podem alterar responsável
+                      if (session?.user?.role === 'admin' || session?.user?.role === 'analyst') {
+                        setEditingAssignee(true)
+                      }
+                    }}
+                    className={`${
+                      session?.user?.role === 'admin' || session?.user?.role === 'analyst' 
+                        ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700' 
+                        : 'cursor-default'
+                    } p-2 -m-2 rounded`}
                   >
                     {ticket.assigned_to_user ? (
                       <>
@@ -577,19 +594,24 @@ export default function TicketDetailsPage() {
             <h2 className="text-xl font-bold mb-4">Ações</h2>
             
             <div className="space-y-2">
-              <button
-                onClick={() => setEditingStatus(true)}
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Alterar Status
-              </button>
-              
-              <button
-                onClick={() => setEditingAssignee(true)}
-                className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-              >
-                Atribuir Responsável
-              </button>
+              {/* Botões de Ação - Apenas admin e analyst */}
+              {(session?.user?.role === 'admin' || session?.user?.role === 'analyst') && (
+                <>
+                  <button
+                    onClick={() => setEditingStatus(true)}
+                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  >
+                    Alterar Status
+                  </button>
+                  
+                  <button
+                    onClick={() => setEditingAssignee(true)}
+                    className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                  >
+                    Atribuir Responsável
+                  </button>
+                </>
+              )}
               
               <label className="w-full">
                 <input
@@ -605,7 +627,8 @@ export default function TicketDetailsPage() {
                 </div>
               </label>
               
-              {(session?.user?.role === 'admin' || session?.user?.id === ticket.created_by_user?.id) && (
+              {/* Botão de Excluir - Apenas admin e analyst */}
+              {(session?.user?.role === 'admin' || session?.user?.role === 'analyst') && (
                 <button
                   onClick={handleDelete}
                   className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-2"
@@ -613,6 +636,18 @@ export default function TicketDetailsPage() {
                   <Trash2 size={16} />
                   Excluir Chamado
                 </button>
+              )}
+              
+              {/* Mensagem para usuários sem permissão */}
+              {session?.user?.role === 'user' && (
+                <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-center">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Você pode adicionar comentários e anexos ao chamado.
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                    Para alterações de status ou atribuição, contate um analista ou administrador.
+                  </p>
+                </div>
               )}
             </div>
           </div>
