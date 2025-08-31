@@ -126,6 +126,18 @@ export default function TestRolePage() {
               <td className="text-center">❌</td>
             </tr>
             <tr className="border-b">
+              <td className="py-2">Cancelar tickets</td>
+              <td className="text-center">✅</td>
+              <td className="text-center">❌</td>
+              <td className="text-center">❌</td>
+            </tr>
+            <tr className="border-b">
+              <td className="py-2">Reativar tickets cancelados</td>
+              <td className="text-center">✅</td>
+              <td className="text-center">❌</td>
+              <td className="text-center">❌</td>
+            </tr>
+            <tr className="border-b">
               <td className="py-2">Excluir tickets</td>
               <td className="text-center">✅</td>
               <td className="text-center">❌</td>
@@ -148,6 +160,10 @@ export default function TestRolePage() {
         </p>
         <p className="text-sm text-yellow-800 mt-2">
           <strong>Novo:</strong> Status "Cancelado" foi adicionado aos tickets. Analysts não podem mais excluir tickets.
+        </p>
+        <p className="text-sm text-yellow-800 mt-2">
+          <strong>Regras de Cancelamento:</strong> Apenas Admin pode cancelar tickets ou reativar tickets cancelados. 
+          Motivo obrigatório será registrado nos comentários.
         </p>
       </div>
     </div>

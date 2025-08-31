@@ -84,6 +84,10 @@ export default function TicketDetailsPage() {
   const [newAssignee, setNewAssignee] = useState<string>('')
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const [uploadingFile, setUploadingFile] = useState(false)
+  const [showCancelModal, setShowCancelModal] = useState(false)
+  const [cancelReason, setCancelReason] = useState('')
+  const [showReactivateModal, setShowReactivateModal] = useState(false)
+  const [reactivateReason, setReactivateReason] = useState('')
 
   useEffect(() => {
     if (ticketId) {
@@ -187,6 +191,32 @@ export default function TicketDetailsPage() {
       return
     }
 
+    // Check if trying to cancel - only admin can cancel
+    if (newStatus === 'cancelled') {
+      if (session?.user?.role !== 'admin') {
+        toast.error('Apenas administradores podem cancelar tickets')
+        setEditingStatus(false)
+        return
+      }
+      // Show cancel modal to get reason
+      setShowCancelModal(true)
+      setEditingStatus(false)
+      return
+    }
+
+    // Check if trying to change from cancelled - only admin can reactivate
+    if (ticket.status === 'cancelled') {
+      if (session?.user?.role !== 'admin') {
+        toast.error('Apenas administradores podem reativar tickets cancelados')
+        setEditingStatus(false)
+        return
+      }
+      // Show reactivate modal to get reason
+      setShowReactivateModal(true)
+      setEditingStatus(false)
+      return
+    }
+
     try {
       console.log('=== DEBUG UPDATE STATUS ===')
       console.log('ID do ticket:', ticket.id)
@@ -208,6 +238,71 @@ export default function TicketDetailsPage() {
       console.error('Erro ao atualizar status:', error)
       console.error('Detalhes do erro:', error.response?.data)
       toast.error(error.response?.data?.error || 'Erro ao atualizar status')
+    }
+  }
+
+  const handleCancelTicket = async () => {
+    if (!cancelReason.trim()) {
+      toast.error('Por favor, informe o motivo do cancelamento')
+      return
+    }
+
+    try {
+      // Update status to cancelled
+      await axios.put('/api/tickets', {
+        id: ticket?.id,
+        status: 'cancelled',
+        updated_by: session?.user?.id
+      })
+
+      // Add comment with cancel reason
+      await axios.post('/api/tickets/comments', {
+        ticket_id: ticket?.id,
+        user_id: session?.user?.id,
+        content: `[TICKET CANCELADO] Motivo: ${cancelReason}`,
+        is_internal: false
+      })
+
+      toast.success('Ticket cancelado com sucesso!')
+      setShowCancelModal(false)
+      setCancelReason('')
+      fetchTicket()
+    } catch (error: any) {
+      console.error('Erro ao cancelar ticket:', error)
+      toast.error('Erro ao cancelar ticket')
+    }
+  }
+
+  const handleReactivateTicket = async () => {
+    if (!reactivateReason.trim()) {
+      toast.error('Por favor, informe o motivo da reativação')
+      return
+    }
+
+    try {
+      // Update status from cancelled
+      await axios.put('/api/tickets', {
+        id: ticket?.id,
+        status: newStatus,
+        updated_by: session?.user?.id
+      })
+
+      // Add comment with reactivation reason
+      await axios.post('/api/tickets/comments', {
+        ticket_id: ticket?.id,
+        user_id: session?.user?.id,
+        content: `[TICKET REATIVADO] Novo status: ${statusConfig[newStatus as keyof typeof statusConfig].label}. Motivo: ${reactivateReason}`,
+        is_internal: false
+      })
+
+      toast.success('Ticket reativado com sucesso!')
+      setShowReactivateModal(false)
+      setReactivateReason('')
+      setNewStatus('')
+      fetchTicket()
+    } catch (error: any) {
+      console.error('Erro ao reativar ticket:', error)
+      toast.error('Erro ao reativar ticket')
     }
   }
 
@@ -333,7 +428,10 @@ export default function TicketDetailsPage() {
                     <option value="in_progress">Em Progresso</option>
                     <option value="resolved">Resolvido</option>
                     <option value="closed">Fechado</option>
-                    <option value="cancelled">Cancelado</option>
+                    {/* Only show cancelled option for admin */}
+                    {session?.user?.role === 'admin' && (
+                      <option value="cancelled">Cancelado</option>
+                    )}
                   </select>
                   <button
                     onClick={handleStatusUpdate}
@@ -596,8 +694,9 @@ export default function TicketDetailsPage() {
             <h2 className="text-xl font-bold mb-4">Ações</h2>
             
             <div className="space-y-2">
-              {/* Botões de Ação - Apenas admin e analyst */}
-              {(session?.user?.role === 'admin' || session?.user?.role === 'analyst') && (
+              {/* Botões de Ação - Apenas admin e analyst (mas se cancelado, apenas admin) */}
+              {((session?.user?.role === 'admin' || session?.user?.role === 'analyst') && 
+                (ticket.status !== 'cancelled' || session?.user?.role === 'admin')) && (
                 <>
                   <button
                     onClick={() => setEditingStatus(true)}
@@ -640,8 +739,20 @@ export default function TicketDetailsPage() {
                 </button>
               )}
               
+              {/* Mensagem especial para tickets cancelados */}
+              {ticket.status === 'cancelled' && session?.user?.role !== 'admin' && (
+                <div className="p-4 bg-red-100 dark:bg-red-900/20 rounded-lg text-center border border-red-300 dark:border-red-800">
+                  <p className="text-sm text-red-800 dark:text-red-300 font-semibold">
+                    ⚠️ Este ticket foi cancelado
+                  </p>
+                  <p className="text-xs text-red-700 dark:text-red-400 mt-1">
+                    Apenas administradores podem reativar tickets cancelados.
+                  </p>
+                </div>
+              )}
+              
               {/* Mensagem para usuários sem permissão */}
-              {session?.user?.role === 'user' && (
+              {session?.user?.role === 'user' && ticket.status !== 'cancelled' && (
                 <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-center">
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Você pode adicionar comentários e anexos ao chamado.
@@ -655,6 +766,83 @@ export default function TicketDetailsPage() {
           </div>
         </div>
       </div>
+
+      {/* Modal de Cancelamento */}
+      {showCancelModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+            <h2 className="text-xl font-bold mb-4">Cancelar Ticket</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Para cancelar este ticket, você deve informar o motivo do cancelamento.
+            </p>
+            <textarea
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              placeholder="Digite o motivo do cancelamento..."
+              className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 resize-none"
+              rows={4}
+              autoFocus
+            />
+            <div className="flex justify-end gap-3 mt-4">
+              <button
+                onClick={() => {
+                  setShowCancelModal(false)
+                  setCancelReason('')
+                }}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleCancelTicket}
+                disabled={!cancelReason.trim()}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Confirmar Cancelamento
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Reativação */}
+      {showReactivateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+            <h2 className="text-xl font-bold mb-4">Reativar Ticket</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Para reativar este ticket cancelado, você deve informar o motivo da reativação.
+            </p>
+            <textarea
+              value={reactivateReason}
+              onChange={(e) => setReactivateReason(e.target.value)}
+              placeholder="Digite o motivo da reativação..."
+              className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 resize-none"
+              rows={4}
+              autoFocus
+            />
+            <div className="flex justify-end gap-3 mt-4">
+              <button
+                onClick={() => {
+                  setShowReactivateModal(false)
+                  setReactivateReason('')
+                  setNewStatus('')
+                }}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleReactivateTicket}
+                disabled={!reactivateReason.trim()}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Confirmar Reativação
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

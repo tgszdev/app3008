@@ -67,9 +67,14 @@
 - ✅ **Filtros**: Por status, prioridade, usuário
 - ✅ **Relacionamentos**: Integração com tabela de usuários
 - ✅ **Permissões por Perfil**:
-  - Admin: Todas as ações incluindo exclusão
-  - Analyst: Criar, editar, alterar status, atribuir (sem poder excluir)
+  - Admin: Todas as ações incluindo exclusão, cancelamento e reativação de tickets cancelados
+  - Analyst: Criar, editar, alterar status (exceto cancelar), atribuir (sem poder excluir ou cancelar)
   - User: Apenas criar, visualizar, comentar e anexar arquivos
+- ✅ **Regras de Cancelamento**:
+  - Apenas Admin pode cancelar tickets
+  - Motivo obrigatório ao cancelar (salvo nos comentários)
+  - Apenas Admin pode reativar tickets cancelados
+  - Motivo obrigatório ao reativar (salvo nos comentários)
 
 ### 6. **PWA Support**
 - ✅ **Service Worker**: Configurado com next-pwa
