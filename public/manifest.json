@@ -61,13 +61,23 @@
   "shortcuts": [
     {
       "name": "Novo Chamado",
-      "url": "/tickets/new",
-      "description": "Criar novo chamado técnico"
+      "url": "/dashboard/tickets/new",
+      "description": "Criar novo chamado técnico",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     },
     {
       "name": "Dashboard",
       "url": "/dashboard",
-      "description": "Ver estatísticas"
+      "description": "Ver estatísticas",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Meus Tickets",
+      "url": "/dashboard/tickets",
+      "description": "Ver meus chamados",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     }
-  ]
+  ],
+  "prefer_related_applications": false,
+  "related_applications": []
 }

@@ -106,28 +106,28 @@ const CategoryCard = ({ category }: { category: CategoryStat }) => {
   
   return (
     <div 
-      className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6"
+      className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3 sm:p-4 md:p-6"
       style={{ borderLeft: `4px solid ${borderColor}` }}
     >
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center">
+      <div className="flex items-start justify-between mb-3 sm:mb-4">
+        <div className="flex items-center flex-1 min-w-0">
           <div 
-            className="p-2 rounded-lg mr-3"
+            className="p-1.5 sm:p-2 rounded-lg mr-2 sm:mr-3 flex-shrink-0"
             style={{ backgroundColor, color: borderColor }}
           >
-            <Icon className="h-5 w-5" />
+            <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+          <div className="min-w-0 flex-1">
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white truncate">
               {category.nome}
             </h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">
               {category.percentual}% do total
             </p>
           </div>
         </div>
-        <div className="text-right">
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">
+        <div className="text-right ml-2 flex-shrink-0">
+          <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             {category.quantidade}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -137,42 +137,42 @@ const CategoryCard = ({ category }: { category: CategoryStat }) => {
       </div>
       
       {/* Status breakdown bar */}
-      <div className="mt-4">
+      <div className="mt-3 sm:mt-4">
         <div className="flex h-2 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700">
           {category.status_breakdown.open > 0 && (
             <div 
-              className="bg-blue-500" 
+              className="bg-blue-500 transition-all duration-300" 
               style={{ width: `${(category.status_breakdown.open / category.quantidade) * 100}%` }}
               title={`Abertos: ${category.status_breakdown.open}`}
             />
           )}
           {category.status_breakdown.in_progress > 0 && (
             <div 
-              className="bg-yellow-500" 
+              className="bg-yellow-500 transition-all duration-300" 
               style={{ width: `${(category.status_breakdown.in_progress / category.quantidade) * 100}%` }}
               title={`Em Progresso: ${category.status_breakdown.in_progress}`}
             />
           )}
           {category.status_breakdown.resolved > 0 && (
             <div 
-              className="bg-green-500" 
+              className="bg-green-500 transition-all duration-300" 
               style={{ width: `${(category.status_breakdown.resolved / category.quantidade) * 100}%` }}
               title={`Resolvidos: ${category.status_breakdown.resolved}`}
             />
           )}
           {category.status_breakdown.cancelled > 0 && (
             <div 
-              className="bg-red-500" 
+              className="bg-red-500 transition-all duration-300" 
               style={{ width: `${(category.status_breakdown.cancelled / category.quantidade) * 100}%` }}
               title={`Cancelados: ${category.status_breakdown.cancelled}`}
             />
           )}
         </div>
-        <div className="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
-          <span>A: {category.status_breakdown.open}</span>
-          <span>P: {category.status_breakdown.in_progress}</span>
-          <span>R: {category.status_breakdown.resolved}</span>
-          <span>C: {category.status_breakdown.cancelled}</span>
+        <div className="flex justify-between mt-1.5 sm:mt-2 text-xs text-gray-500 dark:text-gray-400">
+          <span className="truncate">A: {category.status_breakdown.open}</span>
+          <span className="truncate">P: {category.status_breakdown.in_progress}</span>
+          <span className="truncate">R: {category.status_breakdown.resolved}</span>
+          <span className="truncate">C: {category.status_breakdown.cancelled}</span>
         </div>
       </div>
     </div>
@@ -372,17 +372,17 @@ export default function DashboardPage() {
         
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         >
-          <Calendar className="h-4 w-4" />
-          <span className="text-sm">
+          <Calendar className="h-4 w-4 flex-shrink-0" />
+          <span className="text-xs sm:text-sm truncate">
             {periodFilter.start_date === getCurrentMonthDates().start_date && 
              periodFilter.end_date === getCurrentMonthDates().end_date
               ? 'Mês Atual'
               : `${formatDateShort(periodFilter.start_date)} - ${formatDateShort(periodFilter.end_date)}`
             }
           </span>
-          <Filter className="h-4 w-4" />
+          <Filter className="h-4 w-4 flex-shrink-0" />
         </button>
       </div>
 
@@ -416,16 +416,16 @@ export default function DashboardPage() {
               />
             </div>
           </div>
-          <div className="flex gap-2 mt-4">
+          <div className="flex flex-col sm:flex-row gap-2 mt-4">
             <button
               onClick={handleApplyFilter}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+              className="flex-1 sm:flex-initial px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium"
             >
               Aplicar Filtro
             </button>
             <button
               onClick={handleResetFilter}
-              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm"
+              className="flex-1 sm:flex-initial px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 active:bg-gray-400 dark:active:bg-gray-800 transition-colors text-sm font-medium"
             >
               Limpar Filtro
             </button>
@@ -433,12 +433,17 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Period Info */}
+      {/* Period Info - Responsive */}
       {categoryStats && (
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-          <p className="text-sm text-blue-800 dark:text-blue-300">
-            <span className="font-medium">Período analisado:</span> {formatDateShort(categoryStats.periodo.data_inicio)} até {formatDateShort(categoryStats.periodo.data_fim)}
-            <span className="ml-2">• <strong>{categoryStats.total_tickets}</strong> tickets no período</span>
+          <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-300">
+            <span className="font-medium block sm:inline">Período analisado:</span>
+            <span className="block sm:inline sm:ml-1">
+              {formatDateShort(categoryStats.periodo.data_inicio)} até {formatDateShort(categoryStats.periodo.data_fim)}
+            </span>
+            <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
+              • <strong>{categoryStats.total_tickets}</strong> tickets no período
+            </span>
           </p>
         </div>
       )}
@@ -450,7 +455,7 @@ export default function DashboardPage() {
             <PieChartIcon className="h-5 w-5" />
             Tickets por Categoria
           </h2>
-          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {categoryStats.categorias.map((category) => (
               <CategoryCard key={category.id} category={category} />
             ))}
