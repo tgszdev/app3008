@@ -365,8 +365,105 @@ export default function TicketsPage() {
         </div>
       </div>
 
-      {/* Tickets Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+      {/* Mobile Cards View - Visible on small screens */}
+      <div className="block lg:hidden space-y-3">
+        {filteredTickets.length === 0 ? (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 text-center">
+            <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+            <p className="text-gray-500 dark:text-gray-400 mb-4">
+              Nenhum chamado encontrado
+            </p>
+            <Link
+              href="/dashboard/tickets/new"
+              className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Criar Primeiro Chamado
+            </Link>
+          </div>
+        ) : (
+          filteredTickets.map((ticket) => {
+            const status = statusConfig[ticket.status]
+            const priority = priorityConfig[ticket.priority]
+            const StatusIcon = status.icon
+
+            return (
+              <div key={ticket.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+                {/* Header */}
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex-1">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <span className="text-xs font-mono text-gray-500">#{ticket.ticket_number}</span>
+                      <span className={cn(
+                        "inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full",
+                        status.color
+                      )}>
+                        <StatusIcon className="h-3 w-3 mr-1" />
+                        {status.label}
+                      </span>
+                      <span className={cn(
+                        "inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full",
+                        priority.color
+                      )}>
+                        {priority.label}
+                      </span>
+                    </div>
+                    <Link
+                      href={`/dashboard/tickets/${ticket.id}`}
+                      className="text-base font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 line-clamp-2"
+                    >
+                      {ticket.title}
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Info */}
+                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-1">
+                    <User className="h-3 w-3" />
+                    <span>{ticket.created_by_user?.name || 'Desconhecido'}</span>
+                  </div>
+                  
+                  {ticket.assigned_to_user && (
+                    <div className="flex items-center gap-1">
+                      <User className="h-3 w-3" />
+                      <span>→ {ticket.assigned_to_user.name}</span>
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-3 w-3" />
+                    <span>{getTimeAgo(ticket.created_at)}</span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center justify-end gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                  <Link
+                    href={`/dashboard/tickets/${ticket.id}`}
+                    className="flex-1 text-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    <Eye className="h-4 w-4 inline mr-1" />
+                    Ver Detalhes
+                  </Link>
+                  {session?.user?.role === 'admin' && (
+                    <button
+                      onClick={() => handleDeleteTicket(ticket.id)}
+                      className="p-1.5 text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                      title="Excluir"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            )
+          })
+        )}
+      </div>
+
+      {/* Desktop Table View - Hidden on small screens */}
+      <div className="hidden lg:block bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-900">

@@ -73,6 +73,32 @@ interface UserFormData {
   password?: string
 }
 
+const getRoleBadgeColor = (role: string) => {
+  switch (role) {
+    case 'admin':
+      return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300'
+    case 'analyst':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
+    case 'user':
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300'
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300'
+  }
+}
+
+const getRoleLabel = (role: string) => {
+  switch (role) {
+    case 'admin':
+      return 'Administrador'
+    case 'analyst':
+      return 'Analista'
+    case 'user':
+      return 'Usuário'
+    default:
+      return role
+  }
+}
+
 export default function UsersPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
@@ -409,8 +435,54 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {/* Users Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+      {/* Mobile Cards View - Visible on small screens */}
+      <div className="block md:hidden space-y-3">
+        {filteredUsers.map((user) => (
+          <div key={user.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+            <div className="flex justify-between items-start mb-2">
+              <div>
+                <h3 className="font-medium text-gray-900 dark:text-white">{user.name}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{user.email}</p>
+              </div>
+              <span className={`px-2 py-1 text-xs rounded-full ${
+                user.is_active
+                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                  : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+              }`}>
+                {user.is_active ? 'Ativo' : 'Inativo'}
+              </span>
+            </div>
+            
+            <div className="flex items-center justify-between text-sm">
+              <span className={`px-2 py-1 rounded-full text-xs ${getRoleBadgeColor(user.role)}`}>
+                {getRoleLabel(user.role)}
+              </span>
+              
+              {session?.user?.role === 'admin' && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleEditUser(user)}
+                    className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </button>
+                  {user.email !== 'admin@example.com' && (
+                    <button
+                      onClick={() => handleDeleteUser(user.id)}
+                      className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Table View - Hidden on small screens */}
+      <div className="hidden md:block bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-900">

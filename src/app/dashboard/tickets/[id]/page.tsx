@@ -393,20 +393,21 @@ export default function TicketDetailsPage() {
   const PriorityIcon = priorityConfig[ticket.priority].icon
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6">
         <button
           onClick={() => router.push('/dashboard/tickets')}
-          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-4"
+          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-4 text-sm sm:text-base"
         >
           <ArrowLeft size={20} />
-          Voltar
+          <span className="hidden sm:inline">Voltar para Chamados</span>
+          <span className="sm:hidden">Voltar</span>
         </button>
         
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 break-all">
               Chamado #{ticket.ticket_number?.toString().padStart(10, '0') || ticket.id.slice(0, 8)}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
@@ -474,12 +475,12 @@ export default function TicketDetailsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        {/* Main Content - Order 2 on mobile, Order 1 on desktop */}
+        <div className="order-2 lg:order-1 lg:col-span-2 space-y-4 sm:space-y-6">
           {/* Ticket Details */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-xl font-bold mb-4">{ticket.title}</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-bold mb-4 break-words">{ticket.title}</h2>
             
             <div className="prose dark:prose-invert max-w-none">
               <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Descrição</h3>
@@ -591,11 +592,11 @@ export default function TicketDetailsPage() {
           </div>
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
+        {/* Sidebar - Order 1 on mobile, Order 2 on desktop */}
+        <div className="order-1 lg:order-2 space-y-4 sm:space-y-6">
           {/* Ticket Info */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-xl font-bold mb-4">Informações</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-bold mb-4">Informações</h2>
             
             <div className="space-y-4">
               {/* Solicitante */}
@@ -769,9 +770,9 @@ export default function TicketDetailsPage() {
 
       {/* Modal de Cancelamento */}
       {showCancelModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
-            <h2 className="text-xl font-bold mb-4">Cancelar Ticket</h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <h2 className="text-lg sm:text-xl font-bold mb-4">Cancelar Ticket</h2>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               Para cancelar este ticket, você deve informar o motivo do cancelamento.
             </p>
@@ -807,9 +808,9 @@ export default function TicketDetailsPage() {
 
       {/* Modal de Reativação */}
       {showReactivateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
-            <h2 className="text-xl font-bold mb-4">Reativar Ticket</h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <h2 className="text-lg sm:text-xl font-bold mb-4">Reativar Ticket</h2>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               Para reativar este ticket cancelado, você deve informar o motivo da reativação.
             </p>
