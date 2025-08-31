@@ -104,7 +104,27 @@
 - ✅ **Integração Supabase Storage**: Armazenamento seguro em bucket dedicado
 - ✅ **Validação**: Verificação de tipo e tamanho de arquivo
 
-## 📈 APIs de Dashboard e Analytics
+### 9. **Gerenciamento de Categorias (NOVO)**
+- ✅ **CRUD Completo de Categorias**: Criar, listar, editar e excluir
+- ✅ **Campos Personalizáveis**: Nome, descrição, ícone e cor
+- ✅ **Ordenação**: Sistema de ordenação com setas up/down
+- ✅ **Status**: Ativar/desativar categorias
+- ✅ **Validações**: Não permite excluir categorias com tickets
+- ✅ **Slug Automático**: Geração automática de URL amigável
+- ✅ **Migração de Dados**: Script SQL para migrar categorias existentes
+- ✅ **Interface Admin**: Página exclusiva para administradores
+- ✅ **API RESTful**: Endpoints completos em `/api/categories`
+- ✅ **10 Categorias Padrão**: Geral, Hardware, Software, Rede, etc.
+- ✅ **Upload de Arquivos**: Anexar arquivos aos chamados (máx. 10MB)
+- ✅ **Tipos Suportados**: Imagens (PNG, JPG, GIF), Documentos (PDF, DOC, DOCX, XLS, XLSX, TXT)
+- ✅ **Visualização**: Preview de imagens diretamente na página
+- ✅ **Download**: Baixar anexos dos chamados
+- ✅ **Integração Supabase Storage**: Armazenamento seguro em bucket dedicado
+- ✅ **Validação**: Verificação de tipo e tamanho de arquivo
+
+## 📈 APIs Disponíveis
+
+### Dashboard e Analytics
 
 ### `/api/dashboard/stats`
 - **Método**: GET
@@ -126,6 +146,12 @@
   - Distribuição por prioridade
   - Top performers (analistas)
   - Métricas de desempenho
+
+### `/api/categories`
+- **GET**: Lista todas as categorias (com filtro `?active_only=true`)
+- **POST**: Cria nova categoria (admin only)
+- **PUT**: Atualiza categoria (admin only)
+- **DELETE**: Exclui categoria (admin only, `?id=uuid`)
 
 ## 📊 Estrutura de Dados
 
@@ -172,6 +198,22 @@
 - is_internal: BOOLEAN
 - created_at: TIMESTAMP
 - updated_at: TIMESTAMP
+```
+
+### Tabela: `categories` (NOVA)
+```sql
+- id: UUID (PK)
+- name: VARCHAR(100) (unique)
+- slug: VARCHAR(100) (unique)
+- description: TEXT
+- icon: VARCHAR(50)
+- color: VARCHAR(7)
+- is_active: BOOLEAN
+- display_order: INTEGER
+- created_at: TIMESTAMP
+- updated_at: TIMESTAMP
+- created_by: UUID (FK users)
+- updated_by: UUID (FK users)
 ```
 
 ## 🔐 Credenciais de Teste

@@ -20,6 +20,7 @@ import {
   MessageSquare,
   FileText,
   Loader2,
+  Folder,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
@@ -34,6 +35,7 @@ const navigation = [
 
 const adminNavigation = [
   { name: 'Usuários', href: '/dashboard/users', icon: Users },
+  { name: 'Categorias', href: '/dashboard/categories', icon: Folder },
   { name: 'Configurações', href: '/dashboard/settings', icon: Settings },
 ]
 
