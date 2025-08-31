@@ -2,7 +2,7 @@
 
 ## ✅ Deploy Realizado com Sucesso!
 
-**Data/Hora**: 31/08/2025 16:42 (horário do servidor)  
+**Data/Hora**: 31/08/2025 17:00 (horário do servidor)  
 **URL de Produção**: https://app3008-two.vercel.app  
 **Status**: Online e Funcionando
 
@@ -17,6 +17,12 @@
 - ✅ Campo "Data de Vencimento" removido para usuários com role "user" 
 - ✅ Apenas admin e analyst podem definir SLA/prazo dos tickets
 - ✅ Página de teste atualizada com nova permissão
+
+### Commit: `feat: Remove delete permission from analyst role and add cancelled status`
+- ✅ **Analysts não podem mais excluir tickets** - apenas Admin pode excluir
+- ✅ **Novo status "Cancelado"** adicionado ao sistema de tickets
+- ✅ Status aparece em vermelho para fácil identificação
+- ✅ Disponível no filtro de listagem e na mudança de status
 
 ### Commit: `chore: Force Vercel redeploy with region configuration`
 - ✅ Configuração de região adicionada (gru1 - São Paulo)
@@ -38,7 +44,8 @@
 | Atribuir analistas | ✅ | ✅ | ❌ |
 | Definir data vencimento | ✅ | ✅ | ❌ |
 | Alterar status | ✅ | ✅ | ❌ |
-| Excluir tickets | ✅ | ✅ | ❌ |
+| Cancelar tickets | ✅ | ✅ | ❌ |
+| Excluir tickets | ✅ | ❌ | ❌ |
 | Gerenciar usuários | ✅ | ❌ | ❌ |
 
 ## 🛠️ Comandos Utilizados
