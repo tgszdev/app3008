@@ -17,7 +17,10 @@
 
 ### 1. **Autenticação e Autorização**
 - ✅ Sistema de login com NextAuth.js v5
-- ✅ 3 níveis de acesso: Admin, Analyst, User
+- ✅ **3 níveis de acesso com permissões diferenciadas**:
+  - **Admin**: Acesso total ao sistema
+  - **Analyst**: Gerenciamento completo de tickets, sem acesso a usuários
+  - **User**: Criar tickets, adicionar comentários e anexos (sem alteração de status)
 - ✅ **Proteção de rotas com middleware (Edge Runtime)**
 - ✅ **Proteção server-side em todas as páginas**
 - ✅ **APIs protegidas com verificação de sessão**
@@ -58,6 +61,9 @@
 - ✅ **Histórico**: Registro de todas as alterações
 - ✅ **Filtros**: Por status, prioridade, usuário
 - ✅ **Relacionamentos**: Integração com tabela de usuários
+- ✅ **Permissões por Perfil**:
+  - Admin/Analyst: Todas as ações
+  - User: Apenas criar, visualizar, comentar e anexar arquivos
 
 ### 6. **PWA Support**
 - ✅ **Service Worker**: Configurado com next-pwa
@@ -254,9 +260,9 @@ pm2 start ecosystem.config.cjs
 5. **Deploy no Vercel**: Configurar variáveis de ambiente e deploy
 
 ## 📊 Status do Projeto
-- **Versão**: 1.3.0
+- **Versão**: 1.4.0
 - **Status**: ✅ Em Produção
-- **Última Atualização**: 31/08/2025 - 23:00
+- **Última Atualização**: 01/09/2025 - 00:30
 - **Ambiente**: Vercel + Supabase
 - **Banco de Dados**: ✅ Conectado e Funcional
 - **Total de Usuários**: 6
@@ -264,6 +270,20 @@ pm2 start ecosystem.config.cjs
 - **Deploy**: ✅ Atualizado no Vercel
 
 ## 🆕 Últimas Atualizações
+
+### v1.4.0 - Permissões por Perfil em Tickets
+- **🔒 Restrições para Usuários (role: user)**:
+  - Não podem excluir tickets
+  - Não podem alterar status de tickets  
+  - Não podem atribuir responsável aos tickets
+- **👥 Permissões Completas (admin/analyst)**:
+  - Podem excluir tickets
+  - Podem alterar status
+  - Podem atribuir responsável
+- **💬 Interface Adaptativa**:
+  - Botões são exibidos/ocultados baseado no perfil
+  - Mensagem informativa para usuários sobre suas limitações
+  - Usuários ainda podem adicionar comentários e anexos
 
 ### v1.3.0 - Proteção Completa de Rotas
 - **🔒 Middleware de Autenticação**: Implementado middleware que bloqueia acesso a rotas protegidas sem login
