@@ -20,13 +20,17 @@
 - ✅ **3 níveis de acesso com permissões diferenciadas**:
   - **Admin**: Acesso total ao sistema
   - **Analyst**: Gerenciamento completo de tickets, sem acesso a usuários
-  - **User**: Criar tickets, adicionar comentários e anexos (sem alteração de status)
+  - **User**: Criar tickets, adicionar comentários e anexos (sem alteração de status, sem atribuir analistas)
 - ✅ **Proteção de rotas com middleware (Edge Runtime)**
 - ✅ **Proteção server-side em todas as páginas**
 - ✅ **APIs protegidas com verificação de sessão**
 - ✅ Sessão JWT persistente
 - ✅ **Logout com limpeza completa de cookies**
 - ✅ **Redirecionamento automático para login quando não autenticado**
+- ✅ **Controle de permissões baseado em role**:
+  - Usuários com role "user" não podem atribuir analistas
+  - Usuários com role "user" não podem excluir tickets
+  - Usuários com role "user" não podem alterar status de tickets
 
 ### 2. **Gerenciamento de Usuários (CRUD Completo)**
 - ✅ **Listagem**: Exibição de todos os usuários do banco
