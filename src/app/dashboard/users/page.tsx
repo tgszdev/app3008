@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit, Trash2, UserCheck, UserX, Shield, User as UserIcon, X, Save, Loader2 } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, UserCheck, UserX, Shield, User as UserIcon, X, Save, Loader2, Key } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 import axios from 'axios'
+import { useSession } from 'next-auth/react'
 
 const RoleBadge = ({ role }: { role: string }) => {
   const config: Record<string, { color: string; icon: any; label: string }> = {
@@ -72,14 +73,19 @@ interface UserFormData {
 }
 
 export default function UsersPage() {
+  const { data: session } = useSession()
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
   const [showModal, setShowModal] = useState(false)
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [editingUser, setEditingUser] = useState<User | null>(null)
+  const [passwordChangeUser, setPasswordChangeUser] = useState<User | null>(null)
   const [saving, setSaving] = useState(false)
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [formData, setFormData] = useState<UserFormData>({
     name: '',
     email: '',
@@ -88,6 +94,10 @@ export default function UsersPage() {
     phone: '',
     password: '',
   })
+
+  // Verificar se o usuário atual é admin
+  const currentUserRole = (session?.user as any)?.role
+  const isCurrentUserAdmin = currentUserRole === 'admin'
 
   // Buscar usuários do banco
   const fetchUsers = async () => {
@@ -185,6 +195,25 @@ export default function UsersPage() {
   }
 
   const handleEditUser = (user: User) => {
+    // Se o usuário atual for admin, abrir modal com opção de alterar senha
+    if (isCurrentUserAdmin) {
+      setPasswordChangeUser(user)
+      setShowPasswordModal(true)
+    } else {
+      // Se não for admin, abrir modal normal de edição
+      setEditingUser(user)
+      setFormData({
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        department: user.department || '',
+        phone: user.phone || '',
+      })
+      setShowModal(true)
+    }
+  }
+
+  const handleEditUserInfo = (user: User) => {
     setEditingUser(user)
     setFormData({
       name: user.name,
@@ -194,6 +223,45 @@ export default function UsersPage() {
       phone: user.phone || '',
     })
     setShowModal(true)
+    setShowPasswordModal(false)
+  }
+
+  const handleChangePassword = async () => {
+    // Validação
+    if (!newPassword || !confirmPassword) {
+      toast.error('Por favor, preencha todos os campos!')
+      return
+    }
+
+    if (newPassword.length < 6) {
+      toast.error('A senha deve ter pelo menos 6 caracteres!')
+      return
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error('As senhas não coincidem!')
+      return
+    }
+
+    setSaving(true)
+
+    try {
+      await axios.put('/api/users/change-password', {
+        userId: passwordChangeUser?.id,
+        newPassword: newPassword,
+      })
+
+      toast.success('Senha alterada com sucesso!')
+      setShowPasswordModal(false)
+      setPasswordChangeUser(null)
+      setNewPassword('')
+      setConfirmPassword('')
+    } catch (error: any) {
+      console.error('Erro ao alterar senha:', error)
+      toast.error(error.response?.data?.error || 'Erro ao alterar senha')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleOpenNewUserModal = () => {
@@ -415,6 +483,138 @@ export default function UsersPage() {
           </div>
         </div>
       </div>
+
+      {/* Modal de Escolha de Ação para Admin */}
+      {showPasswordModal && isCurrentUserAdmin ? (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center p-4"
+          style={{ zIndex: 9999 }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowPasswordModal(false)
+              setPasswordChangeUser(null)
+              setNewPassword('')
+              setConfirmPassword('')
+            }
+          }}
+        >
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-2xl"
+               onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                Editar Usuário: {passwordChangeUser?.name}
+              </h2>
+              <button
+                onClick={() => {
+                  setShowPasswordModal(false)
+                  setPasswordChangeUser(null)
+                  setNewPassword('')
+                  setConfirmPassword('')
+                }}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  Escolha o que deseja fazer:
+                </p>
+                
+                <div className="space-y-3">
+                  <button
+                    onClick={() => handleEditUserInfo(passwordChangeUser!)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    <div className="flex items-center">
+                      <Edit className="h-5 w-5 mr-3 text-blue-600" />
+                      <div className="text-left">
+                        <p className="font-medium text-gray-900 dark:text-white">Editar Informações</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Alterar nome, perfil, departamento</p>
+                      </div>
+                    </div>
+                  </button>
+
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-gray-50 dark:bg-gray-900 px-2 text-gray-500 dark:text-gray-400">ou</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">
+                    <div className="flex items-start">
+                      <Key className="h-5 w-5 mr-3 text-orange-600 dark:text-orange-400 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900 dark:text-white mb-3">Alterar Senha</p>
+                        
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Nova Senha
+                            </label>
+                            <input
+                              type="password"
+                              value={newPassword}
+                              onChange={(e) => setNewPassword(e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                              placeholder="Mínimo 6 caracteres"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Confirmar Nova Senha
+                            </label>
+                            <input
+                              type="password"
+                              value={confirmPassword}
+                              onChange={(e) => setConfirmPassword(e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                              placeholder="Digite a senha novamente"
+                            />
+                          </div>
+
+                          <button
+                            onClick={handleChangePassword}
+                            className="w-full px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center disabled:opacity-50"
+                            disabled={saving || !newPassword || !confirmPassword}
+                          >
+                            {saving ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                Alterando...
+                              </>
+                            ) : (
+                              <>
+                                <Key className="h-4 w-4 mr-2" />
+                                Alterar Senha
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
+                <div className="flex items-start">
+                  <Shield className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                  <p className="text-xs text-blue-800 dark:text-blue-300">
+                    <strong>Atenção:</strong> Apenas administradores podem alterar senhas de outros usuários. Esta ação não pode ser desfeita.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {/* Modal de Criar/Editar Usuário */}
       {showModal ? (
