@@ -5,6 +5,27 @@ import bcrypt from 'bcryptjs'
 // GET - Listar todos os usuários
 export async function GET(request: NextRequest) {
   try {
+    // Verificar se as variáveis de ambiente estão configuradas
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.error('Variáveis de ambiente do Supabase não configuradas')
+      
+      // Retornar dados de exemplo para desenvolvimento
+      const mockUsers = [
+        {
+          id: '1',
+          email: 'admin@example.com',
+          name: 'Administrador (Mock - Configure Supabase)',
+          role: 'admin',
+          department: 'TI',
+          is_active: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }
+      ]
+      
+      return NextResponse.json(mockUsers)
+    }
+
     const { data: users, error } = await supabaseAdmin
       .from('users')
       .select('*')
@@ -12,7 +33,20 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Erro ao buscar usuários:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      
+      // Log mais detalhado
+      console.error('Detalhes do erro:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      })
+      
+      return NextResponse.json({ 
+        error: error.message,
+        code: error.code,
+        hint: 'Verifique se as variáveis de ambiente estão configuradas no Vercel'
+      }, { status: 500 })
     }
 
     // Remover password_hash dos resultados
@@ -21,7 +55,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(sanitizedUsers)
   } catch (error: any) {
     console.error('Erro no servidor:', error)
-    return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
+    return NextResponse.json({ 
+      error: 'Erro interno do servidor',
+      message: error.message,
+      hint: 'Verifique as configurações do Supabase no Vercel'
+    }, { status: 500 })
   }
 }
 

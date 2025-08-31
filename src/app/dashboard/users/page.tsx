@@ -93,10 +93,42 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     try {
       const response = await axios.get('/api/users')
-      setUsers(response.data)
+      
+      // Verificar se a resposta é um array
+      if (Array.isArray(response.data)) {
+        setUsers(response.data)
+        console.log(`Carregados ${response.data.length} usuários do banco`)
+      } else {
+        console.error('Resposta inválida da API:', response.data)
+        toast.error('Formato de dados inválido')
+        
+        // Tentar debug endpoint
+        try {
+          const debugResponse = await axios.get('/api/users/debug')
+          console.log('Debug info:', debugResponse.data)
+        } catch (debugError) {
+          console.error('Debug endpoint falhou:', debugError)
+        }
+      }
     } catch (error: any) {
       console.error('Erro ao buscar usuários:', error)
-      toast.error('Erro ao carregar usuários')
+      
+      // Mensagem de erro mais específica
+      if (error.response?.status === 500) {
+        toast.error('Erro no servidor. Verifique as configurações do Supabase.')
+      } else if (error.response?.status === 404) {
+        toast.error('API não encontrada')
+      } else {
+        toast.error('Erro ao carregar usuários')
+      }
+      
+      // Tentar debug endpoint em caso de erro
+      try {
+        const debugResponse = await axios.get('/api/users/debug')
+        console.log('Debug info após erro:', debugResponse.data)
+      } catch (debugError) {
+        console.error('Debug endpoint falhou:', debugError)
+      }
     } finally {
       setLoading(false)
     }
