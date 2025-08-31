@@ -13,6 +13,11 @@
 - ✅ Apenas admin e analyst podem ver e usar o campo de atribuição
 - ✅ Página de teste criada em `/test-role` para verificar permissões
 
+### Commit: `fix: Hide due date field from users with role 'user'`
+- ✅ Campo "Data de Vencimento" removido para usuários com role "user" 
+- ✅ Apenas admin e analyst podem definir SLA/prazo dos tickets
+- ✅ Página de teste atualizada com nova permissão
+
 ### Commit: `chore: Force Vercel redeploy with region configuration`
 - ✅ Configuração de região adicionada (gru1 - São Paulo)
 - ✅ Deploy forçado com sucesso
@@ -22,7 +27,7 @@
 1. **Acesse a aplicação**: https://app3008-two.vercel.app/login
 2. **Faça login com um usuário que tenha role "user"**
 3. **Vá para**: https://app3008-two.vercel.app/dashboard/tickets/new
-4. **Verifique**: O campo "Atribuir para" NÃO deve aparecer
+4. **Verifique**: Os campos "Atribuir para" e "Data de Vencimento" NÃO devem aparecer
 
 ## 📊 Resumo das Permissões por Role
 
@@ -31,6 +36,7 @@
 | Criar tickets | ✅ | ✅ | ✅ |
 | Ver tickets | ✅ | ✅ | ✅ |
 | Atribuir analistas | ✅ | ✅ | ❌ |
+| Definir data vencimento | ✅ | ✅ | ❌ |
 | Alterar status | ✅ | ✅ | ❌ |
 | Excluir tickets | ✅ | ✅ | ❌ |
 | Gerenciar usuários | ✅ | ❌ | ❌ |
