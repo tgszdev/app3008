@@ -9,7 +9,9 @@
 - **Desenvolvimento**: https://3000-inf71qwtpa8mbn30ykzsp-6532622b.e2b.dev
 - **Login**: `/login`
 - **Dashboard**: `/dashboard`
+- **Chamados**: `/dashboard/tickets`
 - **Gerenciamento de Usuários**: `/dashboard/users`
+- **Supabase Dashboard**: https://supabase.com/dashboard/project/eyfvvximmeqmwdfqzqov
 
 ## ✅ Funcionalidades Implementadas
 
@@ -43,10 +45,21 @@
 - ✅ **Loading States**: Indicadores de carregamento
 - ✅ **Modais**: Sistema de modais para criar/editar
 
-### 5. **PWA Support**
+### 5. **Gerenciamento de Chamados (Tickets)**
+- ✅ **CRUD Completo**: Criar, listar, editar, excluir chamados
+- ✅ **Status**: open, in_progress, resolved, closed
+- ✅ **Prioridades**: low, medium, high, critical
+- ✅ **Categorias**: general, hardware, software, network, etc.
+- ✅ **Atribuição**: Designar chamados para analistas
+- ✅ **Histórico**: Registro de todas as alterações
+- ✅ **Filtros**: Por status, prioridade, usuário
+- ✅ **Relacionamentos**: Integração com tabela de usuários
+
+### 6. **PWA Support**
 - ✅ **Service Worker**: Configurado com next-pwa
 - ✅ **Manifest**: Arquivo de manifesto PWA
 - ✅ **Offline Support**: Cache de assets estáticos
+- ✅ **Instalável**: Pode ser instalado como app
 
 ## 📊 Estrutura de Dados
 
@@ -109,6 +122,20 @@ Usuários:
   Email: user1@example.com / user2@example.com / user3@example.com
   Senha: user123
 ```
+
+## 🚨 CORREÇÃO DO ERRO DE RELACIONAMENTO
+
+### Erro Atual:
+```
+Could not find a relationship between 'tickets' and 'users' in the schema cache
+```
+
+### Solução Rápida:
+1. Acesse o SQL Editor do Supabase
+2. Execute o script: `/home/user/webapp/supabase/fix-relationships.sql`
+3. Teste criando um novo chamado
+
+**Instruções detalhadas em:** `/home/user/webapp/SOLUCAO_RAPIDA_ERRO_TICKETS.md`
 
 ## 🚀 Como Executar
 

@@ -83,6 +83,12 @@ export default function NewTicketPage() {
 
       const response = await axios.post('/api/tickets', ticketData)
       
+      console.log('=== DEBUG CRIAÇÃO DE TICKET ===')
+      console.log('Resposta da API:', response.data)
+      console.log('ID do ticket criado:', response.data.id)
+      console.log('Título do ticket criado:', response.data.title)
+      console.log('Redirecionando para:', `/dashboard/tickets/${response.data.id}`)
+      
       toast.success('Chamado criado com sucesso!')
       router.push(`/dashboard/tickets/${response.data.id}`)
     } catch (error: any) {

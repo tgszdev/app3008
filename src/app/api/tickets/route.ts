@@ -97,15 +97,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    // Criar registro no histórico
-    await supabaseAdmin
-      .from('ticket_history')
-      .insert({
-        ticket_id: newTicket.id,
-        user_id: created_by,
-        action: 'created',
-        created_at: new Date().toISOString()
-      })
+    console.log('=== DEBUG API CREATE TICKET ===')
+    console.log('Ticket criado:', newTicket)
+    console.log('ID:', newTicket.id)
+    console.log('Título:', newTicket.title)
+
+    // Criar registro no histórico (ignorar erros)
+    try {
+      await supabaseAdmin
+        .from('ticket_history')
+        .insert({
+          ticket_id: newTicket.id,
+          user_id: created_by,
+          action: 'created',
+          created_at: new Date().toISOString()
+        })
+    } catch (historyError) {
+      console.log('Erro ao criar histórico (ignorado):', historyError)
+    }
 
     return NextResponse.json(newTicket, { status: 201 })
   } catch (error: any) {

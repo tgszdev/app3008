@@ -1,142 +1,289 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { ArrowLeft, Clock, User, Calendar, Tag, MessageSquare, Paperclip, Send } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import axios from 'axios'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
+import { ArrowLeft, Clock, User, Tag, AlertCircle, MessageSquare, Paperclip, Edit, Trash2, Send, CheckCircle, XCircle, AlertTriangle, ChevronDown } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useSession } from 'next-auth/react'
 
-// Mock data
-const ticketData = {
-  id: '1',
-  ticket_number: '202412001',
-  title: 'Problema com impressora do 3º andar',
-  description: `A impressora HP LaserJet Pro M404dn localizada no 3º andar não está imprimindo documentos coloridos. 
-  
-  Detalhes do problema:
-  - Impressões em preto e branco funcionam normalmente
-  - Ao tentar imprimir colorido, a impressora faz o processo mas sai em branco
-  - Já tentei reiniciar a impressora mas o problema persiste
-  - O problema começou hoje pela manhã
-  
-  Modelo: HP LaserJet Pro M404dn
-  Localização: 3º andar, sala 302
-  Número de série: BR123456789`,
-  status: 'in_progress',
-  priority: 'high',
-  module: 'Hardware',
-  requester: {
-    name: 'João Silva',
-    email: 'joao.silva@example.com',
-    department: 'Recursos Humanos'
-  },
-  assigned_to: {
-    name: 'Carlos Souza',
-    email: 'carlos.souza@example.com'
-  },
-  created_at: '2024-12-01T10:00:00',
-  updated_at: '2024-12-01T14:00:00',
-  sla_deadline: '2024-12-02T10:00:00',
-  tags: ['impressora', 'hardware', '3-andar'],
-  comments: [
-    {
-      id: '1',
-      user: 'Carlos Souza',
-      content: 'Vou verificar a impressora agora. Pode ser problema com os cartuchos de tinta.',
-      created_at: '2024-12-01T14:00:00',
-      is_internal: false
-    },
-    {
-      id: '2',
-      user: 'Carlos Souza',
-      content: 'Verificar estoque de cartuchos no almoxarifado.',
-      created_at: '2024-12-01T14:30:00',
-      is_internal: true
-    }
-  ]
+interface User {
+  id: string
+  name: string
+  email: string
+  role: string
 }
 
-const StatusBadge = ({ status }: { status: string }) => {
-  const config: Record<string, { color: string; label: string }> = {
-    open: { color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300', label: 'Aberto' },
-    in_progress: { color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300', label: 'Em Progresso' },
-    waiting: { color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300', label: 'Aguardando' },
-    resolved: { color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300', label: 'Resolvido' },
-    closed: { color: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300', label: 'Fechado' },
-  }
-  
-  const { color, label } = config[status] || config.open
-  
-  return (
-    <span className={`px-3 py-1 text-sm font-medium rounded-full ${color}`}>
-      {label}
-    </span>
-  )
+interface Comment {
+  id: string
+  content: string
+  created_at: string
+  user: User
+  is_internal: boolean
 }
 
-const PriorityBadge = ({ priority }: { priority: string }) => {
-  const config: Record<string, { color: string; label: string }> = {
-    low: { color: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300', label: 'Baixa' },
-    medium: { color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300', label: 'Média' },
-    high: { color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300', label: 'Alta' },
-    critical: { color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300', label: 'Crítica' },
-  }
-  
-  const { color, label } = config[priority] || config.medium
-  
-  return (
-    <span className={`px-3 py-1 text-sm font-medium rounded-full ${color}`}>
-      {label}
-    </span>
-  )
+interface Ticket {
+  id: string
+  ticket_number: number
+  title: string
+  description: string
+  status: 'open' | 'in_progress' | 'resolved' | 'closed'
+  priority: 'low' | 'medium' | 'high' | 'critical'
+  category: string
+  created_at: string
+  updated_at: string
+  due_date?: string
+  resolution_notes?: string
+  created_by_user?: User
+  assigned_to_user?: User
+  comments?: Comment[]
 }
 
-// Remover o tipo params do Next.js 15 que está causando erro
-export default function TicketDetailPage() {
+const statusConfig = {
+  open: { label: 'Aberto', color: 'bg-blue-500', icon: AlertCircle },
+  in_progress: { label: 'Em Progresso', color: 'bg-yellow-500', icon: Clock },
+  resolved: { label: 'Resolvido', color: 'bg-green-500', icon: CheckCircle },
+  closed: { label: 'Fechado', color: 'bg-gray-500', icon: XCircle }
+}
+
+const priorityConfig = {
+  low: { label: 'Baixa', color: 'bg-gray-500', icon: ChevronDown },
+  medium: { label: 'Média', color: 'bg-blue-500', icon: AlertCircle },
+  high: { label: 'Alta', color: 'bg-orange-500', icon: AlertTriangle },
+  critical: { label: 'Crítica', color: 'bg-red-500', icon: AlertTriangle }
+}
+
+export default function TicketDetailsPage() {
+  const params = useParams()
   const router = useRouter()
-  const [newComment, setNewComment] = useState('')
-  const [isInternal, setIsInternal] = useState(false)
-  const [status, setStatus] = useState(ticketData.status)
-  const [showStatusModal, setShowStatusModal] = useState(false)
+  const { data: session } = useSession()
+  const ticketId = params?.id as string
+  
+  const [ticket, setTicket] = useState<Ticket | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [comment, setComment] = useState('')
+  const [submittingComment, setSubmittingComment] = useState(false)
+  const [editingStatus, setEditingStatus] = useState(false)
+  const [newStatus, setNewStatus] = useState<string>('')
+  const [users, setUsers] = useState<User[]>([])
+  const [editingAssignee, setEditingAssignee] = useState(false)
+  const [newAssignee, setNewAssignee] = useState<string>('')
 
-  const handleAddComment = () => {
-    if (!newComment.trim()) {
-      toast.error('Digite um comentário')
+  useEffect(() => {
+    if (ticketId) {
+      fetchTicket()
+      fetchUsers()
+    }
+  }, [ticketId])
+
+  const fetchTicket = async () => {
+    try {
+      console.log('=== DEBUG PÁGINA TICKET ===')
+      console.log('Buscando ticket com ID:', ticketId)
+      
+      const response = await axios.get(`/api/tickets/${ticketId}`)
+      
+      console.log('Resposta da API:', response.data)
+      console.log('Título recebido:', response.data.title)
+      
+      setTicket(response.data)
+      setNewStatus(response.data.status)
+      setNewAssignee(response.data.assigned_to || '')
+    } catch (error) {
+      console.error('Erro ao buscar ticket:', error)
+      toast.error('Erro ao carregar ticket')
+      router.push('/dashboard/tickets')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get('/api/users')
+      setUsers(response.data.filter((u: User) => u.role === 'analyst' || u.role === 'admin'))
+    } catch (error) {
+      console.error('Erro ao buscar usuários:', error)
+    }
+  }
+
+  const handleStatusUpdate = async () => {
+    if (!ticket || newStatus === ticket.status) {
+      setEditingStatus(false)
       return
     }
 
-    toast.success('Comentário adicionado com sucesso!')
-    setNewComment('')
+    try {
+      await axios.put('/api/tickets', {
+        id: ticket.id,
+        status: newStatus,
+        updated_by: session?.user?.id
+      })
+      
+      toast.success('Status atualizado com sucesso!')
+      setEditingStatus(false)
+      fetchTicket()
+    } catch (error) {
+      console.error('Erro ao atualizar status:', error)
+      toast.error('Erro ao atualizar status')
+    }
   }
 
-  const handleUpdateStatus = (newStatus: string) => {
-    setStatus(newStatus)
-    setShowStatusModal(false)
-    toast.success(`Status atualizado para: ${newStatus}`)
+  const handleAssigneeUpdate = async () => {
+    if (!ticket) {
+      setEditingAssignee(false)
+      return
+    }
+
+    try {
+      await axios.put('/api/tickets', {
+        id: ticket.id,
+        assigned_to: newAssignee || null,
+        updated_by: session?.user?.id
+      })
+      
+      toast.success('Responsável atualizado com sucesso!')
+      setEditingAssignee(false)
+      fetchTicket()
+    } catch (error) {
+      console.error('Erro ao atualizar responsável:', error)
+      toast.error('Erro ao atualizar responsável')
+    }
   }
+
+  const handleAddComment = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!comment.trim() || !ticket) return
+
+    setSubmittingComment(true)
+    try {
+      await axios.post('/api/tickets/comments', {
+        ticket_id: ticket.id,
+        user_id: session?.user?.id,
+        content: comment,
+        is_internal: false
+      })
+      
+      toast.success('Comentário adicionado!')
+      setComment('')
+      fetchTicket()
+    } catch (error) {
+      console.error('Erro ao adicionar comentário:', error)
+      toast.error('Erro ao adicionar comentário')
+    } finally {
+      setSubmittingComment(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!ticket) return
+    
+    if (!confirm('Tem certeza que deseja excluir este chamado?')) return
+
+    try {
+      await axios.delete(`/api/tickets?id=${ticket.id}`)
+      toast.success('Chamado excluído com sucesso!')
+      router.push('/dashboard/tickets')
+    } catch (error) {
+      console.error('Erro ao excluir chamado:', error)
+      toast.error('Erro ao excluir chamado')
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    )
+  }
+
+  if (!ticket) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h2 className="text-2xl font-bold mb-4">Chamado não encontrado</h2>
+        <button
+          onClick={() => router.push('/dashboard/tickets')}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          Voltar para Chamados
+        </button>
+      </div>
+    )
+  }
+
+  const StatusIcon = statusConfig[ticket.status].icon
+  const PriorityIcon = priorityConfig[ticket.priority].icon
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => router.back()}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
+      <div className="mb-6">
+        <button
+          onClick={() => router.push('/dashboard/tickets')}
+          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-4"
+        >
+          <ArrowLeft size={20} />
+          Voltar
+        </button>
+        
+        <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Chamado #{ticketData.ticket_number}
+            <h1 className="text-3xl font-bold mb-2">
+              Chamado #{ticket.ticket_number?.toString().padStart(10, '0') || ticket.id.slice(0, 8)}
             </h1>
-            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-              Criado em {new Date(ticketData.created_at).toLocaleDateString('pt-BR')}
+            <p className="text-gray-600 dark:text-gray-400">
+              Criado em {format(new Date(ticket.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
             </p>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <StatusBadge status={status} />
-          <PriorityBadge priority={ticketData.priority} />
+          
+          <div className="flex gap-2">
+            {/* Status */}
+            <div className="relative">
+              {editingStatus ? (
+                <div className="flex gap-2">
+                  <select
+                    value={newStatus}
+                    onChange={(e) => setNewStatus(e.target.value)}
+                    className="px-3 py-1 rounded-lg border dark:bg-gray-700"
+                  >
+                    <option value="open">Aberto</option>
+                    <option value="in_progress">Em Progresso</option>
+                    <option value="resolved">Resolvido</option>
+                    <option value="closed">Fechado</option>
+                  </select>
+                  <button
+                    onClick={handleStatusUpdate}
+                    className="px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                  >
+                    Salvar
+                  </button>
+                  <button
+                    onClick={() => setEditingStatus(false)}
+                    className="px-3 py-1 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setEditingStatus(true)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white ${statusConfig[ticket.status].color} hover:opacity-90`}
+                >
+                  <StatusIcon size={16} />
+                  {statusConfig[ticket.status].label}
+                </button>
+              )}
+            </div>
+            
+            {/* Priority */}
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white ${priorityConfig[ticket.priority].color}`}>
+              <PriorityIcon size={16} />
+              {priorityConfig[ticket.priority].label}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -144,183 +291,206 @@ export default function TicketDetailPage() {
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Ticket Details */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {ticketData.title}
-            </h2>
-            <div className="prose dark:prose-invert max-w-none">
-              <p className="whitespace-pre-wrap text-gray-700 dark:text-gray-300">
-                {ticketData.description}
-              </p>
-            </div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h2 className="text-xl font-bold mb-4">{ticket.title}</h2>
             
-            {/* Tags */}
-            <div className="mt-4 flex items-center gap-2">
-              <Tag className="h-4 w-4 text-gray-500" />
-              {ticketData.tags.map((tag) => (
-                <span key={tag} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded">
-                  {tag}
-                </span>
-              ))}
+            <div className="prose dark:prose-invert max-w-none">
+              <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Descrição</h3>
+              <p className="whitespace-pre-wrap">{ticket.description}</p>
             </div>
+
+            {ticket.resolution_notes && (
+              <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                <h3 className="text-sm font-semibold text-green-800 dark:text-green-400 mb-2">Notas de Resolução</h3>
+                <p className="text-green-700 dark:text-green-300">{ticket.resolution_notes}</p>
+              </div>
+            )}
           </div>
 
           {/* Comments */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-              <MessageSquare className="h-5 w-5 mr-2" />
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <MessageSquare size={20} />
               Comentários
-            </h3>
+            </h2>
             
+            {/* Comments List */}
             <div className="space-y-4 mb-6">
-              {ticketData.comments.map((comment) => (
-                <div key={comment.id} className={`p-4 rounded-lg ${comment.is_internal ? 'bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800' : 'bg-gray-50 dark:bg-gray-700'}`}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium text-gray-900 dark:text-white">
-                      {comment.user}
-                    </span>
-                    <div className="flex items-center gap-2">
+              {ticket.comments && ticket.comments.length > 0 ? (
+                ticket.comments.map((comment) => (
+                  <div key={comment.id} className="border-l-2 border-gray-200 dark:border-gray-700 pl-4">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="font-semibold">{comment.user.name}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {format(new Date(comment.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                        </p>
+                      </div>
                       {comment.is_internal && (
-                        <span className="px-2 py-1 bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 text-xs rounded">
+                        <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400 rounded">
                           Interno
                         </span>
                       )}
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {new Date(comment.created_at).toLocaleString('pt-BR')}
-                      </span>
                     </div>
+                    <p className="mt-2">{comment.content}</p>
                   </div>
-                  <p className="text-gray-700 dark:text-gray-300">
-                    {comment.content}
-                  </p>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-gray-500 dark:text-gray-400">Nenhum comentário ainda.</p>
+              )}
             </div>
-            
-            {/* Add Comment */}
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+
+            {/* Add Comment Form */}
+            <form onSubmit={handleAddComment} className="border-t pt-4">
               <textarea
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
                 placeholder="Adicionar comentário..."
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 resize-none"
                 rows={3}
               />
-              <div className="mt-3 flex items-center justify-between">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={isInternal}
-                    onChange={(e) => setIsInternal(e.target.checked)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                    Comentário interno
-                  </span>
-                </label>
+              <div className="flex justify-end mt-2">
                 <button
-                  onClick={handleAddComment}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center"
+                  type="submit"
+                  disabled={submittingComment || !comment.trim()}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Send className="h-4 w-4 mr-2" />
+                  <Send size={16} />
                   Enviar
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Ticket Info */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Informações
-            </h3>
-            <div className="space-y-3">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h2 className="text-xl font-bold mb-4">Informações</h2>
+            
+            <div className="space-y-4">
+              {/* Solicitante */}
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Solicitante</p>
-                <p className="font-medium text-gray-900 dark:text-white">{ticketData.requester.name}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{ticketData.requester.email}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Solicitante</p>
+                <p className="font-semibold">{ticket.created_by_user?.name || 'Desconhecido'}</p>
+                <p className="text-sm text-gray-500">{ticket.created_by_user?.email}</p>
               </div>
-              
+
+              {/* Responsável */}
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Responsável</p>
-                <p className="font-medium text-gray-900 dark:text-white">
-                  {ticketData.assigned_to ? ticketData.assigned_to.name : 'Não atribuído'}
-                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Responsável</p>
+                {editingAssignee ? (
+                  <div className="space-y-2">
+                    <select
+                      value={newAssignee}
+                      onChange={(e) => setNewAssignee(e.target.value)}
+                      className="w-full px-3 py-1 rounded-lg border dark:bg-gray-700"
+                    >
+                      <option value="">Não atribuído</option>
+                      {users.map((user) => (
+                        <option key={user.id} value={user.id}>
+                          {user.name}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleAssigneeUpdate}
+                        className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
+                      >
+                        Salvar
+                      </button>
+                      <button
+                        onClick={() => setEditingAssignee(false)}
+                        className="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-700"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div 
+                    onClick={() => setEditingAssignee(true)}
+                    className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 p-2 -m-2 rounded"
+                  >
+                    {ticket.assigned_to_user ? (
+                      <>
+                        <p className="font-semibold">{ticket.assigned_to_user.name}</p>
+                        <p className="text-sm text-gray-500">{ticket.assigned_to_user.email}</p>
+                      </>
+                    ) : (
+                      <p className="text-gray-500">Não atribuído</p>
+                    )}
+                  </div>
+                )}
               </div>
-              
+
+              {/* Módulo/Categoria */}
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Módulo</p>
-                <p className="font-medium text-gray-900 dark:text-white">{ticketData.module}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Módulo</p>
+                <p className="font-semibold capitalize">{ticket.category}</p>
               </div>
-              
+
+              {/* SLA */}
+              {ticket.due_date && (
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">SLA</p>
+                  <p className="font-semibold">
+                    {format(new Date(ticket.due_date), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                  </p>
+                </div>
+              )}
+
+              {/* Última atualização */}
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">SLA</p>
-                <p className="font-medium text-gray-900 dark:text-white flex items-center">
-                  <Clock className="h-4 w-4 mr-1" />
-                  {new Date(ticketData.sla_deadline).toLocaleString('pt-BR')}
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Última atualização</p>
+                <p className="font-semibold">
+                  {format(new Date(ticket.updated_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                 </p>
               </div>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Ações
-            </h3>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h2 className="text-xl font-bold mb-4">Ações</h2>
+            
             <div className="space-y-2">
               <button
-                onClick={() => setShowStatusModal(true)}
-                className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+                onClick={() => setEditingStatus(true)}
+                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 Alterar Status
               </button>
-              <button className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium rounded-lg transition-colors">
+              
+              <button
+                onClick={() => setEditingAssignee(true)}
+                className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+              >
                 Atribuir Responsável
               </button>
-              <button className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium rounded-lg transition-colors">
-                <Paperclip className="inline h-4 w-4 mr-2" />
+              
+              <button
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2"
+              >
+                <Paperclip size={16} />
                 Adicionar Anexo
               </button>
+              
+              {(session?.user?.role === 'admin' || session?.user?.id === ticket.created_by_user?.id) && (
+                <button
+                  onClick={handleDelete}
+                  className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-2"
+                >
+                  <Trash2 size={16} />
+                  Excluir Chamado
+                </button>
+              )}
             </div>
           </div>
         </div>
       </div>
-
-      {/* Status Modal */}
-      {showStatusModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-sm">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Alterar Status
-            </h3>
-            <div className="space-y-2">
-              {['open', 'in_progress', 'waiting', 'resolved', 'closed'].map((s) => (
-                <button
-                  key={s}
-                  onClick={() => handleUpdateStatus(s)}
-                  className={`w-full px-4 py-2 text-left rounded-lg transition-colors ${
-                    status === s 
-                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' 
-                      : 'hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <StatusBadge status={s} />
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => setShowStatusModal(false)}
-              className="mt-4 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
