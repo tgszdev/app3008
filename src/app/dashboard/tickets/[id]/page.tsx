@@ -141,6 +141,13 @@ export default function TicketDetailsPage() {
     const file = event.target.files?.[0]
     if (!file || !ticket) return
 
+    // Block non-admin users from uploading to cancelled tickets
+    if (ticket.status === 'cancelled' && session?.user?.role !== 'admin') {
+      toast.error('Apenas administradores podem anexar arquivos em tickets cancelados')
+      event.target.value = ''
+      return
+    }
+
     // Validar tamanho (máximo 10MB)
     const maxSize = 10 * 1024 * 1024
     if (file.size > maxSize) {
@@ -312,6 +319,13 @@ export default function TicketDetailsPage() {
       return
     }
 
+    // Block non-admin users from changing assignee on cancelled tickets
+    if (ticket.status === 'cancelled' && session?.user?.role !== 'admin') {
+      toast.error('Apenas administradores podem alterar o responsável de tickets cancelados')
+      setEditingAssignee(false)
+      return
+    }
+
     try {
       await axios.put('/api/tickets', {
         id: ticket.id,
@@ -331,6 +345,12 @@ export default function TicketDetailsPage() {
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!comment.trim() || !ticket) return
+
+    // Block non-admin users from commenting on cancelled tickets
+    if (ticket.status === 'cancelled' && session?.user?.role !== 'admin') {
+      toast.error('Apenas administradores podem comentar em tickets cancelados')
+      return
+    }
 
     setSubmittingComment(true)
     try {
@@ -450,13 +470,20 @@ export default function TicketDetailsPage() {
               ) : (
                 <button
                   onClick={() => {
-                    // Apenas admin e analyst podem alterar status
+                    // Apenas admin e analyst podem alterar status (mas se cancelado, apenas admin)
+                    if (ticket.status === 'cancelled' && session?.user?.role !== 'admin') {
+                      toast.error('Apenas administradores podem alterar o status de tickets cancelados')
+                      return
+                    }
                     if (session?.user?.role === 'admin' || session?.user?.role === 'analyst') {
                       setEditingStatus(true)
                     }
                   }}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white ${statusConfig[ticket.status].color} ${
-                    session?.user?.role === 'admin' || session?.user?.role === 'analyst' ? 'hover:opacity-90 cursor-pointer' : 'cursor-default'
+                    (session?.user?.role === 'admin' || session?.user?.role === 'analyst') && 
+                    (ticket.status !== 'cancelled' || session?.user?.role === 'admin') 
+                      ? 'hover:opacity-90 cursor-pointer' 
+                      : 'cursor-default'
                   }`}
                   disabled={session?.user?.role === 'user'}
                 >
@@ -569,26 +596,37 @@ export default function TicketDetailsPage() {
               )}
             </div>
 
-            {/* Add Comment Form */}
-            <form onSubmit={handleAddComment} className="border-t pt-4">
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Adicionar comentário..."
-                className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 resize-none"
-                rows={3}
-              />
-              <div className="flex justify-end mt-2">
-                <button
-                  type="submit"
-                  disabled={submittingComment || !comment.trim()}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Send size={16} />
-                  Enviar
-                </button>
+            {/* Add Comment Form - Disabled for cancelled tickets unless admin */}
+            {ticket.status === 'cancelled' && session?.user?.role !== 'admin' ? (
+              <div className="border-t pt-4">
+                <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg text-center">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    🔒 Este ticket está cancelado. Apenas administradores podem adicionar comentários.
+                  </p>
+                </div>
               </div>
-            </form>
+            ) : (
+              <form onSubmit={handleAddComment} className="border-t pt-4">
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Adicionar comentário..."
+                  className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 resize-none"
+                  rows={3}
+                  disabled={ticket.status === 'cancelled' && session?.user?.role !== 'admin'}
+                />
+                <div className="flex justify-end mt-2">
+                  <button
+                    type="submit"
+                    disabled={submittingComment || !comment.trim() || (ticket.status === 'cancelled' && session?.user?.role !== 'admin')}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Send size={16} />
+                    Enviar
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
 
@@ -641,13 +679,18 @@ export default function TicketDetailsPage() {
                 ) : (
                   <div 
                     onClick={() => {
-                      // Apenas admin e analyst podem alterar responsável
+                      // Apenas admin e analyst podem alterar responsável (mas se cancelado, apenas admin)
+                      if (ticket.status === 'cancelled' && session?.user?.role !== 'admin') {
+                        toast.error('Apenas administradores podem alterar o responsável de tickets cancelados')
+                        return
+                      }
                       if (session?.user?.role === 'admin' || session?.user?.role === 'analyst') {
                         setEditingAssignee(true)
                       }
                     }}
                     className={`${
-                      session?.user?.role === 'admin' || session?.user?.role === 'analyst' 
+                      (session?.user?.role === 'admin' || session?.user?.role === 'analyst') && 
+                      (ticket.status !== 'cancelled' || session?.user?.role === 'admin')
                         ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700' 
                         : 'cursor-default'
                     } p-2 -m-2 rounded`}
@@ -715,19 +758,27 @@ export default function TicketDetailsPage() {
                 </>
               )}
               
-              <label className="w-full">
-                <input
-                  type="file"
-                  onChange={handleFileUpload}
-                  disabled={uploadingFile}
-                  className="hidden"
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.txt,.zip,.rar"
-                />
-                <div className={`w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2 cursor-pointer ${uploadingFile ? 'opacity-50 cursor-not-allowed' : ''}`}>
+              {/* File Upload - Disabled for cancelled tickets unless admin */}
+              {ticket.status === 'cancelled' && session?.user?.role !== 'admin' ? (
+                <div className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
                   <Paperclip size={16} />
-                  {uploadingFile ? 'Enviando...' : 'Adicionar Anexo'}
+                  <span className="text-gray-600 dark:text-gray-400">Anexos bloqueados</span>
                 </div>
-              </label>
+              ) : (
+                <label className="w-full">
+                  <input
+                    type="file"
+                    onChange={handleFileUpload}
+                    disabled={uploadingFile || (ticket.status === 'cancelled' && session?.user?.role !== 'admin')}
+                    className="hidden"
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.txt,.zip,.rar"
+                  />
+                  <div className={`w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2 cursor-pointer ${uploadingFile ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                    <Paperclip size={16} />
+                    {uploadingFile ? 'Enviando...' : 'Adicionar Anexo'}
+                  </div>
+                </label>
+              )}
               
               {/* Botão de Excluir - Apenas admin */}
               {session?.user?.role === 'admin' && (
@@ -744,11 +795,20 @@ export default function TicketDetailsPage() {
               {ticket.status === 'cancelled' && session?.user?.role !== 'admin' && (
                 <div className="p-4 bg-red-100 dark:bg-red-900/20 rounded-lg text-center border border-red-300 dark:border-red-800">
                   <p className="text-sm text-red-800 dark:text-red-300 font-semibold">
-                    ⚠️ Este ticket foi cancelado
+                    🔒 Ticket Cancelado - Acesso Restrito
                   </p>
-                  <p className="text-xs text-red-700 dark:text-red-400 mt-1">
-                    Apenas administradores podem reativar tickets cancelados.
+                  <p className="text-xs text-red-700 dark:text-red-400 mt-2">
+                    Este ticket foi cancelado e está bloqueado para alterações.
                   </p>
+                  <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+                    Apenas administradores podem:
+                  </p>
+                  <ul className="text-xs text-red-600 dark:text-red-400 mt-1">
+                    <li>• Reativar o ticket</li>
+                    <li>• Adicionar comentários</li>
+                    <li>• Anexar arquivos</li>
+                    <li>• Fazer alterações</li>
+                  </ul>
                 </div>
               )}
               

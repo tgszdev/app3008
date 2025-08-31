@@ -75,6 +75,7 @@
   - Motivo obrigatório ao cancelar (salvo nos comentários)
   - Apenas Admin pode reativar tickets cancelados
   - Motivo obrigatório ao reativar (salvo nos comentários)
+  - **Tickets cancelados são bloqueados**: Apenas Admin pode comentar, anexar arquivos ou fazer alterações
 
 ### 6. **PWA Support**
 - ✅ **Service Worker**: Configurado com next-pwa
