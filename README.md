@@ -18,9 +18,12 @@
 ### 1. **Autenticação e Autorização**
 - ✅ Sistema de login com NextAuth.js v5
 - ✅ 3 níveis de acesso: Admin, Analyst, User
-- ✅ Proteção de rotas com middleware
+- ✅ **Proteção de rotas com middleware (Edge Runtime)**
+- ✅ **Proteção server-side em todas as páginas**
+- ✅ **APIs protegidas com verificação de sessão**
 - ✅ Sessão JWT persistente
-- ✅ Logout funcional
+- ✅ **Logout com limpeza completa de cookies**
+- ✅ **Redirecionamento automático para login quando não autenticado**
 
 ### 2. **Gerenciamento de Usuários (CRUD Completo)**
 - ✅ **Listagem**: Exibição de todos os usuários do banco
@@ -251,17 +254,26 @@ pm2 start ecosystem.config.cjs
 5. **Deploy no Vercel**: Configurar variáveis de ambiente e deploy
 
 ## 📊 Status do Projeto
-- **Versão**: 1.2.0
+- **Versão**: 1.3.0
 - **Status**: ✅ Em Produção
-- **Última Atualização**: 31/08/2025 - 22:30
+- **Última Atualização**: 31/08/2025 - 23:00
 - **Ambiente**: Vercel + Supabase
 - **Banco de Dados**: ✅ Conectado e Funcional
 - **Total de Usuários**: 6
 - **Total de Chamados**: Sistema pronto com anexos
 - **Deploy**: ✅ Atualizado no Vercel
 
-## 🆕 Última Atualização
+## 🆕 Últimas Atualizações
+
+### v1.3.0 - Proteção Completa de Rotas
+- **🔒 Middleware de Autenticação**: Implementado middleware que bloqueia acesso a rotas protegidas sem login
+- **🚫 Proteção Server-Side**: Todas as páginas do dashboard agora verificam autenticação no servidor
+- **🔐 APIs Protegidas**: Todas as APIs agora exigem autenticação válida
+- **👥 Controle de Acesso por Perfil**: Páginas de admin (Usuários, Configurações) só acessíveis para administradores
+- **↩️ Redirecionamento Automático**: Usuários não autenticados são redirecionados para /login
+- **🚪 Logout Melhorado**: Limpeza completa de sessão e redirecionamento garantido para /login
+
+### v1.2.0 - Alteração de Senha
 - **Funcionalidade Adicionada**: Sistema de alteração de senha para administradores
-- **Descrição**: Administradores agora podem alterar a senha de qualquer usuário através da página de gerenciamento de usuários
-- **Segurança**: Apenas usuários com perfil 'admin' têm acesso a esta funcionalidade
+- **Descrição**: Administradores agora podem alterar a senha de qualquer usuário
 - **Interface**: Modal dedicado com validação de senha e confirmação
