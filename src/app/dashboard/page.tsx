@@ -306,14 +306,19 @@ export default function DashboardPage() {
 
   const fetchCategoryStats = async () => {
     try {
+      console.log('Fetching stats with filter:', periodFilter)
+      
       const params = new URLSearchParams({
         start_date: periodFilter.start_date,
         end_date: periodFilter.end_date
       })
       
+      console.log('Query params:', params.toString())
+      
       const response = await axios.get(`/api/dashboard/categories-stats?${params}`)
       
       if (response.data) {
+        console.log('Received data:', response.data.periodo)
         setCategoryStats(response.data)
       }
     } catch (error: any) {
@@ -323,6 +328,7 @@ export default function DashboardPage() {
   }
 
   const handleApplyFilter = () => {
+    console.log('Applying filter:', tempFilter)
     setPeriodFilter(tempFilter)
     setShowFilters(false)
   }

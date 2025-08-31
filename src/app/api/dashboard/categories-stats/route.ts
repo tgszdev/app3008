@@ -15,13 +15,18 @@ export async function GET(request: Request) {
     const startDate = searchParams.get('start_date')
     const endDate = searchParams.get('end_date')
 
+    console.log('Received dates from frontend:', { startDate, endDate })
+
     // Default to current month if no dates provided
     const now = new Date()
     const defaultStartDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
     const defaultEndDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
 
+    // Use the provided dates or defaults
     const filterStartDate = startDate || defaultStartDate
     const filterEndDate = endDate || defaultEndDate
+
+    console.log('Using dates for query:', { filterStartDate, filterEndDate })
 
     // Get all tickets within the date range with category information
     let query = supabase
@@ -47,6 +52,8 @@ export async function GET(request: Request) {
       console.error('Error fetching tickets:', ticketsError)
       return NextResponse.json({ error: 'Failed to fetch tickets' }, { status: 500 })
     }
+
+    console.log(`Found ${tickets?.length || 0} tickets for period ${filterStartDate} to ${filterEndDate}`)
 
     // Calculate statistics by category
     const totalTickets = tickets?.length || 0
@@ -158,7 +165,8 @@ export async function GET(request: Request) {
       }
     }
 
-    return NextResponse.json({
+    // Return the exact dates that were used for filtering
+    const response = {
       total_tickets: totalTickets,
       periodo: {
         data_inicio: filterStartDate,
@@ -167,7 +175,11 @@ export async function GET(request: Request) {
       categorias: categoriesArray,
       status_summary: statusCounts,
       average_resolution_time: averageResolutionTime
-    })
+    }
+
+    console.log('Returning period:', response.periodo)
+
+    return NextResponse.json(response)
   } catch (error) {
     console.error('Categories stats error:', error)
     return NextResponse.json(
