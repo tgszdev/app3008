@@ -1,5 +1,5 @@
 export type UserRole = 'user' | 'analyst' | 'admin'
-export type TicketStatus = 'open' | 'in_progress' | 'waiting' | 'resolved' | 'closed'
+export type TicketStatus = 'open' | 'in_progress' | 'waiting' | 'resolved' | 'closed' | 'cancelled'
 export type TicketPriority = 'low' | 'medium' | 'high' | 'critical'
 
 export interface User {

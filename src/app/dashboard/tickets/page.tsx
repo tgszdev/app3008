@@ -39,7 +39,7 @@ interface Ticket {
   ticket_number: number
   title: string
   description: string
-  status: 'open' | 'in_progress' | 'resolved' | 'closed'
+  status: 'open' | 'in_progress' | 'resolved' | 'closed' | 'cancelled'
   priority: 'low' | 'medium' | 'high' | 'critical'
   category: string
   created_by: string
@@ -73,6 +73,11 @@ const statusConfig = {
   closed: {
     label: 'Fechado',
     color: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
+    icon: XCircle,
+  },
+  cancelled: {
+    label: 'Cancelado',
+    color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
     icon: XCircle,
   },
 }
@@ -271,6 +276,7 @@ export default function TicketsPage() {
               <option value="in_progress">Em Andamento</option>
               <option value="resolved">Resolvido</option>
               <option value="closed">Fechado</option>
+              <option value="cancelled">Cancelado</option>
             </select>
 
             <select
@@ -482,8 +488,8 @@ export default function TicketsPage() {
                           >
                             <Edit className="h-4 w-4" />
                           </button>
-                          {/* Apenas admin e analyst podem excluir tickets */}
-                          {(session?.user?.role === 'admin' || session?.user?.role === 'analyst') && (
+                          {/* Apenas admin pode excluir tickets */}
+                          {session?.user?.role === 'admin' && (
                             <button
                               onClick={() => handleDeleteTicket(ticket.id)}
                               className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors"

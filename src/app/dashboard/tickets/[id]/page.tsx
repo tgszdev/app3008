@@ -29,7 +29,7 @@ interface Ticket {
   ticket_number: number
   title: string
   description: string
-  status: 'open' | 'in_progress' | 'resolved' | 'closed'
+  status: 'open' | 'in_progress' | 'resolved' | 'closed' | 'cancelled'
   priority: 'low' | 'medium' | 'high' | 'critical'
   category: string
   created_at: string
@@ -45,7 +45,8 @@ const statusConfig = {
   open: { label: 'Aberto', color: 'bg-blue-500', icon: AlertCircle },
   in_progress: { label: 'Em Progresso', color: 'bg-yellow-500', icon: Clock },
   resolved: { label: 'Resolvido', color: 'bg-green-500', icon: CheckCircle },
-  closed: { label: 'Fechado', color: 'bg-gray-500', icon: XCircle }
+  closed: { label: 'Fechado', color: 'bg-gray-500', icon: XCircle },
+  cancelled: { label: 'Cancelado', color: 'bg-red-500', icon: XCircle }
 }
 
 const priorityConfig = {
@@ -332,6 +333,7 @@ export default function TicketDetailsPage() {
                     <option value="in_progress">Em Progresso</option>
                     <option value="resolved">Resolvido</option>
                     <option value="closed">Fechado</option>
+                    <option value="cancelled">Cancelado</option>
                   </select>
                   <button
                     onClick={handleStatusUpdate}
@@ -627,8 +629,8 @@ export default function TicketDetailsPage() {
                 </div>
               </label>
               
-              {/* Botão de Excluir - Apenas admin e analyst */}
-              {(session?.user?.role === 'admin' || session?.user?.role === 'analyst') && (
+              {/* Botão de Excluir - Apenas admin */}
+              {session?.user?.role === 'admin' && (
                 <button
                   onClick={handleDelete}
                   className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-2"

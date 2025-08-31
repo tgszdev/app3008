@@ -18,8 +18,8 @@
 ### 1. **Autenticação e Autorização**
 - ✅ Sistema de login com NextAuth.js v5
 - ✅ **3 níveis de acesso com permissões diferenciadas**:
-  - **Admin**: Acesso total ao sistema
-  - **Analyst**: Gerenciamento completo de tickets, sem acesso a usuários
+  - **Admin**: Acesso total ao sistema (único que pode excluir tickets)
+  - **Analyst**: Gerenciamento de tickets (criar, editar status, atribuir), sem poder excluir ou gerenciar usuários
   - **User**: Criar tickets, adicionar comentários e anexos (sem alteração de status, sem atribuir analistas)
 - ✅ **Proteção de rotas com middleware (Edge Runtime)**
 - ✅ **Proteção server-side em todas as páginas**
@@ -59,7 +59,7 @@
 
 ### 5. **Gerenciamento de Chamados (Tickets)**
 - ✅ **CRUD Completo**: Criar, listar, editar, excluir chamados
-- ✅ **Status**: open, in_progress, resolved, closed
+- ✅ **Status**: open, in_progress, resolved, closed, **cancelled** (novo)
 - ✅ **Prioridades**: low, medium, high, critical
 - ✅ **Categorias**: general, hardware, software, network, etc.
 - ✅ **Atribuição**: Designar chamados para analistas
@@ -67,7 +67,8 @@
 - ✅ **Filtros**: Por status, prioridade, usuário
 - ✅ **Relacionamentos**: Integração com tabela de usuários
 - ✅ **Permissões por Perfil**:
-  - Admin/Analyst: Todas as ações
+  - Admin: Todas as ações incluindo exclusão
+  - Analyst: Criar, editar, alterar status, atribuir (sem poder excluir)
   - User: Apenas criar, visualizar, comentar e anexar arquivos
 
 ### 6. **PWA Support**

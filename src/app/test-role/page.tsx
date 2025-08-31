@@ -54,11 +54,11 @@ export default function TestRolePage() {
           <p>
             <strong>Pode excluir tickets:</strong> 
             <span className={`ml-2 px-2 py-1 rounded text-white ${
-              session?.user?.role === 'admin' || session?.user?.role === 'analyst' 
+              session?.user?.role === 'admin' 
                 ? 'bg-green-500' 
                 : 'bg-red-500'
             }`}>
-              {session?.user?.role === 'admin' || session?.user?.role === 'analyst' ? 'SIM' : 'NÃO'}
+              {session?.user?.role === 'admin' ? 'SIM' : 'NÃO'}
             </span>
           </p>
           <p>
@@ -89,10 +89,65 @@ export default function TestRolePage() {
         </div>
       </div>
 
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow mb-6">
+        <h2 className="text-lg font-semibold mb-4">Matriz de Permissões</h2>
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b">
+              <th className="text-left py-2">Ação</th>
+              <th className="text-center py-2">Admin</th>
+              <th className="text-center py-2">Analyst</th>
+              <th className="text-center py-2">User</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="border-b">
+              <td className="py-2">Criar tickets</td>
+              <td className="text-center">✅</td>
+              <td className="text-center">✅</td>
+              <td className="text-center">✅</td>
+            </tr>
+            <tr className="border-b">
+              <td className="py-2">Atribuir analistas</td>
+              <td className="text-center">✅</td>
+              <td className="text-center">✅</td>
+              <td className="text-center">❌</td>
+            </tr>
+            <tr className="border-b">
+              <td className="py-2">Definir data vencimento</td>
+              <td className="text-center">✅</td>
+              <td className="text-center">✅</td>
+              <td className="text-center">❌</td>
+            </tr>
+            <tr className="border-b">
+              <td className="py-2">Alterar status</td>
+              <td className="text-center">✅</td>
+              <td className="text-center">✅</td>
+              <td className="text-center">❌</td>
+            </tr>
+            <tr className="border-b">
+              <td className="py-2">Excluir tickets</td>
+              <td className="text-center">✅</td>
+              <td className="text-center">❌</td>
+              <td className="text-center">❌</td>
+            </tr>
+            <tr className="border-b">
+              <td className="py-2">Gerenciar usuários</td>
+              <td className="text-center">✅</td>
+              <td className="text-center">❌</td>
+              <td className="text-center">❌</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
         <p className="text-sm text-yellow-800">
           <strong>Nota:</strong> Se os campos "Atribuir para" ou "Data de Vencimento" ainda aparecerem para usuários com role "user", 
           tente limpar o cache do navegador (Ctrl+F5) ou abrir em uma aba anônima.
+        </p>
+        <p className="text-sm text-yellow-800 mt-2">
+          <strong>Novo:</strong> Status "Cancelado" foi adicionado aos tickets. Analysts não podem mais excluir tickets.
         </p>
       </div>
     </div>
