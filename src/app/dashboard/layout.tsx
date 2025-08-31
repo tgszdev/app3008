@@ -1,14 +1,11 @@
-import { requireAuth } from '@/lib/auth-check'
 import ClientLayout from './client-layout'
 
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  // Verificar autenticação no servidor
-  await requireAuth()
-  
-  // Renderizar o layout client-side apenas se autenticado
+  // Renderizar o layout client-side diretamente
+  // A verificação de autenticação será feita no cliente
   return <ClientLayout>{children}</ClientLayout>
 }

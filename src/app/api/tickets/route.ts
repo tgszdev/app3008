@@ -66,12 +66,6 @@ export async function GET(request: NextRequest) {
 // POST - Criar novo ticket
 export async function POST(request: NextRequest) {
   try {
-    // Verificar autenticação
-    const session = await auth()
-    if (!session) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-    }
-    
     const body = await request.json()
     const { title, description, priority, category, created_by, assigned_to, due_date } = body
 

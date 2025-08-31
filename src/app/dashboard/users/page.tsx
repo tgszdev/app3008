@@ -6,6 +6,7 @@ import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 import axios from 'axios'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 
 const RoleBadge = ({ role }: { role: string }) => {
   const config: Record<string, { color: string; icon: any; label: string }> = {
@@ -73,7 +74,8 @@ interface UserFormData {
 }
 
 export default function UsersPage() {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
+  const router = useRouter()
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -98,6 +100,21 @@ export default function UsersPage() {
   // Verificar se o usuário atual é admin
   const currentUserRole = (session?.user as any)?.role
   const isCurrentUserAdmin = currentUserRole === 'admin'
+
+  // Verificar permissão de acesso
+  useEffect(() => {
+    if (status === 'loading') return
+    
+    if (status === 'unauthenticated') {
+      router.push('/login')
+      return
+    }
+    
+    if (status === 'authenticated' && !isCurrentUserAdmin) {
+      toast.error('Acesso negado. Apenas administradores podem acessar esta página.')
+      router.push('/dashboard')
+    }
+  }, [status, isCurrentUserAdmin, router])
 
   // Buscar usuários do banco
   const fetchUsers = async () => {

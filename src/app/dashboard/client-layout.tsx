@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
@@ -42,7 +42,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const pathname = usePathname()
   const router = useRouter()
   const { theme, setTheme } = useTheme()
@@ -50,9 +50,33 @@ export default function DashboardLayout({
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
+  // Verificar autenticação
+  useEffect(() => {
+    if (status === 'loading') return // Ainda carregando
+    
+    if (status === 'unauthenticated') {
+      console.log('Usuário não autenticado, redirecionando para login')
+      router.push('/login')
+    }
+  }, [status, router])
+
   const userRole = (session?.user as any)?.role
   const isAdmin = userRole === 'admin'
   const allNavigation = isAdmin ? [...navigation, ...adminNavigation] : navigation
+
+  // Mostrar loading enquanto verifica autenticação
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      </div>
+    )
+  }
+
+  // Se não estiver autenticado, não mostrar nada (vai redirecionar)
+  if (status === 'unauthenticated') {
+    return null
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -192,23 +216,14 @@ export default function DashboardLayout({
                         setUserMenuOpen(false)
                         
                         try {
-                          // Fazer logout via API primeiro
-                          await fetch('/api/auth/logout', { method: 'POST' })
-                          
-                          // Depois fazer signOut do NextAuth
+                          // Fazer signOut e redirecionar
                           await signOut({ 
-                            redirect: false 
+                            callbackUrl: '/login'
                           })
-                          
-                          // Redirecionar manualmente
-                          router.push('/login')
-                          router.refresh()
                         } catch (error) {
                           console.error('Erro ao fazer logout:', error)
-                          // Tentar redirecionar mesmo com erro
-                          router.push('/login')
-                        } finally {
-                          setIsLoggingOut(false)
+                          // Forçar redirecionamento se houver erro
+                          window.location.href = '/login'
                         }
                       }}
                       className="flex w-full items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
