@@ -55,6 +55,17 @@ const priorityConfig = {
   critical: { label: 'Crítica', color: 'bg-red-500', icon: AlertTriangle }
 }
 
+interface Attachment {
+  id: string
+  file_name: string
+  file_size: number
+  file_type: string
+  file_url: string
+  storage_path?: string
+  created_at: string
+  uploader?: User
+}
+
 export default function TicketDetailsPage() {
   const params = useParams()
   const router = useRouter()
@@ -70,11 +81,14 @@ export default function TicketDetailsPage() {
   const [users, setUsers] = useState<User[]>([])
   const [editingAssignee, setEditingAssignee] = useState(false)
   const [newAssignee, setNewAssignee] = useState<string>('')
+  const [attachments, setAttachments] = useState<Attachment[]>([])
+  const [uploadingFile, setUploadingFile] = useState(false)
 
   useEffect(() => {
     if (ticketId) {
       fetchTicket()
       fetchUsers()
+      fetchAttachments()
     }
   }, [ticketId])
 
@@ -107,6 +121,63 @@ export default function TicketDetailsPage() {
     } catch (error) {
       console.error('Erro ao buscar usuários:', error)
     }
+  }
+
+  const fetchAttachments = async () => {
+    try {
+      const response = await axios.get(`/api/tickets/upload?ticketId=${ticketId}`)
+      setAttachments(response.data)
+    } catch (error) {
+      console.error('Erro ao buscar anexos:', error)
+    }
+  }
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file || !ticket) return
+
+    // Validar tamanho (máximo 10MB)
+    const maxSize = 10 * 1024 * 1024
+    if (file.size > maxSize) {
+      toast.error('Arquivo muito grande. Máximo permitido: 10MB')
+      return
+    }
+
+    setUploadingFile(true)
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('ticketId', ticket.id)
+    formData.append('userId', session?.user?.id || '')
+
+    try {
+      const response = await axios.post('/api/tickets/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+
+      if (response.data.success) {
+        toast.success('Arquivo enviado com sucesso!')
+        fetchAttachments()
+      } else if (response.data.warning) {
+        toast(response.data.warning, { icon: '⚠️' })
+      }
+    } catch (error: any) {
+      console.error('Erro ao fazer upload:', error)
+      toast.error(error.response?.data?.error || 'Erro ao enviar arquivo')
+    } finally {
+      setUploadingFile(false)
+      // Limpar input
+      event.target.value = ''
+    }
+  }
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
   }
 
   const handleStatusUpdate = async () => {
@@ -315,6 +386,47 @@ export default function TicketDetailsPage() {
             )}
           </div>
 
+          {/* Attachments */}
+          {attachments.length > 0 && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <Paperclip size={20} />
+                Anexos ({attachments.length})
+              </h2>
+              
+              <div className="space-y-2">
+                {attachments.map((attachment) => (
+                  <div
+                    key={attachment.id}
+                    className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Paperclip className="h-4 w-4 text-gray-400" />
+                      <div>
+                        <a
+                          href={attachment.file_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                        >
+                          {attachment.file_name}
+                        </a>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {formatFileSize(attachment.file_size)} • {format(new Date(attachment.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+                        </p>
+                      </div>
+                    </div>
+                    {attachment.uploader && (
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        {attachment.uploader.name}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Comments */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
@@ -479,12 +591,19 @@ export default function TicketDetailsPage() {
                 Atribuir Responsável
               </button>
               
-              <button
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2"
-              >
-                <Paperclip size={16} />
-                Adicionar Anexo
-              </button>
+              <label className="w-full">
+                <input
+                  type="file"
+                  onChange={handleFileUpload}
+                  disabled={uploadingFile}
+                  className="hidden"
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.txt,.zip,.rar"
+                />
+                <div className={`w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2 cursor-pointer ${uploadingFile ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                  <Paperclip size={16} />
+                  {uploadingFile ? 'Enviando...' : 'Adicionar Anexo'}
+                </div>
+              </label>
               
               {(session?.user?.role === 'admin' || session?.user?.id === ticket.created_by_user?.id) && (
                 <button
