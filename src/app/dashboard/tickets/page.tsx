@@ -20,6 +20,8 @@ import {
   MessageSquare,
   Loader2,
   RefreshCw,
+  Folder,
+  Tag,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import axios from 'axios'
@@ -34,6 +36,14 @@ interface User {
   role?: string
 }
 
+interface Category {
+  id: string
+  name: string
+  slug: string
+  color: string
+  icon: string
+}
+
 interface Ticket {
   id: string
   ticket_number: number
@@ -41,7 +51,9 @@ interface Ticket {
   description: string
   status: 'open' | 'in_progress' | 'resolved' | 'closed' | 'cancelled'
   priority: 'low' | 'medium' | 'high' | 'critical'
-  category: string
+  category: string // Mantém compatibilidade
+  category_id?: string
+  category_info?: Category[] | Category // Pode vir como array ou objeto
   created_by: string
   assigned_to: string | null
   created_by_user: User
@@ -192,6 +204,30 @@ export default function TicketsPage() {
     if (diffInHours < 48) return 'Ontem'
     if (diffInHours < 168) return `${Math.floor(diffInHours / 24)} dias atrás`
     return format(created, "dd 'de' MMM", { locale: ptBR })
+  }
+
+  const getCategoryInfo = (ticket: Ticket) => {
+    // Verifica se tem category_info do banco
+    if (ticket.category_info) {
+      const category = Array.isArray(ticket.category_info) 
+        ? ticket.category_info[0] 
+        : ticket.category_info
+      
+      if (category) {
+        return {
+          name: category.name,
+          color: category.color || '#6B7280',
+          icon: category.icon || 'folder'
+        }
+      }
+    }
+    
+    // Fallback para categoria em texto (compatibilidade)
+    return {
+      name: ticket.category || 'Geral',
+      color: '#6B7280',
+      icon: 'folder'
+    }
   }
 
   if (loading) {
@@ -407,6 +443,21 @@ export default function TicketsPage() {
                       )}>
                         {priority.label}
                       </span>
+                      {(() => {
+                        const categoryInfo = getCategoryInfo(ticket)
+                        return (
+                          <span 
+                            className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full"
+                            style={{ 
+                              backgroundColor: categoryInfo.color + '20', 
+                              color: categoryInfo.color 
+                            }}
+                          >
+                            <Folder className="h-3 w-3 mr-1" />
+                            {categoryInfo.name}
+                          </span>
+                        )
+                      })()}
                     </div>
                     <Link
                       href={`/dashboard/tickets/${ticket.id}`}
@@ -481,6 +532,9 @@ export default function TicketsPage() {
                   Prioridade
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Categoria
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Responsável
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -494,7 +548,7 @@ export default function TicketsPage() {
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {filteredTickets.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center">
+                  <td colSpan={8} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center">
                       <AlertCircle className="h-12 w-12 text-gray-400 mb-3" />
                       <p className="text-gray-500 dark:text-gray-400">
@@ -560,6 +614,23 @@ export default function TicketsPage() {
                         )}>
                           {priority.label}
                         </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {(() => {
+                          const categoryInfo = getCategoryInfo(ticket)
+                          return (
+                            <span 
+                              className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full"
+                              style={{ 
+                                backgroundColor: categoryInfo.color + '20', 
+                                color: categoryInfo.color 
+                              }}
+                            >
+                              <Folder className="h-3 w-3 mr-1" />
+                              {categoryInfo.name}
+                            </span>
+                          )
+                        })()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900 dark:text-white">

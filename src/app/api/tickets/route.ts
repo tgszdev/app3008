@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
         *,
         created_by_user:users!tickets_created_by_fkey(id, name, email),
         assigned_to_user:users!tickets_assigned_to_fkey(id, name, email),
+        category_info:categories!tickets_category_id_fkey(id, name, slug, color, icon),
         comments:ticket_comments(count)
       `)
       .order('created_at', { ascending: false })
@@ -67,7 +68,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { title, description, priority, category, created_by, assigned_to, due_date } = body
+    const { title, description, priority, category, category_id, created_by, assigned_to, due_date } = body
 
     // Validação básica
     if (!title || !description || !created_by) {
@@ -77,21 +78,28 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Criar ticket
+    // Criar ticket com suporte para category_id
+    const ticketData: any = {
+      title,
+      description,
+      status: 'open',
+      priority: priority || 'medium',
+      category: category || 'general', // Manter compatibilidade
+      created_by,
+      assigned_to,
+      due_date,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+
+    // Adicionar category_id se fornecido
+    if (category_id) {
+      ticketData.category_id = category_id
+    }
+
     const { data: newTicket, error } = await supabaseAdmin
       .from('tickets')
-      .insert({
-        title,
-        description,
-        status: 'open',
-        priority: priority || 'medium',
-        category: category || 'general',
-        created_by,
-        assigned_to,
-        due_date,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
+      .insert(ticketData)
       .select(`
         *,
         created_by_user:users!tickets_created_by_fkey(id, name, email),

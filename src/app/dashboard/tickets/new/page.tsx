@@ -13,6 +13,7 @@ import {
   User,
   FileText,
   Loader2,
+  Folder,
 } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
@@ -26,24 +27,37 @@ interface UserData {
   role: string
 }
 
+interface Category {
+  id: string
+  name: string
+  slug: string
+  description: string
+  icon: string
+  color: string
+  is_active: boolean
+}
+
 export default function NewTicketPage() {
   const router = useRouter()
   const { data: session } = useSession()
   const [loading, setLoading] = useState(false)
   const [analysts, setAnalysts] = useState<UserData[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loadingCategories, setLoadingCategories] = useState(true)
   
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     priority: 'medium',
-    category: 'general',
+    category_id: '', // Mudando de category para category_id
     assigned_to: '',
     due_date: '',
   })
 
-  // Buscar lista de analistas para atribuição
+  // Buscar lista de analistas e categorias
   useEffect(() => {
     fetchAnalysts()
+    fetchCategories()
   }, [])
 
   const fetchAnalysts = async () => {
@@ -58,11 +72,34 @@ export default function NewTicketPage() {
     }
   }
 
+  const fetchCategories = async () => {
+    try {
+      setLoadingCategories(true)
+      const response = await axios.get('/api/categories?active_only=true')
+      setCategories(response.data)
+      
+      // Selecionar a primeira categoria ativa como padrão
+      if (response.data.length > 0 && !formData.category_id) {
+        setFormData(prev => ({ ...prev, category_id: response.data[0].id }))
+      }
+    } catch (error) {
+      console.error('Erro ao buscar categorias:', error)
+      toast.error('Erro ao carregar categorias')
+    } finally {
+      setLoadingCategories(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!formData.title || !formData.description) {
       toast.error('Título e descrição são obrigatórios!')
+      return
+    }
+
+    if (!formData.category_id) {
+      toast.error('Por favor, selecione uma categoria!')
       return
     }
 
@@ -74,8 +111,12 @@ export default function NewTicketPage() {
     setLoading(true)
 
     try {
+      // Encontrar a categoria selecionada para enviar o slug também (compatibilidade)
+      const selectedCategory = categories.find(c => c.id === formData.category_id)
+      
       const ticketData = {
         ...formData,
+        category: selectedCategory?.slug || 'general', // Manter compatibilidade
         created_by: session.user.id,
         assigned_to: formData.assigned_to || null,
         due_date: formData.due_date || null,
@@ -86,7 +127,8 @@ export default function NewTicketPage() {
       console.log('=== DEBUG CRIAÇÃO DE TICKET ===')
       console.log('Resposta da API:', response.data)
       console.log('ID do ticket criado:', response.data.id)
-      console.log('Título do ticket criado:', response.data.title)
+      console.log('Categoria ID:', formData.category_id)
+      console.log('Categoria slug:', selectedCategory?.slug)
       console.log('Redirecionando para:', `/dashboard/tickets/${response.data.id}`)
       
       toast.success('Chamado criado com sucesso!')
@@ -97,6 +139,19 @@ export default function NewTicketPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  // Função para obter o ícone da categoria selecionada
+  const getSelectedCategoryIcon = () => {
+    const category = categories.find(c => c.id === formData.category_id)
+    return category ? (
+      <div
+        className="inline-flex items-center justify-center w-5 h-5 rounded"
+        style={{ backgroundColor: category.color + '20', color: category.color }}
+      >
+        <Folder size={14} />
+      </div>
+    ) : <Tag className="inline h-4 w-4" />
   }
 
   return (
@@ -178,21 +233,53 @@ export default function NewTicketPage() {
             {/* Category */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                <Tag className="inline h-4 w-4 mr-1" />
-                Categoria
+                <span className="inline-flex items-center gap-1">
+                  {getSelectedCategoryIcon()}
+                  <span className="ml-1">Categoria *</span>
+                </span>
               </label>
-              <select
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="general">Geral</option>
-                <option value="technical">Problema Técnico</option>
-                <option value="billing">Financeiro/Cobrança</option>
-                <option value="feature_request">Solicitação de Funcionalidade</option>
-                <option value="bug">Bug/Erro no Sistema</option>
-                <option value="other">Outro</option>
-              </select>
+              {loadingCategories ? (
+                <div className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 flex items-center justify-center">
+                  <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
+                  <span className="ml-2 text-sm text-gray-500">Carregando categorias...</span>
+                </div>
+              ) : categories.length === 0 ? (
+                <div className="w-full px-4 py-2 border border-red-300 dark:border-red-600 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">
+                  Nenhuma categoria disponível. Contate o administrador.
+                </div>
+              ) : (
+                <select
+                  value={formData.category_id}
+                  onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                >
+                  <option value="">Selecione uma categoria...</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name} {category.description && `- ${category.description.substring(0, 50)}...`}
+                    </option>
+                  ))}
+                </select>
+              )}
+              {formData.category_id && (
+                <div className="mt-2 flex items-center gap-2">
+                  {(() => {
+                    const selectedCategory = categories.find(c => c.id === formData.category_id)
+                    return selectedCategory ? (
+                      <>
+                        <div
+                          className="w-4 h-4 rounded"
+                          style={{ backgroundColor: selectedCategory.color }}
+                        />
+                        <span className="text-xs text-gray-600 dark:text-gray-400">
+                          {selectedCategory.description}
+                        </span>
+                      </>
+                    ) : null
+                  })()}
+                </div>
+              )}
             </div>
 
             {/* Assigned To - Only visible for admin and analyst */}
@@ -247,10 +334,10 @@ export default function NewTicketPage() {
           </Link>
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || loadingCategories}
             className={cn(
               "px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center",
-              loading && "opacity-50 cursor-not-allowed"
+              (loading || loadingCategories) && "opacity-50 cursor-not-allowed"
             )}
           >
             {loading ? (
@@ -278,7 +365,8 @@ export default function NewTicketPage() {
           <li>• Inclua mensagens de erro exatas, se houver</li>
           <li>• Informe quando o problema começou</li>
           <li>• Descreva o que você estava tentando fazer</li>
-          <li>• Selecione a prioridade adequada</li>
+          <li>• Selecione a categoria apropriada</li>
+          <li>• Defina a prioridade adequada</li>
         </ul>
       </div>
     </div>
