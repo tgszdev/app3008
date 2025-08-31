@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import {
   Home,
@@ -19,6 +19,7 @@ import {
   BarChart3,
   MessageSquare,
   FileText,
+  Loader2,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
@@ -43,9 +44,11 @@ export default function DashboardLayout({
 }) {
   const { data: session } = useSession()
   const pathname = usePathname()
+  const router = useRouter()
   const { theme, setTheme } = useTheme()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   const userRole = (session?.user as any)?.role
   const isAdmin = userRole === 'admin'
@@ -184,11 +187,39 @@ export default function DashboardLayout({
                       </p>
                     </div>
                     <button
-                      onClick={() => signOut()}
+                      onClick={async () => {
+                        setIsLoggingOut(true)
+                        setUserMenuOpen(false)
+                        
+                        try {
+                          // Fazer logout via API primeiro
+                          await fetch('/api/auth/logout', { method: 'POST' })
+                          
+                          // Depois fazer signOut do NextAuth
+                          await signOut({ 
+                            redirect: false 
+                          })
+                          
+                          // Redirecionar manualmente
+                          router.push('/login')
+                          router.refresh()
+                        } catch (error) {
+                          console.error('Erro ao fazer logout:', error)
+                          // Tentar redirecionar mesmo com erro
+                          router.push('/login')
+                        } finally {
+                          setIsLoggingOut(false)
+                        }
+                      }}
                       className="flex w-full items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      disabled={isLoggingOut}
                     >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Sair
+                      {isLoggingOut ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <LogOut className="mr-2 h-4 w-4" />
+                      )}
+                      {isLoggingOut ? 'Saindo...' : 'Sair'}
                     </button>
                   </div>
                 )}
