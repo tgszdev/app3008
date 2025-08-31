@@ -6,7 +6,7 @@
 **Stack**: Next.js 15 + TypeScript + Supabase + Tailwind CSS
 
 ## 🌐 URLs de Acesso
-- **Desenvolvimento**: https://3000-inf71qwtpa8mbn30ykzsp-6532622b.e2b.dev
+- **Produção (Vercel)**: https://app3008-two.vercel.app
 - **Login**: `/login`
 - **Dashboard**: `/dashboard`
 - **Chamados**: `/dashboard/tickets`
@@ -30,6 +30,7 @@
 - ✅ **Ativação/Desativação**: Toggle de status do usuário
 - ✅ **Filtros**: Por nome, email, perfil e status
 - ✅ **Busca**: Sistema de busca em tempo real
+- ✅ **Alteração de Senha**: Administradores podem alterar senha de qualquer usuário
 
 ### 3. **Integração com Banco de Dados Real**
 - ✅ **Supabase PostgreSQL**: Banco de dados hospedado
@@ -60,6 +61,14 @@
 - ✅ **Manifest**: Arquivo de manifesto PWA
 - ✅ **Offline Support**: Cache de assets estáticos
 - ✅ **Instalável**: Pode ser instalado como app
+
+### 7. **Sistema de Anexos de Arquivos**
+- ✅ **Upload de Arquivos**: Anexar arquivos aos chamados (máx. 10MB)
+- ✅ **Tipos Suportados**: Imagens (PNG, JPG, GIF), Documentos (PDF, DOC, DOCX, XLS, XLSX, TXT)
+- ✅ **Visualização**: Preview de imagens diretamente na página
+- ✅ **Download**: Baixar anexos dos chamados
+- ✅ **Integração Supabase Storage**: Armazenamento seguro em bucket dedicado
+- ✅ **Validação**: Verificação de tipo e tamanho de arquivo
 
 ## 📊 Estrutura de Dados
 
@@ -242,11 +251,17 @@ pm2 start ecosystem.config.cjs
 5. **Deploy no Vercel**: Configurar variáveis de ambiente e deploy
 
 ## 📊 Status do Projeto
-- **Versão**: 1.1.0
+- **Versão**: 1.2.0
 - **Status**: ✅ Em Produção
-- **Última Atualização**: 31/08/2025 - 21:00
+- **Última Atualização**: 31/08/2025 - 22:30
 - **Ambiente**: Vercel + Supabase
 - **Banco de Dados**: ✅ Conectado e Funcional
 - **Total de Usuários**: 6
-- **Total de Chamados**: Sistema pronto
+- **Total de Chamados**: Sistema pronto com anexos
 - **Deploy**: ✅ Atualizado no Vercel
+
+## 🆕 Última Atualização
+- **Funcionalidade Adicionada**: Sistema de alteração de senha para administradores
+- **Descrição**: Administradores agora podem alterar a senha de qualquer usuário através da página de gerenciamento de usuários
+- **Segurança**: Apenas usuários com perfil 'admin' têm acesso a esta funcionalidade
+- **Interface**: Modal dedicado com validação de senha e confirmação
