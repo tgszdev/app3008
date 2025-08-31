@@ -319,6 +319,7 @@ export default function DashboardPage() {
       
       if (response.data) {
         console.log('Received data:', response.data.periodo)
+        console.log('Total tickets:', response.data.total_tickets)
         setCategoryStats(response.data)
       }
     } catch (error: any) {
@@ -670,5 +671,7 @@ export default function DashboardPage() {
 }
 
 function formatDateShort(date: string) {
-  return new Date(date).toLocaleDateString('pt-BR')
+  // Parse the date string and add timezone offset to avoid timezone issues
+  const [year, month, day] = date.split('-').map(Number)
+  return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`
 }

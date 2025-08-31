@@ -18,13 +18,21 @@ export async function GET(request: Request) {
     console.log('Received dates from frontend:', { startDate, endDate })
 
     // Default to current month if no dates provided
-    const now = new Date()
-    const defaultStartDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
-    const defaultEndDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
-
-    // Use the provided dates or defaults
-    const filterStartDate = startDate || defaultStartDate
-    const filterEndDate = endDate || defaultEndDate
+    let filterStartDate: string
+    let filterEndDate: string
+    
+    if (!startDate || !endDate) {
+      // Only use defaults if dates are not provided
+      const now = new Date()
+      const defaultStartDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
+      const defaultEndDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
+      filterStartDate = startDate || defaultStartDate
+      filterEndDate = endDate || defaultEndDate
+    } else {
+      // Use exactly the dates provided without any modification
+      filterStartDate = startDate
+      filterEndDate = endDate
+    }
 
     console.log('Using dates for query:', { filterStartDate, filterEndDate })
 
