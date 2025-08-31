@@ -15,8 +15,20 @@ import {
   BarChart,
   Activity,
   XCircle,
-  Loader2
+  Loader2,
+  Calendar,
+  Filter,
+  PieChart as PieChartIcon,
+  Folder,
+  Cpu,
+  Wifi,
+  Printer,
+  Code,
+  Mail,
+  Shield,
+  Phone
 } from 'lucide-react'
+import { getIcon } from '@/lib/icons'
 
 interface Stats {
   totalTickets: number
@@ -31,6 +43,21 @@ interface Stats {
   activeUsers: number
 }
 
+interface CategoryStat {
+  id: string
+  nome: string
+  icon: string | null
+  color: string | null
+  quantidade: number
+  percentual: number
+  status_breakdown: {
+    open: number
+    in_progress: number
+    resolved: number
+    cancelled: number
+  }
+}
+
 interface RecentTicket {
   id: string
   ticket_number: string
@@ -39,6 +66,11 @@ interface RecentTicket {
   priority: string
   requester: string
   created_at: string
+}
+
+interface PeriodFilter {
+  start_date: string
+  end_date: string
 }
 
 const StatCard = ({ title, value, icon: Icon, trend, color }: any) => (
@@ -66,6 +98,86 @@ const StatCard = ({ title, value, icon: Icon, trend, color }: any) => (
     </div>
   </div>
 )
+
+const CategoryCard = ({ category }: { category: CategoryStat }) => {
+  const Icon = getIcon(category.icon)
+  const backgroundColor = category.color ? `${category.color}20` : '#E5E7EB'
+  const borderColor = category.color || '#6B7280'
+  
+  return (
+    <div 
+      className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6"
+      style={{ borderLeft: `4px solid ${borderColor}` }}
+    >
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center">
+          <div 
+            className="p-2 rounded-lg mr-3"
+            style={{ backgroundColor, color: borderColor }}
+          >
+            <Icon className="h-5 w-5" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+              {category.nome}
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              {category.percentual}% do total
+            </p>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            {category.quantidade}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            tickets
+          </p>
+        </div>
+      </div>
+      
+      {/* Status breakdown bar */}
+      <div className="mt-4">
+        <div className="flex h-2 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700">
+          {category.status_breakdown.open > 0 && (
+            <div 
+              className="bg-blue-500" 
+              style={{ width: `${(category.status_breakdown.open / category.quantidade) * 100}%` }}
+              title={`Abertos: ${category.status_breakdown.open}`}
+            />
+          )}
+          {category.status_breakdown.in_progress > 0 && (
+            <div 
+              className="bg-yellow-500" 
+              style={{ width: `${(category.status_breakdown.in_progress / category.quantidade) * 100}%` }}
+              title={`Em Progresso: ${category.status_breakdown.in_progress}`}
+            />
+          )}
+          {category.status_breakdown.resolved > 0 && (
+            <div 
+              className="bg-green-500" 
+              style={{ width: `${(category.status_breakdown.resolved / category.quantidade) * 100}%` }}
+              title={`Resolvidos: ${category.status_breakdown.resolved}`}
+            />
+          )}
+          {category.status_breakdown.cancelled > 0 && (
+            <div 
+              className="bg-red-500" 
+              style={{ width: `${(category.status_breakdown.cancelled / category.quantidade) * 100}%` }}
+              title={`Cancelados: ${category.status_breakdown.cancelled}`}
+            />
+          )}
+        </div>
+        <div className="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
+          <span>A: {category.status_breakdown.open}</span>
+          <span>P: {category.status_breakdown.in_progress}</span>
+          <span>R: {category.status_breakdown.resolved}</span>
+          <span>C: {category.status_breakdown.cancelled}</span>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 const StatusBadge = ({ status }: { status: string }) => {
   const colors: Record<string, string> = {
@@ -116,6 +228,23 @@ export default function DashboardPage() {
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [showFilters, setShowFilters] = useState(false)
+  
+  // Get current month dates as default
+  const getCurrentMonthDates = () => {
+    const now = new Date()
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+    
+    return {
+      start_date: firstDay.toISOString().split('T')[0],
+      end_date: lastDay.toISOString().split('T')[0]
+    }
+  }
+  
+  const [periodFilter, setPeriodFilter] = useState<PeriodFilter>(getCurrentMonthDates())
+  const [tempFilter, setTempFilter] = useState<PeriodFilter>(getCurrentMonthDates())
+  
   const [stats, setStats] = useState<Stats>({
     totalTickets: 0,
     openTickets: 0,
@@ -128,12 +257,31 @@ export default function DashboardPage() {
     usersTrend: '+0%',
     activeUsers: 0
   })
+  
+  const [categoryStats, setCategoryStats] = useState<{
+    total_tickets: number
+    periodo: { data_inicio: string; data_fim: string }
+    categorias: CategoryStat[]
+    status_summary: {
+      open: number
+      in_progress: number
+      resolved: number
+      cancelled: number
+    }
+    average_resolution_time: string
+  } | null>(null)
+  
   const [recentTickets, setRecentTickets] = useState<RecentTicket[]>([])
 
   useEffect(() => {
     setMounted(true)
     fetchDashboardData()
+    fetchCategoryStats()
   }, [])
+
+  useEffect(() => {
+    fetchCategoryStats()
+  }, [periodFilter])
 
   const fetchDashboardData = async () => {
     try {
@@ -148,13 +296,42 @@ export default function DashboardPage() {
       console.error('Error fetching dashboard data:', error)
       toast.error('Erro ao carregar dados do dashboard')
       
-      // If unauthorized, redirect to login
       if (error.response?.status === 401) {
         router.push('/login')
       }
     } finally {
       setLoading(false)
     }
+  }
+
+  const fetchCategoryStats = async () => {
+    try {
+      const params = new URLSearchParams({
+        start_date: periodFilter.start_date,
+        end_date: periodFilter.end_date
+      })
+      
+      const response = await axios.get(`/api/dashboard/categories-stats?${params}`)
+      
+      if (response.data) {
+        setCategoryStats(response.data)
+      }
+    } catch (error: any) {
+      console.error('Error fetching category stats:', error)
+      toast.error('Erro ao carregar estatísticas por categoria')
+    }
+  }
+
+  const handleApplyFilter = () => {
+    setPeriodFilter(tempFilter)
+    setShowFilters(false)
+  }
+
+  const handleResetFilter = () => {
+    const defaultDates = getCurrentMonthDates()
+    setTempFilter(defaultDates)
+    setPeriodFilter(defaultDates)
+    setShowFilters(false)
   }
 
   const handleTicketClick = (ticketId: string) => {
@@ -175,50 +352,140 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-          Dashboard
-        </h1>
-        <p className="mt-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-          Bem-vindo de volta, {session?.user?.name}! Aqui está um resumo do sistema.
-        </p>
+      {/* Header with Filter */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+            Dashboard
+          </h1>
+          <p className="mt-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+            Bem-vindo de volta, {session?.user?.name}! Aqui está um resumo do sistema.
+          </p>
+        </div>
+        
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        >
+          <Calendar className="h-4 w-4" />
+          <span className="text-sm">
+            {periodFilter.start_date === getCurrentMonthDates().start_date && 
+             periodFilter.end_date === getCurrentMonthDates().end_date
+              ? 'Mês Atual'
+              : `${formatDateShort(periodFilter.start_date)} - ${formatDateShort(periodFilter.end_date)}`
+            }
+          </span>
+          <Filter className="h-4 w-4" />
+        </button>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-5">
-        <StatCard
-          title="Total"
-          value={stats.totalTickets}
-          icon={TicketIcon}
-          trend={stats.ticketsTrend}
-          color="bg-blue-600"
-        />
-        <StatCard
-          title="Abertos"
-          value={stats.openTickets}
-          icon={AlertCircle}
-          color="bg-yellow-600"
-        />
-        <StatCard
-          title="Em Progresso"
-          value={stats.inProgressTickets}
-          icon={Clock}
-          color="bg-orange-600"
-        />
-        <StatCard
-          title="Resolvidos"
-          value={stats.resolvedTickets}
-          icon={CheckCircle}
-          color="bg-green-600"
-        />
-        <StatCard
-          title="Cancelados"
-          value={stats.cancelledTickets}
-          icon={XCircle}
-          color="bg-red-600"
-        />
-      </div>
+      {/* Filter Panel */}
+      {showFilters && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+            Filtrar por Período
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Data Início
+              </label>
+              <input
+                type="date"
+                value={tempFilter.start_date}
+                onChange={(e) => setTempFilter({ ...tempFilter, start_date: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Data Fim
+              </label>
+              <input
+                type="date"
+                value={tempFilter.end_date}
+                onChange={(e) => setTempFilter({ ...tempFilter, end_date: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+          <div className="flex gap-2 mt-4">
+            <button
+              onClick={handleApplyFilter}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+            >
+              Aplicar Filtro
+            </button>
+            <button
+              onClick={handleResetFilter}
+              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm"
+            >
+              Limpar Filtro
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Period Info */}
+      {categoryStats && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+          <p className="text-sm text-blue-800 dark:text-blue-300">
+            <span className="font-medium">Período analisado:</span> {formatDateShort(categoryStats.periodo.data_inicio)} até {formatDateShort(categoryStats.periodo.data_fim)}
+            <span className="ml-2">• <strong>{categoryStats.total_tickets}</strong> tickets no período</span>
+          </p>
+        </div>
+      )}
+
+      {/* Category Stats Grid */}
+      {categoryStats && categoryStats.categorias.length > 0 && (
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <PieChartIcon className="h-5 w-5" />
+            Tickets por Categoria
+          </h2>
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {categoryStats.categorias.map((category) => (
+              <CategoryCard key={category.id} category={category} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Status Stats Grid (using filtered data) */}
+      {categoryStats && (
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-5">
+          <StatCard
+            title="Total no Período"
+            value={categoryStats.total_tickets}
+            icon={TicketIcon}
+            color="bg-blue-600"
+          />
+          <StatCard
+            title="Abertos"
+            value={categoryStats.status_summary.open}
+            icon={AlertCircle}
+            color="bg-yellow-600"
+          />
+          <StatCard
+            title="Em Progresso"
+            value={categoryStats.status_summary.in_progress}
+            icon={Clock}
+            color="bg-orange-600"
+          />
+          <StatCard
+            title="Resolvidos"
+            value={categoryStats.status_summary.resolved}
+            icon={CheckCircle}
+            color="bg-green-600"
+          />
+          <StatCard
+            title="Cancelados"
+            value={categoryStats.status_summary.cancelled}
+            icon={XCircle}
+            color="bg-red-600"
+          />
+        </div>
+      )}
 
       {/* Additional Stats */}
       <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -226,10 +493,10 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
-                Tempo Médio de Resolução
+                Tempo Médio de Resolução (Período)
               </p>
               <p className="mt-2 text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                {stats.averageResolutionTime}
+                {categoryStats?.average_resolution_time || '0h 0m'}
               </p>
             </div>
             <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600" />
@@ -271,12 +538,15 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Recent Tickets */}
+      {/* Recent Tickets (not affected by filter) */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
             Chamados Recentes
           </h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            Últimos tickets criados (não afetado pelo filtro de período)
+          </p>
         </div>
         
         {recentTickets.length > 0 ? (
