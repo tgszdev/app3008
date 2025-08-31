@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { signIn } from 'next-auth/react'
+import { useState, useEffect } from 'react'
+import { signIn, useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -19,6 +19,7 @@ type LoginFormData = z.infer<typeof loginSchema>
 export default function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { data: session, status } = useSession()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -30,36 +31,59 @@ export default function LoginForm() {
     resolver: zodResolver(loginSchema),
   })
 
+  // Verificar se já está autenticado e redirecionar
+  useEffect(() => {
+    if (status === 'authenticated' && session) {
+      const callbackUrl = searchParams?.get('callbackUrl') || '/dashboard'
+      console.log('Usuário autenticado, redirecionando para:', callbackUrl)
+      
+      // Usar replace para evitar voltar para a página de login
+      window.location.replace(callbackUrl)
+    }
+  }, [status, session, searchParams])
+
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true)
     
     try {
       // Obter callbackUrl
       const callbackUrl = searchParams?.get('callbackUrl') || '/dashboard'
-      console.log('Tentando login com callbackUrl:', callbackUrl)
+      console.log('Tentando login, callbackUrl:', callbackUrl)
       
-      // Fazer login com signIn - usando redirect: true
+      // Fazer login com redirect: false para capturar erros
       const result = await signIn('credentials', {
         email: data.email,
         password: data.password,
-        callbackUrl: callbackUrl,
-        redirect: true, // Forçar redirecionamento pelo NextAuth
+        redirect: false, // Importante: false para podermos tratar erros
       })
       
-      // Se chegou aqui, houve erro (pois redirect: true deveria ter redirecionado)
-      console.log('Resultado inesperado:', result)
+      console.log('Resultado do login:', result)
       
-    } catch (error: any) {
-      console.error('Erro capturado:', error)
-      
-      // NextAuth lança erro ao redirecionar com redirect: true - isso é esperado
-      if (error?.message?.includes('NEXT_REDIRECT')) {
-        console.log('Redirecionamento em progresso...')
+      if (result?.error) {
+        // Login falhou
+        console.error('Erro de login:', result.error)
+        toast.error('Email ou senha incorretos')
+        setIsLoading(false)
         return
       }
       
-      // Se chegou aqui, realmente houve erro
-      toast.error('Email ou senha incorretos')
+      if (result?.ok) {
+        // Login bem-sucedido
+        console.log('Login bem-sucedido!')
+        toast.success('Login realizado com sucesso!')
+        
+        // Aguardar um momento para a sessão ser estabelecida
+        setTimeout(() => {
+          console.log('Redirecionando para:', callbackUrl)
+          
+          // Usar window.location.replace para garantir redirecionamento
+          window.location.replace(callbackUrl)
+        }, 100)
+      }
+      
+    } catch (error: any) {
+      console.error('Erro inesperado:', error)
+      toast.error('Erro ao fazer login. Tente novamente.')
       setIsLoading(false)
     }
   }
@@ -161,13 +185,6 @@ export default function LoginForm() {
               <strong>Demo:</strong> admin@example.com / admin123
             </p>
           </div>
-
-          {/* Debug info */}
-          {searchParams?.get('callbackUrl') && (
-            <div className="mt-4 p-2 bg-gray-100 dark:bg-gray-700 rounded text-xs text-gray-600 dark:text-gray-400">
-              <p>Callback URL: {searchParams.get('callbackUrl')}</p>
-            </div>
-          )}
         </div>
       </div>
     </div>
