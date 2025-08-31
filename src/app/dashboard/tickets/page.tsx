@@ -295,57 +295,71 @@ export default function TicketsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{tickets.length}</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">Total</p>
+              <p className="text-xl font-bold text-gray-900 dark:text-white">{tickets.length}</p>
             </div>
-            <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
-              <AlertCircle className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+            <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+              <AlertCircle className="h-5 w-5 text-gray-600 dark:text-gray-400" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Abertos</p>
-              <p className="text-2xl font-bold text-blue-600">
+              <p className="text-xs text-gray-600 dark:text-gray-400">Abertos</p>
+              <p className="text-xl font-bold text-blue-600">
                 {tickets.filter(t => t.status === 'open').length}
               </p>
             </div>
-            <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-lg">
-              <AlertCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+              <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Em Andamento</p>
-              <p className="text-2xl font-bold text-yellow-600">
+              <p className="text-xs text-gray-600 dark:text-gray-400">Em Andamento</p>
+              <p className="text-xl font-bold text-yellow-600">
                 {tickets.filter(t => t.status === 'in_progress').length}
               </p>
             </div>
-            <div className="p-3 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
-              <Clock className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+            <div className="p-2 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
+              <Clock className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Resolvidos</p>
-              <p className="text-2xl font-bold text-green-600">
+              <p className="text-xs text-gray-600 dark:text-gray-400">Resolvidos</p>
+              <p className="text-xl font-bold text-green-600">
                 {tickets.filter(t => t.status === 'resolved').length}
               </p>
             </div>
-            <div className="p-3 bg-green-100 dark:bg-green-900 rounded-lg">
-              <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+            <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
+              <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-gray-600 dark:text-gray-400">Cancelados</p>
+              <p className="text-xl font-bold text-red-600">
+                {tickets.filter(t => t.status === 'cancelled').length}
+              </p>
+            </div>
+            <div className="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
+              <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
             </div>
           </div>
         </div>
