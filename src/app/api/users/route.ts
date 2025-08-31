@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import bcrypt from 'bcryptjs'
+import { auth } from '@/lib/auth'
 
 // GET - Listar todos os usuários
 export async function GET(request: NextRequest) {
   try {
+    // Verificar autenticação
+    const session = await auth()
+    if (!session) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
     // Verificar se as variáveis de ambiente estão configuradas
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       console.error('Variáveis de ambiente do Supabase não configuradas')
@@ -66,6 +72,16 @@ export async function GET(request: NextRequest) {
 // POST - Criar novo usuário
 export async function POST(request: NextRequest) {
   try {
+    // Verificar autenticação e se é admin
+    const session = await auth()
+    if (!session) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+    
+    const userRole = (session.user as any)?.role
+    if (userRole !== 'admin') {
+      return NextResponse.json({ error: 'Apenas administradores podem criar usuários' }, { status: 403 })
+    }
     const body = await request.json()
     const { name, email, password, role, department, phone } = body
 
@@ -129,6 +145,16 @@ export async function POST(request: NextRequest) {
 // PATCH - Atualizar usuário
 export async function PATCH(request: NextRequest) {
   try {
+    // Verificar autenticação e se é admin
+    const session = await auth()
+    if (!session) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+    
+    const userRole = (session.user as any)?.role
+    if (userRole !== 'admin') {
+      return NextResponse.json({ error: 'Apenas administradores podem editar usuários' }, { status: 403 })
+    }
     const body = await request.json()
     const { id, ...updateData } = body
 
@@ -173,6 +199,16 @@ export async function PATCH(request: NextRequest) {
 // DELETE - Excluir usuário
 export async function DELETE(request: NextRequest) {
   try {
+    // Verificar autenticação e se é admin
+    const session = await auth()
+    if (!session) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+    
+    const userRole = (session.user as any)?.role
+    if (userRole !== 'admin') {
+      return NextResponse.json({ error: 'Apenas administradores podem excluir usuários' }, { status: 403 })
+    }
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
 

@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { auth } from '@/lib/auth'
 
 // GET - Listar todos os tickets
 export async function GET(request: NextRequest) {
   try {
+    // Verificar autenticação
+    const session = await auth()
+    if (!session) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+    
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
     const priority = searchParams.get('priority')
@@ -59,6 +66,12 @@ export async function GET(request: NextRequest) {
 // POST - Criar novo ticket
 export async function POST(request: NextRequest) {
   try {
+    // Verificar autenticação
+    const session = await auth()
+    if (!session) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+    
     const body = await request.json()
     const { title, description, priority, category, created_by, assigned_to, due_date } = body
 
@@ -136,6 +149,11 @@ export async function PATCH(request: NextRequest) {
 // Função compartilhada para atualização
 async function handleUpdate(request: NextRequest) {
   try {
+    // Verificar autenticação
+    const session = await auth()
+    if (!session) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
     const body = await request.json()
     const { id, updated_by, user_id, ...updateData } = body
     
@@ -239,6 +257,12 @@ async function handleUpdate(request: NextRequest) {
 // DELETE - Excluir ticket
 export async function DELETE(request: NextRequest) {
   try {
+    // Verificar autenticação
+    const session = await auth()
+    if (!session) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+    
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
 
