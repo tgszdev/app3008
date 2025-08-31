@@ -22,11 +22,13 @@ function LoginForm() {
   const { data: session, status } = useSession()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isRedirecting, setIsRedirecting] = useState(false)
 
   useEffect(() => {
-    // Se já estiver autenticado, redirecionar para o dashboard
+    // Se já estiver autenticado, redirecionar para o dashboard ou callbackUrl
     if (status === 'authenticated' && session) {
-      router.push('/dashboard')
+      const callbackUrl = searchParams?.get('callbackUrl') || '/dashboard'
+      router.push(callbackUrl)
     }
     
     // Verificar se foi um logout
@@ -34,7 +36,7 @@ function LoginForm() {
     if (isLogout) {
       toast.success('Logout realizado com sucesso!')
     }
-  }, [session, status, router, searchParams])
+  }, [session, status]) // Removido router e searchParams das dependências para evitar loops
 
   const {
     register,
@@ -56,14 +58,23 @@ function LoginForm() {
 
       if (result?.error) {
         toast.error('Email ou senha incorretos')
-      } else {
-        toast.success('Login realizado com sucesso!')
-        router.push('/dashboard')
-        router.refresh()
+        setIsLoading(false)
+      } else if (result?.ok) {
+        toast.success('Login realizado com sucesso! Redirecionando...')
+        setIsRedirecting(true)
+        
+        // Pegar o callbackUrl dos searchParams ou usar /dashboard como padrão
+        const callbackUrl = searchParams?.get('callbackUrl') || '/dashboard'
+        
+        // Pequeno delay para garantir que a sessão seja estabelecida
+        setTimeout(() => {
+          // Forçar redirecionamento com window.location para garantir que funcione
+          window.location.href = callbackUrl
+        }, 500)
       }
     } catch (error) {
+      console.error('Erro no login:', error)
       toast.error('Erro ao fazer login. Tente novamente.')
-    } finally {
       setIsLoading(false)
     }
   }
@@ -155,10 +166,10 @@ function LoginForm() {
 
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || isRedirecting}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              {isLoading ? (
+              {isLoading || isRedirecting ? (
                 <>
                   <Loader2 className="animate-spin mr-2 h-5 w-5" />
                   Entrando...

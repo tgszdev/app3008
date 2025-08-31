@@ -4,14 +4,14 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
-  // Rotas públicas que não precisam de autenticação
-  const publicPaths = ['/login', '/api/auth', '/api/health', '/_next', '/static', '/icons', '/manifest.json', '/sw.js', '/favicon.ico']
+  // Lista de rotas que precisam de autenticação
+  const protectedPaths = ['/dashboard', '/api/users', '/api/tickets']
   
-  // Verificar se é uma rota pública
-  const isPublicPath = publicPaths.some(path => pathname.startsWith(path))
+  // Verificar se é uma rota protegida
+  const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path))
   
-  // Se for rota pública, permitir acesso
-  if (isPublicPath) {
+  // Se não for rota protegida, permitir acesso
+  if (!isProtectedPath) {
     return NextResponse.next()
   }
   
@@ -19,26 +19,20 @@ export function middleware(request: NextRequest) {
   const sessionToken = request.cookies.get('next-auth.session-token')?.value || 
                       request.cookies.get('__Secure-next-auth.session-token')?.value
   
-  // Se estiver tentando acessar rota protegida sem token
-  if (!sessionToken && pathname.startsWith('/dashboard')) {
+  // Se for rota protegida e não tiver token, redirecionar para login
+  if (!sessionToken) {
+    // Para APIs, retornar erro 401
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.json(
+        { error: 'Não autorizado' },
+        { status: 401 }
+      )
+    }
+    
+    // Para páginas, redirecionar para login
     const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('callbackUrl', pathname)
     return NextResponse.redirect(loginUrl)
-  }
-  
-  // Se for a rota raiz e não tiver token, redirecionar para login
-  if (!sessionToken && pathname === '/') {
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
-  
-  // Se for a rota raiz e tiver token, redirecionar para dashboard
-  if (sessionToken && pathname === '/') {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
-  }
-  
-  // Se estiver logado e tentar acessar login, redirecionar para dashboard
-  if (sessionToken && pathname === '/login') {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
   
   return NextResponse.next()
@@ -46,14 +40,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api/auth (auth endpoints)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public files (icons, manifest, etc)
-     */
-    '/((?!api/auth|_next/static|_next/image|favicon.ico|icons/.*|manifest.json|sw.js|.*\\.png$|.*\\.jpg$|.*\\.svg$).*)',
+    // Proteger todas as rotas exceto as estáticas e de autenticação
+    '/((?!_next/static|_next/image|favicon.ico|icons|manifest.json|sw.js|login|api/auth|api/health).*)',
   ],
 }
