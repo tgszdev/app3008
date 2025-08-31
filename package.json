@@ -12,6 +12,7 @@
     "db:setup": "node scripts/setup-database.js",
     "db:check": "node scripts/setup-database.js",
     "db:seed": "node scripts/seed-users.js",
+    "db:setup:tickets": "node scripts/setup-tickets.mjs",
     "deploy": "node scripts/deploy-vercel.mjs",
     "deploy:vercel": "vercel --prod",
     "db:push": "npx prisma db push",
