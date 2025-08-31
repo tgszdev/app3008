@@ -13,8 +13,8 @@ import {
   User,
   FileText,
   Loader2,
-  Folder,
 } from 'lucide-react'
+import { getIcon } from '@/lib/icons'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import axios from 'axios'
@@ -144,14 +144,18 @@ export default function NewTicketPage() {
   // Função para obter o ícone da categoria selecionada
   const getSelectedCategoryIcon = () => {
     const category = categories.find(c => c.id === formData.category_id)
-    return category ? (
-      <div
-        className="inline-flex items-center justify-center w-5 h-5 rounded"
-        style={{ backgroundColor: category.color + '20', color: category.color }}
-      >
-        <Folder size={14} />
-      </div>
-    ) : <Tag className="inline h-4 w-4" />
+    if (category) {
+      const Icon = getIcon(category.icon)
+      return (
+        <div
+          className="inline-flex items-center justify-center w-5 h-5 rounded"
+          style={{ backgroundColor: category.color + '20', color: category.color }}
+        >
+          <Icon size={14} />
+        </div>
+      )
+    }
+    return <Tag className="inline h-4 w-4" />
   }
 
   return (

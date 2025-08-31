@@ -5,7 +5,8 @@ import { useParams, useRouter } from 'next/navigation'
 import axios from 'axios'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { ArrowLeft, Clock, User, Tag, AlertCircle, MessageSquare, Paperclip, Edit, Trash2, Send, CheckCircle, XCircle, AlertTriangle, ChevronDown, Folder } from 'lucide-react'
+import { ArrowLeft, Clock, User, Tag, AlertCircle, MessageSquare, Paperclip, Edit, Trash2, Send, CheckCircle, XCircle, AlertTriangle, ChevronDown } from 'lucide-react'
+import { getIcon } from '@/lib/icons'
 import toast from 'react-hot-toast'
 import { useSession } from 'next-auth/react'
 
@@ -726,13 +727,14 @@ export default function TicketDetailsPage() {
                   const category = Array.isArray(categoryInfo) ? categoryInfo[0] : categoryInfo
                   
                   if (category) {
+                    const Icon = getIcon(category.icon)
                     return (
                       <div className="flex items-center gap-2">
                         <div
                           className="w-6 h-6 rounded-lg flex items-center justify-center"
                           style={{ backgroundColor: category.color + '20', color: category.color }}
                         >
-                          <Folder size={14} />
+                          <Icon size={14} />
                         </div>
                         <p className="font-semibold">{category.name}</p>
                       </div>

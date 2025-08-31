@@ -14,7 +14,6 @@ import {
   ChevronDown,
   Loader2,
   X,
-  Folder,
   Hash,
   Palette,
   Type,
@@ -22,6 +21,7 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react'
+import { getIcon } from '@/lib/icons'
 
 interface Category {
   id: string
@@ -312,7 +312,10 @@ export default function CategoriesPage() {
                         className="w-8 h-8 rounded-lg flex items-center justify-center"
                         style={{ backgroundColor: category.color + '20', color: category.color }}
                       >
-                        <Folder size={16} />
+                        {(() => {
+                          const Icon = getIcon(category.icon)
+                          return <Icon size={16} />
+                        })()}
                       </div>
                       <span className="font-medium text-gray-900 dark:text-white">
                         {category.name}
@@ -427,15 +430,33 @@ export default function CategoriesPage() {
                   <Hash size={16} className="inline mr-1" />
                   Ícone
                 </label>
-                <select
-                  value={formData.icon}
-                  onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
-                >
-                  {availableIcons.map(icon => (
-                    <option key={icon} value={icon}>{icon}</option>
-                  ))}
-                </select>
+                <div className="flex items-center gap-2">
+                  <select
+                    value={formData.icon}
+                    onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                    className="flex-1 px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+                  >
+                    {availableIcons.map(icon => (
+                      <option key={icon} value={icon}>{icon}</option>
+                    ))}
+                  </select>
+                  <div
+                    className="w-10 h-10 rounded-lg flex items-center justify-center border-2"
+                    style={{ 
+                      backgroundColor: formData.color + '20', 
+                      color: formData.color,
+                      borderColor: formData.color 
+                    }}
+                  >
+                    {(() => {
+                      const Icon = getIcon(formData.icon)
+                      return <Icon size={20} />
+                    })()}
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Preview do ícone selecionado
+                </p>
               </div>
 
               {/* Cor */}

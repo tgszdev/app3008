@@ -20,9 +20,8 @@ import {
   MessageSquare,
   Loader2,
   RefreshCw,
-  Folder,
-  Tag,
 } from 'lucide-react'
+import { getIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import axios from 'axios'
 import toast from 'react-hot-toast'
@@ -217,7 +216,8 @@ export default function TicketsPage() {
         return {
           name: category.name,
           color: category.color || '#6B7280',
-          icon: category.icon || 'folder'
+          icon: category.icon || 'folder',
+          IconComponent: getIcon(category.icon || 'folder')
         }
       }
     }
@@ -226,7 +226,8 @@ export default function TicketsPage() {
     return {
       name: ticket.category || 'Geral',
       color: '#6B7280',
-      icon: 'folder'
+      icon: 'folder',
+      IconComponent: getIcon('folder')
     }
   }
 
@@ -445,6 +446,7 @@ export default function TicketsPage() {
                       </span>
                       {(() => {
                         const categoryInfo = getCategoryInfo(ticket)
+                        const Icon = categoryInfo.IconComponent
                         return (
                           <span 
                             className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full"
@@ -453,7 +455,7 @@ export default function TicketsPage() {
                               color: categoryInfo.color 
                             }}
                           >
-                            <Folder className="h-3 w-3 mr-1" />
+                            <Icon className="h-3 w-3 mr-1" />
                             {categoryInfo.name}
                           </span>
                         )
@@ -618,6 +620,7 @@ export default function TicketsPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         {(() => {
                           const categoryInfo = getCategoryInfo(ticket)
+                          const Icon = categoryInfo.IconComponent
                           return (
                             <span 
                               className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full"
@@ -626,7 +629,7 @@ export default function TicketsPage() {
                                 color: categoryInfo.color 
                               }}
                             >
-                              <Folder className="h-3 w-3 mr-1" />
+                              <Icon className="h-3 w-3 mr-1" />
                               {categoryInfo.name}
                             </span>
                           )
