@@ -1,201 +1,181 @@
 # Sistema de Suporte Técnico
 
 ## 📋 Visão Geral
+**Nome**: Support System  
+**Objetivo**: Sistema completo de gestão de chamados técnicos com suporte a PWA  
+**Stack**: Next.js 15 + TypeScript + Supabase + Tailwind CSS
 
-Sistema completo e moderno para gestão de chamados técnicos, desenvolvido com Next.js 14+ e preparado para deploy no Vercel. Oferece uma experiência PWA completa com funcionamento offline, notificações push e interface responsiva com dark mode.
-
-## 🚀 Características Principais
-
-### Stack Tecnológica
-- **Frontend**: Next.js 14+ com App Router, TypeScript, Tailwind CSS
-- **Backend**: Next.js API Routes 
-- **Banco de Dados**: Supabase (PostgreSQL hospedado)
-- **Autenticação**: NextAuth.js v5 com JWT e roles
-- **PWA**: next-pwa com Service Worker e cache offline
-- **UI/UX**: Interface moderna e responsiva com dark mode
-- **Deploy**: Otimizado para Vercel
+## 🌐 URLs de Acesso
+- **Desenvolvimento**: https://3000-inf71qwtpa8mbn30ykzsp-6532622b.e2b.dev
+- **Login**: `/login`
+- **Dashboard**: `/dashboard`
+- **Gerenciamento de Usuários**: `/dashboard/users`
 
 ## ✅ Funcionalidades Implementadas
 
-### Autenticação e Autorização
-- ✅ Sistema de login com NextAuth.js
-- ✅ Três níveis de acesso: user, analyst, admin
+### 1. **Autenticação e Autorização**
+- ✅ Sistema de login com NextAuth.js v5
+- ✅ 3 níveis de acesso: Admin, Analyst, User
 - ✅ Proteção de rotas com middleware
-- ✅ Sessão persistente com JWT
+- ✅ Sessão JWT persistente
+- ✅ Logout funcional
 
-### Interface do Usuário
-- ✅ Dashboard com estatísticas em tempo real
-- ✅ Layout responsivo com sidebar navegável
-- ✅ Dark mode integrado
-- ✅ Página de login moderna
-- ✅ Página de listagem de chamados com filtros
+### 2. **Gerenciamento de Usuários (CRUD Completo)**
+- ✅ **Listagem**: Exibição de todos os usuários do banco
+- ✅ **Criação**: Adicionar novos usuários com senha criptografada (bcrypt)
+- ✅ **Edição**: Atualizar informações do usuário
+- ✅ **Exclusão**: Remover usuários (exceto admin principal)
+- ✅ **Ativação/Desativação**: Toggle de status do usuário
+- ✅ **Filtros**: Por nome, email, perfil e status
+- ✅ **Busca**: Sistema de busca em tempo real
 
-### PWA (Progressive Web App)
-- ✅ Manifest.json configurado
-- ✅ Service Worker para funcionamento offline
-- ✅ Instalável em desktop e mobile
-- ✅ Ícones e splash screens
+### 3. **Integração com Banco de Dados Real**
+- ✅ **Supabase PostgreSQL**: Banco de dados hospedado
+- ✅ **API Routes**: GET, POST, PATCH, DELETE funcionais
+- ✅ **Migrations**: Estrutura de tabelas criada
+- ✅ **Seed Data**: 6 usuários de teste inseridos
 
-### Estrutura de Dados
-- ✅ Schema completo do banco de dados
-- ✅ Tipos TypeScript definidos
-- ✅ Integração com Supabase configurada
+### 4. **Interface de Usuário**
+- ✅ **Dark Mode**: Tema claro/escuro funcional
+- ✅ **Responsividade**: Layout adaptativo para mobile/desktop
+- ✅ **Componentes Reutilizáveis**: Sistema modular
+- ✅ **Feedback Visual**: Toast notifications (react-hot-toast)
+- ✅ **Loading States**: Indicadores de carregamento
+- ✅ **Modais**: Sistema de modais para criar/editar
 
-## 🔗 URLs e Endpoints
+### 5. **PWA Support**
+- ✅ **Service Worker**: Configurado com next-pwa
+- ✅ **Manifest**: Arquivo de manifesto PWA
+- ✅ **Offline Support**: Cache de assets estáticos
 
-### Páginas Principais
-- `/` - Redireciona para login ou dashboard
-- `/login` - Página de autenticação
-- `/dashboard` - Dashboard principal com estatísticas
-- `/dashboard/tickets` - Listagem e gestão de chamados
-- `/dashboard/tickets/new` - Criar novo chamado
-- `/dashboard/tickets/[id]` - Detalhes do chamado
-- `/dashboard/analytics` - Estatísticas avançadas
-- `/dashboard/users` - Gestão de usuários (admin)
-- `/dashboard/settings` - Configurações do sistema (admin)
+## 📊 Estrutura de Dados
 
-### API Routes
-- `/api/auth/[...nextauth]` - Endpoints de autenticação
-- `/api/tickets` - CRUD de chamados (a implementar)
-- `/api/comments` - Sistema de comentários (a implementar)
-- `/api/notifications` - Notificações (a implementar)
-- `/api/upload` - Upload de arquivos (a implementar)
+### Tabela: `users`
+```sql
+- id: UUID (PK)
+- email: TEXT (unique)
+- name: TEXT
+- password_hash: TEXT
+- role: TEXT (admin|analyst|user)
+- department: TEXT
+- phone: TEXT
+- is_active: BOOLEAN
+- last_login: TIMESTAMP
+- created_at: TIMESTAMP
+- updated_at: TIMESTAMP
+```
 
-## 📊 Modelos de Dados
+## 🔐 Credenciais de Teste
+```
+Admin:
+  Email: admin@example.com
+  Senha: admin123
 
-### Principais Entidades
-- **Users**: Usuários com roles e preferências
-- **Tickets**: Chamados com status, prioridade e SLA
-- **Comments**: Comentários nos chamados
-- **Attachments**: Anexos de arquivos
-- **Notifications**: Sistema de notificações
-- **Modules**: Categorização de chamados
+Analistas:
+  Email: analyst1@example.com / analyst2@example.com
+  Senha: analyst123
 
-### Níveis de Acesso
-1. **User**: Criar e visualizar próprios chamados
-2. **Analyst**: Gerenciar todos os chamados
-3. **Admin**: Acesso completo ao sistema
+Usuários:
+  Email: user1@example.com / user2@example.com / user3@example.com
+  Senha: user123
+```
 
-## 🚧 Funcionalidades em Desenvolvimento
+## 🚀 Como Executar
 
-### Alta Prioridade
-- [ ] API Routes para CRUD completo de chamados
-- [ ] Sistema de comentários em tempo real
-- [ ] Upload e gestão de anexos
-- [ ] Notificações push via Web Push API
+### Desenvolvimento Local:
+```bash
+# Instalar dependências
+npm install
 
-### Média Prioridade
-- [ ] Gráficos e estatísticas avançadas com Recharts
-- [ ] Exportação de relatórios (PDF/Excel)
-- [ ] Sistema de templates para respostas
-- [ ] Busca avançada com filtros múltiplos
+# Verificar banco de dados
+npm run db:check
 
-### Baixa Prioridade
-- [ ] Integração com email (notificações)
-- [ ] API REST pública documentada
-- [ ] Sistema de webhooks
-- [ ] Chatbot de atendimento
+# Popular banco com dados de teste
+npm run db:seed
 
-## 🛠️ Como Usar
+# Build da aplicação
+npm run build
 
-### Pré-requisitos
-1. Conta no Supabase com banco PostgreSQL
-2. Conta no Vercel para deploy
-3. Node.js 18+ instalado
+# Iniciar servidor
+npm run start
+# ou com PM2
+pm2 start ecosystem.config.cjs
+```
 
-### Configuração Inicial
+### Scripts Disponíveis:
+- `npm run dev` - Modo desenvolvimento
+- `npm run build` - Build de produção
+- `npm run start` - Iniciar em produção
+- `npm run db:check` - Verificar status do banco
+- `npm run db:seed` - Popular banco com dados de teste
+- `npm run db:setup` - Configurar banco de dados
 
-1. **Configurar variáveis de ambiente**:
-   Edite o arquivo `.env.local` com suas credenciais:
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=sua_url_supabase
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima
-   SUPABASE_SERVICE_ROLE_KEY=sua_chave_servico
-   NEXTAUTH_SECRET=gerar_secret_aleatorio
-   ```
+## 🔄 Funcionalidades Pendentes
 
-2. **Configurar banco de dados**:
-   Execute o script SQL em `supabase-schema.sql` no painel do Supabase
+### 1. **Gestão de Chamados**
+- [ ] CRUD completo de tickets
+- [ ] Sistema de prioridades (Alta/Média/Baixa)
+- [ ] Status dinâmicos (Aberto/Em andamento/Resolvido)
+- [ ] Atribuição para analistas
+- [ ] Histórico de alterações
 
-3. **Instalar dependências**:
-   ```bash
-   npm install
-   ```
+### 2. **Sistema de Comentários**
+- [ ] Adicionar comentários aos chamados
+- [ ] Respostas aninhadas
+- [ ] Menções a usuários
+- [ ] Formatação rich text
 
-4. **Executar em desenvolvimento**:
-   ```bash
-   npm run dev
-   ```
+### 3. **Upload de Arquivos**
+- [ ] Anexar arquivos aos chamados
+- [ ] Preview de imagens
+- [ ] Limite de tamanho
+- [ ] Integração com Supabase Storage
 
-5. **Acessar**:
-   - URL: http://localhost:3000
-   - Login demo: admin@example.com / admin123
+### 4. **Notificações**
+- [ ] Push notifications (PWA)
+- [ ] Email notifications
+- [ ] Notificações in-app
+- [ ] Configurações por usuário
 
-### Deploy no Vercel
+### 5. **Analytics e Relatórios**
+- [ ] Dashboard com métricas
+- [ ] Gráficos de desempenho
+- [ ] Exportação para PDF/Excel
+- [ ] Relatórios customizados
 
-1. Fazer push do código para GitHub
-2. Conectar repositório no Vercel
-3. Configurar variáveis de ambiente
-4. Deploy automático
+### 6. **Melhorias de UX**
+- [ ] Onboarding para novos usuários
+- [ ] Tour guiado
+- [ ] Atalhos de teclado
+- [ ] Pesquisa global
 
-## 📱 PWA - Instalação
+## 💻 Tecnologias Utilizadas
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Estilização**: Tailwind CSS, CSS Modules
+- **Banco de Dados**: Supabase (PostgreSQL)
+- **Autenticação**: NextAuth.js v5
+- **State Management**: Zustand
+- **Formulários**: React Hook Form + Zod
+- **PWA**: next-pwa
+- **Deploy**: Preparado para Vercel
 
-### Desktop (Chrome/Edge)
-1. Acessar o sistema
-2. Clicar no ícone de instalação na barra de endereços
-3. Confirmar instalação
+## 📝 Notas de Desenvolvimento
+- Sistema configurado com ES Modules (type: "module")
+- PM2 para gerenciamento de processos
+- Todas as senhas são hasheadas com bcrypt
+- Row Level Security (RLS) configurado no Supabase
+- Service Role Key usado para operações administrativas
 
-### Mobile (Android/iOS)
-1. Acessar o sistema no navegador
-2. Menu → "Adicionar à tela inicial"
-3. Confirmar instalação
+## 🎯 Próximos Passos Recomendados
+1. **Implementar CRUD de Chamados**: Criar estrutura de tabelas e APIs
+2. **Sistema de Comentários**: Adicionar funcionalidade de discussão
+3. **Upload de Arquivos**: Configurar Supabase Storage
+4. **Notificações Push**: Implementar Web Push API
+5. **Deploy no Vercel**: Configurar variáveis de ambiente e deploy
 
-## 🔐 Segurança
-
-- Autenticação via JWT com refresh token
-- Senhas hasheadas com bcrypt
-- RLS (Row Level Security) no Supabase
-- Validação de dados com Zod
-- Proteção CSRF integrada
-- Headers de segurança configurados
-
-## 📈 Próximos Passos Recomendados
-
-1. **Finalizar CRUD de Chamados**
-   - Implementar API routes
-   - Criar formulário de novo chamado
-   - Adicionar edição e exclusão
-
-2. **Sistema de Comentários**
-   - Implementar API de comentários
-   - Interface de comentários em tempo real
-   - Menções e notificações
-
-3. **Upload de Arquivos**
-   - Integrar com Cloudinary ou S3
-   - Preview de imagens
-   - Limite de tamanho e tipos
-
-4. **Notificações Push**
-   - Configurar Web Push API
-   - Solicitar permissão do usuário
-   - Enviar notificações de novos chamados
-
-5. **Deploy e Testes**
-   - Configurar CI/CD
-   - Testes automatizados
-   - Monitoramento com Sentry
-
-## 🤝 Suporte
-
-Para dúvidas ou problemas, abra uma issue no GitHub ou entre em contato com a equipe de desenvolvimento.
-
-## 📄 Licença
-
-Este projeto é proprietário e confidencial.
-
----
-
-**Última Atualização**: Dezembro 2024
-**Versão**: 1.0.0
-**Status**: Em Desenvolvimento
+## 📊 Status do Projeto
+- **Versão**: 1.0.0
+- **Status**: ✅ Em Desenvolvimento
+- **Última Atualização**: 31/08/2025
+- **Ambiente**: Sandbox E2B
+- **Banco de Dados**: ✅ Conectado e Funcional

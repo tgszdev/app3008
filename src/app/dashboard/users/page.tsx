@@ -1,57 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit, Trash2, UserCheck, UserX, Shield, User as UserIcon, X, Save } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, UserCheck, UserX, Shield, User as UserIcon, X, Save, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
-
-// Mock data inicial
-const initialUsers = [
-  {
-    id: '1',
-    name: 'Administrador do Sistema',
-    email: 'admin@example.com',
-    role: 'admin',
-    department: 'Tecnologia da Informação',
-    phone: '(11) 99999-9999',
-    is_active: true,
-    last_login: '2024-12-30T15:00:00',
-    created_at: '2024-01-01T00:00:00',
-  },
-  {
-    id: '2',
-    name: 'João Silva',
-    email: 'joao.silva@example.com',
-    role: 'analyst',
-    department: 'Suporte Técnico',
-    phone: '(11) 98888-8888',
-    is_active: true,
-    last_login: '2024-12-30T14:00:00',
-    created_at: '2024-06-15T00:00:00',
-  },
-  {
-    id: '3',
-    name: 'Maria Santos',
-    email: 'maria.santos@example.com',
-    role: 'user',
-    department: 'Recursos Humanos',
-    phone: '(11) 97777-7777',
-    is_active: true,
-    last_login: '2024-12-30T10:00:00',
-    created_at: '2024-03-20T00:00:00',
-  },
-  {
-    id: '4',
-    name: 'Pedro Costa',
-    email: 'pedro.costa@example.com',
-    role: 'user',
-    department: 'Financeiro',
-    phone: '(11) 96666-6666',
-    is_active: false,
-    last_login: '2024-12-01T10:00:00',
-    created_at: '2024-02-10T00:00:00',
-  },
-]
+import axios from 'axios'
 
 const RoleBadge = ({ role }: { role: string }) => {
   const config: Record<string, { color: string; icon: any; label: string }> = {
@@ -96,6 +49,19 @@ const StatusBadge = ({ isActive }: { isActive: boolean }) => {
   )
 }
 
+interface User {
+  id: string
+  name: string
+  email: string
+  role: string
+  department?: string
+  phone?: string
+  is_active: boolean
+  last_login?: string
+  created_at: string
+  updated_at: string
+}
+
 interface UserFormData {
   name: string
   email: string
@@ -106,12 +72,14 @@ interface UserFormData {
 }
 
 export default function UsersPage() {
-  const [users, setUsers] = useState(initialUsers)
+  const [users, setUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
   const [showModal, setShowModal] = useState(false)
-  const [editingUser, setEditingUser] = useState<any>(null)
+  const [editingUser, setEditingUser] = useState<User | null>(null)
+  const [saving, setSaving] = useState(false)
   const [formData, setFormData] = useState<UserFormData>({
     name: '',
     email: '',
@@ -121,10 +89,22 @@ export default function UsersPage() {
     password: '',
   })
 
-  // Debug useEffect
+  // Buscar usuários do banco
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get('/api/users')
+      setUsers(response.data)
+    } catch (error: any) {
+      console.error('Erro ao buscar usuários:', error)
+      toast.error('Erro ao carregar usuários')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    console.log('Modal state changed:', showModal)
-  }, [showModal])
+    fetchUsers()
+  }, [])
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -137,19 +117,22 @@ export default function UsersPage() {
     return matchesSearch && matchesRole && matchesStatus
   })
 
-  const handleToggleStatus = (userId: string) => {
-    setUsers(prevUsers => 
-      prevUsers.map(user => 
-        user.id === userId 
-          ? { ...user, is_active: !user.is_active }
-          : user
-      )
-    )
-    const user = users.find(u => u.id === userId)
-    toast.success(`Usuário ${user?.is_active ? 'desativado' : 'ativado'} com sucesso!`)
+  const handleToggleStatus = async (userId: string, currentStatus: boolean) => {
+    try {
+      await axios.patch('/api/users', {
+        id: userId,
+        is_active: !currentStatus
+      })
+      
+      await fetchUsers()
+      toast.success(`Usuário ${currentStatus ? 'desativado' : 'ativado'} com sucesso!`)
+    } catch (error: any) {
+      console.error('Erro ao atualizar status:', error)
+      toast.error('Erro ao atualizar status do usuário')
+    }
   }
 
-  const handleDeleteUser = (userId: string) => {
+  const handleDeleteUser = async (userId: string) => {
     const user = users.find(u => u.id === userId)
     
     if (user?.email === 'admin@example.com') {
@@ -158,25 +141,30 @@ export default function UsersPage() {
     }
     
     if (confirm(`Tem certeza que deseja excluir o usuário ${user?.name}?`)) {
-      setUsers(prevUsers => prevUsers.filter(user => user.id !== userId))
-      toast.success('Usuário excluído com sucesso!')
+      try {
+        await axios.delete(`/api/users?id=${userId}`)
+        await fetchUsers()
+        toast.success('Usuário excluído com sucesso!')
+      } catch (error: any) {
+        console.error('Erro ao excluir usuário:', error)
+        toast.error(error.response?.data?.error || 'Erro ao excluir usuário')
+      }
     }
   }
 
-  const handleEditUser = (user: any) => {
+  const handleEditUser = (user: User) => {
     setEditingUser(user)
     setFormData({
       name: user.name,
       email: user.email,
       role: user.role,
-      department: user.department,
-      phone: user.phone,
+      department: user.department || '',
+      phone: user.phone || '',
     })
     setShowModal(true)
   }
 
   const handleOpenNewUserModal = () => {
-    console.log('Abrindo modal de novo usuário')
     setEditingUser(null)
     setFormData({
       name: '',
@@ -189,7 +177,7 @@ export default function UsersPage() {
     setShowModal(true)
   }
 
-  const handleSaveUser = () => {
+  const handleSaveUser = async () => {
     // Validação
     if (!formData.name || !formData.email) {
       toast.error('Nome e email são obrigatórios!')
@@ -201,39 +189,47 @@ export default function UsersPage() {
       return
     }
 
-    if (editingUser) {
-      // Editar usuário existente
-      setUsers(prevUsers =>
-        prevUsers.map(user =>
-          user.id === editingUser.id
-            ? { ...user, ...formData }
-            : user
-        )
-      )
-      toast.success('Usuário atualizado com sucesso!')
-    } else {
-      // Criar novo usuário
-      const newUser = {
-        id: String(Date.now()),
-        ...formData,
-        is_active: true,
-        last_login: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-      }
-      setUsers(prevUsers => [...prevUsers, newUser])
-      toast.success('Usuário criado com sucesso!')
-    }
+    setSaving(true)
 
-    setShowModal(false)
-    setEditingUser(null)
-    setFormData({
-      name: '',
-      email: '',
-      role: 'user',
-      department: '',
-      phone: '',
-      password: '',
-    })
+    try {
+      if (editingUser) {
+        // Editar usuário existente
+        await axios.patch('/api/users', {
+          id: editingUser.id,
+          ...formData
+        })
+        toast.success('Usuário atualizado com sucesso!')
+      } else {
+        // Criar novo usuário
+        await axios.post('/api/users', formData)
+        toast.success('Usuário criado com sucesso!')
+      }
+
+      await fetchUsers()
+      setShowModal(false)
+      setEditingUser(null)
+      setFormData({
+        name: '',
+        email: '',
+        role: 'user',
+        department: '',
+        phone: '',
+        password: '',
+      })
+    } catch (error: any) {
+      console.error('Erro ao salvar usuário:', error)
+      toast.error(error.response?.data?.error || 'Erro ao salvar usuário')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      </div>
+    )
   }
 
   return (
@@ -249,11 +245,7 @@ export default function UsersPage() {
           </p>
         </div>
         <button
-          onClick={() => {
-            console.log('Botão clicado!')
-            alert('Botão funcionando!')
-            handleOpenNewUserModal()
-          }}
+          onClick={handleOpenNewUserModal}
           className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
         >
           <Plus className="h-5 w-5 mr-2" />
@@ -343,18 +335,18 @@ export default function UsersPage() {
                     <RoleBadge role={user.role} />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    {user.department}
+                    {user.department || '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <StatusBadge isActive={user.is_active} />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {new Date(user.last_login).toLocaleDateString('pt-BR')}
+                    {user.last_login ? new Date(user.last_login).toLocaleDateString('pt-BR') : 'Nunca'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end gap-2">
                       <button 
-                        onClick={() => handleToggleStatus(user.id)}
+                        onClick={() => handleToggleStatus(user.id, user.is_active)}
                         className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
                         title={user.is_active ? 'Desativar' : 'Ativar'}
                       >
@@ -382,24 +374,12 @@ export default function UsersPage() {
           </table>
         </div>
 
-        {/* Pagination - Simplificada sem funcionalidade real */}
+        {/* Pagination - Simplificada */}
         <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-700 dark:text-gray-300">
-              Mostrando <span className="font-medium">{filteredUsers.length}</span> de{' '}
-              <span className="font-medium">{users.length}</span> usuários
+              Total de <span className="font-medium">{filteredUsers.length}</span> usuários
             </p>
-            <div className="flex gap-2">
-              <button className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50" disabled>
-                Anterior
-              </button>
-              <button className="px-3 py-1 bg-blue-600 text-white rounded-lg text-sm">
-                1
-              </button>
-              <button className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50" disabled>
-                Próximo
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -453,6 +433,7 @@ export default function UsersPage() {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="email@exemplo.com"
+                  disabled={!!editingUser}
                 />
               </div>
 
@@ -517,15 +498,26 @@ export default function UsersPage() {
               <button
                 onClick={() => setShowModal(false)}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                disabled={saving}
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSaveUser}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center disabled:opacity-50"
+                disabled={saving}
               >
-                <Save className="h-4 w-4 mr-2" />
-                {editingUser ? 'Salvar' : 'Criar'}
+                {saving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Salvando...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    {editingUser ? 'Salvar' : 'Criar'}
+                  </>
+                )}
               </button>
             </div>
           </div>
