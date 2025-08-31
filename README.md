@@ -29,6 +29,7 @@
 - ✅ **Redirecionamento automático para login quando não autenticado**
 - ✅ **Controle de permissões baseado em role**:
   - Usuários com role "user" não podem atribuir analistas
+  - Usuários com role "user" não podem definir data de vencimento (SLA)
   - Usuários com role "user" não podem excluir tickets
   - Usuários com role "user" não podem alterar status de tickets
 

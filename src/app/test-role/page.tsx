@@ -42,6 +42,16 @@ export default function TestRolePage() {
             </span>
           </p>
           <p>
+            <strong>Pode definir data de vencimento:</strong> 
+            <span className={`ml-2 px-2 py-1 rounded text-white ${
+              session?.user?.role === 'admin' || session?.user?.role === 'analyst' 
+                ? 'bg-green-500' 
+                : 'bg-red-500'
+            }`}>
+              {session?.user?.role === 'admin' || session?.user?.role === 'analyst' ? 'SIM' : 'NÃO'}
+            </span>
+          </p>
+          <p>
             <strong>Pode excluir tickets:</strong> 
             <span className={`ml-2 px-2 py-1 rounded text-white ${
               session?.user?.role === 'admin' || session?.user?.role === 'analyst' 
@@ -68,7 +78,7 @@ export default function TestRolePage() {
         <h2 className="text-lg font-semibold mb-4">Testar Páginas</h2>
         <div className="space-y-2">
           <Link href="/dashboard/tickets/new" className="block text-blue-600 hover:text-blue-800">
-            → Criar Novo Ticket (deve esconder campo "Atribuir para" se role = user)
+            → Criar Novo Ticket (deve esconder campos "Atribuir para" e "Data de Vencimento" se role = user)
           </Link>
           <Link href="/dashboard/tickets" className="block text-blue-600 hover:text-blue-800">
             → Lista de Tickets (deve esconder botão excluir se role = user)
@@ -81,7 +91,7 @@ export default function TestRolePage() {
 
       <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
         <p className="text-sm text-yellow-800">
-          <strong>Nota:</strong> Se o campo "Atribuir para" ainda aparecer para usuários com role "user", 
+          <strong>Nota:</strong> Se os campos "Atribuir para" ou "Data de Vencimento" ainda aparecerem para usuários com role "user", 
           tente limpar o cache do navegador (Ctrl+F5) ou abrir em uma aba anônima.
         </p>
       </div>
