@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
-  // Lista de rotas que precisam de autenticação
+  // Rotas que precisam de autenticação
   const protectedPaths = ['/dashboard', '/api/users', '/api/tickets']
   
   // Verificar se é uma rota protegida
@@ -29,10 +29,11 @@ export function middleware(request: NextRequest) {
       )
     }
     
-    // Para páginas, redirecionar para login
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('callbackUrl', pathname)
-    return NextResponse.redirect(loginUrl)
+    // Para páginas, redirecionar para login com callbackUrl
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    url.searchParams.set('callbackUrl', pathname)
+    return NextResponse.redirect(url)
   }
   
   return NextResponse.next()
@@ -40,7 +41,16 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Proteger todas as rotas exceto as estáticas e de autenticação
-    '/((?!_next/static|_next/image|favicon.ico|icons|manifest.json|sw.js|login|api/auth|api/health).*)',
+    /*
+     * Match all request paths except:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico, icons, manifest.json, sw.js (PWA files)
+     * - login page
+     * - api/auth routes (authentication endpoints)
+     * - api/health (health check)
+     * - status page
+     */
+    '/((?!_next/static|_next/image|favicon.ico|icons|manifest.json|sw.js|login|api/auth|api/health|status).*)',
   ],
 }
