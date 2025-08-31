@@ -116,18 +116,26 @@ export default function TicketDetailsPage() {
     }
 
     try {
-      await axios.put('/api/tickets', {
+      console.log('=== DEBUG UPDATE STATUS ===')
+      console.log('ID do ticket:', ticket.id)
+      console.log('Novo status:', newStatus)
+      console.log('User ID:', session?.user?.id)
+      
+      const response = await axios.put('/api/tickets', {
         id: ticket.id,
         status: newStatus,
         updated_by: session?.user?.id
       })
       
+      console.log('Resposta da atualização:', response.data)
+      
       toast.success('Status atualizado com sucesso!')
       setEditingStatus(false)
       fetchTicket()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao atualizar status:', error)
-      toast.error('Erro ao atualizar status')
+      console.error('Detalhes do erro:', error.response?.data)
+      toast.error(error.response?.data?.error || 'Erro ao atualizar status')
     }
   }
 

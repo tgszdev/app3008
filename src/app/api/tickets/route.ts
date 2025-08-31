@@ -123,11 +123,24 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// PUT - Atualizar ticket (mesma funcionalidade que PATCH)
+export async function PUT(request: NextRequest) {
+  return handleUpdate(request)
+}
+
 // PATCH - Atualizar ticket
 export async function PATCH(request: NextRequest) {
+  return handleUpdate(request)
+}
+
+// Função compartilhada para atualização
+async function handleUpdate(request: NextRequest) {
   try {
     const body = await request.json()
-    const { id, user_id, ...updateData } = body
+    const { id, updated_by, user_id, ...updateData } = body
+    
+    // Aceitar tanto updated_by quanto user_id
+    const userId = updated_by || user_id
 
     if (!id) {
       return NextResponse.json(
@@ -172,6 +185,24 @@ export async function PATCH(request: NextRequest) {
 
     if (error) {
       console.error('Erro ao atualizar ticket:', error)
+      
+      // Se for erro de foreign key, tentar atualizar sem as relações
+      if (error.message.includes('relationship')) {
+        const { data: simpleUpdate, error: simpleError } = await supabaseAdmin
+          .from('tickets')
+          .update(updateData)
+          .eq('id', id)
+          .select('*')
+          .single()
+        
+        if (simpleError) {
+          console.error('Erro ao atualizar (simples):', simpleError)
+          return NextResponse.json({ error: simpleError.message }, { status: 500 })
+        }
+        
+        return NextResponse.json(simpleUpdate)
+      }
+      
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -183,7 +214,7 @@ export async function PATCH(request: NextRequest) {
         if (key !== 'updated_at' && currentTicket[key] !== updateData[key]) {
           changes.push({
             ticket_id: id,
-            user_id: user_id || currentTicket.created_by,
+            user_id: userId || currentTicket.created_by,
             action: 'updated',
             field_name: key,
             old_value: String(currentTicket[key] || ''),
