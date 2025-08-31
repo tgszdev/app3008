@@ -16,13 +16,14 @@ export async function GET(
       return NextResponse.json({ error: 'ID do ticket é obrigatório' }, { status: 400 })
     }
 
-    // Buscar ticket com informações relacionadas
+    // Buscar ticket com informações relacionadas incluindo categoria
     const { data: ticket, error } = await supabaseAdmin
       .from('tickets')
       .select(`
         *,
         created_by_user:users!tickets_created_by_fkey(id, name, email, role),
-        assigned_to_user:users!tickets_assigned_to_fkey(id, name, email, role)
+        assigned_to_user:users!tickets_assigned_to_fkey(id, name, email, role),
+        category_info:categories!tickets_category_id_fkey(id, name, slug, color, icon)
       `)
       .eq('id', id)
       .single()

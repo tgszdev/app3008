@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import axios from 'axios'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { ArrowLeft, Clock, User, Tag, AlertCircle, MessageSquare, Paperclip, Edit, Trash2, Send, CheckCircle, XCircle, AlertTriangle, ChevronDown } from 'lucide-react'
+import { ArrowLeft, Clock, User, Tag, AlertCircle, MessageSquare, Paperclip, Edit, Trash2, Send, CheckCircle, XCircle, AlertTriangle, ChevronDown, Folder } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useSession } from 'next-auth/react'
 
@@ -24,6 +24,14 @@ interface Comment {
   is_internal: boolean
 }
 
+interface Category {
+  id: string
+  name: string
+  slug: string
+  color: string
+  icon: string
+}
+
 interface Ticket {
   id: string
   ticket_number: number
@@ -31,7 +39,9 @@ interface Ticket {
   description: string
   status: 'open' | 'in_progress' | 'resolved' | 'closed' | 'cancelled'
   priority: 'low' | 'medium' | 'high' | 'critical'
-  category: string
+  category: string // Mantém compatibilidade
+  category_id?: string
+  category_info?: Category[] | Category // Pode vir como array ou objeto
   created_at: string
   updated_at: string
   due_date?: string
@@ -707,10 +717,31 @@ export default function TicketDetailsPage() {
                 )}
               </div>
 
-              {/* Módulo/Categoria */}
+              {/* Categoria */}
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Módulo</p>
-                <p className="font-semibold capitalize">{ticket.category}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Categoria</p>
+                {(() => {
+                  // Obter informações da categoria
+                  const categoryInfo = ticket.category_info
+                  const category = Array.isArray(categoryInfo) ? categoryInfo[0] : categoryInfo
+                  
+                  if (category) {
+                    return (
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-6 h-6 rounded-lg flex items-center justify-center"
+                          style={{ backgroundColor: category.color + '20', color: category.color }}
+                        >
+                          <Folder size={14} />
+                        </div>
+                        <p className="font-semibold">{category.name}</p>
+                      </div>
+                    )
+                  }
+                  
+                  // Fallback para categoria em texto
+                  return <p className="font-semibold capitalize">{ticket.category || 'Geral'}</p>
+                })()}
               </div>
 
               {/* SLA */}
