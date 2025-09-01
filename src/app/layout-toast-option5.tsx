@@ -1,3 +1,4 @@
+// OPÇÃO 5: Floating Card (Elegante com bordas coloridas - Altamente Recomendado)
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
@@ -62,40 +63,57 @@ export default function RootLayout({
           <AuthProvider>
             {children}
             <Toaster
-              position="bottom-left"
+              position="bottom-right"
               reverseOrder={false}
-              gutter={8}
+              gutter={12}
               toastOptions={{
-                duration: 4000,
+                duration: 5000,
                 style: {
-                  background: '#323232',
-                  color: '#ffffff',
-                  padding: '14px 24px',
-                  borderRadius: '4px',
+                  background: '#ffffff',
+                  color: '#1f2937',
+                  padding: '16px',
+                  borderRadius: '12px',
                   fontSize: '14px',
-                  fontWeight: '400',
+                  fontWeight: '500',
+                  border: '2px solid #e5e7eb',
+                  boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
                   marginBottom: '20px',
-                  marginLeft: '20px',
-                  minWidth: '288px',
-                  maxWidth: '568px',
-                  boxShadow: '0 3px 5px rgba(0,0,0,0.2)',
+                  marginRight: '20px',
+                  minWidth: '300px',
                 },
                 success: {
+                  style: {
+                    background: '#ffffff',
+                    color: '#059669',
+                    border: '2px solid #10b981',
+                  },
+                  icon: '✅',
                   iconTheme: {
-                    primary: '#4caf50',
-                    secondary: '#323232',
+                    primary: '#10b981',
+                    secondary: '#ffffff',
                   },
                 },
                 error: {
+                  style: {
+                    background: '#ffffff',
+                    color: '#dc2626',
+                    border: '2px solid #ef4444',
+                  },
+                  icon: '❌',
                   iconTheme: {
-                    primary: '#f44336',
-                    secondary: '#323232',
+                    primary: '#ef4444',
+                    secondary: '#ffffff',
                   },
                 },
                 loading: {
+                  style: {
+                    background: '#ffffff',
+                    color: '#2563eb',
+                    border: '2px solid #3b82f6',
+                  },
                   iconTheme: {
-                    primary: '#2196f3',
-                    secondary: '#323232',
+                    primary: '#3b82f6',
+                    secondary: '#ffffff',
                   },
                 },
               }}

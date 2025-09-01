@@ -1,3 +1,4 @@
+// OPÇÃO 8: iOS Style (Estilo Apple - Premium com blur)
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
@@ -62,40 +63,52 @@ export default function RootLayout({
           <AuthProvider>
             {children}
             <Toaster
-              position="bottom-left"
+              position="top-center"
               reverseOrder={false}
               gutter={8}
               toastOptions={{
-                duration: 4000,
+                duration: 3500,
                 style: {
-                  background: '#323232',
-                  color: '#ffffff',
-                  padding: '14px 24px',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  fontWeight: '400',
-                  marginBottom: '20px',
-                  marginLeft: '20px',
-                  minWidth: '288px',
-                  maxWidth: '568px',
-                  boxShadow: '0 3px 5px rgba(0,0,0,0.2)',
+                  background: 'rgba(255, 255, 255, 0.98)',
+                  color: '#000000',
+                  padding: '20px',
+                  borderRadius: '14px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  marginTop: '50px',
+                  boxShadow: '0 10px 40px rgba(0,0,0,0.12)',
+                  backdropFilter: 'blur(20px)',
+                  border: '0.5px solid rgba(0,0,0,0.04)',
+                  maxWidth: '350px',
                 },
                 success: {
+                  style: {
+                    background: 'rgba(255, 255, 255, 0.98)',
+                    color: '#34c759',
+                  },
                   iconTheme: {
-                    primary: '#4caf50',
-                    secondary: '#323232',
+                    primary: '#34c759',
+                    secondary: '#ffffff',
                   },
                 },
                 error: {
+                  style: {
+                    background: 'rgba(255, 255, 255, 0.98)',
+                    color: '#ff3b30',
+                  },
                   iconTheme: {
-                    primary: '#f44336',
-                    secondary: '#323232',
+                    primary: '#ff3b30',
+                    secondary: '#ffffff',
                   },
                 },
                 loading: {
+                  style: {
+                    background: 'rgba(255, 255, 255, 0.98)',
+                    color: '#007aff',
+                  },
                   iconTheme: {
-                    primary: '#2196f3',
-                    secondary: '#323232',
+                    primary: '#007aff',
+                    secondary: '#ffffff',
                   },
                 },
               }}

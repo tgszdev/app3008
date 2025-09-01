@@ -1,3 +1,4 @@
+// OPÇÃO 6: Notification Bar (Estilo Slack - Profissional)
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
@@ -62,40 +63,48 @@ export default function RootLayout({
           <AuthProvider>
             {children}
             <Toaster
-              position="bottom-left"
+              position="top-left"
               reverseOrder={false}
               gutter={8}
               toastOptions={{
                 duration: 4000,
                 style: {
-                  background: '#323232',
+                  background: '#1a1a1a',
                   color: '#ffffff',
-                  padding: '14px 24px',
-                  borderRadius: '4px',
-                  fontSize: '14px',
+                  padding: '14px 20px',
+                  borderRadius: '6px',
+                  fontSize: '13px',
                   fontWeight: '400',
-                  marginBottom: '20px',
+                  borderLeft: '4px solid #6b7280',
+                  marginTop: '80px',
                   marginLeft: '20px',
-                  minWidth: '288px',
-                  maxWidth: '568px',
-                  boxShadow: '0 3px 5px rgba(0,0,0,0.2)',
+                  minWidth: '280px',
                 },
                 success: {
+                  style: {
+                    borderLeft: '4px solid #22c55e',
+                  },
                   iconTheme: {
-                    primary: '#4caf50',
-                    secondary: '#323232',
+                    primary: '#22c55e',
+                    secondary: '#1a1a1a',
                   },
                 },
                 error: {
+                  style: {
+                    borderLeft: '4px solid #ef4444',
+                  },
                   iconTheme: {
-                    primary: '#f44336',
-                    secondary: '#323232',
+                    primary: '#ef4444',
+                    secondary: '#1a1a1a',
                   },
                 },
                 loading: {
+                  style: {
+                    borderLeft: '4px solid #3b82f6',
+                  },
                   iconTheme: {
-                    primary: '#2196f3',
-                    secondary: '#323232',
+                    primary: '#3b82f6',
+                    secondary: '#1a1a1a',
                   },
                 },
               }}

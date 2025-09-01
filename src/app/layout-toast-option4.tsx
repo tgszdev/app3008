@@ -1,3 +1,4 @@
+// OPÇÃO 4: Top-Center com Banner (Estilo moderno e chamativo)
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
@@ -62,40 +63,49 @@ export default function RootLayout({
           <AuthProvider>
             {children}
             <Toaster
-              position="bottom-left"
+              position="top-center"
               reverseOrder={false}
               gutter={8}
               toastOptions={{
                 duration: 4000,
                 style: {
-                  background: '#323232',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                   color: '#ffffff',
-                  padding: '14px 24px',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  fontWeight: '400',
-                  marginBottom: '20px',
-                  marginLeft: '20px',
-                  minWidth: '288px',
-                  maxWidth: '568px',
-                  boxShadow: '0 3px 5px rgba(0,0,0,0.2)',
+                  padding: '16px 32px',
+                  borderRadius: '0 0 12px 12px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  width: '100%',
+                  maxWidth: '500px',
+                  textAlign: 'center',
+                  marginTop: '0',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
                 },
                 success: {
+                  style: {
+                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  },
                   iconTheme: {
-                    primary: '#4caf50',
-                    secondary: '#323232',
+                    primary: '#ffffff',
+                    secondary: '#10b981',
                   },
                 },
                 error: {
+                  style: {
+                    background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                  },
                   iconTheme: {
-                    primary: '#f44336',
-                    secondary: '#323232',
+                    primary: '#ffffff',
+                    secondary: '#ef4444',
                   },
                 },
                 loading: {
+                  style: {
+                    background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                  },
                   iconTheme: {
-                    primary: '#2196f3',
-                    secondary: '#323232',
+                    primary: '#ffffff',
+                    secondary: '#3b82f6',
                   },
                 },
               }}

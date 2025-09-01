@@ -1,3 +1,4 @@
+// OPÇÃO 2: Bottom-Right (Estilo WhatsApp - Recomendado para evitar sobreposição)
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
@@ -62,40 +63,48 @@ export default function RootLayout({
           <AuthProvider>
             {children}
             <Toaster
-              position="bottom-left"
+              position="bottom-right"
               reverseOrder={false}
               gutter={8}
               toastOptions={{
                 duration: 4000,
                 style: {
-                  background: '#323232',
+                  background: '#22c55e',
                   color: '#ffffff',
-                  padding: '14px 24px',
-                  borderRadius: '4px',
+                  padding: '12px 20px',
+                  borderRadius: '8px',
                   fontSize: '14px',
-                  fontWeight: '400',
+                  fontWeight: '500',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                  minWidth: '250px',
                   marginBottom: '20px',
-                  marginLeft: '20px',
-                  minWidth: '288px',
-                  maxWidth: '568px',
-                  boxShadow: '0 3px 5px rgba(0,0,0,0.2)',
+                  marginRight: '20px',
                 },
                 success: {
+                  style: {
+                    background: '#22c55e',
+                  },
                   iconTheme: {
-                    primary: '#4caf50',
-                    secondary: '#323232',
+                    primary: '#ffffff',
+                    secondary: '#22c55e',
                   },
                 },
                 error: {
+                  style: {
+                    background: '#ef4444',
+                  },
                   iconTheme: {
-                    primary: '#f44336',
-                    secondary: '#323232',
+                    primary: '#ffffff',
+                    secondary: '#ef4444',
                   },
                 },
                 loading: {
+                  style: {
+                    background: '#3b82f6',
+                  },
                   iconTheme: {
-                    primary: '#2196f3',
-                    secondary: '#323232',
+                    primary: '#ffffff',
+                    secondary: '#3b82f6',
                   },
                 },
               }}

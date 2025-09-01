@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Visual - Opções de Toast Notification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+        }
+        
+        .option-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            position: relative;
+            min-height: 300px;
+        }
+        
+        .option-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        
+        .option-description {
+            color: #6b7280;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        
+        .toast-preview {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 12px;
+            min-height: 150px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* OPÇÃO 1 */
+        .toast-1 {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* OPÇÃO 2 */
+        .toast-2 {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: #22c55e;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 250px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* OPÇÃO 3 */
+        .toast-3 {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* OPÇÃO 4 */
+        .toast-4 {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 0 0 12px 12px;
+            font-size: 15px;
+            font-weight: 600;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        /* OPÇÃO 5 */
+        .toast-5 {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            color: #059669;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            border: 2px solid #10b981;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            min-width: 280px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* OPÇÃO 6 */
+        .toast-6 {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #1a1a1a;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 400;
+            border-left: 4px solid #22c55e;
+            min-width: 280px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* OPÇÃO 7 */
+        .toast-7 {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: #323232;
+            color: white;
+            padding: 14px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 400;
+            min-width: 288px;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* OPÇÃO 8 */
+        .toast-8 {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.98);
+            color: #34c759;
+            padding: 20px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+            backdrop-filter: blur(20px);
+            border: 0.5px solid rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .icon {
+            font-size: 18px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .recommended {
+            background: #10b981;
+            color: white;
+        }
+        
+        .mobile {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .elegant {
+            background: #8b5cf6;
+            color: white;
+        }
+        
+        .pro {
+            background: #f59e0b;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Demonstração Visual - Opções de Toast</h1>
+        
+        <div class="grid">
+            <!-- OPÇÃO 1 -->
+            <div class="option-card">
+                <div class="option-title">
+                    Opção 1: Top-Right com Offset
+                </div>
+                <div class="option-description">
+                    Evita conflito com header, mantém visibilidade
+                </div>
+                <div class="toast-preview">
+                    <div class="toast-1">
+                        <span class="icon">✅</span>
+                        Status atualizado com sucesso!
+                    </div>
+                </div>
+            </div>
+            
+            <!-- OPÇÃO 2 -->
+            <div class="option-card">
+                <div class="option-title">
+                    Opção 2: Bottom-Right (WhatsApp)
+                    <span class="badge recommended">Recomendado</span>
+                </div>
+                <div class="option-description">
+                    Não interfere com conteúdo principal, familiar aos usuários
+                </div>
+                <div class="toast-preview">
+                    <div class="toast-2">
+                        <span class="icon">✅</span>
+                        Chamado criado com sucesso!
+                    </div>
+                </div>
+            </div>
+            
+            <!-- OPÇÃO 3 -->
+            <div class="option-card">
+                <div class="option-title">
+                    Opção 3: Bottom-Center
+                    <span class="badge mobile">Mobile</span>
+                </div>
+                <div class="option-description">
+                    Ótimo para responsividade e dispositivos móveis
+                </div>
+                <div class="toast-preview">
+                    <div class="toast-3">
+                        <span class="icon">✅</span>
+                        Operação realizada!
+                    </div>
+                </div>
+            </div>
+            
+            <!-- OPÇÃO 4 -->
+            <div class="option-card">
+                <div class="option-title">
+                    Opção 4: Top Banner
+                </div>
+                <div class="option-description">
+                    Chamativo, ideal para notificações importantes
+                </div>
+                <div class="toast-preview">
+                    <div class="toast-4">
+                        ✅ Configurações salvas com sucesso!
+                    </div>
+                </div>
+            </div>
+            
+            <!-- OPÇÃO 5 -->
+            <div class="option-card">
+                <div class="option-title">
+                    Opção 5: Floating Card
+                    <span class="badge elegant">Elegante</span>
+                    <span class="badge recommended">Recomendado</span>
+                </div>
+                <div class="option-description">
+                    Visual limpo, ótimo contraste, alta legibilidade
+                </div>
+                <div class="toast-preview">
+                    <div class="toast-5">
+                        <span class="icon">✅</span>
+                        Email enviado com sucesso!
+                    </div>
+                </div>
+            </div>
+            
+            <!-- OPÇÃO 6 -->
+            <div class="option-card">
+                <div class="option-title">
+                    Opção 6: Notification Bar (Slack)
+                    <span class="badge pro">Profissional</span>
+                </div>
+                <div class="option-description">
+                    Estilo corporativo, discreto e profissional
+                </div>
+                <div class="toast-preview">
+                    <div class="toast-6">
+                        <span class="icon">✅</span>
+                        Notificação enviada ao usuário
+                    </div>
+                </div>
+            </div>
+            
+            <!-- OPÇÃO 7 -->
+            <div class="option-card">
+                <div class="option-title">
+                    Opção 7: Material Design (Google)
+                </div>
+                <div class="option-description">
+                    Minimalista, segue padrões do Material Design
+                </div>
+                <div class="toast-preview">
+                    <div class="toast-7">
+                        <span class="icon">✅</span>
+                        Ação concluída
+                    </div>
+                </div>
+            </div>
+            
+            <!-- OPÇÃO 8 -->
+            <div class="option-card">
+                <div class="option-title">
+                    Opção 8: iOS Style (Apple)
+                    <span class="badge elegant">Premium</span>
+                </div>
+                <div class="option-description">
+                    Visual premium com blur effect, estilo iOS
+                </div>
+                <div class="toast-preview">
+                    <div class="toast-8">
+                        <span class="icon">✅</span>
+                        Sucesso!
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 40px; padding: 30px; background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+            <h2 style="color: #1f2937; margin-bottom: 20px;">📊 Análise Comparativa</h2>
+            
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #f3f4f6;">
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Opção</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Prós</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Contras</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Melhor Para</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;"><strong>2 - Bottom-Right</strong></td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">Não interfere, familiar</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">Pode passar despercebido</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">✅ Uso geral</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;"><strong>3 - Bottom-Center</strong></td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">Ótimo em mobile</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">Pode cobrir botões</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">📱 Apps mobile</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;"><strong>5 - Floating Card</strong></td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">Alta legibilidade, elegante</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">Ocupa mais espaço</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">💎 Apps premium</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 30px; padding: 20px; background: #f0fdf4; border-left: 4px solid #10b981; border-radius: 8px;">
+                <h3 style="color: #059669; margin-bottom: 10px;">🎯 Recomendação Final</h3>
+                <p style="color: #047857; line-height: 1.6;">
+                    Para resolver o problema de legibilidade e sobreposição, recomendo a <strong>Opção 2 (Bottom-Right)</strong> ou 
+                    <strong>Opção 5 (Floating Card)</strong>. Ambas oferecem excelente visibilidade sem interferir no conteúdo principal.
+                    A Opção 5 é mais elegante e oferece melhor contraste visual.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

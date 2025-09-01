@@ -1,3 +1,4 @@
+// OPÇÃO 1: Top-Right com Offset Maior (Evita conflito com header)
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
@@ -62,40 +63,44 @@ export default function RootLayout({
           <AuthProvider>
             {children}
             <Toaster
-              position="bottom-left"
+              position="top-right"
               reverseOrder={false}
-              gutter={8}
+              gutter={12}
               toastOptions={{
                 duration: 4000,
                 style: {
-                  background: '#323232',
-                  color: '#ffffff',
-                  padding: '14px 24px',
-                  borderRadius: '4px',
+                  marginTop: '80px',
+                  marginRight: '20px',
+                  background: 'var(--background)',
+                  color: 'var(--foreground)',
+                  padding: '16px',
+                  borderRadius: '8px',
                   fontSize: '14px',
-                  fontWeight: '400',
-                  marginBottom: '20px',
-                  marginLeft: '20px',
-                  minWidth: '288px',
-                  maxWidth: '568px',
-                  boxShadow: '0 3px 5px rgba(0,0,0,0.2)',
+                  fontWeight: '500',
+                  boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+                  zIndex: 9999,
+                  border: '1px solid var(--border)',
                 },
                 success: {
+                  style: {
+                    background: '#10b981',
+                    color: '#ffffff',
+                    border: 'none',
+                  },
                   iconTheme: {
-                    primary: '#4caf50',
-                    secondary: '#323232',
+                    primary: '#ffffff',
+                    secondary: '#10b981',
                   },
                 },
                 error: {
-                  iconTheme: {
-                    primary: '#f44336',
-                    secondary: '#323232',
+                  style: {
+                    background: '#ef4444',
+                    color: '#ffffff',
+                    border: 'none',
                   },
-                },
-                loading: {
                   iconTheme: {
-                    primary: '#2196f3',
-                    secondary: '#323232',
+                    primary: '#ffffff',
+                    secondary: '#ef4444',
                   },
                 },
               }}

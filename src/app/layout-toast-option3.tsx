@@ -1,3 +1,4 @@
+// OPÇÃO 3: Bottom-Center (Estilo Mobile - Ótimo para responsividade)
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
@@ -62,40 +63,37 @@ export default function RootLayout({
           <AuthProvider>
             {children}
             <Toaster
-              position="bottom-left"
+              position="bottom-center"
               reverseOrder={false}
               gutter={8}
               toastOptions={{
-                duration: 4000,
+                duration: 3000,
                 style: {
-                  background: '#323232',
+                  background: 'rgba(0, 0, 0, 0.85)',
                   color: '#ffffff',
-                  padding: '14px 24px',
-                  borderRadius: '4px',
+                  padding: '12px 24px',
+                  borderRadius: '24px',
                   fontSize: '14px',
-                  fontWeight: '400',
+                  backdropFilter: 'blur(10px)',
                   marginBottom: '20px',
-                  marginLeft: '20px',
-                  minWidth: '288px',
-                  maxWidth: '568px',
-                  boxShadow: '0 3px 5px rgba(0,0,0,0.2)',
+                  maxWidth: '90vw',
                 },
                 success: {
                   iconTheme: {
-                    primary: '#4caf50',
-                    secondary: '#323232',
+                    primary: '#10b981',
+                    secondary: '#ffffff',
                   },
                 },
                 error: {
                   iconTheme: {
-                    primary: '#f44336',
-                    secondary: '#323232',
+                    primary: '#ef4444',
+                    secondary: '#ffffff',
                   },
                 },
                 loading: {
                   iconTheme: {
-                    primary: '#2196f3',
-                    secondary: '#323232',
+                    primary: '#3b82f6',
+                    secondary: '#ffffff',
                   },
                 },
               }}
