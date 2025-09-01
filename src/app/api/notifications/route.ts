@@ -68,17 +68,20 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { user_id, title, message, type, severity = 'info', data, action_url } = body
 
+    // Se user_id for 'current', usar o ID do usuário da sessão
+    const targetUserId = user_id === 'current' ? session.user.id : user_id
+
     // Verificar se o usuário tem permissão para criar notificações
     // (normalmente apenas o sistema ou admins podem criar notificações para outros usuários)
     const userRole = (session.user as any).role
-    if (userRole !== 'admin' && user_id !== session.user.id) {
+    if (userRole !== 'admin' && targetUserId !== session.user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     const { data: notification, error } = await supabase
       .from('notifications')
       .insert({
-        user_id,
+        user_id: targetUserId,
         title,
         message,
         type,
@@ -98,7 +101,7 @@ export async function POST(request: NextRequest) {
     const { data: preferences } = await supabase
       .from('user_notification_preferences')
       .select('*')
-      .eq('user_id', user_id)
+      .eq('user_id', targetUserId)
       .single()
 
     if (preferences) {
@@ -108,7 +111,7 @@ export async function POST(request: NextRequest) {
         const { data: subscriptions } = await supabase
           .from('user_push_subscriptions')
           .select('*')
-          .eq('user_id', user_id)
+          .eq('user_id', targetUserId)
           .eq('active', true)
 
         if (subscriptions && subscriptions.length > 0) {

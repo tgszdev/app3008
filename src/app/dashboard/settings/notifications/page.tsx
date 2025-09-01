@@ -106,7 +106,7 @@ export default function NotificationSettingsPage() {
   // Criar notificação de teste
   const sendTestNotification = async () => {
     try {
-      await axios.post('/api/notifications', {
+      const response = await axios.post('/api/notifications', {
         user_id: 'current', // API vai pegar o usuário da sessão
         title: 'Notificação de Teste',
         message: 'Esta é uma notificação de teste para verificar se tudo está funcionando corretamente.',
@@ -115,15 +115,18 @@ export default function NotificationSettingsPage() {
         action_url: '/dashboard/settings/notifications'
       })
       
+      console.log('Test notification response:', response.data)
       toast.success('Notificação de teste enviada!')
       
       // Se push está ativado, enviar também push notification
       if (isSubscribed) {
         await testNotification()
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending test notification:', error)
-      toast.error('Erro ao enviar notificação de teste')
+      console.error('Error response:', error.response?.data)
+      const errorMessage = error.response?.data?.error || 'Erro ao enviar notificação de teste'
+      toast.error(errorMessage)
     }
   }
 
