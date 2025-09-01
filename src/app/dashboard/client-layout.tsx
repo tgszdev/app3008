@@ -24,6 +24,7 @@ import {
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
+import NotificationBell from '@/components/notifications/NotificationBell'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
@@ -184,10 +185,7 @@ export default function DashboardLayout({
               </button>
 
               {/* Notifications */}
-              <button className="relative text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-red-500"></span>
-              </button>
+              <NotificationBell />
 
               {/* User menu */}
               <div className="relative">
