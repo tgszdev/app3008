@@ -361,10 +361,11 @@ export default function DashboardPage() {
       pdfContainer.style.position = 'absolute'
       pdfContainer.style.left = '-9999px'
       pdfContainer.style.top = '0'
-      pdfContainer.style.width = '210mm'
-      pdfContainer.style.padding = '20px'
+      pdfContainer.style.width = '794px' // A4 width in pixels at 96 DPI
       pdfContainer.style.backgroundColor = '#ffffff'
-      pdfContainer.style.fontFamily = 'system-ui, -apple-system, sans-serif'
+      pdfContainer.style.fontFamily = 'Arial, Helvetica, sans-serif'
+      pdfContainer.style.fontSize = '14px'
+      pdfContainer.style.lineHeight = '1.5'
       document.body.appendChild(pdfContainer)
       
       // Build PDF content with better layout
@@ -372,83 +373,89 @@ export default function DashboardPage() {
       const formattedDateTime = `${now.toLocaleDateString('pt-BR')} às ${now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`
       
       let pdfHTML = `
-        <div style="padding: 30px; background: white; min-height: 100vh;">
+        <div style="padding: 30px; background: white; font-family: Arial, sans-serif;">
           <!-- Header -->
-          <div style="text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px solid #e5e7eb;">
-            <h1 style="margin: 0; font-size: 28px; color: #111827; font-weight: bold;">Relatório de Tickets - Dashboard</h1>
-            <p style="margin: 10px 0 5px 0; font-size: 16px; color: #6b7280;">
-              Período: ${formatDateShort(periodFilter.start_date)} até ${formatDateShort(periodFilter.end_date)}
+          <div style="text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 3px solid #3b82f6;">
+            <h1 style="margin: 0; font-size: 32px; color: #111827; font-weight: bold; letter-spacing: 1px;">RELATÓRIO DE TICKETS</h1>
+            <h2 style="margin: 10px 0 0 0; font-size: 24px; color: #3b82f6; font-weight: 600; letter-spacing: 0.5px;">DASHBOARD</h2>
+            <p style="margin: 15px 0 5px 0; font-size: 16px; color: #6b7280;">
+              <strong>Período:</strong> ${formatDateShort(periodFilter.start_date)} até ${formatDateShort(periodFilter.end_date)}
             </p>
-            ${myTicketsOnly ? `<p style="margin: 5px 0; font-size: 14px; color: #3b82f6; font-weight: 500;">Filtrado por: Tickets de ${session?.user?.name}</p>` : ''}
+            ${myTicketsOnly ? `<p style="margin: 5px 0; font-size: 14px; color: #3b82f6; font-weight: 500;"><strong>Filtrado por:</strong> Tickets de ${session?.user?.name}</p>` : ''}
           </div>
           
           <!-- Summary Box -->
-          <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+          <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 40px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3); page-break-inside: avoid;">
             <div style="display: flex; justify-content: space-around; text-align: center;">
               <div>
-                <div style="font-size: 36px; font-weight: bold;">${categoryStats?.total_tickets || 0}</div>
-                <div style="font-size: 14px; opacity: 0.9; margin-top: 5px;">Total de Tickets</div>
+                <div style="font-size: 48px; font-weight: bold; line-height: 1;">${categoryStats?.total_tickets || 0}</div>
+                <div style="font-size: 16px; margin-top: 10px; text-transform: uppercase; letter-spacing: 1px;">Total de Tickets</div>
               </div>
               <div>
-                <div style="font-size: 36px; font-weight: bold;">${categoryStats?.categorias?.length || 0}</div>
-                <div style="font-size: 14px; opacity: 0.9; margin-top: 5px;">Categorias</div>
+                <div style="font-size: 48px; font-weight: bold; line-height: 1;">${categoryStats?.categorias?.length || 0}</div>
+                <div style="font-size: 16px; margin-top: 10px; text-transform: uppercase; letter-spacing: 1px;">Categorias</div>
               </div>
             </div>
           </div>
           
           <!-- Status Cards -->
-          <div style="margin-bottom: 40px;">
-            <h2 style="font-size: 20px; color: #111827; margin-bottom: 20px; font-weight: 600;">Distribuição por Status</h2>
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
-              <div style="background: #fef3c7; padding: 20px; border-radius: 10px; text-align: center;">
-                <div style="font-size: 28px; font-weight: bold; color: #d97706;">${categoryStats?.status_summary.open || 0}</div>
-                <div style="font-size: 12px; color: #92400e; margin-top: 5px;">Abertos</div>
+          <div style="margin-bottom: 40px; page-break-inside: avoid;">
+            <h2 style="font-size: 22px; color: #111827; margin-bottom: 25px; font-weight: 700; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">DISTRIBUIÇÃO POR STATUS</h2>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+              <div style="background: #fef3c7; padding: 25px; border-radius: 12px; text-align: center; border: 2px solid #fbbf24; box-shadow: 0 4px 6px rgba(251, 191, 36, 0.1);">
+                <div style="font-size: 36px; font-weight: bold; color: #d97706; line-height: 1;">${categoryStats?.status_summary.open || 0}</div>
+                <div style="font-size: 14px; color: #92400e; margin-top: 10px; font-weight: 600; text-transform: uppercase;">Abertos</div>
               </div>
-              <div style="background: #fed7aa; padding: 20px; border-radius: 10px; text-align: center;">
-                <div style="font-size: 28px; font-weight: bold; color: #ea580c;">${categoryStats?.status_summary.in_progress || 0}</div>
-                <div style="font-size: 12px; color: #7c2d12; margin-top: 5px;">Em Progresso</div>
+              <div style="background: #fed7aa; padding: 25px; border-radius: 12px; text-align: center; border: 2px solid #fb923c; box-shadow: 0 4px 6px rgba(251, 146, 60, 0.1);">
+                <div style="font-size: 36px; font-weight: bold; color: #ea580c; line-height: 1;">${categoryStats?.status_summary.in_progress || 0}</div>
+                <div style="font-size: 14px; color: #7c2d12; margin-top: 10px; font-weight: 600; text-transform: uppercase;">Em Progresso</div>
               </div>
-              <div style="background: #bbf7d0; padding: 20px; border-radius: 10px; text-align: center;">
-                <div style="font-size: 28px; font-weight: bold; color: #16a34a;">${categoryStats?.status_summary.resolved || 0}</div>
-                <div style="font-size: 12px; color: #14532d; margin-top: 5px;">Resolvidos</div>
+              <div style="background: #bbf7d0; padding: 25px; border-radius: 12px; text-align: center; border: 2px solid #4ade80; box-shadow: 0 4px 6px rgba(74, 222, 128, 0.1);">
+                <div style="font-size: 36px; font-weight: bold; color: #16a34a; line-height: 1;">${categoryStats?.status_summary.resolved || 0}</div>
+                <div style="font-size: 14px; color: #14532d; margin-top: 10px; font-weight: 600; text-transform: uppercase;">Resolvidos</div>
               </div>
-              <div style="background: #fecaca; padding: 20px; border-radius: 10px; text-align: center;">
-                <div style="font-size: 28px; font-weight: bold; color: #dc2626;">${categoryStats?.status_summary.cancelled || 0}</div>
-                <div style="font-size: 12px; color: #7f1d1d; margin-top: 5px;">Cancelados</div>
+              <div style="background: #fecaca; padding: 25px; border-radius: 12px; text-align: center; border: 2px solid #f87171; box-shadow: 0 4px 6px rgba(248, 113, 113, 0.1);">
+                <div style="font-size: 36px; font-weight: bold; color: #dc2626; line-height: 1;">${categoryStats?.status_summary.cancelled || 0}</div>
+                <div style="font-size: 14px; color: #7f1d1d; margin-top: 10px; font-weight: 600; text-transform: uppercase;">Cancelados</div>
               </div>
             </div>
           </div>
           
           <!-- Categories -->
           <div style="margin-bottom: 40px;">
-            <h2 style="font-size: 20px; color: #111827; margin-bottom: 20px; font-weight: 600;">Tickets por Categoria</h2>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+            <h2 style="font-size: 22px; color: #111827; margin-bottom: 25px; font-weight: 700; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">TICKETS POR CATEGORIA</h2>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
       `
       
       // Add category cards
       categoryStats?.categorias?.forEach(category => {
-        const bgColor = category.color ? `${category.color}15` : '#f3f4f6'
+        const bgColor = category.color ? `${category.color}10` : '#f9fafb'
         const borderColor = category.color || '#d1d5db'
         
         pdfHTML += `
-          <div style="border: 2px solid ${borderColor}; background: ${bgColor}; padding: 20px; border-radius: 10px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <h3 style="margin: 0; font-size: 16px; color: #111827; font-weight: 600;">${category.nome}</h3>
-              <div style="background: ${category.color || '#6b7280'}; color: white; padding: 5px 12px; border-radius: 20px; font-size: 14px; font-weight: bold;">
+          <div style="border: 2px solid ${borderColor}; background: ${bgColor}; padding: 20px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); page-break-inside: avoid;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+              <div style="flex-grow: 1;">
+                <h3 style="margin: 0; font-size: 18px; color: #111827; font-weight: 700; text-transform: uppercase;">${category.nome}</h3>
+                <div style="margin-top: 10px;">
+                  <div style="background: #e5e7eb; border-radius: 6px; height: 10px; overflow: hidden;">
+                    <div style="background: ${category.color || '#6b7280'}; height: 100%; width: ${category.percentual}%;" title="${category.percentual.toFixed(1)}%"></div>
+                  </div>
+                  <div style="font-size: 24px; font-weight: bold; color: ${category.color || '#6b7280'}; margin-top: 10px;">${category.percentual.toFixed(1)}%</div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; background: ${category.color || '#6b7280'}; color: white; border-radius: 50%; font-size: 24px; font-weight: bold; margin-left: 20px; flex-shrink: 0;">
                 ${category.quantidade}
               </div>
             </div>
-            <div style="margin-bottom: 10px;">
-              <div style="background: #e5e7eb; border-radius: 4px; height: 8px; overflow: hidden;">
-                <div style="background: ${category.color || '#6b7280'}; height: 100%; width: ${category.percentual}%; transition: width 0.3s;"></div>
+            <div style="border-top: 1px solid #e5e7eb; padding-top: 15px; margin-top: 15px;">
+              <div style="font-size: 12px; color: #374151; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Distribuição por Status:</div>
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; font-size: 13px;">
+                <div style="color: #d97706;"><strong>Abertos:</strong> ${category.status_breakdown.open}</div>
+                <div style="color: #ea580c;"><strong>Em Progresso:</strong> ${category.status_breakdown.in_progress}</div>
+                <div style="color: #16a34a;"><strong>Resolvidos:</strong> ${category.status_breakdown.resolved}</div>
+                <div style="color: #dc2626;"><strong>Cancelados:</strong> ${category.status_breakdown.cancelled}</div>
               </div>
-            </div>
-            <div style="font-size: 24px; font-weight: bold; color: ${category.color || '#6b7280'};">${category.percentual.toFixed(1)}%</div>
-            <div style="font-size: 12px; color: #6b7280; margin-top: 5px;">
-              A: ${category.status_breakdown.open} | 
-              P: ${category.status_breakdown.in_progress} | 
-              R: ${category.status_breakdown.resolved} | 
-              C: ${category.status_breakdown.cancelled}
             </div>
           </div>
         `
@@ -459,9 +466,10 @@ export default function DashboardPage() {
           </div>
           
           <!-- Footer -->
-          <div style="margin-top: 60px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #6b7280;">
-            <p style="margin: 5px 0; font-size: 12px;">Relatório gerado em: ${formattedDateTime}</p>
-            <p style="margin: 5px 0; font-size: 12px; font-weight: 500;">Dashboard gerado automaticamente pelo sistema</p>
+          <div style="margin-top: 60px; padding-top: 20px; border-top: 3px solid #3b82f6; text-align: center; page-break-inside: avoid;">
+            <p style="margin: 8px 0; font-size: 14px; color: #374151; font-weight: 600;">RELATÓRIO GERADO EM: ${formattedDateTime.toUpperCase()}</p>
+            <p style="margin: 8px 0; font-size: 13px; color: #6b7280;">Dashboard gerado automaticamente pelo sistema de suporte técnico</p>
+            <p style="margin: 8px 0; font-size: 11px; color: #9ca3af;">© 2025 - Sistema de Gestão de Tickets</p>
           </div>
         </div>
       `
@@ -470,12 +478,19 @@ export default function DashboardPage() {
       
       // Generate canvas from the container
       const canvas = await html2canvas(pdfContainer, {
-        scale: 2,
+        scale: 3, // Higher quality
         logging: false,
         useCORS: true,
         backgroundColor: '#ffffff',
-        windowWidth: pdfContainer.scrollWidth,
-        windowHeight: pdfContainer.scrollHeight
+        windowWidth: 794, // A4 width in pixels
+        windowHeight: pdfContainer.scrollHeight,
+        onclone: (clonedDoc) => {
+          // Ensure all elements are properly styled in the clone
+          const clonedContainer = clonedDoc.querySelector('div')
+          if (clonedContainer) {
+            clonedContainer.style.width = '794px'
+          }
+        }
       })
       
       // Remove temporary container
@@ -485,25 +500,33 @@ export default function DashboardPage() {
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
-        format: 'a4'
+        format: 'a4',
+        compress: true
       })
       
-      const imgWidth = 190 // A4 width minus margins
-      const pageHeight = 277 // A4 height minus margins
+      // Calculate dimensions
+      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const pdfHeight = pdf.internal.pageSize.getHeight()
+      const margin = 10 // 10mm margins
+      const contentWidth = pdfWidth - (2 * margin)
+      const contentHeight = pdfHeight - (2 * margin)
+      
+      // Convert canvas to image
+      const imgData = canvas.toDataURL('image/png', 1.0)
+      const imgWidth = contentWidth
       const imgHeight = (canvas.height * imgWidth) / canvas.width
-      let heightLeft = imgHeight
-      let position = 10 // Top margin
       
-      // Add first page
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, position, imgWidth, imgHeight)
-      heightLeft -= pageHeight
+      // Calculate pages needed
+      const totalPages = Math.ceil(imgHeight / contentHeight)
       
-      // Add additional pages if needed
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight + 10
-        pdf.addPage()
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, position, imgWidth, imgHeight)
-        heightLeft -= pageHeight
+      // Add pages
+      for (let page = 0; page < totalPages; page++) {
+        if (page > 0) {
+          pdf.addPage()
+        }
+        
+        const yPosition = -(page * contentHeight) + margin
+        pdf.addImage(imgData, 'PNG', margin, yPosition, imgWidth, imgHeight)
       }
       
       // Generate filename with date
