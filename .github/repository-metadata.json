@@ -1,0 +1,24 @@
+{
+  "name": "app3008",
+  "owner": "tgszdev",
+  "description": "Sistema de Suporte Técnico - Support Ticket System",
+  "topics": ["nextjs", "typescript", "supabase", "support-system"],
+  "homepage": "https://app3008-two.vercel.app",
+  "private": true,
+  "has_issues": true,
+  "has_projects": false,
+  "has_wiki": false,
+  "default_branch": "main",
+  "allow_squash_merge": true,
+  "allow_merge_commit": true,
+  "allow_rebase_merge": true,
+  "delete_branch_on_merge": false,
+  "contributors": [
+    {
+      "login": "tgszdev",
+      "email": "tgszdev@gmail.com",
+      "name": "tgszdev",
+      "type": "User"
+    }
+  ]
+}
