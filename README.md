@@ -533,6 +533,19 @@ pm2 start ecosystem.config.cjs
   - Instruções para criar App Password no Gmail
   - Troubleshooting e soluções para problemas comuns
 
+### v1.5.1 - Melhorias de UX/UI (01/09/2025)
+- **🎨 Toast Notifications com Material Design**:
+  - Novo posicionamento bottom-left para não sobrepor conteúdo
+  - Alto contraste para melhor legibilidade (fundo escuro #323232)
+  - Estilo minimalista seguindo Material Design Guidelines
+  - Ícones coloridos diferenciados por tipo:
+    - ✅ Sucesso: Verde Material (#4caf50)
+    - ❌ Erro: Vermelho Material (#f44336)
+    - ⏳ Loading: Azul Material (#2196f3)
+  - Responsivo com largura adaptável (min: 288px, max: 568px)
+  - Sombra sutil para destaque visual
+  - Resolve problema de sobreposição reportado pelos usuários
+
 ### v1.5.0 - Sistema Completo de Notificações (01/09/2025)
 - **🔔 Notificações In-App**: Sino interativo no header com dropdown de notificações
 - **📱 Push Notifications**: Suporte completo para PWA via Service Worker
