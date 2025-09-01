@@ -1,27 +1,138 @@
 import nodemailer from 'nodemailer'
 import type { Transporter } from 'nodemailer'
+import { supabaseAdmin } from '@/lib/supabase'
+import crypto from 'crypto'
 
 // Cache do transporter para reutilização
 let transporterCache: Transporter | null = null
+let configCache: any = null
+let configCacheTime: number = 0
+const CACHE_DURATION = 5 * 60 * 1000 // 5 minutos
+
+// Chave para descriptografar senhas (deve ser a mesma usada para criptografar)
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'default-encryption-key-change-this'
+
+// Função para descriptografar
+function decrypt(text: string): string {
+  try {
+    const algorithm = 'aes-256-cbc'
+    const key = crypto.scryptSync(ENCRYPTION_KEY, 'salt', 32)
+    const [ivHex, encrypted] = text.split(':')
+    const iv = Buffer.from(ivHex, 'hex')
+    const decipher = crypto.createDecipheriv(algorithm, key, iv)
+    
+    let decrypted = decipher.update(encrypted, 'hex', 'utf8')
+    decrypted += decipher.final('utf8')
+    
+    return decrypted
+  } catch (error) {
+    console.error('Erro ao descriptografar:', error)
+    return ''
+  }
+}
+
+// Função para buscar configuração do banco de dados
+async function getEmailConfig() {
+  // Usar cache se ainda válido
+  if (configCache && Date.now() - configCacheTime < CACHE_DURATION) {
+    return configCache
+  }
+
+  try {
+    // Buscar configurações do banco
+    const { data: settings, error } = await supabaseAdmin
+      .from('system_settings')
+      .select('*')
+      .eq('key', 'email_config')
+      .single()
+
+    if (error || !settings) {
+      console.log('Configuração de email não encontrada no banco, tentando variáveis de ambiente...')
+      // Fallback para variáveis de ambiente
+      if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+        const envConfig = {
+          service: process.env.EMAIL_SERVICE || 'smtp',
+          host: process.env.SMTP_HOST || 'smtp.gmail.com',
+          port: process.env.SMTP_PORT || '587',
+          secure: process.env.SMTP_SECURE === 'true',
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+          from: process.env.EMAIL_FROM || process.env.SMTP_USER,
+          fromName: process.env.EMAIL_FROM_NAME || 'Sistema de Suporte Técnico'
+        }
+        configCache = envConfig
+        configCacheTime = Date.now()
+        return envConfig
+      }
+      return null
+    }
+
+    // Descriptografar senha
+    const config = settings.value
+    if (config.pass) {
+      config.pass = decrypt(config.pass)
+    }
+
+    // Atualizar cache
+    configCache = config
+    configCacheTime = Date.now()
+    
+    return config
+  } catch (error) {
+    console.error('Erro ao buscar configuração de email:', error)
+    // Tentar variáveis de ambiente como fallback
+    if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+      const envConfig = {
+        service: process.env.EMAIL_SERVICE || 'smtp',
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port: process.env.SMTP_PORT || '587',
+        secure: process.env.SMTP_SECURE === 'true',
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+        from: process.env.EMAIL_FROM || process.env.SMTP_USER,
+        fromName: process.env.EMAIL_FROM_NAME || 'Sistema de Suporte Técnico'
+      }
+      configCache = envConfig
+      configCacheTime = Date.now()
+      return envConfig
+    }
+    return null
+  }
+}
+
+// Função para limpar cache (útil quando as configurações são atualizadas)
+export function clearEmailConfigCache() {
+  configCache = null
+  configCacheTime = 0
+  transporterCache = null
+}
 
 // Criar transporter baseado na configuração
-export function createEmailTransporter(): Transporter {
+export async function createEmailTransporter(): Promise<Transporter | null> {
   // Retorna cache se já existir
   if (transporterCache) {
     return transporterCache
   }
 
-  const emailService = process.env.EMAIL_SERVICE || 'smtp'
+  // Buscar configuração do banco ou variáveis de ambiente
+  const config = await getEmailConfig()
+  
+  if (!config || !config.user || !config.pass) {
+    console.warn('Configurações de email não encontradas')
+    return null
+  }
+
+  const emailService = config.service || 'smtp'
 
   if (emailService === 'smtp') {
     // Configuração SMTP (Gmail com senha de app)
-    transporterCache = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: process.env.SMTP_SECURE === 'true',
+    transporterCache = nodemailer.createTransporter({
+      host: config.host || 'smtp.gmail.com',
+      port: parseInt(config.port || '587'),
+      secure: config.secure === true || config.secure === 'true',
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS?.replace(/\s/g, '') // Remove espaços da senha de app
+        user: config.user,
+        pass: config.pass.replace(/\s/g, '') // Remove espaços da senha de app
       },
       tls: {
         rejectUnauthorized: false // Aceita certificados auto-assinados (desenvolvimento)
@@ -33,6 +144,7 @@ export function createEmailTransporter(): Transporter {
       transporterCache.verify((error, success) => {
         if (error) {
           console.error('Erro na configuração do email:', error)
+          transporterCache = null // Limpar cache se houver erro
         } else {
           console.log('Servidor de email pronto para enviar mensagens')
         }
@@ -42,10 +154,8 @@ export function createEmailTransporter(): Transporter {
     return transporterCache
   }
 
-  throw new Error(`Serviço de email ${emailService} não configurado`)
-  
-  // TypeScript precisa deste return para garantir que sempre retorna Transporter
-  return transporterCache as Transporter
+  console.error(`Serviço de email ${emailService} não configurado`)
+  return null
 }
 
 // Interface para opções de email
@@ -66,19 +176,29 @@ export interface EmailOptions {
 // Função para enviar email
 export async function sendEmail(options: EmailOptions) {
   try {
+    // Buscar configuração
+    const config = await getEmailConfig()
+    
     // Verificar se as configurações existem
-    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    if (!config || !config.user || !config.pass) {
       console.warn('Configurações de email não encontradas. Email não enviado.')
       return { 
         success: false, 
-        error: 'Email não configurado. Configure as variáveis SMTP_USER e SMTP_PASS.' 
+        error: 'Email não configurado. Configure o email em Configurações > Email ou defina as variáveis SMTP_USER e SMTP_PASS.' 
       }
     }
 
-    const transporter = createEmailTransporter()
+    const transporter = await createEmailTransporter()
+    
+    if (!transporter) {
+      return {
+        success: false,
+        error: 'Não foi possível criar o transporter de email. Verifique as configurações.'
+      }
+    }
     
     const mailOptions = {
-      from: `${process.env.EMAIL_FROM_NAME || 'Sistema de Suporte'} <${process.env.EMAIL_FROM || process.env.SMTP_USER}>`,
+      from: `${config.fromName || 'Sistema de Suporte'} <${config.from || config.user}>`,
       to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
       cc: options.cc ? (Array.isArray(options.cc) ? options.cc.join(', ') : options.cc) : undefined,
       bcc: options.bcc ? (Array.isArray(options.bcc) ? options.bcc.join(', ') : options.bcc) : undefined,

@@ -177,16 +177,9 @@ CREATE INDEX IF NOT EXISTS idx_system_settings_key ON system_settings(key);
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    // Salvar também nas variáveis de ambiente para uso imediato
-    // (Em produção, você deve reiniciar o servidor ou usar um sistema de cache)
-    process.env.EMAIL_SERVICE = config.service || 'smtp'
-    process.env.SMTP_HOST = config.host
-    process.env.SMTP_PORT = config.port
-    process.env.SMTP_SECURE = config.secure ? 'true' : 'false'
-    process.env.SMTP_USER = config.user
-    process.env.SMTP_PASS = config.pass
-    process.env.EMAIL_FROM = config.from || config.user
-    process.env.EMAIL_FROM_NAME = config.fromName
+    // Limpar o cache de configuração de email para forçar recarregamento
+    const { clearEmailConfigCache } = await import('@/lib/email-config')
+    clearEmailConfigCache()
 
     return NextResponse.json({
       success: true,

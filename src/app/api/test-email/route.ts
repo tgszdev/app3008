@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
         success: false, 
         error: result.error,
         details: result.details,
-        help: 'Verifique se você configurou as variáveis SMTP_USER e SMTP_PASS no .env.local'
+        help: 'Configure o email em Configurações > Email ou defina as variáveis SMTP_USER e SMTP_PASS no .env.local'
       }, { status: 500 })
     }
   } catch (error: any) {
@@ -59,25 +59,67 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    // Verificar configurações
-    const config = {
-      service: process.env.EMAIL_SERVICE || 'smtp',
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: process.env.SMTP_PORT || '587',
-      user: process.env.SMTP_USER ? '✅ Configurado' : '❌ Não configurado',
-      pass: process.env.SMTP_PASS ? '✅ Configurado' : '❌ Não configurado',
-      from: process.env.EMAIL_FROM || process.env.SMTP_USER || 'Não configurado',
-      fromName: process.env.EMAIL_FROM_NAME || 'Sistema de Suporte'
-    }
+    // Importar supabaseAdmin aqui para verificar configuração no banco
+    const { supabaseAdmin } = await import('@/lib/supabase')
+    
+    // Verificar se existe configuração no banco de dados
+    const { data: settings, error } = await supabaseAdmin
+      .from('system_settings')
+      .select('*')
+      .eq('key', 'email_config')
+      .single()
 
-    const isConfigured = process.env.SMTP_USER && process.env.SMTP_PASS
+    let config
+    let isConfigured = false
+    let configSource = 'none'
+
+    if (settings && settings.value) {
+      // Configuração encontrada no banco de dados
+      const dbConfig = settings.value
+      config = {
+        service: dbConfig.service || 'smtp',
+        host: dbConfig.host || 'smtp.gmail.com',
+        port: dbConfig.port || '587',
+        user: dbConfig.user ? '✅ Configurado (Banco de Dados)' : '❌ Não configurado',
+        pass: dbConfig.pass ? '✅ Configurado (Banco de Dados)' : '❌ Não configurado',
+        from: dbConfig.from || dbConfig.user || 'Não configurado',
+        fromName: dbConfig.fromName || 'Sistema de Suporte'
+      }
+      isConfigured = !!(dbConfig.user && dbConfig.pass)
+      configSource = 'database'
+    } else if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+      // Configuração das variáveis de ambiente
+      config = {
+        service: process.env.EMAIL_SERVICE || 'smtp',
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port: process.env.SMTP_PORT || '587',
+        user: '✅ Configurado (Variáveis de Ambiente)',
+        pass: '✅ Configurado (Variáveis de Ambiente)',
+        from: process.env.EMAIL_FROM || process.env.SMTP_USER || 'Não configurado',
+        fromName: process.env.EMAIL_FROM_NAME || 'Sistema de Suporte'
+      }
+      isConfigured = true
+      configSource = 'environment'
+    } else {
+      // Nenhuma configuração encontrada
+      config = {
+        service: 'smtp',
+        host: 'smtp.gmail.com',
+        port: '587',
+        user: '❌ Não configurado',
+        pass: '❌ Não configurado',
+        from: 'Não configurado',
+        fromName: 'Sistema de Suporte'
+      }
+    }
 
     return NextResponse.json({
       configured: isConfigured,
+      configSource,
       config,
       message: isConfigured 
-        ? 'Email configurado. Use POST para enviar um teste.'
-        : 'Email não configurado. Configure SMTP_USER e SMTP_PASS no .env.local'
+        ? `Email configurado (${configSource === 'database' ? 'Banco de Dados' : 'Variáveis de Ambiente'}). Use POST para enviar um teste.`
+        : 'Email não configurado. Configure em Configurações > Email ou defina SMTP_USER e SMTP_PASS no .env.local'
     })
   } catch (error: any) {
     console.error('Erro ao verificar configuração:', error)
