@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Sistema de Suporte Técnico',
-  description: 'Sistema completo de gestão de chamados técnicos',
+  description: 'Sistema completo de gestão de chamados técnicos - Deploy 01/09/2025 22:30',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
