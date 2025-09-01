@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     })
 
     // 2. Verificar preferências do criador do ticket
-    const results = {
+    const results: any = {
       ticket: {
         id: targetTicket.id,
         number: targetTicket.ticket_number,
@@ -230,13 +230,14 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Análise e recomendações
-    const analysis = {
+    const analysis: any = {
       should_notify_creator: targetTicket.created_by && targetTicket.created_by !== session.user.id,
       should_notify_assignee: targetTicket.assigned_to && 
                               targetTicket.assigned_to !== session.user.id && 
                               targetTicket.assigned_to !== targetTicket.created_by,
-      notifications_sent: results.notifications.filter(n => n.success).length,
-      total_expected: 0
+      notifications_sent: results.notifications.filter((n: any) => n.success).length,
+      total_expected: 0,
+      success: false
     }
 
     if (analysis.should_notify_creator) analysis.total_expected++
@@ -249,7 +250,7 @@ export async function POST(request: NextRequest) {
     if (!results.email_config.configured) {
       recommendations.push('❌ Configure o email em /dashboard/settings')
     }
-    if (results.notifications.some(n => !n.success)) {
+    if (results.notifications.some((n: any) => !n.success)) {
       recommendations.push('❌ Verificar preferências de notificação dos usuários')
     }
     if (!analysis.should_notify_creator && !analysis.should_notify_assignee) {
