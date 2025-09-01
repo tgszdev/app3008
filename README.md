@@ -90,13 +90,34 @@
   - Motivo obrigatório ao reativar (salvo nos comentários)
   - **Tickets cancelados são bloqueados**: Apenas Admin pode comentar, anexar arquivos ou fazer alterações
 
-### 7. **PWA Support**
-- ✅ **Service Worker**: Configurado com next-pwa
-- ✅ **Manifest**: Arquivo de manifesto PWA
-- ✅ **Offline Support**: Cache de assets estáticos
-- ✅ **Instalável**: Pode ser instalado como app
+### 7. **Sistema de Notificações Completo**
+- ✅ **Push Notifications (PWA)**: Service Worker configurado para notificações push
+- ✅ **Email Notifications**: Sistema de templates de email HTML/Text
+- ✅ **In-app Notifications**: Dropdown de notificações em tempo real
+- ✅ **Preferências de Usuário**: Configuração por tipo de notificação
+- ✅ **Notificações Automáticas**:
+  - Novo ticket criado (admins e responsável)
+  - Ticket atribuído (responsável)
+  - Mudança de status (criador do ticket)
+  - Mudança de prioridade (criador do ticket)
+  - Novo comentário (criador e responsável)
+  - Menções em comentários (@username)
+- ✅ **URLs Contextuais**: Links diretos para tickets/comentários
+- ✅ **Página de Notificações**: Lista completa com filtros e busca
+- ✅ **Marcar como Lida**: Individual ou em massa
+- ✅ **Horário de Silêncio**: Pausar notificações em período específico
+- ✅ **Background Sync**: Sincronização de notificações offline
+- ✅ **Periodic Sync**: Verificação periódica de novas notificações
 
-### 8. **Sistema de Anexos de Arquivos**
+### 8. **PWA Support**
+- ✅ **Service Worker**: Cache offline e push notifications
+- ✅ **Manifest**: Arquivo de manifesto PWA
+- ✅ **Offline Page**: Página customizada para modo offline
+- ✅ **Instalável**: Pode ser instalado como app
+- ✅ **Background Sync**: Sincronização em background
+- ✅ **Push API**: Notificações push nativas
+
+### 9. **Sistema de Anexos de Arquivos**
 - ✅ **Upload de Arquivos**: Anexar arquivos aos chamados (máx. 10MB)
 - ✅ **Tipos Suportados**: Imagens (PNG, JPG, GIF), Documentos (PDF, DOC, DOCX, XLS, XLSX, TXT)
 - ✅ **Visualização**: Preview de imagens diretamente na página
@@ -104,7 +125,7 @@
 - ✅ **Integração Supabase Storage**: Armazenamento seguro em bucket dedicado
 - ✅ **Validação**: Verificação de tipo e tamanho de arquivo
 
-### 9. **Gerenciamento de Categorias (NOVO)**
+### 10. **Gerenciamento de Categorias**
 - ✅ **CRUD Completo de Categorias**: Criar, listar, editar e excluir
 - ✅ **Campos Personalizáveis**: Nome, descrição, ícone e cor
 - ✅ **Ordenação**: Sistema de ordenação com setas up/down
@@ -163,9 +184,16 @@
 - **GET**: Busca preferências de notificação do usuário
 - **PATCH**: Atualiza preferências
 
-### `/api/notifications/push/subscribe`
+### `/api/notifications/subscribe`
 - **POST**: Registra push subscription
 - **DELETE**: Remove push subscription (`?endpoint=url`)
+- **GET**: Lista push subscriptions ativas
+
+### `/api/notifications/check`
+- **GET**: Verifica novas notificações não lidas
+
+### `/api/notifications/test`
+- **POST**: Envia notificação de teste
 
 ## 📊 Estrutura de Dados
 
@@ -214,7 +242,7 @@
 - updated_at: TIMESTAMP
 ```
 
-### Tabela: `categories` (NOVA)
+### Tabela: `categories`
 ```sql
 - id: UUID (PK)
 - name: VARCHAR(100) (unique)
@@ -228,6 +256,68 @@
 - updated_at: TIMESTAMP
 - created_by: UUID (FK users)
 - updated_by: UUID (FK users)
+```
+
+### Tabela: `notifications`
+```sql
+- id: UUID (PK)
+- user_id: UUID (FK users)
+- title: VARCHAR(255)
+- message: TEXT
+- type: VARCHAR(50)
+- severity: VARCHAR(20) (info|warning|error|success)
+- data: JSONB
+- is_read: BOOLEAN
+- read_at: TIMESTAMP
+- created_at: TIMESTAMP
+- expires_at: TIMESTAMP
+- action_url: TEXT
+```
+
+### Tabela: `user_notification_preferences`
+```sql
+- id: UUID (PK)
+- user_id: UUID (FK users, unique)
+- email_enabled: BOOLEAN
+- push_enabled: BOOLEAN
+- in_app_enabled: BOOLEAN
+- ticket_created: JSONB
+- ticket_assigned: JSONB
+- ticket_updated: JSONB
+- ticket_resolved: JSONB
+- comment_added: JSONB
+- comment_mention: JSONB
+- quiet_hours_enabled: BOOLEAN
+- quiet_hours_start: TIME
+- quiet_hours_end: TIME
+- email_frequency: VARCHAR(20)
+- created_at: TIMESTAMP
+- updated_at: TIMESTAMP
+```
+
+### Tabela: `user_push_subscriptions`
+```sql
+- id: UUID (PK)
+- user_id: UUID (FK users)
+- endpoint: TEXT
+- keys: JSONB (p256dh, auth)
+- device_info: JSONB
+- active: BOOLEAN
+- created_at: TIMESTAMP
+- last_used: TIMESTAMP
+```
+
+### Tabela: `email_templates`
+```sql
+- id: UUID (PK)
+- name: VARCHAR(100) (unique)
+- subject: VARCHAR(255)
+- html_body: TEXT
+- text_body: TEXT
+- variables: JSONB
+- active: BOOLEAN
+- created_at: TIMESTAMP
+- updated_at: TIMESTAMP
 ```
 
 ## 🔐 Credenciais de Teste
