@@ -377,7 +377,7 @@ export default function DashboardPage() {
       
       // Build PDF HTML with A4 dimensions in mind
       let pdfHTML = `
-        <div style="width: 210mm; min-height: 297mm; padding: 10mm 15mm; background: white; font-family: Arial, sans-serif; box-sizing: border-box; margin: 0; position: relative;">
+        <div style="width: 210mm; min-height: 297mm; padding: 10mm 10mm; background: white; font-family: Arial, sans-serif; box-sizing: border-box; margin: 0; position: relative;">
           
           <!-- PAGE 1 -->
           <div style="page-break-after: always; min-height: 277mm; position: relative;">
@@ -468,11 +468,11 @@ export default function DashboardPage() {
                 </div>
                 <div style="background: #f8f9fa; border-radius: 6px; padding: 8px; margin-top: 10px; border: 1px solid #e5e7eb;">
                   <div style="font-size: 10px; color: #374151; font-weight: 700; margin-bottom: 5px; text-transform: uppercase;">Distribuição por Status:</div>
-                  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; font-size: 10px;">
-                    <div><span style="color: #d97706;">●</span> Abertos: ${category.status_breakdown.open}</div>
-                    <div><span style="color: #ea580c;">●</span> Progresso: ${category.status_breakdown.in_progress}</div>
-                    <div><span style="color: #16a34a;">●</span> Resolvidos: ${category.status_breakdown.resolved}</div>
-                    <div><span style="color: #dc2626;">●</span> Cancelados: ${category.status_breakdown.cancelled}</div>
+                  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; font-size: 11px;">
+                    <div style="color: #374151;"><span style="color: #d97706; font-size: 14px;">●</span> <span style="font-weight: 600;">Abertos:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.open}</span></div>
+                    <div style="color: #374151;"><span style="color: #ea580c; font-size: 14px;">●</span> <span style="font-weight: 600;">Progresso:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.in_progress}</span></div>
+                    <div style="color: #374151;"><span style="color: #16a34a; font-size: 14px;">●</span> <span style="font-weight: 600;">Resolvidos:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.resolved}</span></div>
+                    <div style="color: #374151;"><span style="color: #dc2626; font-size: 14px;">●</span> <span style="font-weight: 600;">Cancelados:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.cancelled}</span></div>
                   </div>
                 </div>
               </div>
@@ -494,7 +494,7 @@ export default function DashboardPage() {
       pdfHTML += `
             </div>
             <!-- Page number -->
-            <div style="position: absolute; bottom: 5mm; right: 15mm; font-size: 10px; color: #6b7280;">Página 1${secondPageCategories.length > 0 ? ' de 2' : ''}</div>
+            <div style="position: absolute; bottom: 8mm; right: 10mm; font-size: 10px; color: #6b7280;">Página 1${secondPageCategories.length > 0 ? ' de 2' : ''}</div>
           </div> <!-- End of Page 1 -->
           
           ${secondPageCategories.length > 0 ? `
@@ -532,11 +532,11 @@ export default function DashboardPage() {
                         </div>
                         <div style="background: #f8f9fa; border-radius: 6px; padding: 8px; margin-top: 10px; border: 1px solid #e5e7eb;">
                           <div style="font-size: 10px; color: #374151; font-weight: 700; margin-bottom: 5px; text-transform: uppercase;">Distribuição por Status:</div>
-                          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; font-size: 10px;">
-                            <div><span style="color: #d97706;">●</span> Abertos: ${category.status_breakdown.open}</div>
-                            <div><span style="color: #ea580c;">●</span> Progresso: ${category.status_breakdown.in_progress}</div>
-                            <div><span style="color: #16a34a;">●</span> Resolvidos: ${category.status_breakdown.resolved}</div>
-                            <div><span style="color: #dc2626;">●</span> Cancelados: ${category.status_breakdown.cancelled}</div>
+                          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; font-size: 11px;">
+                            <div style="color: #374151;"><span style="color: #d97706; font-size: 14px;">●</span> <span style="font-weight: 600;">Abertos:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.open}</span></div>
+                            <div style="color: #374151;"><span style="color: #ea580c; font-size: 14px;">●</span> <span style="font-weight: 600;">Progresso:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.in_progress}</span></div>
+                            <div style="color: #374151;"><span style="color: #16a34a; font-size: 14px;">●</span> <span style="font-weight: 600;">Resolvidos:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.resolved}</span></div>
+                            <div style="color: #374151;"><span style="color: #dc2626; font-size: 14px;">●</span> <span style="font-weight: 600;">Cancelados:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.cancelled}</span></div>
                           </div>
                         </div>
                       </div>
@@ -554,12 +554,12 @@ export default function DashboardPage() {
             })()}
             
             <!-- Page number -->
-            <div style="position: absolute; bottom: 5mm; right: 15mm; font-size: 10px; color: #6b7280;">Página 2 de 2</div>
+            <div style="position: absolute; bottom: 8mm; right: 10mm; font-size: 10px; color: #6b7280;">Página 2 de 2</div>
           </div> <!-- End of Page 2 -->
           ` : ''}
           
           <!-- Footer -->
-          <div style="${secondPageCategories.length > 0 ? 'page-break-before: avoid;' : 'position: absolute; bottom: 15mm; left: 15mm; right: 15mm;'} text-align: center; border-top: 2px solid #3b82f6; padding-top: 5mm; margin-top: ${secondPageCategories.length > 0 ? '20mm' : '0'};">
+          <div style="${secondPageCategories.length > 0 ? 'page-break-before: avoid;' : 'position: absolute; bottom: 12mm; left: 10mm; right: 10mm;'} text-align: center; border-top: 2px solid #3b82f6; padding-top: 5mm; margin-top: ${secondPageCategories.length > 0 ? '20mm' : '0'};">
             <p style="margin: 3px 0; font-size: 12px; color: #374151; font-weight: 600;">RELATÓRIO GERADO EM: ${formattedDateTime.toUpperCase()}</p>
             <p style="margin: 3px 0; font-size: 11px; color: #6b7280;">Dashboard gerado automaticamente pelo sistema de suporte técnico</p>
             <p style="margin: 3px 0; font-size: 10px; color: #9ca3af;">© 2025 - Sistema de Gestão de Tickets</p>
