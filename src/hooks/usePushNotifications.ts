@@ -146,9 +146,8 @@ export function usePushNotifications() {
         body: 'As notificações push estão funcionando!',
         icon: '/icons/icon-192x192.png',
         badge: '/icons/icon-72x72.png',
-        vibrate: [200, 100, 200],
         tag: 'test-notification'
-      })
+      } as any) // Type cast para permitir vibrate em alguns navegadores
       
       toast.success('Notificação de teste enviada!')
     } catch (error) {
