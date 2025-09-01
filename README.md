@@ -10,6 +10,7 @@
 - **Login**: `/login`
 - **Dashboard**: `/dashboard`
 - **Chamados**: `/dashboard/tickets`
+- **Comentários**: `/dashboard/comments` ✨ NOVO
 - **Gerenciamento de Usuários**: `/dashboard/users`
 - **Supabase Dashboard**: https://supabase.com/dashboard/project/eyfvvximmeqmwdfqzqov
 
@@ -199,6 +200,14 @@
 
 ### `/api/notifications/test`
 - **POST**: Envia notificação de teste
+
+### `/api/comments`
+- **GET**: Lista comentários com paginação e filtros
+  - Query params: `page`, `limit`, `sort`, `search`, `ticket_id`, `user_id`, `internal_only`
+- **POST**: Cria novo comentário
+  - Body: `{ ticket_id, content, is_internal }`
+- **DELETE**: Remove comentário (autor ou admin)
+  - Query param: `id`
 
 ### `/api/settings/email`
 - **GET**: Busca configurações de email (admin only)
@@ -532,6 +541,29 @@ pm2 start ecosystem.config.cjs
   - Novo guia em `/docs/EMAIL_CONFIGURATION.md`
   - Instruções para criar App Password no Gmail
   - Troubleshooting e soluções para problemas comuns
+
+### v1.5.2 - Página de Comentários Completa (01/09/2025)
+- **💬 Central de Comentários**:
+  - Nova página em `/dashboard/comments` totalmente funcional
+  - Listagem completa de todos os comentários do sistema
+  - **Estatísticas em tempo real**:
+    - Total de comentários
+    - Comentários do dia
+    - Comentários com anexos
+    - Comentários internos
+  - **Sistema de busca avançado**:
+    - Busca por conteúdo, usuário ou ticket
+    - Filtro de comentários internos
+    - Ordenação por data (recente/antigo)
+  - **Visualização rica**:
+    - Avatar do usuário ou inicial
+    - Informações do ticket (número, título, status, prioridade)
+    - Link direto para o ticket
+    - Anexos com tamanho formatado
+    - Data relativa e completa em português
+  - **Paginação completa** com navegação intuitiva
+  - **Design responsivo** e suporte a dark mode
+  - **API REST** para operações CRUD de comentários
 
 ### v1.5.1 - Melhorias de UX/UI (01/09/2025)
 - **🎨 Toast Notifications com Material Design**:
