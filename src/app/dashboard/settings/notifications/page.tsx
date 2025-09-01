@@ -112,7 +112,7 @@ export default function NotificationSettingsPage() {
         message: 'Esta é uma notificação de teste para verificar se tudo está funcionando corretamente.',
         type: 'test',
         severity: 'info',
-        action_url: null // Sem URL de ação para notificação de teste
+        action_url: undefined // Sem URL de ação para notificação de teste
       })
       
       console.log('Test notification response:', response.data)

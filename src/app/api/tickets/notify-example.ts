@@ -90,7 +90,7 @@ export async function notifySystemUpdate(userId: string, message: string) {
     message: message,
     type: 'system',
     severity: 'info',
-    action_url: null // Sem link específico
+    action_url: undefined // Sem link específico
   })
 }
 
