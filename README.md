@@ -93,6 +93,11 @@
 ### 7. **Sistema de Notificações Completo**
 - ✅ **Push Notifications (PWA)**: Service Worker configurado para notificações push
 - ✅ **Email Notifications**: Sistema de templates de email HTML/Text
+- ✅ **Configuração de Email via Interface Web**: 
+  - Configurar Gmail/SMTP em `/dashboard/settings`
+  - Armazenamento seguro com criptografia AES-256-CBC
+  - Não requer acesso ao servidor ou variáveis de ambiente
+  - Suporte a Gmail com App Passwords
 - ✅ **In-app Notifications**: Dropdown de notificações em tempo real
 - ✅ **Preferências de Usuário**: Configuração por tipo de notificação
 - ✅ **Notificações Automáticas**:
@@ -194,6 +199,14 @@
 
 ### `/api/notifications/test`
 - **POST**: Envia notificação de teste
+
+### `/api/settings/email`
+- **GET**: Busca configurações de email (admin only)
+- **POST**: Salva configurações de email (admin only)
+
+### `/api/test-email`
+- **GET**: Verifica status da configuração de email
+- **POST**: Envia email de teste para o usuário logado
 
 ## 📊 Estrutura de Dados
 
@@ -318,6 +331,17 @@
 - active: BOOLEAN
 - created_at: TIMESTAMP
 - updated_at: TIMESTAMP
+```
+
+### Tabela: `system_settings`
+```sql
+- id: UUID (PK)
+- key: VARCHAR(100) (unique)
+- value: JSONB
+- description: TEXT
+- created_at: TIMESTAMP
+- updated_at: TIMESTAMP
+- updated_by: UUID (FK users)
 ```
 
 ## 🔐 Credenciais de Teste
@@ -489,6 +513,25 @@ pm2 start ecosystem.config.cjs
 - **Deploy**: ✅ Atualizado no Vercel
 
 ## 🆕 Últimas Atualizações
+
+### v1.5.1 - Configuração de Email via Interface Web (01/09/2025)
+- **📧 Configuração de Email no Dashboard**:
+  - Nova página em `/dashboard/settings` para configurar SMTP
+  - Suporte completo para Gmail com App Passwords
+  - Armazenamento seguro com criptografia AES-256-CBC
+  - Não requer mais variáveis de ambiente no servidor
+- **🔄 Sistema Dinâmico de Configuração**:
+  - Busca configuração primeiro no banco de dados
+  - Fallback para variáveis de ambiente se necessário
+  - Cache de 5 minutos para melhor performance
+- **🔐 Segurança Aprimorada**:
+  - Senhas de email criptografadas no banco
+  - Apenas administradores podem configurar email
+  - Validação e teste de configuração antes de salvar
+- **📝 Documentação**:
+  - Novo guia em `/docs/EMAIL_CONFIGURATION.md`
+  - Instruções para criar App Password no Gmail
+  - Troubleshooting e soluções para problemas comuns
 
 ### v1.5.0 - Sistema Completo de Notificações (01/09/2025)
 - **🔔 Notificações In-App**: Sino interativo no header com dropdown de notificações
