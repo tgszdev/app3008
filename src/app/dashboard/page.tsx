@@ -416,23 +416,37 @@ export default function DashboardPage() {
           </div>
           
           <!-- Categories -->
-          <div style="margin-bottom: 40px; page-break-inside: avoid;">
-            <h2 style="font-size: 22px; color: #111827; margin-bottom: 25px; font-weight: 700; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; page-break-after: avoid;">TICKETS POR CATEGORIA</h2>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px;">
+          <div style="margin-bottom: 40px;">
+            <h2 style="font-size: 22px; color: #111827; margin-bottom: 25px; font-weight: 700; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">TICKETS POR CATEGORIA</h2>
       `
       
-      // Add category cards with page break protection
-      categoryStats?.categorias?.forEach((category, index) => {
-        const bgColor = category.color ? `${category.color}10` : '#f9fafb'
-        const borderColor = category.color || '#d1d5db'
-        
-        // Add page break before every 4 cards to keep pairs together
-        if (index > 0 && index % 4 === 0) {
-          pdfHTML += `</div></div><div style="page-break-before: always; margin-bottom: 40px; page-break-inside: avoid;"><div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px;">`
+      // Group category cards in pairs to prevent page breaks
+      let categoryPairs = []
+      for (let i = 0; i < (categoryStats?.categorias?.length || 0); i += 2) {
+        const pair = []
+        if (categoryStats?.categorias[i]) pair.push(categoryStats.categorias[i])
+        if (categoryStats?.categorias[i + 1]) pair.push(categoryStats.categorias[i + 1])
+        if (pair.length > 0) categoryPairs.push(pair)
+      }
+      
+      // Add each pair of cards in a container that won't break
+      categoryPairs.forEach((pair, pairIndex) => {
+        // Add page break before the third pair (after 4 cards)
+        if (pairIndex === 2) {
+          pdfHTML += `<div style="page-break-before: always;"></div>`
         }
         
         pdfHTML += `
-          <div style="background: white; border-left: 6px solid ${category.color || '#6b7280'}; padding: 20px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.15), 0 3px 10px rgba(0,0,0,0.1); page-break-inside: avoid; break-inside: avoid; position: relative; overflow: hidden; border: 1px solid #c6cbd1; margin-bottom: 8px; min-height: 280px;">
+          <div style="page-break-inside: avoid; margin-bottom: 20px;">
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px;">
+        `
+        
+        pair.forEach(category => {
+          const bgColor = category.color ? `${category.color}10` : '#f9fafb'
+          const borderColor = category.color || '#d1d5db'
+        
+          pdfHTML += `
+            <div style="background: white; border-left: 6px solid ${category.color || '#6b7280'}; padding: 20px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.15), 0 3px 10px rgba(0,0,0,0.1); position: relative; overflow: hidden; border: 1px solid #c6cbd1;">
             <div style="position: absolute; top: 0; right: 0; width: 150px; height: 150px; background: ${category.color || '#6b7280'}; opacity: 0.03; border-radius: 0 0 0 100%;"></div>
             <div style="position: relative;">
               <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
@@ -481,12 +495,22 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
+            </div>
+          `
+        })
+        
+        // Add empty div for single card to maintain grid
+        if (pair.length === 1) {
+          pdfHTML += `<div></div>`
+        }
+        
+        pdfHTML += `
+            </div>
           </div>
         `
       })
       
       pdfHTML += `
-            </div>
           </div>
           
           <!-- Footer -->
