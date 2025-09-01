@@ -358,7 +358,7 @@ async function handleUpdate(request: NextRequest) {
 
           // Notificar sobre mudança de prioridade
           if (updateData.priority && updateData.priority !== currentTicket.priority && currentTicket.created_by) {
-            const priorityMap = {
+            const priorityMap: Record<string, string> = {
               low: 'Baixa',
               medium: 'Média',
               high: 'Alta',
@@ -368,7 +368,7 @@ async function handleUpdate(request: NextRequest) {
             await createAndSendNotification({
               user_id: currentTicket.created_by,
               title: `Prioridade do Chamado #${currentTicket.ticket_number || currentTicket.id.substring(0, 8)} alterada`,
-              message: `Prioridade alterada de ${priorityMap[currentTicket.priority] || currentTicket.priority} para ${priorityMap[updateData.priority] || updateData.priority}`,
+              message: `Prioridade alterada de ${priorityMap[currentTicket.priority as string] || currentTicket.priority} para ${priorityMap[updateData.priority as string] || updateData.priority}`,
               type: 'ticket_priority_changed',
               severity: updateData.priority === 'urgent' ? 'warning' : 'info',
               data: {
