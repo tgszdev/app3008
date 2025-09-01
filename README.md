@@ -245,6 +245,27 @@ Usuários:
   Senha: user123
 ```
 
+## 🚨 CONFIGURAÇÃO DO SISTEMA DE NOTIFICAÇÕES
+
+### Erro: "Could not find the 'action_url' column"
+
+Se você receber este erro ao tentar enviar notificações de teste, execute um dos scripts SQL abaixo no Supabase:
+
+#### Opção 1: Adicionar colunas faltantes (recomendado)
+```sql
+-- Execute o script em:
+/home/user/webapp/supabase/migrations/fix_notifications_columns.sql
+```
+
+#### Opção 2: Recriar tabela completa (se a opção 1 não funcionar)
+```sql
+-- Execute o script em:
+/home/user/webapp/supabase/migrations/recreate_notifications_table.sql
+```
+
+### Verificar se funcionou:
+Acesse: `/api/notifications/test` após fazer login
+
 ## 🚨 CORREÇÃO DO ERRO DE RELACIONAMENTO
 
 ### Erro Atual:
