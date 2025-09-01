@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS notifications (
     type VARCHAR(50) NOT NULL, -- ticket_created, ticket_updated, ticket_assigned, comment_added, etc
     severity VARCHAR(20) DEFAULT 'info', -- info, warning, error, success
     data JSONB, -- Dados adicionais (ticket_id, comment_id, etc)
-    read BOOLEAN DEFAULT FALSE,
+    is_read BOOLEAN DEFAULT FALSE,
     read_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expires_at TIMESTAMP, -- Para notificações temporárias
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS notifications (
 
 -- Índices para performance
 CREATE INDEX idx_notifications_user_id ON notifications(user_id);
-CREATE INDEX idx_notifications_read ON notifications(read);
+CREATE INDEX idx_notifications_is_read ON notifications(is_read);
 CREATE INDEX idx_notifications_created_at ON notifications(created_at DESC);
 CREATE INDEX idx_notifications_type ON notifications(type);
 
@@ -118,7 +118,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION mark_notification_read(p_notification_id UUID) RETURNS VOID AS $$
 BEGIN
     UPDATE notifications 
-    SET read = TRUE, read_at = CURRENT_TIMESTAMP 
+    SET is_read = TRUE, read_at = CURRENT_TIMESTAMP 
     WHERE id = p_notification_id;
 END;
 $$ LANGUAGE plpgsql;
@@ -127,8 +127,8 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION mark_all_notifications_read(p_user_id UUID) RETURNS VOID AS $$
 BEGIN
     UPDATE notifications 
-    SET read = TRUE, read_at = CURRENT_TIMESTAMP 
-    WHERE user_id = p_user_id AND read = FALSE;
+    SET is_read = TRUE, read_at = CURRENT_TIMESTAMP 
+    WHERE user_id = p_user_id AND is_read = FALSE;
 END;
 $$ LANGUAGE plpgsql;
 

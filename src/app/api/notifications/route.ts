@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       .range(offset, offset + limit - 1)
 
     if (unreadOnly) {
-      query = query.eq('read', false)
+      query = query.eq('is_read', false)
     }
 
     const { data: notifications, error } = await query
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
       .from('notifications')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', session.user.id)
-      .eq('read', false)
+      .eq('is_read', false)
 
     return NextResponse.json({
       notifications: notifications || [],
@@ -146,9 +146,9 @@ export async function PATCH(request: NextRequest) {
       // Marcar todas como lidas
       const { error } = await supabase
         .from('notifications')
-        .update({ read: true, read_at: new Date().toISOString() })
+        .update({ is_read: true, read_at: new Date().toISOString() })
         .eq('user_id', session.user.id)
-        .eq('read', false)
+        .eq('is_read', false)
 
       if (error) {
         console.error('Error marking all notifications as read:', error)
@@ -160,7 +160,7 @@ export async function PATCH(request: NextRequest) {
       // Marcar uma notificação específica como lida
       const { error } = await supabase
         .from('notifications')
-        .update({ read: true, read_at: new Date().toISOString() })
+        .update({ is_read: true, read_at: new Date().toISOString() })
         .eq('id', notification_id)
         .eq('user_id', session.user.id)
 

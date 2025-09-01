@@ -14,7 +14,7 @@ interface Notification {
   message: string
   type: string
   severity: 'info' | 'warning' | 'error' | 'success'
-  read: boolean
+  is_read: boolean
   created_at: string
   action_url?: string
   data?: any
@@ -47,7 +47,7 @@ export default function NotificationBell() {
       await axios.patch('/api/notifications', { notification_id: notificationId })
       
       setNotifications(prev => 
-        prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
+        prev.map(n => n.id === notificationId ? { ...n, is_read: true } : n)
       )
       setUnreadCount(prev => Math.max(0, prev - 1))
     } catch (error) {
@@ -61,7 +61,7 @@ export default function NotificationBell() {
     try {
       await axios.patch('/api/notifications', { mark_all: true })
       
-      setNotifications(prev => prev.map(n => ({ ...n, read: true })))
+      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })))
       setUnreadCount(0)
       toast.success('Todas as notificações foram marcadas como lidas')
     } catch (error) {
@@ -77,7 +77,7 @@ export default function NotificationBell() {
       
       setNotifications(prev => prev.filter(n => n.id !== notificationId))
       const notification = notifications.find(n => n.id === notificationId)
-      if (notification && !notification.read) {
+      if (notification && !notification.is_read) {
         setUnreadCount(prev => Math.max(0, prev - 1))
       }
       
@@ -180,7 +180,7 @@ export default function NotificationBell() {
                 <div
                   key={notification.id}
                   className={`p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
-                    !notification.read ? 'bg-blue-50 dark:bg-blue-900/10' : ''
+                    !notification.is_read ? 'bg-blue-50 dark:bg-blue-900/10' : ''
                   }`}
                 >
                   <div className="flex items-start justify-between">
@@ -203,7 +203,7 @@ export default function NotificationBell() {
                             <Link
                               href={notification.action_url}
                               className="text-sm text-blue-600 dark:text-blue-400 hover:underline mt-2 inline-block"
-                              onClick={() => !notification.read && markAsRead(notification.id)}
+                              onClick={() => !notification.is_read && markAsRead(notification.id)}
                             >
                               Ver detalhes →
                             </Link>
@@ -212,7 +212,7 @@ export default function NotificationBell() {
                       </div>
                     </div>
                     <div className="flex items-center gap-1 ml-2">
-                      {!notification.read && (
+                      {!notification.is_read && (
                         <button
                           onClick={() => markAsRead(notification.id)}
                           className="p-1 text-gray-500 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400"
