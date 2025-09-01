@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export async function GET(request: Request) {
   try {
@@ -14,6 +14,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const startDate = searchParams.get('start_date')
     const endDate = searchParams.get('end_date')
+    const userId = searchParams.get('user_id')
 
     console.log('Received dates from frontend:', { startDate, endDate })
 
@@ -37,12 +38,13 @@ export async function GET(request: Request) {
     console.log('Using dates for query:', { filterStartDate, filterEndDate })
 
     // Get all tickets within the date range with category information
-    let query = supabase
+    let query = supabaseAdmin
       .from('tickets')
       .select(`
         id,
         status,
         created_at,
+        created_by,
         category_id,
         categories (
           id,
@@ -53,6 +55,11 @@ export async function GET(request: Request) {
       `)
       .gte('created_at', `${filterStartDate}T00:00:00`)
       .lte('created_at', `${filterEndDate}T23:59:59`)
+    
+    // Apply user filter if provided
+    if (userId) {
+      query = query.eq('created_by', userId)
+    }
 
     const { data: tickets, error: ticketsError } = await query
 

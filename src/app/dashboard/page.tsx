@@ -26,8 +26,12 @@ import {
   Code,
   Mail,
   Shield,
-  Phone
+  Phone,
+  User,
+  FileDown
 } from 'lucide-react'
+import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
 import { getIcon } from '@/lib/icons'
 
 interface Stats {
@@ -240,6 +244,8 @@ export default function DashboardPage() {
   
   const [periodFilter, setPeriodFilter] = useState<PeriodFilter>(getCurrentMonthDates())
   const [tempFilter, setTempFilter] = useState<PeriodFilter>(getCurrentMonthDates())
+  const [myTicketsOnly, setMyTicketsOnly] = useState(false)
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
   
   const [stats, setStats] = useState<Stats>({
     totalTickets: 0,
@@ -272,13 +278,23 @@ export default function DashboardPage() {
   }, [])
 
   useEffect(() => {
+    fetchDashboardData()
     fetchCategoryStats()
-  }, [periodFilter])
+  }, [periodFilter, myTicketsOnly])
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true)
-      const response = await axios.get('/api/dashboard/stats')
+      
+      const params = new URLSearchParams()
+      
+      // Add user filter if "Meus Tickets" is active
+      if (myTicketsOnly && session?.user?.id) {
+        params.append('user_id', session.user.id)
+      }
+      
+      const url = params.toString() ? `/api/dashboard/stats?${params}` : '/api/dashboard/stats'
+      const response = await axios.get(url)
       
       if (response.data) {
         setStats(response.data.stats)
@@ -303,6 +319,11 @@ export default function DashboardPage() {
         start_date: periodFilter.start_date,
         end_date: periodFilter.end_date
       })
+      
+      // Add user filter if "Meus Tickets" is active
+      if (myTicketsOnly && session?.user?.id) {
+        params.append('user_id', session.user.id)
+      }
       
       const response = await axios.get(`/api/dashboard/categories-stats?${params}`)
       
@@ -331,6 +352,87 @@ export default function DashboardPage() {
     router.push(`/dashboard/tickets/${ticketId}`)
   }
 
+  const handleExportPDF = async () => {
+    try {
+      setIsGeneratingPDF(true)
+      
+      // Hide elements that shouldn't be in the PDF
+      const recentTicketsSection = document.getElementById('recent-tickets-section')
+      const sidebar = document.querySelector('[data-sidebar]')
+      
+      if (recentTicketsSection) {
+        recentTicketsSection.style.display = 'none'
+      }
+      
+      // Get the dashboard content
+      const dashboardContent = document.getElementById('dashboard-content')
+      
+      if (!dashboardContent) {
+        toast.error('Erro ao capturar conteúdo do dashboard')
+        return
+      }
+      
+      // Generate canvas from HTML
+      const canvas = await html2canvas(dashboardContent, {
+        scale: 2,
+        logging: false,
+        useCORS: true,
+        backgroundColor: '#ffffff'
+      })
+      
+      // Create PDF
+      const imgData = canvas.toDataURL('image/png')
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      })
+      
+      const imgWidth = 210 // A4 width in mm
+      const pageHeight = 297 // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width
+      let heightLeft = imgHeight
+      let position = 0
+      
+      // Add first page
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+      heightLeft -= pageHeight
+      
+      // Add additional pages if needed
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight
+        pdf.addPage()
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+        heightLeft -= pageHeight
+      }
+      
+      // Generate filename with date
+      const today = new Date().toISOString().split('T')[0]
+      const filename = `dashboard_${today}${myTicketsOnly ? '_meus_tickets' : ''}.pdf`
+      
+      // Save PDF
+      pdf.save(filename)
+      
+      toast.success('PDF exportado com sucesso!')
+      
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+      toast.error('Erro ao gerar PDF')
+    } finally {
+      // Restore hidden elements
+      const recentTicketsSection = document.getElementById('recent-tickets-section')
+      if (recentTicketsSection) {
+        recentTicketsSection.style.display = ''
+      }
+      
+      setIsGeneratingPDF(false)
+    }
+  }
+
+  const toggleMyTickets = () => {
+    setMyTicketsOnly(!myTicketsOnly)
+  }
+
   if (!mounted) {
     return null
   }
@@ -344,32 +446,68 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div id="dashboard-content" className="space-y-4 sm:space-y-6">
       {/* Header with Filter */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-            Dashboard
+            Dashboard {myTicketsOnly && '- Meus Tickets'}
           </h1>
           <p className="mt-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-            Bem-vindo de volta, {session?.user?.name}! Aqui está um resumo do sistema.
+            Bem-vindo de volta, {session?.user?.name}! 
+            {myTicketsOnly 
+              ? 'Visualizando apenas seus tickets.'
+              : 'Aqui está um resumo do sistema.'
+            }
           </p>
         </div>
         
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-        >
-          <Calendar className="h-4 w-4 flex-shrink-0" />
-          <span className="text-xs sm:text-sm truncate">
-            {periodFilter.start_date === getCurrentMonthDates().start_date && 
-             periodFilter.end_date === getCurrentMonthDates().end_date
-              ? 'Mês Atual'
-              : `${formatDateShort(periodFilter.start_date)} - ${formatDateShort(periodFilter.end_date)}`
-            }
-          </span>
-          <Filter className="h-4 w-4 flex-shrink-0" />
-        </button>
+        <div className="flex flex-wrap gap-2">
+          {/* My Tickets Button */}
+          <button
+            onClick={toggleMyTickets}
+            className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-2 border rounded-lg transition-colors ${
+              myTicketsOnly 
+                ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
+                : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+            }`}
+          >
+            <User className="h-4 w-4 flex-shrink-0" />
+            <span className="text-xs sm:text-sm">Meus Tickets</span>
+          </button>
+          
+          {/* Date Filter Button */}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          >
+            <Calendar className="h-4 w-4 flex-shrink-0" />
+            <span className="text-xs sm:text-sm truncate">
+              {periodFilter.start_date === getCurrentMonthDates().start_date && 
+               periodFilter.end_date === getCurrentMonthDates().end_date
+                ? 'Mês Atual'
+                : `${formatDateShort(periodFilter.start_date)} - ${formatDateShort(periodFilter.end_date)}`
+              }
+            </span>
+            <Filter className="h-4 w-4 flex-shrink-0" />
+          </button>
+          
+          {/* Export PDF Button */}
+          <button
+            onClick={handleExportPDF}
+            disabled={isGeneratingPDF}
+            className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isGeneratingPDF ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Printer className="h-4 w-4 flex-shrink-0" />
+            )}
+            <span className="text-xs sm:text-sm">
+              {isGeneratingPDF ? 'Gerando...' : 'Exportar PDF'}
+            </span>
+          </button>
+        </div>
       </div>
 
       {/* Filter Panel */}
@@ -428,8 +566,13 @@ export default function DashboardPage() {
               {formatDateShort(categoryStats.periodo.data_inicio)} até {formatDateShort(categoryStats.periodo.data_fim)}
             </span>
             <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
-              • <strong>{categoryStats.total_tickets}</strong> tickets no período
+              • <strong>{categoryStats.total_tickets}</strong> {myTicketsOnly ? 'seus tickets' : 'tickets'} no período
             </span>
+            {myTicketsOnly && (
+              <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
+                • <span className="font-medium">Filtrado por: Meus Tickets</span>
+              </span>
+            )}
           </p>
         </div>
       )}
@@ -486,13 +629,13 @@ export default function DashboardPage() {
       )}
 
       {/* Recent Tickets (not affected by filter) */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+      <div id="recent-tickets-section" className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-            Chamados Recentes
+            {myTicketsOnly ? 'Meus Chamados Recentes' : 'Chamados Recentes'}
           </h2>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Últimos tickets criados (não afetado pelo filtro de período)
+            Últimos {myTicketsOnly ? 'seus' : ''} tickets criados {myTicketsOnly ? '' : '(não afetado pelo filtro de período)'}
           </p>
         </div>
         

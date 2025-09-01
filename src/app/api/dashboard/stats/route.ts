@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const session = await auth()
     
@@ -10,10 +10,20 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const searchParams = request.nextUrl.searchParams
+    const userId = searchParams.get('user_id')
+
     // Get ticket statistics
-    const { data: tickets, error: ticketsError } = await supabaseAdmin
+    let query = supabaseAdmin
       .from('tickets')
-      .select('id, status, created_at, updated_at')
+      .select('id, status, created_at, updated_at, created_by')
+    
+    // Apply user filter if provided
+    if (userId) {
+      query = query.eq('created_by', userId)
+    }
+    
+    const { data: tickets, error: ticketsError } = await query
 
     if (ticketsError) {
       console.error('Error fetching tickets:', ticketsError)
@@ -52,7 +62,7 @@ export async function GET() {
     // Removed active users, users trend and satisfaction rate - not needed anymore
 
     // Get recent tickets with user information
-    const { data: recentTicketsList, error: recentError } = await supabaseAdmin
+    let recentQuery = supabaseAdmin
       .from('tickets')
       .select(`
         id,
@@ -70,16 +80,29 @@ export async function GET() {
       `)
       .order('created_at', { ascending: false })
       .limit(5)
+    
+    // Apply user filter to recent tickets as well
+    if (userId) {
+      recentQuery = recentQuery.eq('created_by', userId)
+    }
+    
+    const { data: recentTicketsList, error: recentError } = await recentQuery
 
     if (recentError) {
       console.error('Error fetching recent tickets:', recentError)
       
       // If there's an error with the foreign key, try a simpler query
-      const { data: simpleTickets, error: simpleError } = await supabaseAdmin
+      let simpleQuery = supabaseAdmin
         .from('tickets')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(5)
+      
+      if (userId) {
+        simpleQuery = simpleQuery.eq('created_by', userId)
+      }
+      
+      const { data: simpleTickets, error: simpleError } = await simpleQuery
         
       if (!simpleError && simpleTickets) {
         // Fetch users separately
