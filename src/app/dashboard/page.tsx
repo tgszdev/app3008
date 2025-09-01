@@ -973,7 +973,13 @@ function formatDateShort(date: string | null | undefined) {
     return 'N/A'
   }
   
-  // Try to parse as ISO date first (handles timestamps like "2024-01-15T10:30:00.000Z")
+  // Check if it's a date in YYYY-MM-DD format (without time)
+  if (date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    const [year, month, day] = date.split('-')
+    return `${day}/${month}/${year}`
+  }
+  
+  // Try to parse as ISO date with time (handles timestamps like "2024-01-15T10:30:00.000Z")
   const dateObj = new Date(date)
   if (!isNaN(dateObj.getTime())) {
     const day = String(dateObj.getDate()).padStart(2, '0')
@@ -982,7 +988,7 @@ function formatDateShort(date: string | null | undefined) {
     return `${day}/${month}/${year}`
   }
   
-  // If not a valid date object, try parsing as YYYY-MM-DD
+  // If not a valid date object, try parsing as YYYY-MM-DD manually
   const parts = date.split('-')
   if (parts.length === 3) {
     const [year, month, day] = parts.map(Number)
