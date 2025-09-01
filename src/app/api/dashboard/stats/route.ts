@@ -73,8 +73,6 @@ export async function GET() {
 
     if (recentError) {
       console.error('Error fetching recent tickets:', recentError)
-      console.error('Recent tickets error details:', recentError.message)
-      console.error('Full error:', JSON.stringify(recentError, null, 2))
       
       // If there's an error with the foreign key, try a simpler query
       const { data: simpleTickets, error: simpleError } = await supabaseAdmin
@@ -117,20 +115,12 @@ export async function GET() {
       }
     }
 
-    // Log for debug
-    console.log('Recent tickets query successful:', !recentError)
-    if (recentTicketsList && recentTicketsList.length > 0) {
-      console.log('Sample ticket data:', JSON.stringify(recentTicketsList[0], null, 2))
-    }
-
     // Format recent tickets (when the join worked)
     const formattedRecentTickets = recentTicketsList?.map((ticket: any) => {
       // Handle both array and object responses from Supabase
       const user = Array.isArray(ticket.created_by_user) 
         ? ticket.created_by_user[0] 
         : ticket.created_by_user
-      
-      console.log(`Ticket ${ticket.ticket_number}: created_by_user =`, ticket.created_by_user)
       
       return {
         id: ticket.id,
