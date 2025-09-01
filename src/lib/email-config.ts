@@ -126,7 +126,7 @@ export async function createEmailTransporter(): Promise<Transporter | null> {
 
   if (emailService === 'smtp') {
     // Configuração SMTP (Gmail com senha de app)
-    transporterCache = nodemailer.createTransporter({
+    transporterCache = nodemailer.createTransport({
       host: config.host || 'smtp.gmail.com',
       port: parseInt(config.port || '587'),
       secure: config.secure === true || config.secure === 'true',
