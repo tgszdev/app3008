@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { auth } from '@/lib/auth'
+import { createAndSendNotification } from '@/lib/notifications'
 
 // GET - Listar todos os tickets
 export async function GET(request: NextRequest) {
@@ -131,6 +132,55 @@ export async function POST(request: NextRequest) {
       console.log('Erro ao criar histórico (ignorado):', historyError)
     }
 
+    // Enviar notificação para o responsável (se houver)
+    if (assigned_to && assigned_to !== created_by) {
+      try {
+        await createAndSendNotification({
+          user_id: assigned_to,
+          title: `Novo Chamado #${newTicket.ticket_number || newTicket.id.substring(0, 8)}`,
+          message: `${newTicket.created_by_user?.name || 'Usuário'} criou um novo chamado: ${title}`,
+          type: 'ticket_assigned',
+          severity: 'info',
+          data: {
+            ticket_id: newTicket.id,
+            ticket_number: newTicket.ticket_number
+          },
+          action_url: `/dashboard/tickets/${newTicket.id}`
+        })
+      } catch (notificationError) {
+        console.log('Erro ao enviar notificação (ignorado):', notificationError)
+      }
+    }
+
+    // Notificar administradores sobre novo ticket (opcional)
+    try {
+      // Buscar administradores
+      const { data: admins } = await supabaseAdmin
+        .from('users')
+        .select('id')
+        .eq('role', 'admin')
+        .neq('id', created_by)
+
+      if (admins && admins.length > 0) {
+        for (const admin of admins) {
+          await createAndSendNotification({
+            user_id: admin.id,
+            title: `Novo Chamado #${newTicket.ticket_number || newTicket.id.substring(0, 8)}`,
+            message: `${newTicket.created_by_user?.name || 'Usuário'} criou um novo chamado: ${title}`,
+            type: 'ticket_created',
+            severity: 'info',
+            data: {
+              ticket_id: newTicket.id,
+              ticket_number: newTicket.ticket_number
+            },
+            action_url: `/dashboard/tickets/${newTicket.id}`
+          })
+        }
+      }
+    } catch (notificationError) {
+      console.log('Erro ao notificar admins (ignorado):', notificationError)
+    }
+
     return NextResponse.json(newTicket, { status: 201 })
   } catch (error: any) {
     console.error('Erro no servidor:', error)
@@ -246,6 +296,93 @@ async function handleUpdate(request: NextRequest) {
 
       if (changes.length > 0) {
         await supabaseAdmin.from('ticket_history').insert(changes)
+
+        // Enviar notificações baseadas nas mudanças
+        try {
+          // Notificar se o ticket foi atribuído a alguém
+          if (updateData.assigned_to && updateData.assigned_to !== currentTicket.assigned_to) {
+            await createAndSendNotification({
+              user_id: updateData.assigned_to,
+              title: `Chamado #${currentTicket.ticket_number || currentTicket.id.substring(0, 8)} atribuído a você`,
+              message: `O chamado "${currentTicket.title}" foi atribuído a você`,
+              type: 'ticket_assigned',
+              severity: 'info',
+              data: {
+                ticket_id: id,
+                ticket_number: currentTicket.ticket_number
+              },
+              action_url: `/dashboard/tickets/${id}`
+            })
+          }
+
+          // Notificar o criador se o status mudou
+          if (updateData.status && updateData.status !== currentTicket.status && currentTicket.created_by) {
+            let notificationTitle = ''
+            let notificationSeverity: 'info' | 'success' | 'warning' | 'error' = 'info'
+            
+            switch (updateData.status) {
+              case 'in_progress':
+                notificationTitle = `Chamado #${currentTicket.ticket_number || currentTicket.id.substring(0, 8)} em andamento`
+                break
+              case 'resolved':
+                notificationTitle = `Chamado #${currentTicket.ticket_number || currentTicket.id.substring(0, 8)} foi resolvido`
+                notificationSeverity = 'success'
+                break
+              case 'closed':
+                notificationTitle = `Chamado #${currentTicket.ticket_number || currentTicket.id.substring(0, 8)} foi fechado`
+                notificationSeverity = 'info'
+                break
+              case 'on_hold':
+                notificationTitle = `Chamado #${currentTicket.ticket_number || currentTicket.id.substring(0, 8)} em espera`
+                notificationSeverity = 'warning'
+                break
+              default:
+                notificationTitle = `Chamado #${currentTicket.ticket_number || currentTicket.id.substring(0, 8)} atualizado`
+            }
+
+            await createAndSendNotification({
+              user_id: currentTicket.created_by,
+              title: notificationTitle,
+              message: `Status do chamado "${currentTicket.title}" foi alterado para ${updateData.status}`,
+              type: 'ticket_status_changed',
+              severity: notificationSeverity,
+              data: {
+                ticket_id: id,
+                ticket_number: currentTicket.ticket_number,
+                old_status: currentTicket.status,
+                new_status: updateData.status
+              },
+              action_url: `/dashboard/tickets/${id}`
+            })
+          }
+
+          // Notificar sobre mudança de prioridade
+          if (updateData.priority && updateData.priority !== currentTicket.priority && currentTicket.created_by) {
+            const priorityMap = {
+              low: 'Baixa',
+              medium: 'Média',
+              high: 'Alta',
+              urgent: 'Urgente'
+            }
+            
+            await createAndSendNotification({
+              user_id: currentTicket.created_by,
+              title: `Prioridade do Chamado #${currentTicket.ticket_number || currentTicket.id.substring(0, 8)} alterada`,
+              message: `Prioridade alterada de ${priorityMap[currentTicket.priority] || currentTicket.priority} para ${priorityMap[updateData.priority] || updateData.priority}`,
+              type: 'ticket_priority_changed',
+              severity: updateData.priority === 'urgent' ? 'warning' : 'info',
+              data: {
+                ticket_id: id,
+                ticket_number: currentTicket.ticket_number,
+                old_priority: currentTicket.priority,
+                new_priority: updateData.priority
+              },
+              action_url: `/dashboard/tickets/${id}`
+            })
+          }
+        } catch (notificationError) {
+          console.log('Erro ao enviar notificações (ignorado):', notificationError)
+        }
       }
     }
 

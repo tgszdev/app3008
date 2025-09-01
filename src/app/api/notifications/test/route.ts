@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
           message: 'Esta é uma notificação de teste criada pela API de verificação',
           type: 'test',
           severity: 'info',
-          action_url: '/dashboard/settings/notifications'
+          action_url: null
         })
         .select()
         .single()

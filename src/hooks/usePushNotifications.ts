@@ -1,167 +1,125 @@
-'use client'
+import { useState, useEffect, useCallback } from 'react'
+import { useSession } from 'next-auth/react'
+import pushManager from '@/lib/push-notifications'
+import { toast } from 'react-hot-toast'
 
-import { useState, useEffect } from 'react'
-import axios from 'axios'
-import toast from 'react-hot-toast'
+interface UsePushNotificationsReturn {
+  isSupported: boolean
+  permission: NotificationPermission
+  isSubscribed: boolean
+  isLoading: boolean
+  subscribe: () => Promise<void>
+  unsubscribe: () => Promise<void>
+  requestPermission: () => Promise<void>
+  testNotification: () => Promise<void>
+}
 
-const PUBLIC_VAPID_KEY = process.env.NEXT_PUBLIC_VAPID_KEY || 'BKRJGDpkYQJm0P3XvX_9cVpRgNq0HjWXPwZ7VOXQzWqN4hMpkbz3R6wXt1lS6iYZgDqjcD_kxXdJvgYGqzW_Ens'
-
-export function usePushNotifications() {
-  const [isSupported, setIsSupported] = useState(false)
-  const [subscription, setSubscription] = useState<PushSubscription | null>(null)
+export function usePushNotifications(): UsePushNotificationsReturn {
+  const { data: session } = useSession()
+  const [permission, setPermission] = useState<NotificationPermission>('default')
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isSupported] = useState(() => pushManager.isSupported())
 
+  // Check initial permission and subscription status
   useEffect(() => {
-    // Verificar se o navegador suporta push notifications
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
-      setIsSupported(true)
-      checkSubscription()
-    }
-  }, [])
+    if (!isSupported) return
 
-  // Verificar se já está inscrito
-  const checkSubscription = async () => {
-    try {
-      const registration = await navigator.serviceWorker.ready
-      const sub = await registration.pushManager.getSubscription()
-      
-      if (sub) {
-        setSubscription(sub)
-        setIsSubscribed(true)
-      }
-    } catch (error) {
-      console.error('Erro ao verificar subscription:', error)
-    }
-  }
+    // Check permission
+    setPermission(pushManager.getPermissionStatus())
 
-  // Converter VAPID key
-  const urlBase64ToUint8Array = (base64String: string) => {
-    const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
-    const base64 = (base64String + padding)
-      .replace(/\-/g, '+')
-      .replace(/_/g, '/')
+    // Check subscription
+    pushManager.isSubscribed().then(setIsSubscribed)
+  }, [isSupported])
 
-    const rawData = window.atob(base64)
-    const outputArray = new Uint8Array(rawData.length)
-
-    for (let i = 0; i < rawData.length; ++i) {
-      outputArray[i] = rawData.charCodeAt(i)
-    }
-    return outputArray
-  }
-
-  // Inscrever para push notifications
-  const subscribe = async () => {
-    if (!isSupported) {
-      toast.error('Seu navegador não suporta notificações push')
-      return false
-    }
-
-    setIsLoading(true)
-
-    try {
-      // Pedir permissão
-      const permission = await Notification.requestPermission()
-      
-      if (permission !== 'granted') {
-        toast.error('Permissão para notificações negada')
-        setIsLoading(false)
-        return false
-      }
-
-      // Obter service worker registration
-      const registration = await navigator.serviceWorker.ready
-
-      // Criar subscription
-      const sub = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY)
-      })
-
-      // Enviar subscription para o servidor
-      const deviceInfo = {
-        userAgent: navigator.userAgent,
-        platform: navigator.platform,
-        language: navigator.language
-      }
-
-      await axios.post('/api/notifications/push/subscribe', {
-        subscription: sub.toJSON(),
-        deviceInfo
-      })
-
-      setSubscription(sub)
-      setIsSubscribed(true)
-      toast.success('Notificações push ativadas!')
-      
-      return true
-    } catch (error) {
-      console.error('Erro ao inscrever para push notifications:', error)
-      toast.error('Erro ao ativar notificações push')
-      return false
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  // Cancelar inscrição
-  const unsubscribe = async () => {
-    if (!subscription) return false
-
-    setIsLoading(true)
-
-    try {
-      // Cancelar subscription no navegador
-      await subscription.unsubscribe()
-
-      // Notificar servidor
-      await axios.delete(`/api/notifications/push/subscribe?endpoint=${encodeURIComponent(subscription.endpoint)}`)
-
-      setSubscription(null)
-      setIsSubscribed(false)
-      toast.success('Notificações push desativadas')
-      
-      return true
-    } catch (error) {
-      console.error('Erro ao cancelar push notifications:', error)
-      toast.error('Erro ao desativar notificações push')
-      return false
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  // Testar notificação
-  const testNotification = async () => {
-    if (!isSubscribed) {
-      toast.error('Você precisa ativar as notificações primeiro')
+  // Subscribe to push notifications
+  const subscribe = useCallback(async () => {
+    if (!session?.user?.id) {
+      toast.error('Você precisa estar logado')
       return
     }
 
+    setIsLoading(true)
     try {
-      // Criar notificação local para teste
-      const registration = await navigator.serviceWorker.ready
-      await registration.showNotification('Teste de Notificação', {
-        body: 'As notificações push estão funcionando!',
-        icon: '/icons/icon-192x192.png',
-        badge: '/icons/icon-72x72.png',
-        tag: 'test-notification'
-      } as any) // Type cast para permitir vibrate em alguns navegadores
-      
-      toast.success('Notificação de teste enviada!')
+      const subscription = await pushManager.subscribe(session.user.id)
+      if (subscription) {
+        setIsSubscribed(true)
+        setPermission('granted')
+        toast.success('Notificações push ativadas!')
+      }
     } catch (error) {
-      console.error('Erro ao enviar notificação de teste:', error)
-      toast.error('Erro ao enviar notificação de teste')
+      console.error('Failed to subscribe:', error)
+      toast.error('Erro ao ativar notificações push')
+    } finally {
+      setIsLoading(false)
     }
-  }
+  }, [session?.user?.id])
+
+  // Unsubscribe from push notifications
+  const unsubscribe = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      const success = await pushManager.unsubscribe()
+      if (success) {
+        setIsSubscribed(false)
+        
+        // Also remove from server
+        if (session?.user?.id) {
+          await fetch('/api/notifications/subscribe', {
+            method: 'DELETE'
+          })
+        }
+        
+        toast.success('Notificações push desativadas')
+      }
+    } catch (error) {
+      console.error('Failed to unsubscribe:', error)
+      toast.error('Erro ao desativar notificações push')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [session?.user?.id])
+
+  // Request notification permission
+  const requestPermission = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      const perm = await pushManager.requestPermission()
+      setPermission(perm)
+      
+      if (perm === 'granted' && session?.user?.id) {
+        // Auto-subscribe if permission granted
+        await subscribe()
+      }
+    } catch (error) {
+      console.error('Failed to request permission:', error)
+      toast.error('Erro ao solicitar permissão')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [session?.user?.id, subscribe])
+
+  // Test notification
+  const testNotification = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      await pushManager.testNotification()
+    } catch (error) {
+      console.error('Failed to test notification:', error)
+      toast.error('Erro ao testar notificação')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
 
   return {
     isSupported,
+    permission,
     isSubscribed,
     isLoading,
     subscribe,
     unsubscribe,
+    requestPermission,
     testNotification
   }
 }

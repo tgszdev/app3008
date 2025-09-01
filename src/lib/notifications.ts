@@ -180,7 +180,7 @@ export async function notifyTicketCreated(ticket: any, created_by: any) {
           priority: ticket.priority,
           created_by: created_by.name
         },
-        action_url: `/dashboard/tickets/${ticket.id}`
+        action_url: `/dashboard/tickets/${ticket.id}` // URL correta para o ticket
       })
     }
   }

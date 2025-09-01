@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { createAndSendNotification } from '@/lib/notifications'
 
 // POST - Adicionar comentário
 export async function POST(request: NextRequest) {
@@ -79,6 +80,95 @@ export async function POST(request: NextRequest) {
         action: 'comment_added',
         created_at: new Date().toISOString()
       })
+
+    // Buscar informações do ticket e usuário para notificação
+    try {
+      const { data: ticket } = await supabaseAdmin
+        .from('tickets')
+        .select('id, title, ticket_number, created_by, assigned_to')
+        .eq('id', ticket_id)
+        .single()
+
+      if (ticket) {
+        const { data: commentUser } = await supabaseAdmin
+          .from('users')
+          .select('name')
+          .eq('id', user_id)
+          .single()
+
+        const userName = commentUser?.name || 'Usuário'
+        const commentPreview = content.substring(0, 100) + (content.length > 100 ? '...' : '')
+
+        // Notificar o criador do ticket (se não for ele mesmo comentando)
+        if (ticket.created_by && ticket.created_by !== user_id) {
+          await createAndSendNotification({
+            user_id: ticket.created_by,
+            title: `Novo comentário no Chamado #${ticket.ticket_number || ticket.id.substring(0, 8)}`,
+            message: `${userName} comentou: "${commentPreview}"`,
+            type: 'comment_added',
+            severity: 'info',
+            data: {
+              ticket_id: ticket.id,
+              comment_id: comment.id,
+              ticket_number: ticket.ticket_number
+            },
+            action_url: `/dashboard/tickets/${ticket.id}#comment-${comment.id}`
+          })
+        }
+
+        // Notificar o responsável (se houver e não for ele mesmo)
+        if (ticket.assigned_to && ticket.assigned_to !== user_id && ticket.assigned_to !== ticket.created_by) {
+          await createAndSendNotification({
+            user_id: ticket.assigned_to,
+            title: `Novo comentário no Chamado #${ticket.ticket_number || ticket.id.substring(0, 8)}`,
+            message: `${userName} comentou: "${commentPreview}"`,
+            type: 'comment_added',
+            severity: 'info',
+            data: {
+              ticket_id: ticket.id,
+              comment_id: comment.id,
+              ticket_number: ticket.ticket_number
+            },
+            action_url: `/dashboard/tickets/${ticket.id}#comment-${comment.id}`
+          })
+        }
+
+        // Detectar e notificar menções (@username)
+        const mentionRegex = /@(\w+)/g
+        const mentions = content.match(mentionRegex)
+        
+        if (mentions && mentions.length > 0) {
+          for (const mention of mentions) {
+            const username = mention.substring(1) // Remove @
+            
+            // Buscar usuário pela menção
+            const { data: mentionedUser } = await supabaseAdmin
+              .from('users')
+              .select('id')
+              .ilike('name', `%${username}%`)
+              .single()
+
+            if (mentionedUser && mentionedUser.id !== user_id) {
+              await createAndSendNotification({
+                user_id: mentionedUser.id,
+                title: `Você foi mencionado no Chamado #${ticket.ticket_number || ticket.id.substring(0, 8)}`,
+                message: `${userName} mencionou você em um comentário`,
+                type: 'comment_mention',
+                severity: 'info',
+                data: {
+                  ticket_id: ticket.id,
+                  comment_id: comment.id,
+                  ticket_number: ticket.ticket_number
+                },
+                action_url: `/dashboard/tickets/${ticket.id}#comment-${comment.id}`
+              })
+            }
+          }
+        }
+      }
+    } catch (notificationError) {
+      console.log('Erro ao enviar notificações (ignorado):', notificationError)
+    }
 
     return NextResponse.json(comment)
   } catch (error: any) {
