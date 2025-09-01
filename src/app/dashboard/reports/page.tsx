@@ -14,7 +14,6 @@ import {
   Filter,
   Eye,
   FileSpreadsheet,
-  FilePdf,
   Loader2,
   TrendingUp,
   Users,
@@ -601,7 +600,7 @@ export default function ReportsPage() {
                         : 'border-gray-300 dark:border-gray-600'
                     }`}
                   >
-                    <FilePdf className="h-5 w-5 mx-auto mb-1" />
+                    <FileText className="h-5 w-5 mx-auto mb-1" />
                     <span className="text-xs">PDF</span>
                   </button>
                   <button
@@ -690,8 +689,9 @@ export default function ReportsPage() {
                   <button
                     onClick={() => exportToPDF(reportData)}
                     className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    title="Exportar PDF"
                   >
-                    <FilePdf className="h-4 w-4" />
+                    <FileText className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => exportToExcel(reportData)}
