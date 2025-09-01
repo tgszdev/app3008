@@ -153,6 +153,20 @@
 - **PUT**: Atualiza categoria (admin only)
 - **DELETE**: Exclui categoria (admin only, `?id=uuid`)
 
+### `/api/notifications`
+- **GET**: Lista notificações do usuário (`?unread=true&limit=20&offset=0`)
+- **POST**: Cria nova notificação
+- **PATCH**: Marca como lida (`notification_id` ou `mark_all=true`)
+- **DELETE**: Remove notificação (`?id=uuid`)
+
+### `/api/notifications/preferences`
+- **GET**: Busca preferências de notificação do usuário
+- **PATCH**: Atualiza preferências
+
+### `/api/notifications/push/subscribe`
+- **POST**: Registra push subscription
+- **DELETE**: Remove push subscription (`?endpoint=url`)
+
 ## 📊 Estrutura de Dados
 
 ### Tabela: `users`
@@ -307,11 +321,14 @@ pm2 start ecosystem.config.cjs
 - [ ] Limite de tamanho
 - [ ] Integração com Supabase Storage
 
-### 4. **Notificações**
-- [ ] Push notifications (PWA)
-- [ ] Email notifications
-- [ ] Notificações in-app
-- [ ] Configurações por usuário
+### 4. **Notificações** ✅ IMPLEMENTADO
+- ✅ Push notifications (PWA) via Service Worker
+- ✅ Email notifications com templates HTML
+- ✅ Notificações in-app com sino no header
+- ✅ Configurações por usuário com página dedicada
+- ✅ Preferências granulares por tipo de notificação
+- ✅ Horário de silêncio configurável
+- ✅ Notificações de teste para validar configurações
 
 ### 5. **Analytics e Relatórios**
 - [ ] Dashboard com métricas
@@ -350,9 +367,9 @@ pm2 start ecosystem.config.cjs
 5. **Deploy no Vercel**: Configurar variáveis de ambiente e deploy
 
 ## 📊 Status do Projeto
-- **Versão**: 1.4.0
+- **Versão**: 1.5.0
 - **Status**: ✅ Em Produção
-- **Última Atualização**: 01/09/2025 - 12:15
+- **Última Atualização**: 01/09/2025 - 13:00
 - **Ambiente**: Vercel + Supabase
 - **Banco de Dados**: ✅ Conectado e Funcional
 - **Total de Usuários**: 6
@@ -360,6 +377,28 @@ pm2 start ecosystem.config.cjs
 - **Deploy**: ✅ Atualizado no Vercel
 
 ## 🆕 Últimas Atualizações
+
+### v1.5.0 - Sistema Completo de Notificações (01/09/2025)
+- **🔔 Notificações In-App**: Sino interativo no header com dropdown de notificações
+- **📱 Push Notifications**: Suporte completo para PWA via Service Worker
+- **📧 Email Notifications**: Templates HTML responsivos para diferentes eventos
+- **⚙️ Configurações Personalizadas**:
+  - Página dedicada em `/dashboard/settings/notifications`
+  - Controle granular por tipo de notificação
+  - Ativar/desativar por método (email, push, in-app)
+  - Horário de silêncio configurável
+- **🗄️ Banco de Dados**:
+  - Tabelas para notificações, preferências e push subscriptions
+  - Sistema de templates de email
+  - Triggers automáticos para novos usuários
+- **🚀 APIs Completas**:
+  - CRUD de notificações
+  - Gerenciamento de preferências
+  - Push subscription management
+- **📨 Integração de Email**:
+  - Suporte para Resend e SendGrid
+  - Templates para ticket criado, atribuído e resolvido
+  - Fallback para log em desenvolvimento
 
 ### v1.4.0 - Permissões por Perfil em Tickets
 - **🔒 Restrições para Usuários (role: user)**:
