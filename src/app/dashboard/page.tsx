@@ -387,77 +387,49 @@ export default function DashboardPage() {
             <div style="width: 180mm; min-height: 267mm; position: relative;">
             
             <!-- Header (20mm) -->
-            <div style="position: relative; text-align: center; margin-bottom: 10mm; padding: 15px 10px 10px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-radius: 12px; box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25); overflow: hidden;">
-              <!-- Background decorative pattern -->
-              <svg style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.1;" viewBox="0 0 400 100" preserveAspectRatio="none">
-                <path d="M0,50 Q100,30 200,50 T400,50 L400,100 L0,100 Z" fill="white"/>
-                <path d="M0,30 Q100,10 200,30 T400,30 L400,100 L0,100 Z" fill="white"/>
-              </svg>
-              <div style="position: absolute; top: -30px; right: -30px; width: 100px; height: 100px; background: radial-gradient(circle, rgba(255,255,255,0.2), transparent); border-radius: 50%;"></div>
-              <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: radial-gradient(circle, rgba(255,255,255,0.15), transparent); border-radius: 50%;"></div>
-              <!-- Content -->
-              <div style="position: relative; z-index: 1;">
-                <h1 style="margin: 0; font-size: 22px; color: #ffffff; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">RELATÓRIO DE TICKETS</h1>
-                <h2 style="margin: 4px 0 0 0; font-size: 16px; color: #e0f2fe; font-weight: 600;">DASHBOARD</h2>
-                <p style="margin: 8px 0 2px 0; font-size: 11px; color: #ffffff; background: rgba(255,255,255,0.2); display: inline-block; padding: 4px 12px; border-radius: 20px;">
-                  <strong>Período:</strong> ${formatDateShort(periodFilter.start_date)} até ${formatDateShort(periodFilter.end_date)}
-                </p>
-                ${myTicketsOnly ? `<p style="margin: 4px 0; font-size: 10px; color: #ffffff; font-weight: 500; background: rgba(255,255,255,0.15); display: inline-block; padding: 3px 10px; border-radius: 15px;"><strong>Filtrado por:</strong> Tickets de ${session?.user?.name}</p>` : ''}
-              </div>
+            <div style="text-align: center; margin-bottom: 10mm; padding-bottom: 3mm; border-bottom: 2px solid #3b82f6;">
+              <h1 style="margin: 0; font-size: 20px; color: #111827; font-weight: bold;">RELATÓRIO DE TICKETS</h1>
+              <h2 style="margin: 3px 0 0 0; font-size: 16px; color: #3b82f6; font-weight: 600;">DASHBOARD</h2>
+              <p style="margin: 5px 0 2px 0; font-size: 11px; color: #6b7280;">
+                <strong>Período:</strong> ${formatDateShort(periodFilter.start_date)} até ${formatDateShort(periodFilter.end_date)}
+              </p>
+              ${myTicketsOnly ? `<p style="margin: 2px 0; font-size: 10px; color: #3b82f6; font-weight: 500;"><strong>Filtrado por:</strong> Tickets de ${session?.user?.name}</p>` : ''}
             </div>
             
             <!-- Summary Box (30mm) -->
-            <div style="position: relative; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; padding: 20px 15px; border-radius: 12px; margin-bottom: 10mm; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3); overflow: hidden;">
-              <!-- Decorative elements -->
-              <div style="position: absolute; top: -25px; right: -25px; width: 100px; height: 100px; background: radial-gradient(circle, rgba(255,255,255,0.15), transparent); border-radius: 50%;"></div>
-              <div style="position: absolute; bottom: -20px; left: -20px; width: 80px; height: 80px; background: radial-gradient(circle, rgba(255,255,255,0.1), transparent); border-radius: 50%;"></div>
-              <svg style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.05;" viewBox="0 0 400 100" preserveAspectRatio="none">
-                <path d="M0,60 Q100,40 200,60 T400,60 L400,100 L0,100 Z" fill="white"/>
-              </svg>
-              <div style="position: relative; z-index: 1; text-align: center;">
-                <div style="font-size: 42px; font-weight: bold; line-height: 1; text-shadow: 0 4px 8px rgba(0,0,0,0.2);">${categoryStats?.total_tickets || 0}</div>
-                <div style="font-size: 13px; margin-top: 10px; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; opacity: 0.95;">TOTAL DE TICKETS</div>
+            <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 15px; border-radius: 8px; margin-bottom: 10mm; box-shadow: 0 6px 15px rgba(59, 130, 246, 0.2);">
+              <div style="text-align: center;">
+                <div style="font-size: 36px; font-weight: bold; line-height: 1;">${categoryStats?.total_tickets || 0}</div>
+                <div style="font-size: 12px; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 500;">TOTAL DE TICKETS</div>
               </div>
             </div>
             
             <!-- Status Cards (35mm) -->
             <div style="margin-bottom: 10mm;">
-              <h2 style="font-size: 16px; color: #111827; margin-bottom: 10px; font-weight: 700; padding: 8px 12px; background: linear-gradient(90deg, #f0f9ff, #ffffff); border-left: 4px solid #3b82f6; border-radius: 6px;">TOTAL DE TICKETS POR STATUS</h2>
+              <h2 style="font-size: 16px; color: #111827; margin-bottom: 8px; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 3px;">TOTAL DE TICKETS POR STATUS</h2>
               <div style="display: flex; gap: 8px; justify-content: space-between;">
-                <div style="flex: 1; position: relative; overflow: hidden; background: linear-gradient(135deg, #fef3c7, #fef9e7); padding: 14px 8px; border-radius: 10px; text-align: center; border: 1px solid #fbbf24; box-shadow: 0 4px 12px rgba(251, 191, 36, 0.15);">
-                  <div style="position: absolute; top: -15px; right: -15px; width: 40px; height: 40px; background: radial-gradient(circle, rgba(251, 191, 36, 0.2), transparent); border-radius: 50%;"></div>
-                  <div style="position: relative; z-index: 1;">
-                    <div style="font-size: 24px; font-weight: bold; color: #d97706; line-height: 1; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">${categoryStats?.status_summary.open || 0}</div>
-                    <div style="font-size: 10px; color: #92400e; margin-top: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Abertos</div>
-                  </div>
+                <div style="flex: 1; background: #fef3c7; padding: 12px 8px; border-radius: 6px; text-align: center; border: 1px solid #fbbf24;">
+                  <div style="font-size: 22px; font-weight: bold; color: #d97706; line-height: 1;">${categoryStats?.status_summary.open || 0}</div>
+                  <div style="font-size: 9px; color: #92400e; margin-top: 3px; font-weight: 600; text-transform: uppercase;">Abertos</div>
                 </div>
-                <div style="flex: 1; position: relative; overflow: hidden; background: linear-gradient(135deg, #fed7aa, #fef3e7); padding: 14px 8px; border-radius: 10px; text-align: center; border: 1px solid #fb923c; box-shadow: 0 4px 12px rgba(251, 146, 60, 0.15);">
-                  <div style="position: absolute; top: -15px; right: -15px; width: 40px; height: 40px; background: radial-gradient(circle, rgba(251, 146, 60, 0.2), transparent); border-radius: 50%;"></div>
-                  <div style="position: relative; z-index: 1;">
-                    <div style="font-size: 24px; font-weight: bold; color: #ea580c; line-height: 1; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">${categoryStats?.status_summary.in_progress || 0}</div>
-                    <div style="font-size: 10px; color: #7c2d12; margin-top: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Em Progresso</div>
-                  </div>
+                <div style="flex: 1; background: #fed7aa; padding: 12px 8px; border-radius: 6px; text-align: center; border: 1px solid #fb923c;">
+                  <div style="font-size: 22px; font-weight: bold; color: #ea580c; line-height: 1;">${categoryStats?.status_summary.in_progress || 0}</div>
+                  <div style="font-size: 9px; color: #7c2d12; margin-top: 3px; font-weight: 600; text-transform: uppercase;">Em Progresso</div>
                 </div>
-                <div style="flex: 1; position: relative; overflow: hidden; background: linear-gradient(135deg, #bbf7d0, #e6ffed); padding: 14px 8px; border-radius: 10px; text-align: center; border: 1px solid #4ade80; box-shadow: 0 4px 12px rgba(74, 222, 128, 0.15);">
-                  <div style="position: absolute; top: -15px; right: -15px; width: 40px; height: 40px; background: radial-gradient(circle, rgba(74, 222, 128, 0.2), transparent); border-radius: 50%;"></div>
-                  <div style="position: relative; z-index: 1;">
-                    <div style="font-size: 24px; font-weight: bold; color: #16a34a; line-height: 1; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">${categoryStats?.status_summary.resolved || 0}</div>
-                    <div style="font-size: 10px; color: #14532d; margin-top: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Resolvidos</div>
-                  </div>
+                <div style="flex: 1; background: #bbf7d0; padding: 12px 8px; border-radius: 6px; text-align: center; border: 1px solid #4ade80;">
+                  <div style="font-size: 22px; font-weight: bold; color: #16a34a; line-height: 1;">${categoryStats?.status_summary.resolved || 0}</div>
+                  <div style="font-size: 9px; color: #14532d; margin-top: 3px; font-weight: 600; text-transform: uppercase;">Resolvidos</div>
                 </div>
-                <div style="flex: 1; position: relative; overflow: hidden; background: linear-gradient(135deg, #fecaca, #fff1f1); padding: 14px 8px; border-radius: 10px; text-align: center; border: 1px solid #f87171; box-shadow: 0 4px 12px rgba(248, 113, 113, 0.15);">
-                  <div style="position: absolute; top: -15px; right: -15px; width: 40px; height: 40px; background: radial-gradient(circle, rgba(248, 113, 113, 0.2), transparent); border-radius: 50%;"></div>
-                  <div style="position: relative; z-index: 1;">
-                    <div style="font-size: 24px; font-weight: bold; color: #dc2626; line-height: 1; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">${categoryStats?.status_summary.cancelled || 0}</div>
-                    <div style="font-size: 10px; color: #7f1d1d; margin-top: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Cancelados</div>
-                  </div>
+                <div style="flex: 1; background: #fecaca; padding: 12px 8px; border-radius: 6px; text-align: center; border: 1px solid #f87171;">
+                  <div style="font-size: 22px; font-weight: bold; color: #dc2626; line-height: 1;">${categoryStats?.status_summary.cancelled || 0}</div>
+                  <div style="font-size: 9px; color: #7f1d1d; margin-top: 3px; font-weight: 600; text-transform: uppercase;">Cancelados</div>
                 </div>
               </div>
             </div>
           
             <!-- Categories Section (remaining space ~152mm for 4 cards = 38mm each) -->
             <div>
-              <h2 style="font-size: 16px; color: #111827; margin-bottom: 10px; font-weight: 700; padding: 8px 12px; background: linear-gradient(90deg, #f0f9ff, #ffffff); border-left: 4px solid #3b82f6; border-radius: 6px;">TICKETS POR CATEGORIA</h2>
+              <h2 style="font-size: 16px; color: #111827; margin-bottom: 8px; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 3px;">TICKETS POR CATEGORIA</h2>
       `
       
       // Process categories - first 4 on page 1, rest on page 2
@@ -481,17 +453,7 @@ export default function DashboardPage() {
           const borderColor = category.color || '#d1d5db'
         
             pdfHTML += `
-              <div style="flex: 1; position: relative; overflow: hidden; background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%); border-left: 5px solid ${category.color || '#6b7280'}; padding: 12px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); border: 1px solid #e0e7ff; min-height: 70mm; max-width: 86mm;">
-                <!-- Background decorative elements -->
-                <div style="position: absolute; top: -20px; right: -20px; width: 80px; height: 80px; background: linear-gradient(135deg, ${category.color || '#3b82f6'}15, ${category.color || '#3b82f6'}05); border-radius: 50%; opacity: 0.5;"></div>
-                <div style="position: absolute; bottom: -30px; left: -30px; width: 100px; height: 100px; background: linear-gradient(135deg, ${category.color || '#3b82f6'}10, transparent); border-radius: 50%; opacity: 0.3;"></div>
-                <div style="position: absolute; top: 50%; right: 10px; width: 60px; height: 60px; background: radial-gradient(circle, ${category.color || '#3b82f6'}08, transparent); border-radius: 50%;"></div>
-                <!-- Wave pattern -->
-                <svg style="position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; opacity: 0.1;" viewBox="0 0 200 40" preserveAspectRatio="none">
-                  <path d="M0,20 Q50,5 100,20 T200,20 L200,40 L0,40 Z" fill="${category.color || '#3b82f6'}"/>
-                </svg>
-                <!-- Content with relative positioning -->
-                <div style="position: relative; z-index: 1;">
+              <div style="flex: 1; background: white; border-left: 5px solid ${category.color || '#6b7280'}; padding: 12px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #e5e7eb; min-height: 70mm; max-width: 86mm;">
                 <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
                   <h3 style="margin: 0; font-size: 14px; color: #111827; font-weight: 700; text-transform: uppercase; flex: 1; padding-right: 10px;">${category.nome}</h3>
                   <div style="text-align: right; flex-shrink: 0;">
@@ -508,7 +470,7 @@ export default function DashboardPage() {
                     <div style="background: linear-gradient(90deg, ${category.color || '#6b7280'}, ${category.color || '#6b7280'}dd); height: 100%; width: ${category.percentual}%; border-radius: 3px;"></div>
                   </div>
                 </div>
-                <div style="background: linear-gradient(135deg, #fafbfc, #ffffff); border-radius: 8px; padding: 10px; margin-top: 12px; border: 1px solid #e0e7ff; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                <div style="background: #fafbfc; border-radius: 6px; padding: 10px; margin-top: 12px; border: 1px solid #e5e7eb;">
                   <div style="font-size: 11px; color: #374151; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">Distribuição por Status:</div>
                   <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 11px;">
                     <div style="display: flex; align-items: center;"><span style="color: #d97706; font-size: 14px; margin-right: 4px;">●</span> <span style="font-weight: 600; color: #374151;">Abertos:</span> <span style="font-weight: 700; color: #111827; margin-left: 4px;">${category.status_breakdown.open}</span></div>
@@ -517,7 +479,6 @@ export default function DashboardPage() {
                     <div style="display: flex; align-items: center;"><span style="color: #dc2626; font-size: 14px; margin-right: 4px;">●</span> <span style="font-weight: 600; color: #374151;">Cancelados:</span> <span style="font-weight: 700; color: #111827; margin-left: 4px;">${category.status_breakdown.cancelled}</span></div>
                   </div>
                 </div>
-                </div> <!-- End of content wrapper -->
               </div>
             `
           })
@@ -558,17 +519,7 @@ export default function DashboardPage() {
                   
                   pair.forEach(category => {
                     page2HTML += `
-                      <div style="flex: 1; position: relative; overflow: hidden; background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%); border-left: 5px solid ${category.color || '#6b7280'}; padding: 12px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); border: 1px solid #e0e7ff; min-height: 70mm; max-width: 86mm;">
-                        <!-- Background decorative elements -->
-                        <div style="position: absolute; top: -20px; right: -20px; width: 80px; height: 80px; background: linear-gradient(135deg, ${category.color || '#3b82f6'}15, ${category.color || '#3b82f6'}05); border-radius: 50%; opacity: 0.5;"></div>
-                        <div style="position: absolute; bottom: -30px; left: -30px; width: 100px; height: 100px; background: linear-gradient(135deg, ${category.color || '#3b82f6'}10, transparent); border-radius: 50%; opacity: 0.3;"></div>
-                        <div style="position: absolute; top: 50%; right: 10px; width: 60px; height: 60px; background: radial-gradient(circle, ${category.color || '#3b82f6'}08, transparent); border-radius: 50%;"></div>
-                        <!-- Wave pattern -->
-                        <svg style="position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; opacity: 0.1;" viewBox="0 0 200 40" preserveAspectRatio="none">
-                          <path d="M0,20 Q50,5 100,20 T200,20 L200,40 L0,40 Z" fill="${category.color || '#3b82f6'}"/>
-                        </svg>
-                        <!-- Content with relative positioning -->
-                        <div style="position: relative; z-index: 1;">
+                      <div style="flex: 1; background: white; border-left: 5px solid ${category.color || '#6b7280'}; padding: 12px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #e5e7eb; min-height: 70mm; max-width: 86mm;">
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
                           <h3 style="margin: 0; font-size: 14px; color: #111827; font-weight: 700; text-transform: uppercase; flex: 1; padding-right: 10px;">${category.nome}</h3>
                           <div style="text-align: right; flex-shrink: 0;">
@@ -585,7 +536,7 @@ export default function DashboardPage() {
                             <div style="background: linear-gradient(90deg, ${category.color || '#6b7280'}, ${category.color || '#6b7280'}dd); height: 100%; width: ${category.percentual}%; border-radius: 3px;"></div>
                           </div>
                         </div>
-                        <div style="background: linear-gradient(135deg, #fafbfc, #ffffff); border-radius: 8px; padding: 10px; margin-top: 12px; border: 1px solid #e0e7ff; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                        <div style="background: #fafbfc; border-radius: 6px; padding: 10px; margin-top: 12px; border: 1px solid #e5e7eb;">
                           <div style="font-size: 11px; color: #374151; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">Distribuição por Status:</div>
                           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 11px;">
                             <div style="display: flex; align-items: center;"><span style="color: #d97706; font-size: 14px; margin-right: 4px;">●</span> <span style="font-weight: 600; color: #374151;">Abertos:</span> <span style="font-weight: 700; color: #111827; margin-left: 4px;">${category.status_breakdown.open}</span></div>
@@ -594,7 +545,6 @@ export default function DashboardPage() {
                             <div style="display: flex; align-items: center;"><span style="color: #dc2626; font-size: 14px; margin-right: 4px;">●</span> <span style="font-weight: 600; color: #374151;">Cancelados:</span> <span style="font-weight: 700; color: #111827; margin-left: 4px;">${category.status_breakdown.cancelled}</span></div>
                           </div>
                         </div>
-                        </div> <!-- End of content wrapper -->
                       </div>
                     `
                   })
