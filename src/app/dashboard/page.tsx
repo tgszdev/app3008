@@ -449,12 +449,12 @@ export default function DashboardPage() {
           const borderColor = category.color || '#d1d5db'
         
             pdfHTML += `
-              <div style="flex: 1; background: white; border-left: 4px solid ${category.color || '#6b7280'}; padding: 12px; border-radius: 8px; box-shadow: 0 3px 8px rgba(0,0,0,0.08); border: 1px solid #e5e7eb;">
+              <div style="flex: 1; background: white; border-left: 5px solid ${category.color || '#6b7280'}; padding: 14px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.08); border: 1px solid #cbd5e1;">
                 <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
                   <h3 style="margin: 0; font-size: 14px; color: #111827; font-weight: 700; text-transform: uppercase;">${category.nome}</h3>
                   <div style="text-align: right;">
-                    <div style="font-size: 9px; color: #6b7280; font-weight: 600; text-transform: uppercase;">Total</div>
-                    <div style="font-size: 24px; font-weight: bold; color: ${category.color || '#6b7280'}; line-height: 1;">${category.quantidade}</div>
+                    <div style="font-size: 10px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Total de Tickets</div>
+                    <div style="font-size: 26px; font-weight: bold; color: ${category.color || '#6b7280'}; line-height: 1; margin-top: 2px;">${category.quantidade}</div>
                   </div>
                 </div>
                 <div style="margin: 10px 0;">
@@ -466,8 +466,8 @@ export default function DashboardPage() {
                     <div style="background: ${category.color || '#6b7280'}; height: 100%; width: ${category.percentual}%;"></div>
                   </div>
                 </div>
-                <div style="border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 10px;">
-                  <div style="font-size: 10px; color: #374151; font-weight: 600; margin-bottom: 5px;">STATUS:</div>
+                <div style="background: #f8f9fa; border-radius: 6px; padding: 8px; margin-top: 10px; border: 1px solid #e5e7eb;">
+                  <div style="font-size: 10px; color: #374151; font-weight: 700; margin-bottom: 5px; text-transform: uppercase;">Distribuição por Status:</div>
                   <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; font-size: 10px;">
                     <div><span style="color: #d97706;">●</span> Abertos: ${category.status_breakdown.open}</div>
                     <div><span style="color: #ea580c;">●</span> Progresso: ${category.status_breakdown.in_progress}</div>
@@ -493,12 +493,13 @@ export default function DashboardPage() {
       // Close categories section and first page
       pdfHTML += `
             </div>
+            <!-- Page number -->
+            <div style="position: absolute; bottom: 5mm; right: 15mm; font-size: 10px; color: #6b7280;">Página 1${secondPageCategories.length > 0 ? ' de 2' : ''}</div>
           </div> <!-- End of Page 1 -->
           
           ${secondPageCategories.length > 0 ? `
           <!-- PAGE 2 -->
-          <div style="page-break-before: always; min-height: 277mm; padding-top: 10mm;">
-            <h2 style="font-size: 18px; color: #111827; margin-bottom: 10px; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">TICKETS POR CATEGORIA (CONTINUAÇÃO)</h2>
+          <div style="page-break-before: always; min-height: 277mm; padding-top: 10mm; position: relative;">
             
             ${(() => {
               let page2HTML = ''
@@ -512,12 +513,12 @@ export default function DashboardPage() {
                   
                   pair.forEach(category => {
                     page2HTML += `
-                      <div style="flex: 1; background: white; border-left: 4px solid ${category.color || '#6b7280'}; padding: 12px; border-radius: 8px; box-shadow: 0 3px 8px rgba(0,0,0,0.08); border: 1px solid #e5e7eb;">
+                      <div style="flex: 1; background: white; border-left: 5px solid ${category.color || '#6b7280'}; padding: 14px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.08); border: 1px solid #cbd5e1;">
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
                           <h3 style="margin: 0; font-size: 14px; color: #111827; font-weight: 700; text-transform: uppercase;">${category.nome}</h3>
                           <div style="text-align: right;">
-                            <div style="font-size: 9px; color: #6b7280; font-weight: 600; text-transform: uppercase;">Total</div>
-                            <div style="font-size: 24px; font-weight: bold; color: ${category.color || '#6b7280'}; line-height: 1;">${category.quantidade}</div>
+                            <div style="font-size: 10px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Total de Tickets</div>
+                            <div style="font-size: 26px; font-weight: bold; color: ${category.color || '#6b7280'}; line-height: 1; margin-top: 2px;">${category.quantidade}</div>
                           </div>
                         </div>
                         <div style="margin: 10px 0;">
@@ -529,8 +530,8 @@ export default function DashboardPage() {
                             <div style="background: ${category.color || '#6b7280'}; height: 100%; width: ${category.percentual}%;"></div>
                           </div>
                         </div>
-                        <div style="border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 10px;">
-                          <div style="font-size: 10px; color: #374151; font-weight: 600; margin-bottom: 5px;">STATUS:</div>
+                        <div style="background: #f8f9fa; border-radius: 6px; padding: 8px; margin-top: 10px; border: 1px solid #e5e7eb;">
+                          <div style="font-size: 10px; color: #374151; font-weight: 700; margin-bottom: 5px; text-transform: uppercase;">Distribuição por Status:</div>
                           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; font-size: 10px;">
                             <div><span style="color: #d97706;">●</span> Abertos: ${category.status_breakdown.open}</div>
                             <div><span style="color: #ea580c;">●</span> Progresso: ${category.status_breakdown.in_progress}</div>
@@ -551,11 +552,14 @@ export default function DashboardPage() {
               }
               return page2HTML
             })()}
+            
+            <!-- Page number -->
+            <div style="position: absolute; bottom: 5mm; right: 15mm; font-size: 10px; color: #6b7280;">Página 2 de 2</div>
           </div> <!-- End of Page 2 -->
           ` : ''}
           
-          <!-- Footer (on last page) -->
-          <div style="position: absolute; bottom: 10mm; left: 15mm; right: 15mm; text-align: center; border-top: 2px solid #3b82f6; padding-top: 5mm;">
+          <!-- Footer -->
+          <div style="${secondPageCategories.length > 0 ? 'page-break-before: avoid;' : 'position: absolute; bottom: 15mm; left: 15mm; right: 15mm;'} text-align: center; border-top: 2px solid #3b82f6; padding-top: 5mm; margin-top: ${secondPageCategories.length > 0 ? '20mm' : '0'};">
             <p style="margin: 3px 0; font-size: 12px; color: #374151; font-weight: 600;">RELATÓRIO GERADO EM: ${formattedDateTime.toUpperCase()}</p>
             <p style="margin: 3px 0; font-size: 11px; color: #6b7280;">Dashboard gerado automaticamente pelo sistema de suporte técnico</p>
             <p style="margin: 3px 0; font-size: 10px; color: #9ca3af;">© 2025 - Sistema de Gestão de Tickets</p>
