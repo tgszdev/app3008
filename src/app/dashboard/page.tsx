@@ -385,16 +385,10 @@ export default function DashboardPage() {
           </div>
           
           <!-- Summary Box -->
-          <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 40px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3); page-break-inside: avoid;">
-            <div style="display: flex; justify-content: space-around; text-align: center;">
-              <div>
-                <div style="font-size: 48px; font-weight: bold; line-height: 1;">${categoryStats?.total_tickets || 0}</div>
-                <div style="font-size: 16px; margin-top: 10px; text-transform: uppercase; letter-spacing: 1px;">Total de Tickets</div>
-              </div>
-              <div>
-                <div style="font-size: 48px; font-weight: bold; line-height: 1;">${categoryStats?.categorias?.length || 0}</div>
-                <div style="font-size: 16px; margin-top: 10px; text-transform: uppercase; letter-spacing: 1px;">Categorias</div>
-              </div>
+          <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 35px; border-radius: 12px; margin-bottom: 40px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3); page-break-inside: avoid;">
+            <div style="text-align: center;">
+              <div style="font-size: 64px; font-weight: bold; line-height: 1;">${categoryStats?.total_tickets || 0}</div>
+              <div style="font-size: 18px; margin-top: 15px; text-transform: uppercase; letter-spacing: 2px; font-weight: 500;">TOTAL DE TICKETS</div>
             </div>
           </div>
           
