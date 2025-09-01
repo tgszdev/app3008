@@ -1,6 +1,10 @@
 {
   "name": "support-system",
   "version": "1.0.0",
+  "author": {
+    "name": "tgszdev",
+    "email": "tgszdev@gmail.com"
+  },
   "private": true,
   "type": "module",
   "scripts": {

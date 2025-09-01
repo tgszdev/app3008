@@ -1,0 +1,17 @@
+# Code Owners
+# This file defines who owns the code in this repository
+
+# Global owners - will be requested for review when someone opens a pull request
+* @tgszdev
+
+# Frontend code
+/src/app/ @tgszdev
+/src/components/ @tgszdev
+
+# Backend/API code
+/src/app/api/ @tgszdev
+/src/lib/ @tgszdev
+
+# Configuration files
+*.json @tgszdev
+*.config.* @tgszdev
