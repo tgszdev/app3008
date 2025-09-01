@@ -551,30 +551,32 @@ export default function AnalyticsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {analyticsData.userActivity.slice(0, 5).map((user, index) => (
-                  <tr key={index}>
-                    <td className="py-3">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {user.name}
-                      </p>
-                    </td>
-                    <td className="py-3 text-center">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {user.ticketsCreated}
-                      </span>
-                    </td>
-                    <td className="py-3 text-center">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {user.ticketsResolved}
-                      </span>
-                    </td>
-                    <td className="py-3 text-right">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {user.avgTime}
-                      </span>
-                    </td>
-                  </tr>
-                )) : (
+                {analyticsData.userActivity.length > 0 ? (
+                  analyticsData.userActivity.slice(0, 5).map((user, index) => (
+                    <tr key={index}>
+                      <td className="py-3">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {user.name}
+                        </p>
+                      </td>
+                      <td className="py-3 text-center">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          {user.ticketsCreated}
+                        </span>
+                      </td>
+                      <td className="py-3 text-center">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          {user.ticketsResolved}
+                        </span>
+                      </td>
+                      <td className="py-3 text-right">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          {user.avgTime}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
                   <tr>
                     <td colSpan={4} className="py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                       Nenhuma atividade de usuário no período selecionado
