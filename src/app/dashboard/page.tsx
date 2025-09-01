@@ -298,20 +298,15 @@ export default function DashboardPage() {
 
   const fetchCategoryStats = async () => {
     try {
-      console.log('Fetching stats with filter:', periodFilter)
       
       const params = new URLSearchParams({
         start_date: periodFilter.start_date,
         end_date: periodFilter.end_date
       })
       
-      console.log('Query params:', params.toString())
-      
       const response = await axios.get(`/api/dashboard/categories-stats?${params}`)
       
       if (response.data) {
-        console.log('Received data:', response.data.periodo)
-        console.log('Total tickets:', response.data.total_tickets)
         setCategoryStats(response.data)
       }
     } catch (error: any) {
@@ -321,7 +316,6 @@ export default function DashboardPage() {
   }
 
   const handleApplyFilter = () => {
-    console.log('Applying filter:', tempFilter)
     setPeriodFilter(tempFilter)
     setShowFilters(false)
   }
@@ -616,28 +610,30 @@ export default function DashboardPage() {
   )
 }
 
-function formatDateShort(date: string) {
+function formatDateShort(date: string | null | undefined) {
   // Handle invalid dates
-  if (!date) return 'N/A'
+  if (!date) {
+    return 'N/A'
+  }
   
-  // Parse the date string safely
+  // Try to parse as ISO date first (handles timestamps like "2024-01-15T10:30:00.000Z")
+  const dateObj = new Date(date)
+  if (!isNaN(dateObj.getTime())) {
+    const day = String(dateObj.getDate()).padStart(2, '0')
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0')
+    const year = dateObj.getFullYear()
+    return `${day}/${month}/${year}`
+  }
+  
+  // If not a valid date object, try parsing as YYYY-MM-DD
   const parts = date.split('-')
-  if (parts.length !== 3) {
-    // Try to parse as ISO date
-    const dateObj = new Date(date)
-    if (!isNaN(dateObj.getTime())) {
-      const day = String(dateObj.getDate()).padStart(2, '0')
-      const month = String(dateObj.getMonth() + 1).padStart(2, '0')
-      const year = dateObj.getFullYear()
-      return `${day}/${month}/${year}`
+  if (parts.length === 3) {
+    const [year, month, day] = parts.map(Number)
+    // Fixed: Changed OR (||) to AND (&&) for proper validation
+    if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+      return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`
     }
-    return 'N/A'
   }
   
-  const [year, month, day] = parts.map(Number)
-  if (isNaN(year) || isNaN(month) || isNaN(day)) {
-    return 'N/A'
-  }
-  
-  return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`
+  return 'N/A'
 }

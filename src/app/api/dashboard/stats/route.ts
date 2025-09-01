@@ -61,6 +61,7 @@ export async function GET() {
         status,
         priority,
         created_at,
+        created_by,
         created_by_user:users!tickets_created_by_fkey(
           id,
           name,
@@ -72,10 +73,52 @@ export async function GET() {
 
     if (recentError) {
       console.error('Error fetching recent tickets:', recentError)
+      console.error('Recent tickets error details:', recentError.message)
+      
+      // If there's an error with the foreign key, try a simpler query
+      const { data: simpleTickets, error: simpleError } = await supabase
+        .from('tickets')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5)
+        
+      if (!simpleError && simpleTickets) {
+        // Fetch users separately
+        const userIds = [...new Set(simpleTickets.map(t => t.created_by).filter(Boolean))]
+        const { data: users } = await supabase
+          .from('users')
+          .select('id, name, email')
+          .in('id', userIds)
+          
+        const usersMap = new Map(users?.map(u => [u.id, u]) || [])
+        
+        const formattedRecentTickets = simpleTickets.map((ticket: any) => ({
+          id: ticket.id,
+          ticket_number: ticket.ticket_number,
+          title: ticket.title,
+          status: ticket.status,
+          priority: ticket.priority,
+          requester: usersMap.get(ticket.created_by)?.name || 'Desconhecido',
+          created_at: ticket.created_at
+        }))
+        
+        return NextResponse.json({
+          stats: {
+            totalTickets,
+            openTickets,
+            inProgressTickets,
+            resolvedTickets,
+            cancelledTickets,
+            ticketsTrend: ticketsTrend.startsWith('-') ? ticketsTrend : `+${ticketsTrend}`
+          },
+          recentTickets: formattedRecentTickets
+        })
+      }
     }
 
-    // Format recent tickets
+    // Format recent tickets (when the join worked)
     const formattedRecentTickets = recentTicketsList?.map((ticket: any) => {
+      // Handle both array and object responses from Supabase
       const user = Array.isArray(ticket.created_by_user) 
         ? ticket.created_by_user[0] 
         : ticket.created_by_user
