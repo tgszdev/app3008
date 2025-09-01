@@ -427,23 +427,28 @@ export default function DashboardPage() {
         const borderColor = category.color || '#d1d5db'
         
         pdfHTML += `
-          <div style="border: 2px solid ${borderColor}; background: linear-gradient(135deg, ${bgColor} 0%, white 100%); padding: 20px; border-radius: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.08); page-break-inside: avoid; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: 0; right: 0; width: 100px; height: 100px; background: ${category.color || '#6b7280'}; opacity: 0.05; border-radius: 0 0 0 100%;"></div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; position: relative;">
-              <div style="flex-grow: 1; max-width: calc(100% - 120px);">
+          <div style="background: white; border-left: 5px solid ${category.color || '#6b7280'}; padding: 20px; border-radius: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.08); page-break-inside: avoid; position: relative; overflow: hidden; border: 1px solid #e5e7eb;">
+            <div style="position: absolute; top: 0; right: 0; width: 150px; height: 150px; background: ${category.color || '#6b7280'}; opacity: 0.03; border-radius: 0 0 0 100%;"></div>
+            <div style="position: relative;">
+              <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
                 <h3 style="margin: 0; font-size: 18px; color: #111827; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${category.nome}</h3>
-                <div style="margin-top: 12px;">
-                  <div style="position: relative; background: white; border-radius: 8px; height: 14px; overflow: visible; box-shadow: 0 2px 8px rgba(0,0,0,0.15), inset 0 1px 2px rgba(0,0,0,0.1); border: 1px solid #e5e7eb;">
-                    <div style="background: linear-gradient(90deg, ${category.color || '#6b7280'} 0%, ${category.color ? category.color + 'cc' : '#4b5563'} 100%); height: 100%; width: ${category.percentual}%; transition: width 0.5s ease; border-radius: 7px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);" title="${category.percentual.toFixed(1)}%"></div>
+                <div style="text-align: right;">
+                  <div style="font-size: 11px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Total de Tickets</div>
+                  <div style="font-size: 36px; font-weight: bold; color: ${category.color || '#6b7280'}; line-height: 1; margin-top: 4px;">
+                    ${category.quantidade}
                   </div>
-                  <div style="font-size: 28px; font-weight: bold; color: ${category.color || '#6b7280'}; margin-top: 12px; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">${category.percentual.toFixed(1)}%</div>
                 </div>
               </div>
-              <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-left: 15px; flex-shrink: 0; text-align: center;">
-                <div style="display: flex; align-items: center; justify-content: center; width: 80px; height: 80px; background: linear-gradient(135deg, ${category.color || '#6b7280'} 0%, ${category.color ? category.color + 'dd' : '#4b5563'} 100%); color: white; border-radius: 50%; font-size: 32px; font-weight: bold; box-shadow: 0 6px 20px rgba(0,0,0,0.2), 0 3px 8px rgba(0,0,0,0.15); border: 4px solid white;">
-                  ${category.quantidade}
+              <div style="margin-top: 20px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                  <span style="font-size: 13px; color: #6b7280; font-weight: 500;">Percentual do Total</span>
+                  <span style="font-size: 24px; font-weight: bold; color: ${category.color || '#6b7280'};">${category.percentual.toFixed(1)}%</span>
                 </div>
-                <div style="font-size: 10px; color: #6b7280; font-weight: 600; text-transform: uppercase; margin-top: 8px; letter-spacing: 0.5px;">Total de<br/>Tickets</div>
+                <div style="position: relative; background: #f3f4f6; border-radius: 8px; height: 16px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
+                  <div style="background: linear-gradient(90deg, ${category.color || '#6b7280'} 0%, ${category.color ? category.color + 'cc' : '#4b5563'} 100%); height: 100%; width: ${category.percentual}%; transition: width 0.5s ease; position: relative;">
+                    <span style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: white; font-size: 11px; font-weight: 600;">${category.percentual > 10 ? category.percentual.toFixed(1) + '%' : ''}</span>
+                  </div>
+                </div>
               </div>
             </div>
             <div style="border-top: 2px solid ${category.color || '#6b7280'}22; padding-top: 15px; margin-top: 15px; background: white; border-radius: 8px; padding: 12px; margin: 15px -5px -5px -5px;">
