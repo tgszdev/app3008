@@ -4,12 +4,18 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { Save, Bell, Shield, Palette, Globe, User, Mail, Phone, Server, Eye, EyeOff, TestTube } from 'lucide-react'
 import toast from 'react-hot-toast'
+import SQLInstructionsModal from '@/components/SQLInstructionsModal'
 
 export default function SettingsPage() {
   const { data: session } = useSession()
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [testingEmail, setTestingEmail] = useState(false)
+  const [sqlModal, setSqlModal] = useState<{ isOpen: boolean; sql: string; instructions?: string[] }>({
+    isOpen: false,
+    sql: '',
+    instructions: []
+  })
   
   // Estados para as configurações
   const [profile, setProfile] = useState({
@@ -516,12 +522,24 @@ export default function SettingsPage() {
                   body: JSON.stringify(emailConfig)
                 })
                 const data = await response.json()
+                
                 if (data.success) {
                   toast.success('Configuração de email salva com sucesso!')
+                } else if (data.sql) {
+                  // Se retornou SQL, significa que a tabela não existe
+                  setSqlModal({
+                    isOpen: true,
+                    sql: data.sql,
+                    instructions: data.instructions
+                  })
+                  toast.error(data.error || 'Tabela de configurações não existe', {
+                    duration: 5000
+                  })
                 } else {
                   toast.error(data.error || 'Erro ao salvar configuração')
                 }
               } catch (error) {
+                console.error('Erro ao salvar:', error)
                 toast.error('Erro ao salvar configuração')
               } finally {
                 setLoading(false)
@@ -536,6 +554,15 @@ export default function SettingsPage() {
         </div>
       </div>
       )}
+
+      {/* Modal de Instruções SQL */}
+      <SQLInstructionsModal
+        isOpen={sqlModal.isOpen}
+        onClose={() => setSqlModal({ ...sqlModal, isOpen: false })}
+        sql={sqlModal.sql}
+        title="Configuração do Banco de Dados Necessária"
+        instructions={sqlModal.instructions}
+      />
     </div>
   )
 }

@@ -117,34 +117,46 @@ export async function POST(request: NextRequest) {
     const configToSave = { ...config }
     configToSave.pass = encrypt(config.pass)
 
-    // Primeiro, verificar se a tabela system_settings existe
-    const { error: tableError } = await supabaseAdmin
-      .from('system_settings')
-      .select('id')
-      .limit(1)
+    // Tentar salvar primeiro, se falhar por causa da tabela, retornar instruções
+    try {
+      // Primeiro tentar buscar para ver se a tabela existe
+      const { error: checkError } = await supabaseAdmin
+        .from('system_settings')
+        .select('key')
+        .eq('key', 'email_config')
+        .maybeSingle()
 
-    if (tableError && tableError.message.includes('relation') && tableError.message.includes('does not exist')) {
-      // Criar tabela se não existir
-      const createTableQuery = `
-        CREATE TABLE IF NOT EXISTS system_settings (
-          id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-          key VARCHAR(100) UNIQUE NOT NULL,
-          value JSONB NOT NULL,
-          description TEXT,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_by UUID REFERENCES users(id)
-        );
+      // Se a tabela não existir, retornar instruções SQL
+      if (checkError && checkError.message?.includes('relation "public.system_settings" does not exist')) {
+        const createTableQuery = `
+-- Tabela para armazenar configurações do sistema
+CREATE TABLE IF NOT EXISTS system_settings (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  key VARCHAR(100) UNIQUE NOT NULL,
+  value JSONB NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_by UUID REFERENCES users(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_system_settings_key ON system_settings(key);
+        `.trim()
         
-        CREATE INDEX IF NOT EXISTS idx_system_settings_key ON system_settings(key);
-      `
-      
-      // Nota: Não podemos executar SQL diretamente via Supabase Admin API
-      // Retornar instruções para criar a tabela
-      return NextResponse.json({
-        error: 'Tabela system_settings não existe. Execute o script SQL no Supabase.',
-        sql: createTableQuery
-      }, { status: 500 })
+        return NextResponse.json({
+          error: 'Tabela de configurações não existe',
+          message: 'Execute o script SQL abaixo no Supabase SQL Editor para criar a tabela system_settings',
+          sql: createTableQuery,
+          instructions: [
+            '1. Acesse o Supabase Dashboard',
+            '2. Vá para SQL Editor',
+            '3. Cole e execute o script SQL fornecido',
+            '4. Tente salvar novamente'
+          ]
+        }, { status: 400 })
+      }
+    } catch (checkErr) {
+      console.error('Erro ao verificar tabela:', checkErr)
     }
 
     // Upsert configurações
