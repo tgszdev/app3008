@@ -15,7 +15,7 @@ export function createEmailTransporter(): Transporter {
 
   if (emailService === 'smtp') {
     // Configuração SMTP (Gmail com senha de app)
-    transporterCache = nodemailer.createTransporter({
+    transporterCache = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.gmail.com',
       port: parseInt(process.env.SMTP_PORT || '587'),
       secure: process.env.SMTP_SECURE === 'true',
@@ -29,18 +29,23 @@ export function createEmailTransporter(): Transporter {
     })
 
     // Verificar conexão
-    transporterCache.verify((error, success) => {
-      if (error) {
-        console.error('Erro na configuração do email:', error)
-      } else {
-        console.log('Servidor de email pronto para enviar mensagens')
-      }
-    })
+    if (transporterCache) {
+      transporterCache.verify((error, success) => {
+        if (error) {
+          console.error('Erro na configuração do email:', error)
+        } else {
+          console.log('Servidor de email pronto para enviar mensagens')
+        }
+      })
+    }
 
     return transporterCache
   }
 
   throw new Error(`Serviço de email ${emailService} não configurado`)
+  
+  // TypeScript precisa deste return para garantir que sempre retorna Transporter
+  return transporterCache as Transporter
 }
 
 // Interface para opções de email

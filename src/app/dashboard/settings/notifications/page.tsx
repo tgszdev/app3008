@@ -96,10 +96,10 @@ export default function NotificationSettingsPage() {
       await unsubscribe()
       setPreferences(prev => ({ ...prev, push_enabled: false }))
     } else {
-      const success = await subscribe()
-      if (success) {
-        setPreferences(prev => ({ ...prev, push_enabled: true }))
-      }
+      await subscribe()
+      // Subscribe atualiza isSubscribed internamente se tiver sucesso
+      // Vamos sempre atualizar a preferência após tentar
+      setPreferences(prev => ({ ...prev, push_enabled: true }))
     }
   }
 

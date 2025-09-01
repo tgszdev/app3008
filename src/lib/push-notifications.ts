@@ -94,7 +94,7 @@ export class PushNotificationManager {
         
         subscription = await this.registration.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: convertedVapidKey
+          applicationServerKey: convertedVapidKey as BufferSource
         })
       }
 
@@ -183,17 +183,23 @@ export class PushNotificationManager {
       }
 
       if (Notification.permission === 'granted') {
-        const notification = new Notification('Teste de Notificação', {
+        const notificationOptions: NotificationOptions = {
           body: 'Esta é uma notificação de teste do sistema',
           icon: '/icon-192x192.png',
           badge: '/icon-72x72.png',
           tag: 'test-notification',
           requireInteraction: false,
-          vibrate: [200, 100, 200],
           data: {
             action_url: '/dashboard/notifications'
           }
-        })
+        }
+        
+        // Adicionar vibrate apenas se suportado (não existe em NotificationOptions padrão)
+        if ('vibrate' in Notification.prototype) {
+          (notificationOptions as any).vibrate = [200, 100, 200]
+        }
+        
+        const notification = new Notification('Teste de Notificação', notificationOptions)
 
         notification.addEventListener('click', () => {
           window.open('/dashboard/notifications', '_blank')
