@@ -75,21 +75,50 @@ export async function createAndSendNotification(notification: NotificationData) 
     }
 
     // 5. Enviar email se habilitado
-    const typePreferences = preferences[notification.type as keyof typeof preferences] as any
+    // Mapear tipos de notificação para preferências existentes
+    const typeMapping: Record<string, string> = {
+      'ticket_status_changed': 'ticket_updated',
+      'ticket_priority_changed': 'ticket_updated',
+      'test': 'ticket_updated' // Para testes, usar ticket_updated como padrão
+    }
+    
+    const preferenceKey = typeMapping[notification.type] || notification.type
+    const typePreferences = preferences[preferenceKey as keyof typeof preferences] as any
+    
+    console.log('DEBUG: Verificando envio de email', {
+      type: notification.type,
+      preferenceKey,
+      email_enabled: preferences.email_enabled,
+      typePreferences,
+      user_email: user.email
+    })
+    
     if (preferences.email_enabled && typePreferences?.email && user.email) {
       try {
-        await sendEmail({
+        console.log('Tentando enviar email para:', user.email)
+        const result = await sendEmail({
           to: user.email,
           title: notification.title,
           message: notification.message,
           actionUrl: notification.action_url,
           actionText: 'Ver Detalhes'
         })
-        console.log('Email de notificação enviado para:', user.email)
+        console.log('Resultado do envio de email:', result)
+        if (result.success) {
+          console.log('✅ Email de notificação enviado com sucesso para:', user.email)
+        } else {
+          console.error('❌ Falha ao enviar email:', result.error)
+        }
       } catch (emailError) {
         console.error('Erro ao enviar email de notificação:', emailError)
         // Não falhar se o email não for enviado
       }
+    } else {
+      console.log('Email não enviado. Condições:', {
+        email_enabled: preferences.email_enabled,
+        type_email_enabled: typePreferences?.email,
+        has_user_email: !!user.email
+      })
     }
 
     // 6. Enviar push notification se habilitado
