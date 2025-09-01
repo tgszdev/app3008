@@ -356,59 +356,159 @@ export default function DashboardPage() {
     try {
       setIsGeneratingPDF(true)
       
-      // Hide elements that shouldn't be in the PDF
-      const recentTicketsSection = document.getElementById('recent-tickets-section')
-      const sidebar = document.querySelector('[data-sidebar]')
+      // Create a temporary container for PDF content
+      const pdfContainer = document.createElement('div')
+      pdfContainer.style.position = 'absolute'
+      pdfContainer.style.left = '-9999px'
+      pdfContainer.style.top = '0'
+      pdfContainer.style.width = '210mm'
+      pdfContainer.style.padding = '20px'
+      pdfContainer.style.backgroundColor = '#ffffff'
+      pdfContainer.style.fontFamily = 'system-ui, -apple-system, sans-serif'
+      document.body.appendChild(pdfContainer)
       
-      if (recentTicketsSection) {
-        recentTicketsSection.style.display = 'none'
-      }
+      // Build PDF content with better layout
+      const now = new Date()
+      const formattedDateTime = `${now.toLocaleDateString('pt-BR')} às ${now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`
       
-      // Get the dashboard content
-      const dashboardContent = document.getElementById('dashboard-content')
+      let pdfHTML = `
+        <div style="padding: 30px; background: white; min-height: 100vh;">
+          <!-- Header -->
+          <div style="text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px solid #e5e7eb;">
+            <h1 style="margin: 0; font-size: 28px; color: #111827; font-weight: bold;">Relatório de Tickets - Dashboard</h1>
+            <p style="margin: 10px 0 5px 0; font-size: 16px; color: #6b7280;">
+              Período: ${formatDateShort(periodFilter.start_date)} até ${formatDateShort(periodFilter.end_date)}
+            </p>
+            ${myTicketsOnly ? `<p style="margin: 5px 0; font-size: 14px; color: #3b82f6; font-weight: 500;">Filtrado por: Tickets de ${session?.user?.name}</p>` : ''}
+          </div>
+          
+          <!-- Summary Box -->
+          <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <div style="display: flex; justify-content: space-around; text-align: center;">
+              <div>
+                <div style="font-size: 36px; font-weight: bold;">${categoryStats?.total_tickets || 0}</div>
+                <div style="font-size: 14px; opacity: 0.9; margin-top: 5px;">Total de Tickets</div>
+              </div>
+              <div>
+                <div style="font-size: 36px; font-weight: bold;">${categoryStats?.categorias?.length || 0}</div>
+                <div style="font-size: 14px; opacity: 0.9; margin-top: 5px;">Categorias</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Status Cards -->
+          <div style="margin-bottom: 40px;">
+            <h2 style="font-size: 20px; color: #111827; margin-bottom: 20px; font-weight: 600;">Distribuição por Status</h2>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+              <div style="background: #fef3c7; padding: 20px; border-radius: 10px; text-align: center;">
+                <div style="font-size: 28px; font-weight: bold; color: #d97706;">${categoryStats?.status_summary.open || 0}</div>
+                <div style="font-size: 12px; color: #92400e; margin-top: 5px;">Abertos</div>
+              </div>
+              <div style="background: #fed7aa; padding: 20px; border-radius: 10px; text-align: center;">
+                <div style="font-size: 28px; font-weight: bold; color: #ea580c;">${categoryStats?.status_summary.in_progress || 0}</div>
+                <div style="font-size: 12px; color: #7c2d12; margin-top: 5px;">Em Progresso</div>
+              </div>
+              <div style="background: #bbf7d0; padding: 20px; border-radius: 10px; text-align: center;">
+                <div style="font-size: 28px; font-weight: bold; color: #16a34a;">${categoryStats?.status_summary.resolved || 0}</div>
+                <div style="font-size: 12px; color: #14532d; margin-top: 5px;">Resolvidos</div>
+              </div>
+              <div style="background: #fecaca; padding: 20px; border-radius: 10px; text-align: center;">
+                <div style="font-size: 28px; font-weight: bold; color: #dc2626;">${categoryStats?.status_summary.cancelled || 0}</div>
+                <div style="font-size: 12px; color: #7f1d1d; margin-top: 5px;">Cancelados</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Categories -->
+          <div style="margin-bottom: 40px;">
+            <h2 style="font-size: 20px; color: #111827; margin-bottom: 20px; font-weight: 600;">Tickets por Categoria</h2>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+      `
       
-      if (!dashboardContent) {
-        toast.error('Erro ao capturar conteúdo do dashboard')
-        return
-      }
+      // Add category cards
+      categoryStats?.categorias?.forEach(category => {
+        const bgColor = category.color ? `${category.color}15` : '#f3f4f6'
+        const borderColor = category.color || '#d1d5db'
+        
+        pdfHTML += `
+          <div style="border: 2px solid ${borderColor}; background: ${bgColor}; padding: 20px; border-radius: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <h3 style="margin: 0; font-size: 16px; color: #111827; font-weight: 600;">${category.nome}</h3>
+              <div style="background: ${category.color || '#6b7280'}; color: white; padding: 5px 12px; border-radius: 20px; font-size: 14px; font-weight: bold;">
+                ${category.quantidade}
+              </div>
+            </div>
+            <div style="margin-bottom: 10px;">
+              <div style="background: #e5e7eb; border-radius: 4px; height: 8px; overflow: hidden;">
+                <div style="background: ${category.color || '#6b7280'}; height: 100%; width: ${category.percentual}%; transition: width 0.3s;"></div>
+              </div>
+            </div>
+            <div style="font-size: 24px; font-weight: bold; color: ${category.color || '#6b7280'};">${category.percentual.toFixed(1)}%</div>
+            <div style="font-size: 12px; color: #6b7280; margin-top: 5px;">
+              A: ${category.status_breakdown.open} | 
+              P: ${category.status_breakdown.in_progress} | 
+              R: ${category.status_breakdown.resolved} | 
+              C: ${category.status_breakdown.cancelled}
+            </div>
+          </div>
+        `
+      })
       
-      // Generate canvas from HTML
-      const canvas = await html2canvas(dashboardContent, {
+      pdfHTML += `
+            </div>
+          </div>
+          
+          <!-- Footer -->
+          <div style="margin-top: 60px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #6b7280;">
+            <p style="margin: 5px 0; font-size: 12px;">Relatório gerado em: ${formattedDateTime}</p>
+            <p style="margin: 5px 0; font-size: 12px; font-weight: 500;">Dashboard gerado automaticamente pelo sistema</p>
+          </div>
+        </div>
+      `
+      
+      pdfContainer.innerHTML = pdfHTML
+      
+      // Generate canvas from the container
+      const canvas = await html2canvas(pdfContainer, {
         scale: 2,
         logging: false,
         useCORS: true,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        windowWidth: pdfContainer.scrollWidth,
+        windowHeight: pdfContainer.scrollHeight
       })
       
+      // Remove temporary container
+      document.body.removeChild(pdfContainer)
+      
       // Create PDF
-      const imgData = canvas.toDataURL('image/png')
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4'
       })
       
-      const imgWidth = 210 // A4 width in mm
-      const pageHeight = 297 // A4 height in mm
+      const imgWidth = 190 // A4 width minus margins
+      const pageHeight = 277 // A4 height minus margins
       const imgHeight = (canvas.height * imgWidth) / canvas.width
       let heightLeft = imgHeight
-      let position = 0
+      let position = 10 // Top margin
       
       // Add first page
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, position, imgWidth, imgHeight)
       heightLeft -= pageHeight
       
       // Add additional pages if needed
       while (heightLeft >= 0) {
-        position = heightLeft - imgHeight
+        position = heightLeft - imgHeight + 10
         pdf.addPage()
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, position, imgWidth, imgHeight)
         heightLeft -= pageHeight
       }
       
       // Generate filename with date
       const today = new Date().toISOString().split('T')[0]
-      const filename = `dashboard_${today}${myTicketsOnly ? '_meus_tickets' : ''}.pdf`
+      const filename = `relatorio_tickets_${today}${myTicketsOnly ? '_meus_tickets' : ''}.pdf`
       
       // Save PDF
       pdf.save(filename)
@@ -419,12 +519,6 @@ export default function DashboardPage() {
       console.error('Error generating PDF:', error)
       toast.error('Erro ao gerar PDF')
     } finally {
-      // Restore hidden elements
-      const recentTicketsSection = document.getElementById('recent-tickets-section')
-      if (recentTicketsSection) {
-        recentTicketsSection.style.display = ''
-      }
-      
       setIsGeneratingPDF(false)
     }
   }
