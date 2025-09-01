@@ -357,15 +357,18 @@ export default function DashboardPage() {
       setIsGeneratingPDF(true)
       
       // Create a temporary container for PDF content
+      // A4 dimensions: 210mm x 297mm = 794px x 1123px at 96 DPI
       const pdfContainer = document.createElement('div')
       pdfContainer.style.position = 'absolute'
       pdfContainer.style.left = '-9999px'
       pdfContainer.style.top = '0'
-      pdfContainer.style.width = '794px' // A4 width in pixels at 96 DPI
+      pdfContainer.style.width = '210mm' // Use mm for accurate A4 width
+      pdfContainer.style.maxWidth = '210mm'
       pdfContainer.style.backgroundColor = '#ffffff'
       pdfContainer.style.fontFamily = 'Arial, Helvetica, sans-serif'
-      pdfContainer.style.fontSize = '14px'
-      pdfContainer.style.lineHeight = '1.5'
+      pdfContainer.style.fontSize = '12px' // Slightly smaller for better fit
+      pdfContainer.style.lineHeight = '1.4'
+      pdfContainer.style.boxSizing = 'border-box'
       document.body.appendChild(pdfContainer)
       
       // Build PDF content with better layout
@@ -373,7 +376,7 @@ export default function DashboardPage() {
       const formattedDateTime = `${now.toLocaleDateString('pt-BR')} às ${now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`
       
       let pdfHTML = `
-        <div style="padding: 30px; background: white; font-family: Arial, sans-serif;">
+        <div style="padding: 15mm 15mm; background: white; font-family: Arial, sans-serif; width: 210mm; box-sizing: border-box; margin: 0 auto;">
           <!-- Header -->
           <div style="text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 3px solid #3b82f6;">
             <h1 style="margin: 0; font-size: 32px; color: #111827; font-weight: bold; letter-spacing: 1px;">RELATÓRIO DE TICKETS</h1>
@@ -433,17 +436,19 @@ export default function DashboardPage() {
       categoryPairs.forEach((pair, pairIndex) => {
         // Force page break BEFORE the third pair (5th and 6th cards)
         // This keeps first 4 cards on one page
-        if (pairIndex > 0 && pairIndex % 2 === 0) {
+        if (pairIndex === 2) {
+          // Close previous container and start new page
           pdfHTML += `
-            <div style="page-break-before: always; margin-top: 40px;">
-              <h2 style="font-size: 22px; color: #111827; margin-bottom: 25px; font-weight: 700; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">TICKETS POR CATEGORIA (CONTINUAÇÃO)</h2>
+            <div style="page-break-before: always; height: 0;"></div>
+            <div style="padding-top: 15mm;">
+              <h2 style="font-size: 20px; color: #111827; margin-bottom: 20px; font-weight: 700; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">TICKETS POR CATEGORIA (CONTINUAÇÃO)</h2>
             </div>
           `
         }
         
         pdfHTML += `
-          <div style="page-break-inside: avoid; break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 25px;">
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px;">
+          <div style="page-break-inside: avoid; break-inside: avoid; margin-bottom: 15px;">
+            <div style="display: flex; gap: 15px; width: 100%;">
         `
         
         pair.forEach(category => {
@@ -451,14 +456,14 @@ export default function DashboardPage() {
           const borderColor = category.color || '#d1d5db'
         
           pdfHTML += `
-            <div style="background: white; border-left: 6px solid ${category.color || '#6b7280'}; padding: 20px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.15), 0 3px 10px rgba(0,0,0,0.1); position: relative; overflow: hidden; border: 1px solid #c6cbd1; page-break-inside: avoid; break-inside: avoid; -webkit-column-break-inside: avoid; display: inline-block; width: 100%;">
+            <div style="flex: 1; background: white; border-left: 5px solid ${category.color || '#6b7280'}; padding: 15px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; overflow: hidden; border: 1px solid #d1d5db; min-height: 240px;">
             <div style="position: absolute; top: 0; right: 0; width: 150px; height: 150px; background: ${category.color || '#6b7280'}; opacity: 0.03; border-radius: 0 0 0 100%;"></div>
             <div style="position: relative;">
               <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
-                <h3 style="margin: 0; font-size: 18px; color: #111827; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${category.nome}</h3>
+                <h3 style="margin: 0; font-size: 16px; color: #111827; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${category.nome}</h3>
                 <div style="text-align: right;">
                   <div style="font-size: 11px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Total de Tickets</div>
-                  <div style="font-size: 36px; font-weight: bold; color: ${category.color || '#6b7280'}; line-height: 1; margin-top: 4px;">
+                  <div style="font-size: 32px; font-weight: bold; color: ${category.color || '#6b7280'}; line-height: 1; margin-top: 4px;">
                     ${category.quantidade}
                   </div>
                 </div>
@@ -466,7 +471,7 @@ export default function DashboardPage() {
               <div style="margin-top: 20px;">
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                   <span style="font-size: 13px; color: #6b7280; font-weight: 500;">Percentual do Total</span>
-                  <span style="font-size: 24px; font-weight: bold; color: ${category.color || '#6b7280'};">${category.percentual.toFixed(1)}%</span>
+                  <span style="font-size: 20px; font-weight: bold; color: ${category.color || '#6b7280'};">${category.percentual.toFixed(1)}%</span>
                 </div>
                 <div style="position: relative; background: #f3f4f6; border-radius: 8px; height: 16px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
                   <div style="background: linear-gradient(90deg, ${category.color || '#6b7280'} 0%, ${category.color ? category.color + 'cc' : '#4b5563'} 100%); height: 100%; width: ${category.percentual}%; transition: width 0.5s ease; position: relative;">
@@ -475,9 +480,9 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
-            <div style="border-top: 2px solid ${category.color || '#6b7280'}33; padding-top: 15px; margin-top: 20px; background: #f8f9fa; border-radius: 8px; padding: 12px; margin: 15px -5px -5px -5px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.08); border: 1px solid #e5e7eb;">
-              <div style="font-size: 13px; color: #374151; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px;">Distribuição por Status:</div>
-              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 14px;">
+            <div style="border-top: 2px solid ${category.color || '#6b7280'}33; padding-top: 12px; margin-top: 15px; background: #f8f9fa; border-radius: 6px; padding: 10px; margin: 12px -5px -5px -5px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+              <div style="font-size: 12px; color: #374151; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Distribuição por Status:</div>
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 12px;">
                 <div style="display: flex; align-items: center; gap: 6px;">
                   <span style="display: inline-block; width: 8px; height: 8px; background: #fbbf24; border-radius: 50%;"></span>
                   <span style="color: #92400e; font-weight: 600;">Abertos:</span>
@@ -531,19 +536,14 @@ export default function DashboardPage() {
       
       // Generate canvas from the container
       const canvas = await html2canvas(pdfContainer, {
-        scale: 3, // Higher quality
+        scale: 2, // Good quality, faster rendering
         logging: false,
         useCORS: true,
         backgroundColor: '#ffffff',
-        windowWidth: 794, // A4 width in pixels
-        windowHeight: pdfContainer.scrollHeight,
-        onclone: (clonedDoc) => {
-          // Ensure all elements are properly styled in the clone
-          const clonedContainer = clonedDoc.querySelector('div')
-          if (clonedContainer) {
-            clonedContainer.style.width = '794px'
-          }
-        }
+        width: 794, // A4 width in pixels at 96 DPI
+        height: pdfContainer.scrollHeight,
+        windowWidth: 794,
+        windowHeight: pdfContainer.scrollHeight
       })
       
       // Remove temporary container
@@ -557,12 +557,12 @@ export default function DashboardPage() {
         compress: true
       })
       
-      // Calculate dimensions
-      const pdfWidth = pdf.internal.pageSize.getWidth()
-      const pdfHeight = pdf.internal.pageSize.getHeight()
-      const margin = 10 // 10mm margins
-      const contentWidth = pdfWidth - (2 * margin)
-      const contentHeight = pdfHeight - (2 * margin)
+      // Calculate dimensions - A4: 210mm x 297mm
+      const pdfWidth = 210 // A4 width in mm
+      const pdfHeight = 297 // A4 height in mm
+      const margin = 0 // No additional margins, already in HTML
+      const contentWidth = pdfWidth
+      const contentHeight = pdfHeight
       
       // Convert canvas to image
       const imgData = canvas.toDataURL('image/png', 1.0)
@@ -578,8 +578,8 @@ export default function DashboardPage() {
           pdf.addPage()
         }
         
-        const yPosition = -(page * contentHeight) + margin
-        pdf.addImage(imgData, 'PNG', margin, yPosition, imgWidth, imgHeight)
+        const yPosition = -(page * contentHeight)
+        pdf.addImage(imgData, 'PNG', 0, yPosition, contentWidth, imgHeight, undefined, 'FAST')
       }
       
       // Generate filename with date
