@@ -380,10 +380,11 @@ export default function DashboardPage() {
       // Professional margins: 25mm all sides
       // Usable area: 160mm x 247mm
       let pdfHTML = `
-        <div style="width: 210mm; min-height: 297mm; padding: 25mm; background: white; font-family: Arial, sans-serif; box-sizing: border-box; margin: 0; position: relative;">
+        <div style="width: 210mm; background: white; font-family: Arial, sans-serif; box-sizing: border-box; margin: 0;">
           
           <!-- PAGE 1 -->
-          <div style="page-break-after: always; width: 160mm; min-height: 247mm; position: relative;">
+          <div style="page-break-after: always; padding: 25mm; min-height: 297mm; box-sizing: border-box; position: relative;">
+            <div style="width: 160mm; min-height: 247mm; position: relative;">
             
             <!-- Header (20mm) -->
             <div style="text-align: center; margin-bottom: 10mm; padding-bottom: 3mm; border-bottom: 2px solid #3b82f6;">
@@ -498,11 +499,13 @@ export default function DashboardPage() {
             </div>
             <!-- Page number -->
             <div style="position: absolute; bottom: 0; right: 0; font-size: 9px; color: #6b7280;">Página 1${secondPageCategories.length > 0 ? ' de 2' : ''}</div>
+            </div>
           </div> <!-- End of Page 1 -->
           
           ${secondPageCategories.length > 0 ? `
           <!-- PAGE 2 -->
-          <div style="page-break-before: always; width: 160mm; min-height: 247mm; padding-top: 0; position: relative;">
+          <div style="page-break-before: always; padding: 25mm; min-height: 297mm; box-sizing: border-box; position: relative;">
+            <div style="width: 160mm; min-height: 247mm; position: relative;">
             
             ${(() => {
               let page2HTML = ''
@@ -524,22 +527,22 @@ export default function DashboardPage() {
                             <div style="font-size: 20px; font-weight: bold; color: ${category.color || '#6b7280'}; line-height: 1; margin-top: 1px;">${category.quantidade}</div>
                           </div>
                         </div>
-                        <div style="margin: 10px 0;">
-                          <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                            <span style="font-size: 11px; color: #6b7280;">Percentual</span>
-                            <span style="font-size: 16px; font-weight: bold; color: ${category.color || '#6b7280'};">${category.percentual.toFixed(1)}%</span>
+                        <div style="margin: 8px 0;">
+                          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                            <span style="font-size: 9px; color: #6b7280;">Percentual</span>
+                            <span style="font-size: 14px; font-weight: bold; color: ${category.color || '#6b7280'};">${category.percentual.toFixed(1)}%</span>
                           </div>
-                          <div style="background: #f3f4f6; border-radius: 4px; height: 12px; overflow: hidden;">
+                          <div style="background: #f3f4f6; border-radius: 3px; height: 10px; overflow: hidden;">
                             <div style="background: ${category.color || '#6b7280'}; height: 100%; width: ${category.percentual}%;"></div>
                           </div>
                         </div>
-                        <div style="background: #f8f9fa; border-radius: 6px; padding: 8px; margin-top: 10px; border: 1px solid #e5e7eb;">
-                          <div style="font-size: 10px; color: #374151; font-weight: 700; margin-bottom: 5px; text-transform: uppercase;">Distribuição por Status:</div>
-                          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; font-size: 11px;">
-                            <div style="color: #374151;"><span style="color: #d97706; font-size: 14px;">●</span> <span style="font-weight: 600;">Abertos:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.open}</span></div>
-                            <div style="color: #374151;"><span style="color: #ea580c; font-size: 14px;">●</span> <span style="font-weight: 600;">Progresso:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.in_progress}</span></div>
-                            <div style="color: #374151;"><span style="color: #16a34a; font-size: 14px;">●</span> <span style="font-weight: 600;">Resolvidos:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.resolved}</span></div>
-                            <div style="color: #374151;"><span style="color: #dc2626; font-size: 14px;">●</span> <span style="font-weight: 600;">Cancelados:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.cancelled}</span></div>
+                        <div style="background: #f8f9fa; border-radius: 4px; padding: 6px; margin-top: 8px; border: 1px solid #e5e7eb;">
+                          <div style="font-size: 9px; color: #374151; font-weight: 700; margin-bottom: 4px; text-transform: uppercase;">Distribuição por Status:</div>
+                          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px; font-size: 9px;">
+                            <div style="color: #374151;"><span style="color: #d97706; font-size: 12px;">●</span> <span style="font-weight: 600;">Abertos:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.open}</span></div>
+                            <div style="color: #374151;"><span style="color: #ea580c; font-size: 12px;">●</span> <span style="font-weight: 600;">Progresso:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.in_progress}</span></div>
+                            <div style="color: #374151;"><span style="color: #16a34a; font-size: 12px;">●</span> <span style="font-weight: 600;">Resolvidos:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.resolved}</span></div>
+                            <div style="color: #374151;"><span style="color: #dc2626; font-size: 12px;">●</span> <span style="font-weight: 600;">Cancelados:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.cancelled}</span></div>
                           </div>
                         </div>
                       </div>
@@ -557,15 +560,16 @@ export default function DashboardPage() {
             })()}
             
             <!-- Page number -->
-            <div style="position: absolute; bottom: 8mm; right: 10mm; font-size: 10px; color: #6b7280;">Página 2 de 2</div>
+            <div style="position: absolute; bottom: 0; right: 0; font-size: 9px; color: #6b7280;">Página 2 de 2</div>
+            </div>
           </div> <!-- End of Page 2 -->
           ` : ''}
           
-          <!-- Footer -->
-          <div style="${secondPageCategories.length > 0 ? 'page-break-before: avoid;' : 'position: absolute; bottom: 12mm; left: 10mm; right: 10mm;'} text-align: center; border-top: 2px solid #3b82f6; padding-top: 5mm; margin-top: ${secondPageCategories.length > 0 ? '20mm' : '0'};">
-            <p style="margin: 3px 0; font-size: 12px; color: #374151; font-weight: 600;">RELATÓRIO GERADO EM: ${formattedDateTime.toUpperCase()}</p>
-            <p style="margin: 3px 0; font-size: 11px; color: #6b7280;">Dashboard gerado automaticamente pelo sistema de suporte técnico</p>
-            <p style="margin: 3px 0; font-size: 10px; color: #9ca3af;">© 2025 - Sistema de Gestão de Tickets</p>
+          <!-- Footer (positioned in last page content area) -->
+          <div style="${secondPageCategories.length > 0 ? 'position: absolute; bottom: 25mm; left: 25mm; right: 25mm;' : 'position: absolute; bottom: 25mm; left: 25mm; right: 25mm;'} text-align: center; border-top: 1px solid #3b82f6; padding-top: 3mm; width: 160mm;">
+            <p style="margin: 2px 0; font-size: 10px; color: #374151; font-weight: 600;">RELATÓRIO GERADO EM: ${formattedDateTime.toUpperCase()}</p>
+            <p style="margin: 2px 0; font-size: 9px; color: #6b7280;">Dashboard gerado automaticamente pelo sistema de suporte técnico</p>
+            <p style="margin: 2px 0; font-size: 8px; color: #9ca3af;">© 2025 - Sistema de Gestão de Tickets</p>
           </div>
         </div>
       `
