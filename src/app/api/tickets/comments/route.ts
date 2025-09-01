@@ -82,6 +82,11 @@ export async function POST(request: NextRequest) {
       })
 
     // Buscar informações do ticket e usuário para notificação
+    console.log('=== PROCESSANDO NOTIFICAÇÕES DE COMENTÁRIO ===')
+    console.log('Ticket ID:', ticket_id)
+    console.log('Usuário comentando:', user_id)
+    console.log('Comentário ID:', comment.id)
+    
     try {
       const { data: ticket } = await supabaseAdmin
         .from('tickets')
@@ -101,7 +106,13 @@ export async function POST(request: NextRequest) {
 
         // Notificar o criador do ticket (se não for ele mesmo comentando)
         if (ticket.created_by && ticket.created_by !== user_id) {
-          await createAndSendNotification({
+          console.log('Tentando notificar criador do ticket:', {
+            created_by: ticket.created_by,
+            user_commenting: user_id,
+            ticket_number: ticket.ticket_number
+          })
+          
+          const notificationResult = await createAndSendNotification({
             user_id: ticket.created_by,
             title: `Novo comentário no Chamado #${ticket.ticket_number || ticket.id.substring(0, 8)}`,
             message: `${userName} comentou: "${commentPreview}"`,
@@ -114,11 +125,24 @@ export async function POST(request: NextRequest) {
             },
             action_url: `/dashboard/tickets/${ticket.id}#comment-${comment.id}`
           })
+          
+          console.log('Resultado da notificação para criador:', notificationResult ? '✅ Sucesso' : '❌ Falhou')
+        } else {
+          console.log('Criador não notificado porque:', {
+            has_creator: !!ticket.created_by,
+            is_same_user: ticket.created_by === user_id
+          })
         }
 
         // Notificar o responsável (se houver e não for ele mesmo)
         if (ticket.assigned_to && ticket.assigned_to !== user_id && ticket.assigned_to !== ticket.created_by) {
-          await createAndSendNotification({
+          console.log('Tentando notificar responsável:', {
+            assigned_to: ticket.assigned_to,
+            user_commenting: user_id,
+            ticket_number: ticket.ticket_number
+          })
+          
+          const notificationResult = await createAndSendNotification({
             user_id: ticket.assigned_to,
             title: `Novo comentário no Chamado #${ticket.ticket_number || ticket.id.substring(0, 8)}`,
             message: `${userName} comentou: "${commentPreview}"`,
@@ -130,6 +154,14 @@ export async function POST(request: NextRequest) {
               ticket_number: ticket.ticket_number
             },
             action_url: `/dashboard/tickets/${ticket.id}#comment-${comment.id}`
+          })
+          
+          console.log('Resultado da notificação para responsável:', notificationResult ? '✅ Sucesso' : '❌ Falhou')
+        } else {
+          console.log('Responsável não notificado porque:', {
+            has_assignee: !!ticket.assigned_to,
+            is_same_user: ticket.assigned_to === user_id,
+            is_creator: ticket.assigned_to === ticket.created_by
           })
         }
 
