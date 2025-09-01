@@ -429,21 +429,21 @@ export default function DashboardPage() {
         pdfHTML += `
           <div style="border: 2px solid ${borderColor}; background: linear-gradient(135deg, ${bgColor} 0%, white 100%); padding: 20px; border-radius: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.08); page-break-inside: avoid; position: relative; overflow: hidden;">
             <div style="position: absolute; top: 0; right: 0; width: 100px; height: 100px; background: ${category.color || '#6b7280'}; opacity: 0.05; border-radius: 0 0 0 100%;"></div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; position: relative;">
-              <div style="flex-grow: 1; max-width: calc(100% - 100px);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; position: relative;">
+              <div style="flex-grow: 1; max-width: calc(100% - 120px);">
                 <h3 style="margin: 0; font-size: 18px; color: #111827; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${category.nome}</h3>
                 <div style="margin-top: 12px;">
-                  <div style="background: #e5e7eb; border-radius: 8px; height: 12px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
-                    <div style="background: linear-gradient(90deg, ${category.color || '#6b7280'} 0%, ${category.color ? category.color + 'cc' : '#4b5563'} 100%); height: 100%; width: ${category.percentual}%; transition: width 0.5s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.1);" title="${category.percentual.toFixed(1)}%"></div>
+                  <div style="position: relative; background: white; border-radius: 8px; height: 14px; overflow: visible; box-shadow: 0 2px 8px rgba(0,0,0,0.15), inset 0 1px 2px rgba(0,0,0,0.1); border: 1px solid #e5e7eb;">
+                    <div style="background: linear-gradient(90deg, ${category.color || '#6b7280'} 0%, ${category.color ? category.color + 'cc' : '#4b5563'} 100%); height: 100%; width: ${category.percentual}%; transition: width 0.5s ease; border-radius: 7px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);" title="${category.percentual.toFixed(1)}%"></div>
                   </div>
                   <div style="font-size: 28px; font-weight: bold; color: ${category.color || '#6b7280'}; margin-top: 12px; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">${category.percentual.toFixed(1)}%</div>
                 </div>
               </div>
-              <div style="position: relative; margin-left: 20px; flex-shrink: 0;">
-                <div style="display: flex; align-items: center; justify-content: center; width: 70px; height: 70px; background: linear-gradient(135deg, ${category.color || '#6b7280'} 0%, ${category.color ? category.color + 'dd' : '#4b5563'} 100%); color: white; border-radius: 50%; font-size: 28px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.1); border: 3px solid white;">
+              <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-left: 15px; flex-shrink: 0; text-align: center;">
+                <div style="display: flex; align-items: center; justify-content: center; width: 80px; height: 80px; background: linear-gradient(135deg, ${category.color || '#6b7280'} 0%, ${category.color ? category.color + 'dd' : '#4b5563'} 100%); color: white; border-radius: 50%; font-size: 32px; font-weight: bold; box-shadow: 0 6px 20px rgba(0,0,0,0.2), 0 3px 8px rgba(0,0,0,0.15); border: 4px solid white;">
                   ${category.quantidade}
                 </div>
-                <div style="position: absolute; top: -2px; right: -2px; width: 74px; height: 74px; border-radius: 50%; border: 2px solid ${category.color || '#6b7280'}; opacity: 0.3; pointer-events: none;"></div>
+                <div style="font-size: 10px; color: #6b7280; font-weight: 600; text-transform: uppercase; margin-top: 8px; letter-spacing: 0.5px;">Total de<br/>Tickets</div>
               </div>
             </div>
             <div style="border-top: 2px solid ${category.color || '#6b7280'}22; padding-top: 15px; margin-top: 15px; background: white; border-radius: 8px; padding: 12px; margin: 15px -5px -5px -5px;">
