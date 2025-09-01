@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Bell, Mail, Smartphone, Clock, Save, TestTube, Loader2 } from 'lucide-react'
+import { Bell, Mail, Smartphone, Clock, Save, TestTube, Loader2, Send } from 'lucide-react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
@@ -327,13 +327,37 @@ export default function NotificationSettingsPage() {
 
         {/* Ações */}
         <div className="p-6 flex justify-between">
-          <button
-            onClick={sendTestNotification}
-            className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center gap-2"
-          >
-            <TestTube className="h-4 w-4" />
-            Enviar Teste
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={sendTestNotification}
+              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center gap-2"
+            >
+              <TestTube className="h-4 w-4" />
+              Teste Notificação
+            </button>
+            
+            <button
+              onClick={async () => {
+                try {
+                  const response = await axios.post('/api/test-email')
+                  if (response.data.success) {
+                    toast.success(response.data.message)
+                  } else {
+                    toast.error(response.data.error || 'Erro ao enviar email de teste')
+                  }
+                } catch (error: any) {
+                  console.error('Erro ao testar email:', error)
+                  const errorMsg = error.response?.data?.error || 'Erro ao enviar email de teste'
+                  const helpMsg = error.response?.data?.help
+                  toast.error(helpMsg ? `${errorMsg}\n${helpMsg}` : errorMsg)
+                }
+              }}
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+            >
+              <Send className="h-4 w-4" />
+              Teste Email
+            </button>
+          </div>
           
           <button
             onClick={savePreferences}

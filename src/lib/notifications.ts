@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { sendNotificationEmail } from './email'
+import { sendNotificationEmail as sendEmail } from './email-config'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -77,23 +77,18 @@ export async function createAndSendNotification(notification: NotificationData) 
     // 5. Enviar email se habilitado
     const typePreferences = preferences[notification.type as keyof typeof preferences] as any
     if (preferences.email_enabled && typePreferences?.email && user.email) {
-      const emailData = {
-        ...notification.data,
-        recipient_name: user.name,
-        recipient_email: user.email,
-        notification_url: `${process.env.NEXT_PUBLIC_APP_URL}${notification.action_url || '/dashboard/notifications'}`
-      }
-
-      // Mapear tipo de notificação para template de email
-      const emailTemplateMap: Record<string, string> = {
-        'ticket_created': 'ticketCreated',
-        'ticket_assigned': 'ticketAssigned',
-        'ticket_resolved': 'ticketResolved',
-      }
-
-      const template = emailTemplateMap[notification.type]
-      if (template) {
-        await sendNotificationEmail(template as any, user.email, emailData)
+      try {
+        await sendEmail({
+          to: user.email,
+          title: notification.title,
+          message: notification.message,
+          actionUrl: notification.action_url,
+          actionText: 'Ver Detalhes'
+        })
+        console.log('Email de notificação enviado para:', user.email)
+      } catch (emailError) {
+        console.error('Erro ao enviar email de notificação:', emailError)
+        // Não falhar se o email não for enviado
       }
     }
 
