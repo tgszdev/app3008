@@ -375,57 +375,60 @@ export default function DashboardPage() {
       const now = new Date()
       const formattedDateTime = `${now.toLocaleDateString('pt-BR')} às ${now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`
       
-      // Build PDF HTML with A4 dimensions in mind
+      // Build PDF HTML with A4 dimensions and professional margins
+      // A4: 210mm x 297mm
+      // Professional margins: 25mm all sides
+      // Usable area: 160mm x 247mm
       let pdfHTML = `
-        <div style="width: 210mm; min-height: 297mm; padding: 10mm 10mm; background: white; font-family: Arial, sans-serif; box-sizing: border-box; margin: 0; position: relative;">
+        <div style="width: 210mm; min-height: 297mm; padding: 25mm; background: white; font-family: Arial, sans-serif; box-sizing: border-box; margin: 0; position: relative;">
           
           <!-- PAGE 1 -->
-          <div style="page-break-after: always; min-height: 277mm; position: relative;">
+          <div style="page-break-after: always; width: 160mm; min-height: 247mm; position: relative;">
             
-            <!-- Header -->
-            <div style="text-align: center; margin-bottom: 15mm; padding-bottom: 5mm; border-bottom: 2px solid #3b82f6;">
-              <h1 style="margin: 0; font-size: 24px; color: #111827; font-weight: bold;">RELATÓRIO DE TICKETS</h1>
-              <h2 style="margin: 5px 0 0 0; font-size: 18px; color: #3b82f6; font-weight: 600;">DASHBOARD</h2>
-              <p style="margin: 8px 0 3px 0; font-size: 13px; color: #6b7280;">
+            <!-- Header (20mm) -->
+            <div style="text-align: center; margin-bottom: 10mm; padding-bottom: 3mm; border-bottom: 2px solid #3b82f6;">
+              <h1 style="margin: 0; font-size: 20px; color: #111827; font-weight: bold;">RELATÓRIO DE TICKETS</h1>
+              <h2 style="margin: 3px 0 0 0; font-size: 16px; color: #3b82f6; font-weight: 600;">DASHBOARD</h2>
+              <p style="margin: 5px 0 2px 0; font-size: 11px; color: #6b7280;">
                 <strong>Período:</strong> ${formatDateShort(periodFilter.start_date)} até ${formatDateShort(periodFilter.end_date)}
               </p>
-              ${myTicketsOnly ? `<p style="margin: 3px 0; font-size: 12px; color: #3b82f6; font-weight: 500;"><strong>Filtrado por:</strong> Tickets de ${session?.user?.name}</p>` : ''}
+              ${myTicketsOnly ? `<p style="margin: 2px 0; font-size: 10px; color: #3b82f6; font-weight: 500;"><strong>Filtrado por:</strong> Tickets de ${session?.user?.name}</p>` : ''}
             </div>
             
-            <!-- Summary Box -->
-            <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 15mm; box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);">
+            <!-- Summary Box (30mm) -->
+            <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 15px; border-radius: 8px; margin-bottom: 10mm; box-shadow: 0 6px 15px rgba(59, 130, 246, 0.2);">
               <div style="text-align: center;">
-                <div style="font-size: 48px; font-weight: bold; line-height: 1;">${categoryStats?.total_tickets || 0}</div>
-                <div style="font-size: 14px; margin-top: 10px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 500;">TOTAL DE TICKETS</div>
+                <div style="font-size: 36px; font-weight: bold; line-height: 1;">${categoryStats?.total_tickets || 0}</div>
+                <div style="font-size: 12px; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 500;">TOTAL DE TICKETS</div>
               </div>
             </div>
             
-            <!-- Status Cards -->
-            <div style="margin-bottom: 15mm;">
-              <h2 style="font-size: 18px; color: #111827; margin-bottom: 10px; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">TOTAL DE TICKETS POR STATUS</h2>
-              <div style="display: flex; gap: 10px; justify-content: space-between;">
-                <div style="flex: 1; background: #fef3c7; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #fbbf24;">
-                  <div style="font-size: 28px; font-weight: bold; color: #d97706; line-height: 1;">${categoryStats?.status_summary.open || 0}</div>
-                  <div style="font-size: 11px; color: #92400e; margin-top: 5px; font-weight: 600; text-transform: uppercase;">Abertos</div>
+            <!-- Status Cards (35mm) -->
+            <div style="margin-bottom: 10mm;">
+              <h2 style="font-size: 16px; color: #111827; margin-bottom: 8px; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 3px;">TOTAL DE TICKETS POR STATUS</h2>
+              <div style="display: flex; gap: 8px; justify-content: space-between;">
+                <div style="flex: 1; background: #fef3c7; padding: 12px 8px; border-radius: 6px; text-align: center; border: 1px solid #fbbf24;">
+                  <div style="font-size: 22px; font-weight: bold; color: #d97706; line-height: 1;">${categoryStats?.status_summary.open || 0}</div>
+                  <div style="font-size: 9px; color: #92400e; margin-top: 3px; font-weight: 600; text-transform: uppercase;">Abertos</div>
                 </div>
-                <div style="flex: 1; background: #fed7aa; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #fb923c;">
-                  <div style="font-size: 28px; font-weight: bold; color: #ea580c; line-height: 1;">${categoryStats?.status_summary.in_progress || 0}</div>
-                  <div style="font-size: 11px; color: #7c2d12; margin-top: 5px; font-weight: 600; text-transform: uppercase;">Em Progresso</div>
+                <div style="flex: 1; background: #fed7aa; padding: 12px 8px; border-radius: 6px; text-align: center; border: 1px solid #fb923c;">
+                  <div style="font-size: 22px; font-weight: bold; color: #ea580c; line-height: 1;">${categoryStats?.status_summary.in_progress || 0}</div>
+                  <div style="font-size: 9px; color: #7c2d12; margin-top: 3px; font-weight: 600; text-transform: uppercase;">Em Progresso</div>
                 </div>
-                <div style="flex: 1; background: #bbf7d0; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #4ade80;">
-                  <div style="font-size: 28px; font-weight: bold; color: #16a34a; line-height: 1;">${categoryStats?.status_summary.resolved || 0}</div>
-                  <div style="font-size: 11px; color: #14532d; margin-top: 5px; font-weight: 600; text-transform: uppercase;">Resolvidos</div>
+                <div style="flex: 1; background: #bbf7d0; padding: 12px 8px; border-radius: 6px; text-align: center; border: 1px solid #4ade80;">
+                  <div style="font-size: 22px; font-weight: bold; color: #16a34a; line-height: 1;">${categoryStats?.status_summary.resolved || 0}</div>
+                  <div style="font-size: 9px; color: #14532d; margin-top: 3px; font-weight: 600; text-transform: uppercase;">Resolvidos</div>
                 </div>
-                <div style="flex: 1; background: #fecaca; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #f87171;">
-                  <div style="font-size: 28px; font-weight: bold; color: #dc2626; line-height: 1;">${categoryStats?.status_summary.cancelled || 0}</div>
-                  <div style="font-size: 11px; color: #7f1d1d; margin-top: 5px; font-weight: 600; text-transform: uppercase;">Cancelados</div>
+                <div style="flex: 1; background: #fecaca; padding: 12px 8px; border-radius: 6px; text-align: center; border: 1px solid #f87171;">
+                  <div style="font-size: 22px; font-weight: bold; color: #dc2626; line-height: 1;">${categoryStats?.status_summary.cancelled || 0}</div>
+                  <div style="font-size: 9px; color: #7f1d1d; margin-top: 3px; font-weight: 600; text-transform: uppercase;">Cancelados</div>
                 </div>
               </div>
             </div>
           
-            <!-- Categories Section -->
+            <!-- Categories Section (remaining space ~152mm for 4 cards = 38mm each) -->
             <div>
-              <h2 style="font-size: 18px; color: #111827; margin-bottom: 10px; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">TICKETS POR CATEGORIA</h2>
+              <h2 style="font-size: 16px; color: #111827; margin-bottom: 8px; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 3px;">TICKETS POR CATEGORIA</h2>
       `
       
       // Process categories - first 4 on page 1, rest on page 2
@@ -441,7 +444,7 @@ export default function DashboardPage() {
         
         if (pair.length > 0) {
           pdfHTML += `
-            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <div style="display: flex; gap: 8px; margin-bottom: 8px;">
           `
         
         pair.forEach(category => {
@@ -449,30 +452,30 @@ export default function DashboardPage() {
           const borderColor = category.color || '#d1d5db'
         
             pdfHTML += `
-              <div style="flex: 1; background: white; border-left: 5px solid ${category.color || '#6b7280'}; padding: 14px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.08); border: 1px solid #cbd5e1;">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
-                  <h3 style="margin: 0; font-size: 14px; color: #111827; font-weight: 700; text-transform: uppercase;">${category.nome}</h3>
+              <div style="flex: 1; background: white; border-left: 4px solid ${category.color || '#6b7280'}; padding: 10px; border-radius: 6px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); border: 1px solid #d1d5db; min-height: 60mm; max-width: 76mm;">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                  <h3 style="margin: 0; font-size: 12px; color: #111827; font-weight: 700; text-transform: uppercase;">${category.nome}</h3>
                   <div style="text-align: right;">
-                    <div style="font-size: 10px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Total de Tickets</div>
-                    <div style="font-size: 26px; font-weight: bold; color: ${category.color || '#6b7280'}; line-height: 1; margin-top: 2px;">${category.quantidade}</div>
+                    <div style="font-size: 8px; color: #6b7280; font-weight: 600; text-transform: uppercase;">Total de Tickets</div>
+                    <div style="font-size: 20px; font-weight: bold; color: ${category.color || '#6b7280'}; line-height: 1; margin-top: 1px;">${category.quantidade}</div>
                   </div>
                 </div>
-                <div style="margin: 10px 0;">
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                    <span style="font-size: 11px; color: #6b7280;">Percentual</span>
-                    <span style="font-size: 16px; font-weight: bold; color: ${category.color || '#6b7280'};">${category.percentual.toFixed(1)}%</span>
+                <div style="margin: 8px 0;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <span style="font-size: 9px; color: #6b7280;">Percentual</span>
+                    <span style="font-size: 14px; font-weight: bold; color: ${category.color || '#6b7280'};">${category.percentual.toFixed(1)}%</span>
                   </div>
-                  <div style="background: #f3f4f6; border-radius: 4px; height: 12px; overflow: hidden;">
+                  <div style="background: #f3f4f6; border-radius: 3px; height: 10px; overflow: hidden;">
                     <div style="background: ${category.color || '#6b7280'}; height: 100%; width: ${category.percentual}%;"></div>
                   </div>
                 </div>
-                <div style="background: #f8f9fa; border-radius: 6px; padding: 8px; margin-top: 10px; border: 1px solid #e5e7eb;">
-                  <div style="font-size: 10px; color: #374151; font-weight: 700; margin-bottom: 5px; text-transform: uppercase;">Distribuição por Status:</div>
-                  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; font-size: 11px;">
-                    <div style="color: #374151;"><span style="color: #d97706; font-size: 14px;">●</span> <span style="font-weight: 600;">Abertos:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.open}</span></div>
-                    <div style="color: #374151;"><span style="color: #ea580c; font-size: 14px;">●</span> <span style="font-weight: 600;">Progresso:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.in_progress}</span></div>
-                    <div style="color: #374151;"><span style="color: #16a34a; font-size: 14px;">●</span> <span style="font-weight: 600;">Resolvidos:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.resolved}</span></div>
-                    <div style="color: #374151;"><span style="color: #dc2626; font-size: 14px;">●</span> <span style="font-weight: 600;">Cancelados:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.cancelled}</span></div>
+                <div style="background: #f8f9fa; border-radius: 4px; padding: 6px; margin-top: 8px; border: 1px solid #e5e7eb;">
+                  <div style="font-size: 9px; color: #374151; font-weight: 700; margin-bottom: 4px; text-transform: uppercase;">Distribuição por Status:</div>
+                  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px; font-size: 9px;">
+                    <div style="color: #374151;"><span style="color: #d97706; font-size: 12px;">●</span> <span style="font-weight: 600;">Abertos:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.open}</span></div>
+                    <div style="color: #374151;"><span style="color: #ea580c; font-size: 12px;">●</span> <span style="font-weight: 600;">Progresso:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.in_progress}</span></div>
+                    <div style="color: #374151;"><span style="color: #16a34a; font-size: 12px;">●</span> <span style="font-weight: 600;">Resolvidos:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.resolved}</span></div>
+                    <div style="color: #dc2626; font-size: 12px;">●</span> <span style="font-weight: 600;">Cancelados:</span> <span style="font-weight: 700; color: #111827;">${category.status_breakdown.cancelled}</span></div>
                   </div>
                 </div>
               </div>
@@ -494,12 +497,12 @@ export default function DashboardPage() {
       pdfHTML += `
             </div>
             <!-- Page number -->
-            <div style="position: absolute; bottom: 8mm; right: 10mm; font-size: 10px; color: #6b7280;">Página 1${secondPageCategories.length > 0 ? ' de 2' : ''}</div>
+            <div style="position: absolute; bottom: 0; right: 0; font-size: 9px; color: #6b7280;">Página 1${secondPageCategories.length > 0 ? ' de 2' : ''}</div>
           </div> <!-- End of Page 1 -->
           
           ${secondPageCategories.length > 0 ? `
           <!-- PAGE 2 -->
-          <div style="page-break-before: always; min-height: 277mm; padding-top: 10mm; position: relative;">
+          <div style="page-break-before: always; width: 160mm; min-height: 247mm; padding-top: 0; position: relative;">
             
             ${(() => {
               let page2HTML = ''
@@ -509,16 +512,16 @@ export default function DashboardPage() {
                 if (secondPageCategories[i + 1]) pair.push(secondPageCategories[i + 1])
                 
                 if (pair.length > 0) {
-                  page2HTML += '<div style="display: flex; gap: 10px; margin-bottom: 10px;">'
+                  page2HTML += '<div style="display: flex; gap: 8px; margin-bottom: 8px;">'
                   
                   pair.forEach(category => {
                     page2HTML += `
-                      <div style="flex: 1; background: white; border-left: 5px solid ${category.color || '#6b7280'}; padding: 14px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.08); border: 1px solid #cbd5e1;">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
-                          <h3 style="margin: 0; font-size: 14px; color: #111827; font-weight: 700; text-transform: uppercase;">${category.nome}</h3>
+                      <div style="flex: 1; background: white; border-left: 4px solid ${category.color || '#6b7280'}; padding: 10px; border-radius: 6px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); border: 1px solid #d1d5db; min-height: 60mm; max-width: 76mm;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                          <h3 style="margin: 0; font-size: 12px; color: #111827; font-weight: 700; text-transform: uppercase;">${category.nome}</h3>
                           <div style="text-align: right;">
-                            <div style="font-size: 10px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Total de Tickets</div>
-                            <div style="font-size: 26px; font-weight: bold; color: ${category.color || '#6b7280'}; line-height: 1; margin-top: 2px;">${category.quantidade}</div>
+                            <div style="font-size: 8px; color: #6b7280; font-weight: 600; text-transform: uppercase;">Total de Tickets</div>
+                            <div style="font-size: 20px; font-weight: bold; color: ${category.color || '#6b7280'}; line-height: 1; margin-top: 1px;">${category.quantidade}</div>
                           </div>
                         </div>
                         <div style="margin: 10px 0;">
