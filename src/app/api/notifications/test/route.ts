@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const tests = {
+    const tests: any = {
       notifications: false,
       preferences: false,
       push_subscriptions: false,
