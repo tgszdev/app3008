@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
+import { supabaseAdmin } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,18 +23,18 @@ export async function GET(request: NextRequest) {
     // Calcular offset
     const offset = (page - 1) * limit
 
-    // Construir query base
-    let query = supabase
+    // Construir query base - usando joins corretos
+    let query = supabaseAdmin
       .from('ticket_comments')
       .select(`
         *,
-        user:users!ticket_comments_user_id_fkey (
+        user:users (
           id,
           name,
           email,
           avatar_url
         ),
-        ticket:tickets!ticket_comments_ticket_id_fkey (
+        ticket:tickets (
           id,
           ticket_number,
           title,
@@ -82,7 +77,10 @@ export async function GET(request: NextRequest) {
     if (error) {
       console.error('Erro ao buscar comentários:', error)
       return NextResponse.json(
-        { error: 'Erro ao buscar comentários' },
+        { 
+          error: 'Erro ao buscar comentários',
+          details: error.message 
+        },
         { status: 500 }
       )
     }
@@ -91,7 +89,7 @@ export async function GET(request: NextRequest) {
     const commentsWithAttachments = await Promise.all(
       (comments || []).map(async (comment) => {
         // Buscar anexos do comentário
-        const { data: attachments } = await supabase
+        const { data: attachments } = await supabaseAdmin
           .from('ticket_attachments')
           .select('*')
           .eq('comment_id', comment.id)
@@ -114,7 +112,10 @@ export async function GET(request: NextRequest) {
   } catch (error: any) {
     console.error('Erro no endpoint de comentários:', error)
     return NextResponse.json(
-      { error: 'Erro interno do servidor' },
+      { 
+        error: 'Erro interno do servidor',
+        message: error.message 
+      },
       { status: 500 }
     )
   }
@@ -139,7 +140,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Buscar o usuário no banco de dados
-    const { data: userData, error: userError } = await supabase
+    const { data: userData, error: userError } = await supabaseAdmin
       .from('users')
       .select('id')
       .eq('email', session.user.email)
@@ -153,7 +154,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Criar comentário
-    const { data: comment, error } = await supabase
+    const { data: comment, error } = await supabaseAdmin
       .from('ticket_comments')
       .insert({
         ticket_id,
@@ -163,7 +164,7 @@ export async function POST(request: NextRequest) {
       })
       .select(`
         *,
-        user:users!ticket_comments_user_id_fkey (
+        user:users (
           id,
           name,
           email,
@@ -175,13 +176,16 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Erro ao criar comentário:', error)
       return NextResponse.json(
-        { error: 'Erro ao criar comentário' },
+        { 
+          error: 'Erro ao criar comentário',
+          details: error.message 
+        },
         { status: 500 }
       )
     }
 
     // Atualizar o updated_at do ticket
-    await supabase
+    await supabaseAdmin
       .from('tickets')
       .update({ updated_at: new Date().toISOString() })
       .eq('id', ticket_id)
@@ -191,7 +195,10 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error('Erro ao criar comentário:', error)
     return NextResponse.json(
-      { error: 'Erro interno do servidor' },
+      { 
+        error: 'Erro interno do servidor',
+        message: error.message 
+      },
       { status: 500 }
     )
   }
@@ -216,7 +223,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Buscar o usuário no banco de dados
-    const { data: userData, error: userError } = await supabase
+    const { data: userData, error: userError } = await supabaseAdmin
       .from('users')
       .select('id, role')
       .eq('email', session.user.email)
@@ -230,7 +237,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Buscar o comentário para verificar propriedade
-    const { data: comment, error: commentError } = await supabase
+    const { data: comment, error: commentError } = await supabaseAdmin
       .from('ticket_comments')
       .select('user_id')
       .eq('id', commentId)
@@ -252,13 +259,13 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Deletar anexos associados primeiro
-    await supabase
+    await supabaseAdmin
       .from('ticket_attachments')
       .delete()
       .eq('comment_id', commentId)
 
     // Deletar comentário
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('ticket_comments')
       .delete()
       .eq('id', commentId)
@@ -266,7 +273,10 @@ export async function DELETE(request: NextRequest) {
     if (error) {
       console.error('Erro ao deletar comentário:', error)
       return NextResponse.json(
-        { error: 'Erro ao deletar comentário' },
+        { 
+          error: 'Erro ao deletar comentário',
+          details: error.message 
+        },
         { status: 500 }
       )
     }
@@ -276,7 +286,10 @@ export async function DELETE(request: NextRequest) {
   } catch (error: any) {
     console.error('Erro ao deletar comentário:', error)
     return NextResponse.json(
-      { error: 'Erro interno do servidor' },
+      { 
+        error: 'Erro interno do servidor',
+        message: error.message 
+      },
       { status: 500 }
     )
   }

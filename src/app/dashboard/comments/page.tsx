@@ -160,11 +160,18 @@ export default function CommentsPage() {
       })
 
       const response = await axios.get(`/api/comments?${params}`)
-      setComments(response.data.comments || [])
-      setTotalComments(response.data.total || 0)
+      
+      if (response.data.error) {
+        console.error('Erro da API:', response.data)
+        toast.error(response.data.error + (response.data.details ? ': ' + response.data.details : ''))
+      } else {
+        setComments(response.data.comments || [])
+        setTotalComments(response.data.total || 0)
+      }
     } catch (error: any) {
       console.error('Erro ao buscar comentários:', error)
-      toast.error('Erro ao carregar comentários')
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || 'Erro ao carregar comentários'
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -206,13 +213,13 @@ export default function CommentsPage() {
 
   // Filtrar comentários localmente baseado na busca
   const filteredComments = comments.filter(comment => {
-    if (searchTerm) {
+    if (searchTerm && comment) {
       const search = searchTerm.toLowerCase()
       return (
-        comment.content.toLowerCase().includes(search) ||
-        comment.user.name.toLowerCase().includes(search) ||
-        comment.ticket.title.toLowerCase().includes(search) ||
-        comment.ticket.ticket_number.toString().includes(search)
+        (comment.content && comment.content.toLowerCase().includes(search)) ||
+        (comment.user?.name && comment.user.name.toLowerCase().includes(search)) ||
+        (comment.ticket?.title && comment.ticket.title.toLowerCase().includes(search)) ||
+        (comment.ticket?.ticket_number && comment.ticket.ticket_number.toString().includes(search))
       )
     }
     return true
@@ -261,10 +268,11 @@ export default function CommentsPage() {
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Comentários Hoje</p>
               <p className="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
-                {comments.filter(c => {
+                {Array.isArray(comments) ? comments.filter(c => {
+                  if (!c?.created_at) return false
                   const today = new Date().toDateString()
                   return new Date(c.created_at).toDateString() === today
-                }).length}
+                }).length : 0}
               </p>
             </div>
             <Calendar className="h-8 w-8 text-green-500" />
@@ -276,7 +284,7 @@ export default function CommentsPage() {
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Com Anexos</p>
               <p className="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
-                {comments.filter(c => c.attachments && c.attachments.length > 0).length}
+                {Array.isArray(comments) ? comments.filter(c => c?.attachments && Array.isArray(c.attachments) && c.attachments.length > 0).length : 0}
               </p>
             </div>
             <Paperclip className="h-8 w-8 text-purple-500" />
@@ -288,7 +296,7 @@ export default function CommentsPage() {
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Internos</p>
               <p className="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
-                {comments.filter(c => c.is_internal).length}
+                {Array.isArray(comments) ? comments.filter(c => c?.is_internal).length : 0}
               </p>
             </div>
             <Eye className="h-8 w-8 text-orange-500" />
