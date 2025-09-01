@@ -394,7 +394,7 @@ export default function DashboardPage() {
           
           <!-- Status Cards -->
           <div style="margin-bottom: 40px; page-break-inside: avoid;">
-            <h2 style="font-size: 22px; color: #111827; margin-bottom: 25px; font-weight: 700; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">DISTRIBUIÇÃO POR STATUS</h2>
+            <h2 style="font-size: 22px; color: #111827; margin-bottom: 25px; font-weight: 700; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">TOTAL DE TICKETS POR STATUS</h2>
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
               <div style="background: #fef3c7; padding: 25px; border-radius: 12px; text-align: center; border: 2px solid #fbbf24; box-shadow: 0 4px 6px rgba(251, 191, 36, 0.1);">
                 <div style="font-size: 36px; font-weight: bold; color: #d97706; line-height: 1;">${categoryStats?.status_summary.open || 0}</div>
