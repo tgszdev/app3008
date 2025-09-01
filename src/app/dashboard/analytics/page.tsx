@@ -574,7 +574,13 @@ export default function AnalyticsPage() {
                       </span>
                     </td>
                   </tr>
-                ))}
+                )) : (
+                  <tr>
+                    <td colSpan={4} className="py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                      Nenhuma atividade de usuário no período selecionado
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

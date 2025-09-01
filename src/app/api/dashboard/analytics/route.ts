@@ -34,7 +34,7 @@ export async function GET(request: Request) {
         startDate.setDate(endDate.getDate() - 30)
     }
 
-    // Get all tickets in date range
+    // Get all tickets in date range with all relations
     const { data: tickets, error: ticketsError } = await supabaseAdmin
       .from('tickets')
       .select(`
@@ -63,6 +63,19 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Failed to fetch tickets' }, { status: 500 })
     }
 
+    // Get ticket comments for first response time calculation
+    const { data: comments } = await supabaseAdmin
+      .from('ticket_comments')
+      .select('*')
+      .in('ticket_id', tickets?.map(t => t.id) || [])
+      .order('created_at', { ascending: true })
+
+    // Get ticket ratings for satisfaction calculation
+    const { data: ratings } = await supabaseAdmin
+      .from('ticket_ratings')
+      .select('*')
+      .in('ticket_id', tickets?.map(t => t.id) || [])
+
     // Calculate previous period for trends
     const previousEndDate = new Date(startDate)
     const previousStartDate = new Date(startDate)
@@ -75,6 +88,11 @@ export async function GET(request: Request) {
       .gte('created_at', previousStartDate.toISOString())
       .lte('created_at', previousEndDate.toISOString())
 
+    const { data: previousRatings } = await supabaseAdmin
+      .from('ticket_ratings')
+      .select('*')
+      .in('ticket_id', previousTickets?.map(t => t.id) || [])
+
     // Overview metrics
     const totalTickets = tickets?.length || 0
     const previousTotalTickets = previousTickets?.length || 0
@@ -82,7 +100,7 @@ export async function GET(request: Request) {
       ? Math.round(((totalTickets - previousTotalTickets) / previousTotalTickets) * 100)
       : 0
 
-    // Calculate average resolution time
+    // Calculate average resolution time from real data
     const resolvedTickets = tickets?.filter(t => t.status === 'resolved') || []
     let avgResolutionHours = 0
     
@@ -124,14 +142,27 @@ export async function GET(request: Request) {
       ? Math.round(((avgResolutionHours - previousAvgResolutionHours) / previousAvgResolutionHours) * 100)
       : 0
 
-    // Satisfaction rate (mock data for now - would come from ratings table)
-    const satisfactionRate = 92
-    const satisfactionTrend = 5
+    // Real satisfaction rate from ratings
+    let satisfactionRate = 0
+    if (ratings && ratings.length > 0) {
+      const avgRating = ratings.reduce((sum, r) => sum + (r.rating || 0), 0) / ratings.length
+      satisfactionRate = Math.round((avgRating / 5) * 100) // Convert 5-star to percentage
+    }
+
+    let previousSatisfactionRate = 0
+    if (previousRatings && previousRatings.length > 0) {
+      const avgRating = previousRatings.reduce((sum, r) => sum + (r.rating || 0), 0) / previousRatings.length
+      previousSatisfactionRate = Math.round((avgRating / 5) * 100)
+    }
+
+    const satisfactionTrend = previousSatisfactionRate > 0
+      ? Math.round(((satisfactionRate - previousSatisfactionRate) / previousSatisfactionRate) * 100)
+      : 0
 
     // Active users
-    const uniqueUsers = new Set(tickets?.map(t => t.created_by))
+    const uniqueUsers = new Set(tickets?.map(t => t.created_by).filter(Boolean))
     const activeUsers = uniqueUsers.size
-    const previousUniqueUsers = new Set(previousTickets?.map(t => t.created_by))
+    const previousUniqueUsers = new Set(previousTickets?.map(t => t.created_by).filter(Boolean))
     const previousActiveUsers = previousUniqueUsers.size
     const activeUsersTrend = previousActiveUsers > 0
       ? Math.round(((activeUsers - previousActiveUsers) / previousActiveUsers) * 100)
@@ -199,29 +230,64 @@ export async function GET(request: Request) {
       currentDate.setDate(currentDate.getDate() + intervalDays)
     }
 
-    // Performance metrics
+    // Real performance metrics from comments and ticket history
     const firstResponseTimes: number[] = []
+    
+    // Calculate real first response times from comments
     tickets?.forEach(ticket => {
-      // Mock first response time (would come from ticket_comments table)
-      firstResponseTimes.push(Math.random() * 4 + 0.5) // 0.5 to 4.5 hours
+      const ticketComments = comments?.filter(c => c.ticket_id === ticket.id) || []
+      if (ticketComments.length > 0) {
+        // Find first comment that's not from the ticket creator
+        const firstResponse = ticketComments.find(c => c.user_id !== ticket.created_by)
+        if (firstResponse) {
+          const created = new Date(ticket.created_at)
+          const responded = new Date(firstResponse.created_at)
+          const hours = (responded.getTime() - created.getTime()) / (1000 * 60 * 60)
+          if (hours >= 0) { // Only positive values
+            firstResponseTimes.push(hours)
+          }
+        }
+      }
     })
     
     const avgFirstResponse = firstResponseTimes.length > 0
       ? firstResponseTimes.reduce((a, b) => a + b, 0) / firstResponseTimes.length
       : 0
     
+    // Calculate real reopen rate (tickets that were resolved then reopened)
+    let reopenedCount = 0
+    tickets?.forEach(ticket => {
+      // Check if ticket was reopened (has resolved_at but status is not resolved)
+      if (ticket.resolved_at && ticket.status !== 'resolved' && ticket.status !== 'cancelled') {
+        reopenedCount++
+      }
+    })
+    const reopenRate = totalTickets > 0 
+      ? Math.round((reopenedCount / totalTickets) * 100)
+      : 0
+
+    // Calculate escalation rate (high and critical priority tickets)
+    const escalatedTickets = tickets?.filter(t => 
+      t.priority === 'high' || t.priority === 'critical'
+    ).length || 0
+    const escalationRate = totalTickets > 0
+      ? Math.round((escalatedTickets / totalTickets) * 100)
+      : 0
+    
     const performanceMetrics = {
-      firstResponseTime: avgFirstResponse < 1 
-        ? `${Math.round(avgFirstResponse * 60)}min`
-        : `${avgFirstResponse.toFixed(1)}h`,
+      firstResponseTime: avgFirstResponse === 0 
+        ? 'N/A'
+        : avgFirstResponse < 1 
+          ? `${Math.round(avgFirstResponse * 60)}min`
+          : `${avgFirstResponse.toFixed(1)}h`,
       resolutionRate: totalTickets > 0 
         ? Math.round((resolvedTickets.length / totalTickets) * 100)
         : 0,
-      reopenRate: 3, // Mock data
-      escalationRate: 8 // Mock data
+      reopenRate,
+      escalationRate
     }
 
-    // User activity
+    // User activity with real data
     const userActivityMap = new Map<string, {
       name: string
       ticketsCreated: number
@@ -236,7 +302,7 @@ export async function GET(request: Request) {
         const userId = ticket.created_by_user.id
         if (!userActivityMap.has(userId)) {
           userActivityMap.set(userId, {
-            name: ticket.created_by_user.name || 'Unknown',
+            name: ticket.created_by_user.name || ticket.created_by_user.email || 'Unknown',
             ticketsCreated: 0,
             ticketsResolved: 0,
             totalResolutionTime: 0,
@@ -246,26 +312,33 @@ export async function GET(request: Request) {
         userActivityMap.get(userId)!.ticketsCreated++
       }
 
-      // Track resolved tickets (by assigned user)
-      if (ticket.status === 'resolved' && ticket.assigned_to_user) {
-        const userId = ticket.assigned_to_user.id
-        if (!userActivityMap.has(userId)) {
-          userActivityMap.set(userId, {
-            name: ticket.assigned_to_user.name || 'Unknown',
-            ticketsCreated: 0,
-            ticketsResolved: 0,
-            totalResolutionTime: 0,
-            resolvedCount: 0
-          })
-        }
-        userActivityMap.get(userId)!.ticketsResolved++
+      // Track resolved tickets (by assigned user or creator if no assignee)
+      if (ticket.status === 'resolved') {
+        const resolverId = ticket.assigned_to_user?.id || ticket.created_by_user?.id
+        const resolverName = ticket.assigned_to_user?.name || ticket.created_by_user?.name || 
+                            ticket.assigned_to_user?.email || ticket.created_by_user?.email || 'Unknown'
         
-        if (ticket.resolved_at) {
-          const created = new Date(ticket.created_at)
-          const resolved = new Date(ticket.resolved_at)
-          const hours = (resolved.getTime() - created.getTime()) / (1000 * 60 * 60)
-          userActivityMap.get(userId)!.totalResolutionTime += hours
-          userActivityMap.get(userId)!.resolvedCount++
+        if (resolverId) {
+          if (!userActivityMap.has(resolverId)) {
+            userActivityMap.set(resolverId, {
+              name: resolverName,
+              ticketsCreated: 0,
+              ticketsResolved: 0,
+              totalResolutionTime: 0,
+              resolvedCount: 0
+            })
+          }
+          userActivityMap.get(resolverId)!.ticketsResolved++
+          
+          if (ticket.resolved_at) {
+            const created = new Date(ticket.created_at)
+            const resolved = new Date(ticket.resolved_at)
+            const hours = (resolved.getTime() - created.getTime()) / (1000 * 60 * 60)
+            if (hours >= 0) { // Only positive values
+              userActivityMap.get(resolverId)!.totalResolutionTime += hours
+              userActivityMap.get(resolverId)!.resolvedCount++
+            }
+          }
         }
       }
     })
@@ -276,12 +349,14 @@ export async function GET(request: Request) {
         ticketsCreated: user.ticketsCreated,
         ticketsResolved: user.ticketsResolved,
         avgTime: user.resolvedCount > 0
-          ? `${Math.round(user.totalResolutionTime / user.resolvedCount)}h`
+          ? user.totalResolutionTime / user.resolvedCount < 24
+            ? `${Math.round(user.totalResolutionTime / user.resolvedCount)}h`
+            : `${Math.round(user.totalResolutionTime / user.resolvedCount / 24)}d`
           : 'N/A'
       }))
       .sort((a, b) => (b.ticketsCreated + b.ticketsResolved) - (a.ticketsCreated + a.ticketsResolved))
 
-    // Peak hours analysis
+    // Peak hours analysis with real data
     const hourMap = new Map<number, number>()
     for (let i = 0; i < 24; i++) {
       hourMap.set(i, 0)
@@ -296,14 +371,14 @@ export async function GET(request: Request) {
       .map(([hour, count]) => ({ hour, count }))
       .sort((a, b) => a.hour - b.hour)
 
-    // Build response
+    // Build response with all real data
     const analyticsData = {
       overview: {
         totalTickets,
         totalTicketsTrend,
         avgResolutionTime,
         avgResolutionTrend,
-        satisfactionRate,
+        satisfactionRate: satisfactionRate || 0, // 0 if no ratings yet
         satisfactionTrend,
         activeUsers,
         activeUsersTrend
