@@ -502,9 +502,9 @@ pm2 start ecosystem.config.cjs
 5. **Deploy no Vercel**: Configurar variáveis de ambiente e deploy
 
 ## 📊 Status do Projeto
-- **Versão**: 1.5.1
+- **Versão**: 1.5.2
 - **Status**: ✅ Em Produção
-- **Última Atualização**: 01/09/2025 - 22:20
+- **Última Atualização**: 01/09/2025 - 22:40
 - **Ambiente**: Vercel + Supabase
 - **Banco de Dados**: ✅ Conectado e Funcional
 - **Total de Usuários**: 6
