@@ -369,11 +369,12 @@ pm2 start ecosystem.config.cjs
 ## 📊 Status do Projeto
 - **Versão**: 1.5.0
 - **Status**: ✅ Em Produção
-- **Última Atualização**: 01/09/2025 - 13:00
+- **Última Atualização**: 01/09/2025 - 16:00
 - **Ambiente**: Vercel + Supabase
 - **Banco de Dados**: ✅ Conectado e Funcional
 - **Total de Usuários**: 6
 - **Total de Chamados**: Sistema pronto com anexos
+- **Sistema de Notificações**: ✅ Completo (In-App, Push, Email)
 - **Deploy**: ✅ Atualizado no Vercel
 
 ## 🆕 Últimas Atualizações
