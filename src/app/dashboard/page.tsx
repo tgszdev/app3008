@@ -416,18 +416,23 @@ export default function DashboardPage() {
           </div>
           
           <!-- Categories -->
-          <div style="margin-bottom: 40px;">
-            <h2 style="font-size: 22px; color: #111827; margin-bottom: 25px; font-weight: 700; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">TICKETS POR CATEGORIA</h2>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+          <div style="margin-bottom: 40px; page-break-inside: avoid;">
+            <h2 style="font-size: 22px; color: #111827; margin-bottom: 25px; font-weight: 700; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; page-break-after: avoid;">TICKETS POR CATEGORIA</h2>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px;">
       `
       
-      // Add category cards
-      categoryStats?.categorias?.forEach(category => {
+      // Add category cards with page break protection
+      categoryStats?.categorias?.forEach((category, index) => {
         const bgColor = category.color ? `${category.color}10` : '#f9fafb'
         const borderColor = category.color || '#d1d5db'
         
+        // Add page break before every 4 cards to keep pairs together
+        if (index > 0 && index % 4 === 0) {
+          pdfHTML += `</div></div><div style="page-break-before: always; margin-bottom: 40px; page-break-inside: avoid;"><div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px;">`
+        }
+        
         pdfHTML += `
-          <div style="background: white; border-left: 5px solid ${category.color || '#6b7280'}; padding: 20px; border-radius: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.08); page-break-inside: avoid; position: relative; overflow: hidden; border: 1px solid #e5e7eb;">
+          <div style="background: white; border-left: 6px solid ${category.color || '#6b7280'}; padding: 20px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.15), 0 3px 10px rgba(0,0,0,0.1); page-break-inside: avoid; break-inside: avoid; position: relative; overflow: hidden; border: 1px solid #c6cbd1; margin-bottom: 8px; min-height: 280px;">
             <div style="position: absolute; top: 0; right: 0; width: 150px; height: 150px; background: ${category.color || '#6b7280'}; opacity: 0.03; border-radius: 0 0 0 100%;"></div>
             <div style="position: relative;">
               <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
@@ -451,7 +456,7 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
-            <div style="border-top: 2px solid ${category.color || '#6b7280'}22; padding-top: 15px; margin-top: 15px; background: white; border-radius: 8px; padding: 12px; margin: 15px -5px -5px -5px;">
+            <div style="border-top: 2px solid ${category.color || '#6b7280'}33; padding-top: 15px; margin-top: 20px; background: #f8f9fa; border-radius: 8px; padding: 12px; margin: 15px -5px -5px -5px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.08); border: 1px solid #e5e7eb;">
               <div style="font-size: 13px; color: #374151; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px;">Distribuição por Status:</div>
               <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 14px;">
                 <div style="display: flex; align-items: center; gap: 6px;">
