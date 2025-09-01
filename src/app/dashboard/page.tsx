@@ -286,15 +286,17 @@ export default function DashboardPage() {
     try {
       setLoading(true)
       
-      const params = new URLSearchParams()
+      const params = new URLSearchParams({
+        start_date: periodFilter.start_date,
+        end_date: periodFilter.end_date
+      })
       
       // Add user filter if "Meus Tickets" is active
       if (myTicketsOnly && session?.user?.id) {
         params.append('user_id', session.user.id)
       }
       
-      const url = params.toString() ? `/api/dashboard/stats?${params}` : '/api/dashboard/stats'
-      const response = await axios.get(url)
+      const response = await axios.get(`/api/dashboard/stats?${params}`)
       
       if (response.data) {
         setStats(response.data.stats)

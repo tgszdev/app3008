@@ -12,11 +12,23 @@ export async function GET(request: NextRequest) {
 
     const searchParams = request.nextUrl.searchParams
     const userId = searchParams.get('user_id')
+    const startDate = searchParams.get('start_date')
+    const endDate = searchParams.get('end_date')
+    
+    // If no dates provided, use current month
+    const now = new Date()
+    const defaultStartDate = startDate || new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
+    const defaultEndDate = endDate || new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
 
     // Get ticket statistics
     let query = supabaseAdmin
       .from('tickets')
       .select('id, status, created_at, updated_at, created_by')
+    
+    // Apply date filter
+    query = query
+      .gte('created_at', `${defaultStartDate}T00:00:00`)
+      .lte('created_at', `${defaultEndDate}T23:59:59`)
     
     // Apply user filter if provided
     if (userId) {
@@ -78,6 +90,8 @@ export async function GET(request: NextRequest) {
           email
         )
       `)
+      .gte('created_at', `${defaultStartDate}T00:00:00`)
+      .lte('created_at', `${defaultEndDate}T23:59:59`)
       .order('created_at', { ascending: false })
       .limit(5)
     
