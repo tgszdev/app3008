@@ -427,28 +427,48 @@ export default function DashboardPage() {
         const borderColor = category.color || '#d1d5db'
         
         pdfHTML += `
-          <div style="border: 2px solid ${borderColor}; background: ${bgColor}; padding: 20px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); page-break-inside: avoid;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-              <div style="flex-grow: 1;">
-                <h3 style="margin: 0; font-size: 18px; color: #111827; font-weight: 700; text-transform: uppercase;">${category.nome}</h3>
-                <div style="margin-top: 10px;">
-                  <div style="background: #e5e7eb; border-radius: 6px; height: 10px; overflow: hidden;">
-                    <div style="background: ${category.color || '#6b7280'}; height: 100%; width: ${category.percentual}%;" title="${category.percentual.toFixed(1)}%"></div>
+          <div style="border: 2px solid ${borderColor}; background: linear-gradient(135deg, ${bgColor} 0%, white 100%); padding: 20px; border-radius: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.08); page-break-inside: avoid; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; right: 0; width: 100px; height: 100px; background: ${category.color || '#6b7280'}; opacity: 0.05; border-radius: 0 0 0 100%;"></div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; position: relative;">
+              <div style="flex-grow: 1; max-width: calc(100% - 100px);">
+                <h3 style="margin: 0; font-size: 18px; color: #111827; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${category.nome}</h3>
+                <div style="margin-top: 12px;">
+                  <div style="background: #e5e7eb; border-radius: 8px; height: 12px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
+                    <div style="background: linear-gradient(90deg, ${category.color || '#6b7280'} 0%, ${category.color ? category.color + 'cc' : '#4b5563'} 100%); height: 100%; width: ${category.percentual}%; transition: width 0.5s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.1);" title="${category.percentual.toFixed(1)}%"></div>
                   </div>
-                  <div style="font-size: 24px; font-weight: bold; color: ${category.color || '#6b7280'}; margin-top: 10px;">${category.percentual.toFixed(1)}%</div>
+                  <div style="font-size: 28px; font-weight: bold; color: ${category.color || '#6b7280'}; margin-top: 12px; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">${category.percentual.toFixed(1)}%</div>
                 </div>
               </div>
-              <div style="display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; background: ${category.color || '#6b7280'}; color: white; border-radius: 50%; font-size: 24px; font-weight: bold; margin-left: 20px; flex-shrink: 0;">
-                ${category.quantidade}
+              <div style="position: relative; margin-left: 20px; flex-shrink: 0;">
+                <div style="display: flex; align-items: center; justify-content: center; width: 70px; height: 70px; background: linear-gradient(135deg, ${category.color || '#6b7280'} 0%, ${category.color ? category.color + 'dd' : '#4b5563'} 100%); color: white; border-radius: 50%; font-size: 28px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.1); border: 3px solid white;">
+                  ${category.quantidade}
+                </div>
+                <div style="position: absolute; top: -2px; right: -2px; width: 74px; height: 74px; border-radius: 50%; border: 2px solid ${category.color || '#6b7280'}; opacity: 0.3; pointer-events: none;"></div>
               </div>
             </div>
-            <div style="border-top: 1px solid #e5e7eb; padding-top: 15px; margin-top: 15px;">
-              <div style="font-size: 12px; color: #374151; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Distribuição por Status:</div>
-              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; font-size: 13px;">
-                <div style="color: #d97706;"><strong>Abertos:</strong> ${category.status_breakdown.open}</div>
-                <div style="color: #ea580c;"><strong>Em Progresso:</strong> ${category.status_breakdown.in_progress}</div>
-                <div style="color: #16a34a;"><strong>Resolvidos:</strong> ${category.status_breakdown.resolved}</div>
-                <div style="color: #dc2626;"><strong>Cancelados:</strong> ${category.status_breakdown.cancelled}</div>
+            <div style="border-top: 2px solid ${category.color || '#6b7280'}22; padding-top: 15px; margin-top: 15px; background: white; border-radius: 8px; padding: 12px; margin: 15px -5px -5px -5px;">
+              <div style="font-size: 13px; color: #374151; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px;">Distribuição por Status:</div>
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 14px;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="display: inline-block; width: 8px; height: 8px; background: #fbbf24; border-radius: 50%;"></span>
+                  <span style="color: #92400e; font-weight: 600;">Abertos:</span>
+                  <span style="color: #d97706; font-weight: 700;">${category.status_breakdown.open}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="display: inline-block; width: 8px; height: 8px; background: #fb923c; border-radius: 50%;"></span>
+                  <span style="color: #7c2d12; font-weight: 600;">Em Progresso:</span>
+                  <span style="color: #ea580c; font-weight: 700;">${category.status_breakdown.in_progress}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="display: inline-block; width: 8px; height: 8px; background: #4ade80; border-radius: 50%;"></span>
+                  <span style="color: #14532d; font-weight: 600;">Resolvidos:</span>
+                  <span style="color: #16a34a; font-weight: 700;">${category.status_breakdown.resolved}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="display: inline-block; width: 8px; height: 8px; background: #f87171; border-radius: 50%;"></span>
+                  <span style="color: #7f1d1d; font-weight: 600;">Cancelados:</span>
+                  <span style="color: #dc2626; font-weight: 700;">${category.status_breakdown.cancelled}</span>
+                </div>
               </div>
             </div>
           </div>
