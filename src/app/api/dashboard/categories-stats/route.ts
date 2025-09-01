@@ -159,12 +159,19 @@ export async function GET(request: Request) {
     let averageResolutionTime = '0h 0m'
     
     if (resolvedTickets.length > 0) {
-      const { data: resolvedWithUpdated } = await supabase
+      let resolvedQuery = supabaseAdmin
         .from('tickets')
         .select('created_at, updated_at')
         .eq('status', 'resolved')
         .gte('created_at', `${filterStartDate}T00:00:00`)
         .lte('created_at', `${filterEndDate}T23:59:59`)
+      
+      // Apply user filter if provided
+      if (userId) {
+        resolvedQuery = resolvedQuery.eq('created_by', userId)
+      }
+      
+      const { data: resolvedWithUpdated } = await resolvedQuery
 
       if (resolvedWithUpdated && resolvedWithUpdated.length > 0) {
         const totalTime = resolvedWithUpdated.reduce((acc, ticket) => {
