@@ -1,55 +1,139 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
+import { auth } from '@/lib/auth'
 
-// GET - Listar categorias
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+// GET /api/knowledge-base/categories - Listar todas as categorias
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams
-    const withCount = searchParams.get('with_count') === 'true'
+    const session = await auth()
+    
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
 
-    // Buscar categorias
-    const { data: categories, error } = await supabaseAdmin
+    // Buscar todas as categorias com contagem de artigos
+    const { data: categories, error } = await supabase
       .from('kb_categories')
-      .select('*')
-      .eq('is_active', true)
-      .order('order_index', { ascending: true })
+      .select(`
+        *,
+        article_count:kb_articles(count)
+      `)
+      .order('display_order', { ascending: true })
 
     if (error) {
       console.error('Erro ao buscar categorias:', error)
+      return NextResponse.json({ error: 'Erro ao buscar categorias' }, { status: 500 })
+    }
+
+    // Formatar a resposta
+    const formattedCategories = categories?.map(category => {
+      // Extrair a contagem de artigos
+      const articleCount = (category.article_count as any)?.[0]?.count || 0
+      
+      return {
+        id: category.id,
+        name: category.name,
+        slug: category.slug,
+        description: category.description,
+        icon: category.icon,
+        color: category.color,
+        display_order: category.display_order,
+        created_at: category.created_at,
+        article_count: articleCount
+      }
+    }) || []
+
+    return NextResponse.json({
+      categories: formattedCategories
+    })
+
+  } catch (error) {
+    console.error('Erro ao buscar categorias:', error)
+    return NextResponse.json(
+      { error: 'Erro ao buscar categorias' },
+      { status: 500 }
+    )
+  }
+}
+
+// POST /api/knowledge-base/categories - Criar nova categoria (admin only)
+export async function POST(request: NextRequest) {
+  try {
+    const session = await auth()
+    
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+
+    // Verificar se é admin
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('email', session.user.email)
+      .single()
+
+    if (!profile || profile.role !== 'admin') {
+      return NextResponse.json({ error: 'Apenas administradores podem criar categorias' }, { status: 403 })
+    }
+
+    const body = await request.json()
+    const { name, slug, description, icon, color, display_order } = body
+
+    // Validar campos obrigatórios
+    if (!name || !slug) {
       return NextResponse.json(
-        { error: 'Erro ao buscar categorias', details: error.message },
-        { status: 500 }
+        { error: 'Nome e slug são obrigatórios' },
+        { status: 400 }
       )
     }
 
-    // Se requisitado, adicionar contagem de artigos
-    let categoriesWithCount = categories || []
-    
-    if (withCount) {
-      categoriesWithCount = await Promise.all(
-        categories.map(async (category) => {
-          const { count } = await supabaseAdmin
-            .from('kb_articles')
-            .select('*', { count: 'exact', head: true })
-            .eq('category_id', category.id)
-            .eq('status', 'published')
+    // Verificar se o slug já existe
+    const { data: existingCategory } = await supabase
+      .from('kb_categories')
+      .select('id')
+      .eq('slug', slug)
+      .single()
 
-          return {
-            ...category,
-            article_count: count || 0
-          }
-        })
+    if (existingCategory) {
+      return NextResponse.json(
+        { error: 'Já existe uma categoria com este slug' },
+        { status: 400 }
       )
+    }
+
+    // Criar categoria
+    const { data: category, error } = await supabase
+      .from('kb_categories')
+      .insert({
+        name,
+        slug,
+        description,
+        icon: icon || 'FileText',
+        color: color || '#6366F1',
+        display_order: display_order || 999
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Erro ao criar categoria:', error)
+      return NextResponse.json({ error: 'Erro ao criar categoria' }, { status: 500 })
     }
 
     return NextResponse.json({
-      categories: categoriesWithCount
+      message: 'Categoria criada com sucesso',
+      category
     })
 
-  } catch (error: any) {
-    console.error('Erro na API de categorias:', error)
+  } catch (error) {
+    console.error('Erro ao criar categoria:', error)
     return NextResponse.json(
-      { error: 'Erro interno do servidor', message: error.message },
+      { error: 'Erro ao criar categoria' },
       { status: 500 }
     )
   }

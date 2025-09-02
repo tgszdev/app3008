@@ -1,50 +1,59 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
+import { auth } from '@/lib/auth'
 
-// GET - Obter estatísticas da base de conhecimento
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+// GET /api/knowledge-base/stats - Obter estatísticas da base de conhecimento
 export async function GET(request: NextRequest) {
   try {
-    // Contar total de artigos publicados
-    const { count: totalArticles } = await supabaseAdmin
+    const session = await auth()
+    
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+
+    // Buscar total de artigos publicados
+    const { count: totalArticles } = await supabase
       .from('kb_articles')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'published')
 
-    // Contar total de categorias ativas
-    const { count: totalCategories } = await supabaseAdmin
+    // Buscar total de categorias
+    const { count: totalCategories } = await supabase
       .from('kb_categories')
       .select('*', { count: 'exact', head: true })
-      .eq('is_active', true)
 
-    // Somar total de visualizações
-    const { data: viewsData } = await supabaseAdmin
+    // Buscar total de visualizações
+    const { data: viewsData } = await supabase
       .from('kb_articles')
       .select('view_count')
       .eq('status', 'published')
 
     const totalViews = viewsData?.reduce((sum, article) => sum + (article.view_count || 0), 0) || 0
 
-    // Calcular taxa de utilidade
-    const { data: feedbackData } = await supabaseAdmin
+    // Calcular taxa de ajuda
+    const { data: feedbackData } = await supabase
       .from('kb_articles')
       .select('helpful_count, not_helpful_count')
       .eq('status', 'published')
 
-    let totalHelpful = 0
-    let totalNotHelpful = 0
-    
-    feedbackData?.forEach(article => {
-      totalHelpful += article.helpful_count || 0
-      totalNotHelpful += article.not_helpful_count || 0
-    })
-
-    const totalFeedback = totalHelpful + totalNotHelpful
-    const helpfulPercentage = totalFeedback > 0 
-      ? Math.round((totalHelpful / totalFeedback) * 100)
-      : 0
+    let helpfulPercentage = 0
+    if (feedbackData && feedbackData.length > 0) {
+      const totalHelpful = feedbackData.reduce((sum, article) => sum + (article.helpful_count || 0), 0)
+      const totalNotHelpful = feedbackData.reduce((sum, article) => sum + (article.not_helpful_count || 0), 0)
+      const totalFeedback = totalHelpful + totalNotHelpful
+      
+      if (totalFeedback > 0) {
+        helpfulPercentage = Math.round((totalHelpful / totalFeedback) * 100)
+      }
+    }
 
     // Buscar artigos populares (mais visualizados)
-    const { data: popularArticles } = await supabaseAdmin
+    const { data: popularArticles } = await supabase
       .from('kb_articles')
       .select(`
         id,
@@ -53,20 +62,14 @@ export async function GET(request: NextRequest) {
         excerpt,
         view_count,
         helpful_count,
-        category:kb_categories (
-          id,
-          name,
-          slug,
-          icon,
-          color
-        )
+        category:kb_categories(id, name, slug, icon, color)
       `)
       .eq('status', 'published')
       .order('view_count', { ascending: false })
       .limit(5)
 
     // Buscar artigos recentes
-    const { data: recentArticles } = await supabaseAdmin
+    const { data: recentArticles } = await supabase
       .from('kb_articles')
       .select(`
         id,
@@ -74,13 +77,7 @@ export async function GET(request: NextRequest) {
         slug,
         excerpt,
         created_at,
-        category:kb_categories (
-          id,
-          name,
-          slug,
-          icon,
-          color
-        )
+        category:kb_categories(id, name, slug, icon, color)
       `)
       .eq('status', 'published')
       .order('created_at', { ascending: false })
@@ -95,10 +92,10 @@ export async function GET(request: NextRequest) {
       recent_articles: recentArticles || []
     })
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao buscar estatísticas:', error)
     return NextResponse.json(
-      { error: 'Erro interno do servidor', message: error.message },
+      { error: 'Erro ao buscar estatísticas' },
       { status: 500 }
     )
   }
