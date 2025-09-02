@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
-import { Server, BookOpen, Mail, Settings } from 'lucide-react'
+import { BookOpen, Mail, Settings, Shield, Bell, Database } from 'lucide-react'
 import SQLInstructionsModal from '@/components/SQLInstructionsModal'
 import ProfileCategorySettings from '@/components/ProfileCategorySettings'
 import EmailConfigModal from '@/components/EmailConfigModal'
+import toast from 'react-hot-toast'
 
 export default function SettingsPage() {
   const { data: session } = useSession()
@@ -33,6 +34,13 @@ export default function SettingsPage() {
     )
   }
 
+  const handleComingSoon = (feature: string) => {
+    toast('🚧 ' + feature + ' - Em breve!', {
+      icon: '🔨',
+      duration: 2000
+    })
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -46,11 +54,11 @@ export default function SettingsPage() {
       </div>
 
       {/* Cards de Configuração */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {/* Email Configuration Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center mb-4">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
+          <div className="flex items-start mb-4">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex-shrink-0">
               <Mail className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div className="ml-3">
@@ -63,23 +71,23 @@ export default function SettingsPage() {
             </div>
           </div>
           
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-grow">
             Configure o servidor SMTP para envio de emails de notificação do sistema
           </p>
           
           <button
             onClick={() => setEmailModalOpen(true)}
-            className="w-full inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
           >
-            <Server className="h-5 w-5 mr-2" />
+            <Settings className="h-5 w-5 mr-2" />
             Configurar Email
           </button>
         </div>
 
         {/* Knowledge Base Permissions Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center mb-4">
-            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
+          <div className="flex items-start mb-4">
+            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex-shrink-0">
               <BookOpen className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div className="ml-3">
@@ -92,7 +100,99 @@ export default function SettingsPage() {
             </div>
           </div>
           
-          <ProfileCategorySettings />
+          <div className="flex-grow flex flex-col">
+            <ProfileCategorySettings />
+          </div>
+        </div>
+
+        {/* Security Settings Card (Coming Soon) */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full opacity-75">
+          <div className="flex items-start mb-4">
+            <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg flex-shrink-0">
+              <Shield className="h-6 w-6 text-red-600 dark:text-red-400" />
+            </div>
+            <div className="ml-3">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Configurações de Segurança
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Políticas e autenticação
+              </p>
+            </div>
+          </div>
+          
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-grow">
+            Configure políticas de senha, autenticação de dois fatores e sessões
+          </p>
+          
+          <button
+            onClick={() => handleComingSoon('Configurações de Segurança')}
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-400 text-white font-medium rounded-lg cursor-not-allowed opacity-60"
+            disabled
+          >
+            <Settings className="h-5 w-5 mr-2" />
+            Em Breve
+          </button>
+        </div>
+
+        {/* Notifications Settings Card (Coming Soon) */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full opacity-75">
+          <div className="flex items-start mb-4">
+            <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex-shrink-0">
+              <Bell className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+            </div>
+            <div className="ml-3">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Notificações
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Alertas e comunicações
+              </p>
+            </div>
+          </div>
+          
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-grow">
+            Configure tipos de notificações, frequência e canais de envio
+          </p>
+          
+          <button
+            onClick={() => handleComingSoon('Configurações de Notificações')}
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-400 text-white font-medium rounded-lg cursor-not-allowed opacity-60"
+            disabled
+          >
+            <Settings className="h-5 w-5 mr-2" />
+            Em Breve
+          </button>
+        </div>
+
+        {/* Backup Settings Card (Coming Soon) */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full opacity-75">
+          <div className="flex items-start mb-4">
+            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg flex-shrink-0">
+              <Database className="h-6 w-6 text-green-600 dark:text-green-400" />
+            </div>
+            <div className="ml-3">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Backup e Restauração
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Gerenciamento de dados
+              </p>
+            </div>
+          </div>
+          
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-grow">
+            Configure backups automáticos e restauração de dados do sistema
+          </p>
+          
+          <button
+            onClick={() => handleComingSoon('Backup e Restauração')}
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-400 text-white font-medium rounded-lg cursor-not-allowed opacity-60"
+            disabled
+          >
+            <Settings className="h-5 w-5 mr-2" />
+            Em Breve
+          </button>
         </div>
       </div>
 

@@ -154,18 +154,18 @@ export default function ProfileCategorySettings() {
   return (
     <>
       {/* Botão para abrir o modal */}
-      <div className="flex flex-col items-center py-6">
+      <>
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
           Defina quais categorias cada perfil de usuário pode visualizar na Base de Conhecimento
         </p>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          className="w-full inline-flex items-center justify-center px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
         >
           <Settings className="h-5 w-5 mr-2" />
           Configurar Permissões
         </button>
-      </div>
+      </>
 
       {/* Modal */}
       {isModalOpen && (
