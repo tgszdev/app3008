@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
-import { Save, Bell, Shield, Palette, Globe, User, Mail, Phone, Server, Eye, EyeOff, TestTube } from 'lucide-react'
+import { Save, Bell, Shield, Palette, Globe, User, Mail, Phone, Server, Eye, EyeOff, TestTube, BookOpen } from 'lucide-react'
 import toast from 'react-hot-toast'
 import SQLInstructionsModal from '@/components/SQLInstructionsModal'
+import ProfileCategorySettings from '@/components/ProfileCategorySettings'
 
 export default function SettingsPage() {
   const { data: session } = useSession()
+  const isAdmin = (session?.user as any)?.role === 'admin'
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [testingEmail, setTestingEmail] = useState(false)
@@ -551,6 +553,27 @@ export default function SettingsPage() {
             <Save className="h-4 w-4 mr-2" />
             Salvar Configuração
           </button>
+        </div>
+      </div>
+      )}
+
+      {/* Configuração de Perfis e Categorias da Base de Conhecimento - Admin Only */}
+      {isAdmin && (
+      <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center">
+            <BookOpen className="h-6 w-6 mr-3 text-purple-600 dark:text-purple-400" />
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Configuração de Perfis - Base de Conhecimento
+            </h2>
+          </div>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            Configure quais categorias cada perfil pode visualizar na Base de Conhecimento
+          </p>
+        </div>
+
+        <div className="p-6 space-y-6">
+          <ProfileCategorySettings />
         </div>
       </div>
       )}

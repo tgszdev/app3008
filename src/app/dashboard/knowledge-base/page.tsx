@@ -217,6 +217,16 @@ export default function KnowledgeBasePage() {
           </div>
           
           <div className="flex items-center space-x-3">
+            {isAdmin && (
+              <button
+                onClick={() => router.push('/dashboard/knowledge-base/categories')}
+                className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur border border-white/30 rounded-lg text-white hover:bg-white/30 transition-colors"
+              >
+                <Grid className="h-5 w-5 mr-2" />
+                Nova Categoria
+              </button>
+            )}
+            
             {canEdit && (
               <button
                 onClick={createNewArticle}

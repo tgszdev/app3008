@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 
-// GET /api/knowledge-base/categories - Listar todas as categorias
+// GET /api/knowledge-base/categories - Listar categorias (filtradas por permissão)
 export async function GET(request: NextRequest) {
   try {
     const session = await auth()
@@ -11,7 +11,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    console.log('Buscando categorias...')
+    const userRole = (session.user as any)?.role || 'user'
+    console.log('Buscando categorias para role:', userRole)
     
     // Primeiro, tentar buscar apenas as categorias sem JOIN e sem ordenação
     let { data: simpleCategories, error: simpleError } = await supabaseAdmin
@@ -78,10 +79,36 @@ export async function GET(request: NextRequest) {
     // Ordenar por display_order (já que pode não ter vindo ordenado do banco)
     categoriesWithCount.sort((a, b) => a.display_order - b.display_order)
     
-    console.log('Categorias finais:', categoriesWithCount)
+    // Filtrar categorias baseado nas permissões do usuário
+    let filteredCategories = categoriesWithCount
+    
+    // Buscar permissões do role do usuário
+    try {
+      const { data: rolePermission } = await supabaseAdmin
+        .from('kb_role_permissions')
+        .select('allowed_categories')
+        .eq('role', userRole)
+        .single()
+      
+      if (rolePermission && rolePermission.allowed_categories && rolePermission.allowed_categories.length > 0) {
+        // Se há categorias específicas permitidas, filtrar
+        filteredCategories = categoriesWithCount.filter(cat => 
+          rolePermission.allowed_categories.includes(cat.id)
+        )
+        console.log('Categorias filtradas por permissão:', filteredCategories.length)
+      } else {
+        // Se não há restrições ou array vazio, mostrar todas
+        console.log('Sem restrições de categoria para o role:', userRole)
+      }
+    } catch (permError) {
+      console.log('Erro ao buscar permissões (usando todas as categorias):', permError)
+      // Se houver erro, mostrar todas as categorias
+    }
+    
+    console.log('Categorias finais:', filteredCategories.length)
     
     return NextResponse.json({
-      categories: categoriesWithCount
+      categories: filteredCategories
     })
 
 
