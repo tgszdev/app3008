@@ -276,19 +276,19 @@ export default function SettingsPage() {
 
       {/* Configuração de Perfis e Categorias da Base de Conhecimento */}
       <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center">
-            <BookOpen className="h-6 w-6 mr-3 text-purple-600 dark:text-purple-400" />
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <BookOpen className="h-5 w-5 mr-2 text-purple-600 dark:text-purple-400" />
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               Configuração de Perfis - Base de Conhecimento
             </h2>
           </div>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
             Configure quais categorias cada perfil pode visualizar na Base de Conhecimento
           </p>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="p-4">
           <ProfileCategorySettings />
         </div>
       </div>
