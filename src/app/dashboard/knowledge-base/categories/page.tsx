@@ -13,18 +13,83 @@ import {
   Loader2,
   Grid,
   FileText,
-  Rocket,
-  BookOpen,
-  Wrench,
-  HelpCircle,
-  Lightbulb,
-  Shield,
-  Code,
-  TrendingUp,
-  BookMarked,
   Palette,
-  GripVertical
+  GripVertical,
+  Search,
+  ChevronDown,
+  Package,
+  Package2,
+  PackageCheck,
+  PackageX,
+  PackageSearch,
+  PackagePlus,
+  PackageMinus,
+  Boxes,
+  Warehouse,
+  Truck,
+  ShoppingCart,
+  ShoppingBag,
+  Archive,
+  Box,
+  Container,
+  Map,
+  Navigation,
+  Compass,
+  Plane,
+  Ship,
+  Car,
+  Bike,
+  Route,
+  MapPin,
+  Clipboard,
+  ClipboardList,
+  ClipboardCheck,
+  ListChecks,
+  Layers,
+  LayoutGrid,
+  Grid3x3,
+  ScanLine,
+  QrCode,
+  Scan,
+  BookOpen,
+  Briefcase,
+  HelpCircle,
+  Info,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Calendar,
+  Settings,
+  Wrench,
+  Shield,
+  Lock,
+  Key,
+  Database,
+  Server,
+  Cloud,
+  Wifi,
+  Cpu,
+  Monitor,
+  Mail,
+  Phone,
+  MessageSquare,
+  Send,
+  DollarSign,
+  CreditCard,
+  BarChart,
+  TrendingUp,
+  Users,
+  User,
+  UserCheck,
+  Home,
+  Star,
+  Flag,
+  Tag,
+  Zap,
+  Activity,
+  Folder
 } from 'lucide-react'
+import { getIcon } from '@/lib/icons'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
@@ -40,18 +105,105 @@ interface Category {
   created_at: string
 }
 
-const AVAILABLE_ICONS = [
-  { name: 'FileText', icon: FileText },
-  { name: 'Rocket', icon: Rocket },
-  { name: 'BookOpen', icon: BookOpen },
-  { name: 'Wrench', icon: Wrench },
-  { name: 'HelpCircle', icon: HelpCircle },
-  { name: 'Lightbulb', icon: Lightbulb },
-  { name: 'Shield', icon: Shield },
-  { name: 'Code', icon: Code },
-  { name: 'TrendingUp', icon: TrendingUp },
-  { name: 'BookMarked', icon: BookMarked },
-  { name: 'Grid', icon: Grid }
+// Lista de ícones disponíveis com foco em logística e WMS
+const iconsList = [
+  // WMS - Warehouse Management System
+  { value: 'warehouse', label: 'Armazém', icon: 'Warehouse' },
+  { value: 'package', label: 'Pacote', icon: 'Package' },
+  { value: 'package-2', label: 'Caixa Aberta', icon: 'Package2' },
+  { value: 'package-check', label: 'Pacote Verificado', icon: 'PackageCheck' },
+  { value: 'package-x', label: 'Pacote Rejeitado', icon: 'PackageX' },
+  { value: 'package-search', label: 'Buscar Pacote', icon: 'PackageSearch' },
+  { value: 'package-plus', label: 'Adicionar Pacote', icon: 'PackagePlus' },
+  { value: 'package-minus', label: 'Remover Pacote', icon: 'PackageMinus' },
+  { value: 'boxes', label: 'Múltiplas Caixas', icon: 'Boxes' },
+  { value: 'container', label: 'Container', icon: 'Container' },
+  { value: 'pallet', label: 'Palete', icon: 'Package' },
+  { value: 'barcode', label: 'Código de Barras', icon: 'ScanLine' },
+  { value: 'qr-code', label: 'QR Code', icon: 'QrCode' },
+  { value: 'scan', label: 'Scanner', icon: 'Scan' },
+  { value: 'forklift', label: 'Empilhadeira', icon: 'Truck' },
+  
+  // Logística e Transporte
+  { value: 'truck', label: 'Caminhão', icon: 'Truck' },
+  { value: 'truck-delivery', label: 'Entrega', icon: 'Truck' },
+  { value: 'shopping-cart', label: 'Carrinho', icon: 'ShoppingCart' },
+  { value: 'shopping-bag', label: 'Sacola', icon: 'ShoppingBag' },
+  { value: 'archive', label: 'Arquivo', icon: 'Archive' },
+  { value: 'box', label: 'Caixa', icon: 'Box' },
+  { value: 'map', label: 'Mapa', icon: 'Map' },
+  { value: 'navigation', label: 'Navegação', icon: 'Navigation' },
+  { value: 'compass', label: 'Bússola', icon: 'Compass' },
+  { value: 'plane', label: 'Avião', icon: 'Plane' },
+  { value: 'ship', label: 'Navio', icon: 'Ship' },
+  { value: 'car', label: 'Carro', icon: 'Car' },
+  { value: 'bike', label: 'Bicicleta', icon: 'Bike' },
+  { value: 'route', label: 'Rota', icon: 'Route' },
+  { value: 'map-pin', label: 'Local', icon: 'MapPin' },
+  
+  // Inventário e Estoque
+  { value: 'clipboard-list', label: 'Lista de Inventário', icon: 'ClipboardList' },
+  { value: 'clipboard-check', label: 'Checklist', icon: 'ClipboardCheck' },
+  { value: 'list-checks', label: 'Lista de Tarefas', icon: 'ListChecks' },
+  { value: 'layers', label: 'Camadas/Níveis', icon: 'Layers' },
+  { value: 'layout-grid', label: 'Grade de Layout', icon: 'LayoutGrid' },
+  { value: 'grid-3x3', label: 'Grade 3x3', icon: 'Grid3x3' },
+  
+  // Documentação e Gestão
+  { value: 'file-text', label: 'Documento', icon: 'FileText' },
+  { value: 'clipboard', label: 'Prancheta', icon: 'Clipboard' },
+  { value: 'book-open', label: 'Manual', icon: 'BookOpen' },
+  { value: 'folder', label: 'Pasta', icon: 'Folder' },
+  { value: 'briefcase', label: 'Maleta', icon: 'Briefcase' },
+  
+  // Status e Alertas
+  { value: 'help-circle', label: 'Ajuda', icon: 'HelpCircle' },
+  { value: 'info', label: 'Informação', icon: 'Info' },
+  { value: 'alert-circle', label: 'Alerta', icon: 'AlertCircle' },
+  { value: 'check-circle', label: 'Concluído', icon: 'CheckCircle' },
+  { value: 'clock', label: 'Tempo', icon: 'Clock' },
+  { value: 'calendar', label: 'Calendário', icon: 'Calendar' },
+  
+  // Ferramentas e Configurações
+  { value: 'settings', label: 'Configurações', icon: 'Settings' },
+  { value: 'tool', label: 'Ferramenta', icon: 'Wrench' },
+  { value: 'wrench', label: 'Chave Inglesa', icon: 'Wrench' },
+  { value: 'shield', label: 'Segurança', icon: 'Shield' },
+  { value: 'lock', label: 'Bloqueado', icon: 'Lock' },
+  { value: 'key', label: 'Chave', icon: 'Key' },
+  
+  // Tecnologia
+  { value: 'database', label: 'Banco de Dados', icon: 'Database' },
+  { value: 'server', label: 'Servidor', icon: 'Server' },
+  { value: 'cloud', label: 'Nuvem', icon: 'Cloud' },
+  { value: 'wifi', label: 'Wi-Fi', icon: 'Wifi' },
+  { value: 'cpu', label: 'Processador', icon: 'Cpu' },
+  { value: 'monitor', label: 'Monitor', icon: 'Monitor' },
+  
+  // Comunicação
+  { value: 'mail', label: 'E-mail', icon: 'Mail' },
+  { value: 'phone', label: 'Telefone', icon: 'Phone' },
+  { value: 'message-square', label: 'Mensagem', icon: 'MessageSquare' },
+  { value: 'send', label: 'Enviar', icon: 'Send' },
+  
+  // Finanças
+  { value: 'dollar-sign', label: 'Financeiro', icon: 'DollarSign' },
+  { value: 'credit-card', label: 'Cartão', icon: 'CreditCard' },
+  { value: 'bar-chart', label: 'Gráfico', icon: 'BarChart' },
+  { value: 'trending-up', label: 'Crescimento', icon: 'TrendingUp' },
+  
+  // Usuários
+  { value: 'users', label: 'Equipe', icon: 'Users' },
+  { value: 'user', label: 'Usuário', icon: 'User' },
+  { value: 'user-check', label: 'Usuário Verificado', icon: 'UserCheck' },
+  
+  // Outros
+  { value: 'home', label: 'Início', icon: 'Home' },
+  { value: 'star', label: 'Favorito', icon: 'Star' },
+  { value: 'flag', label: 'Bandeira', icon: 'Flag' },
+  { value: 'tag', label: 'Etiqueta', icon: 'Tag' },
+  { value: 'zap', label: 'Energia', icon: 'Zap' },
+  { value: 'activity', label: 'Atividade', icon: 'Activity' }
 ]
 
 const PRESET_COLORS = [
@@ -77,12 +229,14 @@ export default function CategoriesPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [saving, setSaving] = useState(false)
+  const [showIconDropdown, setShowIconDropdown] = useState(false)
+  const [iconSearchTerm, setIconSearchTerm] = useState('')
   
   // Form state
   const [name, setName] = useState('')
   const [slug, setSlug] = useState('')
   const [description, setDescription] = useState('')
-  const [icon, setIcon] = useState('FileText')
+  const [icon, setIcon] = useState('file-text')
   const [color, setColor] = useState('#6366F1')
   const [displayOrder, setDisplayOrder] = useState(999)
 
@@ -123,11 +277,13 @@ export default function CategoriesPage() {
     setName('')
     setSlug('')
     setDescription('')
-    setIcon('FileText')
+    setIcon('file-text')
     setColor('#6366F1')
     setDisplayOrder(999)
     setEditingCategory(null)
     setShowForm(false)
+    setShowIconDropdown(false)
+    setIconSearchTerm('')
   }
 
   const handleEdit = (category: Category) => {
@@ -223,10 +379,7 @@ export default function CategoriesPage() {
     }
   }
 
-  const getIconComponent = (iconName: string) => {
-    const iconData = AVAILABLE_ICONS.find(i => i.name === iconName)
-    return iconData?.icon || FileText
-  }
+
 
   if (loading) {
     return (
@@ -333,25 +486,123 @@ export default function CategoriesPage() {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Ícone
               </label>
-              <div className="grid grid-cols-6 gap-2">
-                {AVAILABLE_ICONS.map((iconData) => {
-                  const IconComponent = iconData.icon
-                  return (
-                    <button
-                      key={iconData.name}
-                      type="button"
-                      onClick={() => setIcon(iconData.name)}
-                      className={`p-2 rounded-lg border-2 transition-colors ${
-                        icon === iconData.name
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                          : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
-                      }`}
-                      title={iconData.name}
-                    >
-                      <IconComponent className="h-5 w-5 mx-auto" style={{ color: icon === iconData.name ? color : undefined }} />
-                    </button>
-                  )
-                })}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowIconDropdown(!showIconDropdown)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 flex items-center justify-between"
+                >
+                  <div className="flex items-center space-x-2">
+                    {icon ? (
+                      <>
+                        {(() => {
+                          const IconComponent = getIcon(icon)
+                          return <IconComponent className="h-4 w-4" />
+                        })()}
+                        <span>{iconsList.find(i => i.value === icon)?.label || icon}</span>
+                      </>
+                    ) : (
+                      <span className="text-gray-500">Selecione...</span>
+                    )}
+                  </div>
+                  <ChevronDown className="h-4 w-4" />
+                </button>
+                
+                {showIconDropdown && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    {/* Overlay */}
+                    <div 
+                      className="fixed inset-0 bg-black bg-opacity-50" 
+                      onClick={() => {
+                        setShowIconDropdown(false)
+                        setIconSearchTerm('')
+                      }}
+                    />
+                    
+                    {/* Popup Modal */}
+                    <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+                      {/* Header */}
+                      <div className="bg-gray-50 dark:bg-gray-900 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Selecionar Ícone</h3>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowIconDropdown(false)
+                              setIconSearchTerm('')
+                            }}
+                            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                          >
+                            <X className="h-5 w-5" />
+                          </button>
+                        </div>
+                        
+                        {/* Search Bar */}
+                        <div className="mt-3">
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <input
+                              type="text"
+                              placeholder="Buscar ícone..."
+                              value={iconSearchTerm}
+                              onChange={(e) => setIconSearchTerm(e.target.value)}
+                              className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              autoFocus
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Icons Grid */}
+                      <div className="p-4 overflow-y-auto max-h-[60vh]">
+                        <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                          {iconsList
+                            .filter(iconItem => 
+                              iconItem.label.toLowerCase().includes(iconSearchTerm.toLowerCase()) ||
+                              iconItem.value.toLowerCase().includes(iconSearchTerm.toLowerCase())
+                            )
+                            .map(iconItem => {
+                              const IconComponent = getIcon(iconItem.value)
+                              const isSelected = icon === iconItem.value
+                              return (
+                                <button
+                                  key={iconItem.value}
+                                  type="button"
+                                  onClick={() => {
+                                    setIcon(iconItem.value)
+                                    setShowIconDropdown(false)
+                                    setIconSearchTerm('')
+                                  }}
+                                  className={`
+                                    flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all
+                                    ${isSelected 
+                                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
+                                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                                    }
+                                  `}
+                                  title={iconItem.label}
+                                >
+                                  <IconComponent className={`h-6 w-6 mb-1 ${isSelected ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`} />
+                                  <span className={`text-xs ${isSelected ? 'text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-600 dark:text-gray-400'}`}>
+                                    {iconItem.label}
+                                  </span>
+                                </button>
+                              )
+                            })}
+                        </div>
+                        
+                        {iconsList.filter(iconItem => 
+                          iconItem.label.toLowerCase().includes(iconSearchTerm.toLowerCase()) ||
+                          iconItem.value.toLowerCase().includes(iconSearchTerm.toLowerCase())
+                        ).length === 0 && (
+                          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                            Nenhum ícone encontrado para "{iconSearchTerm}"
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             
@@ -455,7 +706,7 @@ export default function CategoriesPage() {
         ) : (
           <div className="divide-y divide-gray-200 dark:divide-gray-700">
             {categories.map((category) => {
-              const IconComponent = getIconComponent(category.icon)
+              const IconComponent = getIcon(category.icon)
               
               return (
                 <div
