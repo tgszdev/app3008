@@ -288,7 +288,6 @@ export const iconMap: Record<string, LucideIcon> = {
   'laptop': Laptop,
   'tv': Tv,
   'radio': Radio,
-  'layers': Layers,
   'layout': Layout,
   'grid': Grid,
   'list': List,
