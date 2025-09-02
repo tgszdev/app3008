@@ -10,7 +10,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 // POST /api/knowledge-base/article/[slug]/feedback - Enviar feedback do artigo
 export async function POST(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const session = await auth()
@@ -19,7 +19,7 @@ export async function POST(
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    const { slug } = params
+    const { slug } = await params
     const body = await request.json()
     const { helpful, comment } = body
 
@@ -121,7 +121,7 @@ export async function POST(
 // GET /api/knowledge-base/article/[slug]/feedback - Buscar feedback do usuário para o artigo
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const session = await auth()
@@ -130,7 +130,7 @@ export async function GET(
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    const { slug } = params
+    const { slug } = await params
 
     // Buscar o artigo pelo slug
     const { data: article, error: articleError } = await supabase

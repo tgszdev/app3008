@@ -4,10 +4,10 @@ import { supabaseAdmin } from '@/lib/supabase'
 // POST - Incrementar visualizações
 export async function POST(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const slug = params.slug
+    const { slug } = await params
 
     // Buscar artigo atual
     const { data: article, error: fetchError } = await supabaseAdmin

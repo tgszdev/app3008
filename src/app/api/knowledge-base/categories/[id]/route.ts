@@ -10,7 +10,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 // PUT /api/knowledge-base/categories/[id] - Atualizar categoria
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -30,7 +30,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Apenas administradores podem editar categorias' }, { status: 403 })
     }
 
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
     const { name, slug, description, icon, color, display_order } = body
 
@@ -94,7 +94,7 @@ export async function PUT(
 // DELETE /api/knowledge-base/categories/[id] - Deletar categoria
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -114,7 +114,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Apenas administradores podem excluir categorias' }, { status: 403 })
     }
 
-    const { id } = params
+    const { id } = await params
 
     // Verificar se a categoria possui artigos
     const { count } = await supabase

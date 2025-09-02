@@ -10,7 +10,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 // GET /api/knowledge-base/articles/[id] - Buscar artigo por ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -19,7 +19,7 @@ export async function GET(
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    const { id } = params
+    const { id } = await params
 
     // Buscar artigo com categoria, autor e tags
     const { data: article, error } = await supabase
@@ -64,7 +64,7 @@ export async function GET(
 // PUT /api/knowledge-base/articles/[id] - Atualizar artigo
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -84,7 +84,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Sem permissão para editar artigos' }, { status: 403 })
     }
 
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
     const {
       title,
@@ -219,7 +219,7 @@ export async function PUT(
 // DELETE /api/knowledge-base/articles/[id] - Deletar artigo
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -239,7 +239,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Apenas administradores podem excluir artigos' }, { status: 403 })
     }
 
-    const { id } = params
+    const { id } = await params
 
     // Deletar tags associadas
     await supabase

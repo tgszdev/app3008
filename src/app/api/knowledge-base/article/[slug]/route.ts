@@ -4,10 +4,10 @@ import { supabaseAdmin } from '@/lib/supabase'
 // GET - Buscar artigo por slug
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const slug = params.slug
+    const { slug } = await params
 
     // Buscar artigo
     const { data: article, error } = await supabaseAdmin
