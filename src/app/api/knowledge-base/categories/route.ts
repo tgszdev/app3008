@@ -13,11 +13,21 @@ export async function GET(request: NextRequest) {
 
     console.log('Buscando categorias...')
     
-    // Primeiro, tentar buscar apenas as categorias sem JOIN
-    const { data: simpleCategories, error: simpleError } = await supabaseAdmin
+    // Primeiro, tentar buscar apenas as categorias sem JOIN e sem ordenação
+    let { data: simpleCategories, error: simpleError } = await supabaseAdmin
       .from('kb_categories')
       .select('*')
-      .order('display_order', { ascending: true })
+    
+    // Se der erro, pode ser por causa de colunas faltantes
+    if (simpleError && simpleError.message?.includes('display_order')) {
+      console.log('Coluna display_order não existe, buscando sem ordenação')
+      const result = await supabaseAdmin
+        .from('kb_categories')
+        .select('id, name, slug, description, icon, color, created_at')
+      
+      simpleCategories = result.data
+      simpleError = result.error
+    }
     
     console.log('Categorias simples:', simpleCategories)
     console.log('Erro simples:', simpleError)
@@ -30,8 +40,18 @@ export async function GET(request: NextRequest) {
       })
     }
     
-    // Se conseguiu buscar as categorias, tentar adicionar a contagem
-    let categoriesWithCount = simpleCategories || []
+    // Se conseguiu buscar as categorias, normalizar os dados
+    let categoriesWithCount = (simpleCategories || []).map((cat, index) => ({
+      id: cat.id,
+      name: cat.name || 'Sem nome',
+      slug: cat.slug || '',
+      description: cat.description || '',
+      icon: cat.icon || 'FileText',
+      color: cat.color || '#6366F1',
+      display_order: cat.display_order || (index + 1) * 10,
+      created_at: cat.created_at,
+      article_count: 0
+    }))
     
     // Tentar buscar a contagem de artigos para cada categoria
     try {
@@ -52,12 +72,11 @@ export async function GET(request: NextRequest) {
       categoriesWithCount = categoriesWithArticleCount
     } catch (countError) {
       console.error('Erro ao buscar contagem de artigos:', countError)
-      // Se falhar, usar as categorias sem contagem
-      categoriesWithCount = categoriesWithCount.map(cat => ({
-        ...cat,
-        article_count: 0
-      }))
+      // Se falhar, usar as categorias sem contagem (já está com 0)
     }
+    
+    // Ordenar por display_order (já que pode não ter vindo ordenado do banco)
+    categoriesWithCount.sort((a, b) => a.display_order - b.display_order)
     
     console.log('Categorias finais:', categoriesWithCount)
     
