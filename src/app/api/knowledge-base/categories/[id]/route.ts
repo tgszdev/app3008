@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { auth } from '@/lib/auth'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
+import { supabaseAdmin } from '@/lib/supabase'
 
 // PUT /api/knowledge-base/categories/[id] - Atualizar categoria
 export async function PUT(
@@ -40,7 +35,7 @@ export async function PUT(
     }
 
     // Verificar se o slug já existe (exceto para a própria categoria)
-    const { data: existingCategory } = await supabase
+    const { data: existingCategory } = await supabaseAdmin
       .from('kb_categories')
       .select('id')
       .eq('slug', slug)
@@ -55,7 +50,7 @@ export async function PUT(
     }
 
     // Atualizar categoria
-    const { data: category, error } = await supabase
+    const { data: category, error } = await supabaseAdmin
       .from('kb_categories')
       .update({
         name,
@@ -111,7 +106,7 @@ export async function DELETE(
     const { id } = await params
 
     // Verificar se a categoria possui artigos
-    const { count } = await supabase
+    const { count } = await supabaseAdmin
       .from('kb_articles')
       .select('*', { count: 'exact', head: true })
       .eq('category_id', id)
@@ -124,7 +119,7 @@ export async function DELETE(
     }
 
     // Deletar categoria
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('kb_categories')
       .delete()
       .eq('id', id)

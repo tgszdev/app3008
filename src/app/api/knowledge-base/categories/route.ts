@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { auth } from '@/lib/auth'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
+import { supabaseAdmin } from '@/lib/supabase'
 
 // GET /api/knowledge-base/categories - Listar todas as categorias
 export async function GET(request: NextRequest) {
@@ -16,63 +11,61 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    // Buscar todas as categorias com contagem de artigos
-    const { data: categories, error } = await supabase
+    console.log('Buscando categorias...')
+    
+    // Primeiro, tentar buscar apenas as categorias sem JOIN
+    const { data: simpleCategories, error: simpleError } = await supabaseAdmin
       .from('kb_categories')
-      .select(`
-        *,
-        article_count:kb_articles(count)
-      `)
+      .select('*')
       .order('display_order', { ascending: true })
-
-    if (error) {
-      console.error('Erro ao buscar categorias:', error)
-      // Se houver erro, mas não é de tabela inexistente, tentar buscar sem o count
-      if (error.message?.includes('relation') || error.message?.includes('does not exist')) {
-        // Tabela não existe
-        return NextResponse.json({ categories: [] })
-      }
-      
-      // Tentar buscar categorias sem o count de artigos
-      const { data: simpleCats } = await supabase
-        .from('kb_categories')
-        .select('*')
-        .order('display_order', { ascending: true })
-      
-      if (simpleCats) {
-        const formatted = simpleCats.map(cat => ({
-          ...cat,
-          article_count: 0
-        }))
-        return NextResponse.json({ categories: formatted })
-      }
-      
-      return NextResponse.json({ categories: [] })
+    
+    console.log('Categorias simples:', simpleCategories)
+    console.log('Erro simples:', simpleError)
+    
+    if (simpleError) {
+      console.error('Erro ao buscar categorias simples:', simpleError)
+      return NextResponse.json({ 
+        categories: [],
+        error: simpleError.message 
+      })
     }
-
-    // Formatar a resposta
-    const formattedCategories = categories?.map(category => {
-      // Extrair a contagem de artigos
-      const articleCount = Array.isArray(category.article_count) 
-        ? (category.article_count[0] as any)?.count || 0
-        : 0
+    
+    // Se conseguiu buscar as categorias, tentar adicionar a contagem
+    let categoriesWithCount = simpleCategories || []
+    
+    // Tentar buscar a contagem de artigos para cada categoria
+    try {
+      const categoriesWithArticleCount = await Promise.all(
+        categoriesWithCount.map(async (category) => {
+          const { count } = await supabaseAdmin
+            .from('kb_articles')
+            .select('*', { count: 'exact', head: true })
+            .eq('category_id', category.id)
+          
+          return {
+            ...category,
+            article_count: count || 0
+          }
+        })
+      )
       
-      return {
-        id: category.id,
-        name: category.name,
-        slug: category.slug,
-        description: category.description,
-        icon: category.icon,
-        color: category.color,
-        display_order: category.display_order,
-        created_at: category.created_at,
-        article_count: articleCount
-      }
-    }) || []
-
+      categoriesWithCount = categoriesWithArticleCount
+    } catch (countError) {
+      console.error('Erro ao buscar contagem de artigos:', countError)
+      // Se falhar, usar as categorias sem contagem
+      categoriesWithCount = categoriesWithCount.map(cat => ({
+        ...cat,
+        article_count: 0
+      }))
+    }
+    
+    console.log('Categorias finais:', categoriesWithCount)
+    
     return NextResponse.json({
-      categories: formattedCategories
+      categories: categoriesWithCount
     })
+
+
 
   } catch (error) {
     console.error('Erro ao buscar categorias:', error)
@@ -112,7 +105,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar se o slug já existe
-    const { data: existingCategory } = await supabase
+    const { data: existingCategory } = await supabaseAdmin
       .from('kb_categories')
       .select('id')
       .eq('slug', slug)
@@ -128,7 +121,7 @@ export async function POST(request: NextRequest) {
     // Criar categoria
     console.log('Tentando criar categoria:', { name, slug, description, icon, color, display_order })
     
-    const { data: category, error } = await supabase
+    const { data: category, error } = await supabaseAdmin
       .from('kb_categories')
       .insert({
         name,

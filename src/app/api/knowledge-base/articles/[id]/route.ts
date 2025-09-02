@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { auth } from '@/lib/auth'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
+import { supabaseAdmin } from '@/lib/supabase'
 
 // GET /api/knowledge-base/articles/[id] - Buscar artigo por ID
 export async function GET(
@@ -22,7 +17,7 @@ export async function GET(
     const { id } = await params
 
     // Buscar artigo com categoria, autor e tags
-    const { data: article, error } = await supabase
+    const { data: article, error } = await supabaseAdmin
       .from('kb_articles')
       .select(`
         *,
@@ -106,7 +101,7 @@ export async function PUT(
     }
 
     // Verificar se o slug já existe (exceto para o próprio artigo)
-    const { data: existingArticle } = await supabase
+    const { data: existingArticle } = await supabaseAdmin
       .from('kb_articles')
       .select('id')
       .eq('slug', slug)
@@ -137,7 +132,7 @@ export async function PUT(
 
     // Se o status está mudando para published e ainda não tem published_at
     if (status === 'published') {
-      const { data: currentArticle } = await supabase
+      const { data: currentArticle } = await supabaseAdmin
         .from('kb_articles')
         .select('published_at')
         .eq('id', id)
@@ -148,7 +143,7 @@ export async function PUT(
       }
     }
 
-    const { data: article, error: updateError } = await supabase
+    const { data: article, error: updateError } = await supabaseAdmin
       .from('kb_articles')
       .update(updateData)
       .eq('id', id)
@@ -163,7 +158,7 @@ export async function PUT(
     // Atualizar tags
     if (tags && Array.isArray(tags)) {
       // Remover tags antigas
-      await supabase
+      await supabaseAdmin
         .from('kb_article_tags')
         .delete()
         .eq('article_id', id)
@@ -173,7 +168,7 @@ export async function PUT(
         // Criar tag se não existir
         const tagSlug = tagName.toLowerCase().replace(/[^a-z0-9]+/g, '-')
         
-        const { data: tag } = await supabase
+        const { data: tag } = await supabaseAdmin
           .from('kb_tags')
           .select('id')
           .eq('slug', tagSlug)
@@ -182,7 +177,7 @@ export async function PUT(
         let tagId = tag?.id
 
         if (!tagId) {
-          const { data: newTag } = await supabase
+          const { data: newTag } = await supabaseAdmin
             .from('kb_tags')
             .insert({ name: tagName, slug: tagSlug })
             .select('id')
@@ -192,7 +187,7 @@ export async function PUT(
         }
 
         if (tagId) {
-          await supabase
+          await supabaseAdmin
             .from('kb_article_tags')
             .insert({ article_id: id, tag_id: tagId })
         }
@@ -236,19 +231,19 @@ export async function DELETE(
     const { id } = await params
 
     // Deletar tags associadas
-    await supabase
+    await supabaseAdmin
       .from('kb_article_tags')
       .delete()
       .eq('article_id', id)
 
     // Deletar feedbacks associados
-    await supabase
+    await supabaseAdmin
       .from('kb_article_feedback')
       .delete()
       .eq('article_id', id)
 
     // Deletar artigo
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('kb_articles')
       .delete()
       .eq('id', id)

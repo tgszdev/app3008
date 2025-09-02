@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { auth } from '@/lib/auth'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
+import { supabaseAdmin } from '@/lib/supabase'
 
 // POST /api/knowledge-base/article/[slug]/feedback - Enviar feedback do artigo
 export async function POST(
@@ -24,7 +19,7 @@ export async function POST(
     const { helpful, comment } = body
 
     // Buscar o artigo pelo slug
-    const { data: article, error: articleError } = await supabase
+    const { data: article, error: articleError } = await supabaseAdmin
       .from('kb_articles')
       .select('id')
       .eq('slug', slug)
@@ -35,7 +30,7 @@ export async function POST(
     }
 
     // Buscar o usuário
-    const { data: user, error: userError } = await supabase
+    const { data: user, error: userError } = await supabaseAdmin
       .from('profiles')
       .select('id')
       .eq('email', session.user.email)
@@ -46,7 +41,7 @@ export async function POST(
     }
 
     // Verificar se o usuário já deu feedback neste artigo
-    const { data: existingFeedback } = await supabase
+    const { data: existingFeedback } = await supabaseAdmin
       .from('kb_article_feedback')
       .select('id')
       .eq('article_id', article.id)
@@ -55,7 +50,7 @@ export async function POST(
 
     if (existingFeedback) {
       // Atualizar feedback existente
-      const { error: updateError } = await supabase
+      const { error: updateError } = await supabaseAdmin
         .from('kb_article_feedback')
         .update({
           helpful,
@@ -70,7 +65,7 @@ export async function POST(
       }
     } else {
       // Criar novo feedback
-      const { error: insertError } = await supabase
+      const { error: insertError } = await supabaseAdmin
         .from('kb_article_feedback')
         .insert({
           article_id: article.id,
@@ -86,7 +81,7 @@ export async function POST(
     }
 
     // Atualizar contadores no artigo
-    const { data: allFeedback } = await supabase
+    const { data: allFeedback } = await supabaseAdmin
       .from('kb_article_feedback')
       .select('helpful')
       .eq('article_id', article.id)
@@ -95,7 +90,7 @@ export async function POST(
       const helpfulCount = allFeedback.filter(f => f.helpful === true).length
       const notHelpfulCount = allFeedback.filter(f => f.helpful === false).length
 
-      await supabase
+      await supabaseAdmin
         .from('kb_articles')
         .update({
           helpful_count: helpfulCount,
@@ -133,7 +128,7 @@ export async function GET(
     const { slug } = await params
 
     // Buscar o artigo pelo slug
-    const { data: article, error: articleError } = await supabase
+    const { data: article, error: articleError } = await supabaseAdmin
       .from('kb_articles')
       .select('id')
       .eq('slug', slug)
@@ -144,7 +139,7 @@ export async function GET(
     }
 
     // Buscar o usuário
-    const { data: user, error: userError } = await supabase
+    const { data: user, error: userError } = await supabaseAdmin
       .from('profiles')
       .select('id')
       .eq('email', session.user.email)
@@ -155,7 +150,7 @@ export async function GET(
     }
 
     // Buscar feedback do usuário para este artigo
-    const { data: feedback, error: feedbackError } = await supabase
+    const { data: feedback, error: feedbackError } = await supabaseAdmin
       .from('kb_article_feedback')
       .select('*')
       .eq('article_id', article.id)

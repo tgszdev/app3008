@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { auth } from '@/lib/auth'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
+import { supabaseAdmin } from '@/lib/supabase'
 
 // GET /api/knowledge-base/stats - Obter estatísticas da base de conhecimento
 export async function GET(request: NextRequest) {
@@ -17,7 +12,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Buscar total de artigos publicados
-    const { count: totalArticles, error: articlesError } = await supabase
+    const { count: totalArticles, error: articlesError } = await supabaseAdmin
       .from('kb_articles')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'published')
@@ -36,12 +31,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Buscar total de categorias
-    const { count: totalCategories } = await supabase
+    const { count: totalCategories } = await supabaseAdmin
       .from('kb_categories')
       .select('*', { count: 'exact', head: true })
 
     // Buscar total de visualizações
-    const { data: viewsData } = await supabase
+    const { data: viewsData } = await supabaseAdmin
       .from('kb_articles')
       .select('view_count')
       .eq('status', 'published')
@@ -49,7 +44,7 @@ export async function GET(request: NextRequest) {
     const totalViews = viewsData?.reduce((sum, article) => sum + (article.view_count || 0), 0) || 0
 
     // Calcular taxa de ajuda
-    const { data: feedbackData } = await supabase
+    const { data: feedbackData } = await supabaseAdmin
       .from('kb_articles')
       .select('helpful_count, not_helpful_count')
       .eq('status', 'published')
@@ -66,7 +61,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Buscar artigos populares (mais visualizados)
-    const { data: popularArticles } = await supabase
+    const { data: popularArticles } = await supabaseAdmin
       .from('kb_articles')
       .select(`
         id,
@@ -82,7 +77,7 @@ export async function GET(request: NextRequest) {
       .limit(5)
 
     // Buscar artigos recentes
-    const { data: recentArticles } = await supabase
+    const { data: recentArticles } = await supabaseAdmin
       .from('kb_articles')
       .select(`
         id,
