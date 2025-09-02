@@ -113,7 +113,7 @@ CREATE TRIGGER kb_articles_updated_at
 INSERT INTO kb_categories (name, slug, description, icon, color, order_index) VALUES
   ('Primeiros Passos', 'primeiros-passos', 'Guias para começar a usar o sistema', 'Rocket', '#10b981', 1),
   ('Tutoriais', 'tutoriais', 'Passo a passo detalhado das funcionalidades', 'BookOpen', '#3b82f6', 2),
-  ('Solução de Problemas', 'solucao-problemas', 'Resoluções para problemas comuns', 'Tool', '#ef4444', 3),
+  ('Solução de Problemas', 'solucao-problemas', 'Resoluções para problemas comuns', 'Wrench', '#ef4444', 3),
   ('FAQ', 'faq', 'Perguntas frequentes', 'HelpCircle', '#f59e0b', 4),
   ('Boas Práticas', 'boas-praticas', 'Recomendações e dicas de uso', 'Lightbulb', '#8b5cf6', 5),
   ('Segurança', 'seguranca', 'Informações sobre segurança e privacidade', 'Shield', '#06b6d4', 6),
