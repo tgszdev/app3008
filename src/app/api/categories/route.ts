@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase'
 
 // GET - Listar todas as categorias
 export async function GET(request: Request) {
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
     const active_only = searchParams.get('active_only') === 'true'
 
     // Build query
-    let query = supabase
+    let query = supabaseAdmin
       .from('categories')
       .select(`
         *,
@@ -92,7 +92,7 @@ export async function POST(request: Request) {
       .replace(/^-+|-+$/g, '') // Remove hífens do início e fim
 
     // Verificar se já existe categoria com esse slug
-    const { data: existing } = await supabase
+    const { data: existing } = await supabaseAdmin
       .from('categories')
       .select('id')
       .eq('slug', slug)
@@ -103,7 +103,7 @@ export async function POST(request: Request) {
     }
 
     // Obter próximo display_order
-    const { data: maxOrder } = await supabase
+    const { data: maxOrder } = await supabaseAdmin
       .from('categories')
       .select('display_order')
       .order('display_order', { ascending: false })
@@ -113,7 +113,7 @@ export async function POST(request: Request) {
     const nextOrder = (maxOrder?.display_order || 0) + 1
 
     // Inserir nova categoria
-    const { data: newCategory, error: insertError } = await supabase
+    const { data: newCategory, error: insertError } = await supabaseAdmin
       .from('categories')
       .insert({
         name,
@@ -188,7 +188,7 @@ export async function PUT(request: Request) {
     if (display_order !== undefined) updateData.display_order = display_order
 
     // Atualizar categoria
-    const { data: updatedCategory, error: updateError } = await supabase
+    const { data: updatedCategory, error: updateError } = await supabaseAdmin
       .from('categories')
       .update(updateData)
       .eq('id', id)
@@ -232,7 +232,7 @@ export async function DELETE(request: Request) {
     }
 
     // Verificar se há tickets usando esta categoria
-    const { data: tickets } = await supabase
+    const { data: tickets } = await supabaseAdmin
       .from('tickets')
       .select('id')
       .eq('category_id', id)
@@ -246,7 +246,7 @@ export async function DELETE(request: Request) {
     }
 
     // Excluir categoria
-    const { error: deleteError } = await supabase
+    const { error: deleteError } = await supabaseAdmin
       .from('categories')
       .delete()
       .eq('id', id)

@@ -78,17 +78,35 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
         credentials: 'include'
       })
       
+      console.log('Response status:', response.status)
+      
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        const errorData = await response.json()
+        console.error('API Error:', errorData)
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
       }
       
       const data = await response.json()
-      setCategories(data.categories || [])
+      console.log('Categories data:', data)
+      
+      // Tratar diferentes formatos de resposta
+      if (Array.isArray(data)) {
+        setCategories(data)
+      } else if (data.categories) {
+        setCategories(data.categories)
+      } else {
+        setCategories([])
+      }
     } catch (error: any) {
       console.error('Erro ao buscar categorias:', error)
-      toast.error('Erro ao carregar categorias: ' + (error.message || 'Erro desconhecido'))
-      // Se não houver categorias, mostrar array vazio
-      setCategories([])
+      
+      // Se for erro 404 ou similar, ainda mostrar interface vazia
+      if (error.message.includes('404') || error.message.includes('Not found')) {
+        setCategories([])
+      } else {
+        toast.error('Erro ao carregar categorias: ' + (error.message || 'Erro desconhecido'))
+        setCategories([])
+      }
     } finally {
       setLoading(false)
     }
