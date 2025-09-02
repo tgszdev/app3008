@@ -39,8 +39,9 @@ export default function ProfileCategorySettings() {
   const fetchData = async () => {
     setLoading(true)
     try {
-      // Buscar categorias
-      const categoriesResponse = await axios.get('/api/knowledge-base/categories')
+      // Buscar TODAS as categorias diretamente do banco para configuração
+      // Usar endpoint especial que não aplica filtros de permissão
+      const categoriesResponse = await axios.get('/api/knowledge-base/categories/all')
       setCategories(categoriesResponse.data.categories || [])
 
       // Buscar permissões salvas
@@ -48,23 +49,21 @@ export default function ProfileCategorySettings() {
       if (permissionsResponse.data.permissions) {
         setPermissions(permissionsResponse.data.permissions)
       } else {
-        // Se não houver permissões salvas, todas as categorias são permitidas para todos
-        const allCategoryIds = categoriesResponse.data.categories?.map((c: Category) => c.id) || []
+        // Se não houver permissões salvas, nenhuma categoria é permitida por padrão
         setPermissions([
-          { role: 'admin', categories: allCategoryIds },
-          { role: 'analyst', categories: allCategoryIds },
-          { role: 'user', categories: allCategoryIds }
+          { role: 'admin', categories: [] },
+          { role: 'analyst', categories: [] },
+          { role: 'user', categories: [] }
         ])
       }
     } catch (error: any) {
       console.error('Erro ao buscar dados:', error)
-      // Se a API não existir ainda, permitir todas as categorias
+      // Se a API não existir ainda, nenhuma categoria é permitida por padrão
       if (error.response?.status === 404) {
-        const allCategoryIds = categories.map(c => c.id)
         setPermissions([
-          { role: 'admin', categories: allCategoryIds },
-          { role: 'analyst', categories: allCategoryIds },
-          { role: 'user', categories: allCategoryIds }
+          { role: 'admin', categories: [] },
+          { role: 'analyst', categories: [] },
+          { role: 'user', categories: [] }
         ])
       }
     } finally {

@@ -39,23 +39,9 @@ export async function GET(request: NextRequest) {
       console.log('Erro ao deletar permissões antigas (pode não existir):', deleteError.message)
     }
 
-    // Criar permissões padrão - todos os roles podem ver todas as categorias
-    const roles = ['admin', 'analyst', 'user']
-    
-    for (const role of roles) {
-      const { error: insertError } = await supabaseAdmin
-        .from('kb_role_permissions')
-        .insert({
-          role,
-          allowed_categories: [] // Array vazio significa acesso a todas as categorias
-        })
-      
-      if (insertError) {
-        console.log(`Erro ao inserir permissão para ${role}:`, insertError.message)
-      } else {
-        console.log(`Permissão resetada para ${role} - acesso a todas as categorias`)
-      }
-    }
+    // Não criar nenhuma permissão - sem registros significa sem acesso
+    // Quando o admin configurar, ele definirá as permissões específicas
+    console.log('Permissões resetadas - nenhuma categoria permitida até ser configurado')
 
     return NextResponse.json({ 
       success: true,
