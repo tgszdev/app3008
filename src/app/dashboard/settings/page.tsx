@@ -7,6 +7,9 @@ import SQLInstructionsModal from '@/components/SQLInstructionsModal'
 import ProfileCategorySettings from '@/components/ProfileCategorySettings'
 import EmailConfigModal from '@/components/EmailConfigModal'
 import CategoryManagementModal from '@/components/CategoryManagementModal'
+import SecuritySettingsModal from '@/components/SecuritySettingsModal'
+import NotificationSettingsModal from '@/components/NotificationSettingsModal'
+import BackupRestoreModal from '@/components/BackupRestoreModal'
 import toast from 'react-hot-toast'
 
 export default function SettingsPage() {
@@ -14,6 +17,9 @@ export default function SettingsPage() {
   const isAdmin = (session?.user as any)?.role === 'admin'
   const [emailModalOpen, setEmailModalOpen] = useState(false)
   const [categoryModalOpen, setCategoryModalOpen] = useState(false)
+  const [securityModalOpen, setSecurityModalOpen] = useState(false)
+  const [notificationModalOpen, setNotificationModalOpen] = useState(false)
+  const [backupModalOpen, setBackupModalOpen] = useState(false)
   const [sqlModal, setSqlModal] = useState<{ isOpen: boolean; sql: string; instructions?: string[] }>({
     isOpen: false,
     sql: '',
@@ -136,8 +142,8 @@ export default function SettingsPage() {
           </button>
         </div>
 
-        {/* Security Settings Card (Coming Soon) */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full opacity-75">
+        {/* Security Settings Card */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
           <div className="flex items-start mb-4">
             <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg flex-shrink-0">
               <Shield className="h-6 w-6 text-red-600 dark:text-red-400" />
@@ -157,17 +163,16 @@ export default function SettingsPage() {
           </p>
           
           <button
-            onClick={() => handleComingSoon('Configurações de Segurança')}
-            className="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-400 text-white font-medium rounded-lg cursor-not-allowed opacity-60"
-            disabled
+            onClick={() => setSecurityModalOpen(true)}
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
           >
             <Settings className="h-5 w-5 mr-2" />
-            Em Breve
+            Configurar Segurança
           </button>
         </div>
 
-        {/* Notifications Settings Card (Coming Soon) */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full opacity-75">
+        {/* Notifications Settings Card */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
           <div className="flex items-start mb-4">
             <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex-shrink-0">
               <Bell className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
@@ -187,17 +192,16 @@ export default function SettingsPage() {
           </p>
           
           <button
-            onClick={() => handleComingSoon('Configurações de Notificações')}
-            className="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-400 text-white font-medium rounded-lg cursor-not-allowed opacity-60"
-            disabled
+            onClick={() => setNotificationModalOpen(true)}
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-yellow-600 text-white font-medium rounded-lg hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors"
           >
             <Settings className="h-5 w-5 mr-2" />
-            Em Breve
+            Configurar Notificações
           </button>
         </div>
 
-        {/* Backup Settings Card (Coming Soon) */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full opacity-75">
+        {/* Backup Settings Card */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
           <div className="flex items-start mb-4">
             <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg flex-shrink-0">
               <Database className="h-6 w-6 text-green-600 dark:text-green-400" />
@@ -217,12 +221,11 @@ export default function SettingsPage() {
           </p>
           
           <button
-            onClick={() => handleComingSoon('Backup e Restauração')}
-            className="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-400 text-white font-medium rounded-lg cursor-not-allowed opacity-60"
-            disabled
+            onClick={() => setBackupModalOpen(true)}
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
           >
             <Settings className="h-5 w-5 mr-2" />
-            Em Breve
+            Gerenciar Backups
           </button>
         </div>
       </div>
@@ -243,6 +246,21 @@ export default function SettingsPage() {
       <CategoryManagementModal
         isOpen={categoryModalOpen}
         onClose={() => setCategoryModalOpen(false)}
+      />
+
+      <SecuritySettingsModal
+        isOpen={securityModalOpen}
+        onClose={() => setSecurityModalOpen(false)}
+      />
+
+      <NotificationSettingsModal
+        isOpen={notificationModalOpen}
+        onClose={() => setNotificationModalOpen(false)}
+      />
+
+      <BackupRestoreModal
+        isOpen={backupModalOpen}
+        onClose={() => setBackupModalOpen(false)}
       />
 
       <SQLInstructionsModal
