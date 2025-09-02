@@ -179,7 +179,24 @@ export default function CategoriesPage() {
       fetchCategories()
     } catch (error: any) {
       console.error('Erro ao salvar categoria:', error)
-      toast.error(error.response?.data?.error || 'Erro ao salvar categoria')
+      console.error('Response:', error.response)
+      
+      const errorMessage = error.response?.data?.error || 'Erro ao salvar categoria'
+      const errorDetails = error.response?.data?.details || ''
+      const errorHint = error.response?.data?.hint || ''
+      
+      if (errorDetails || errorHint) {
+        toast.error(
+          <div>
+            <p className="font-semibold">{errorMessage}</p>
+            {errorDetails && <p className="text-sm mt-1">{errorDetails}</p>}
+            {errorHint && <p className="text-sm mt-1 italic">{errorHint}</p>}
+          </div>,
+          { duration: 6000 }
+        )
+      } else {
+        toast.error(errorMessage)
+      }
     } finally {
       setSaving(false)
     }

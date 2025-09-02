@@ -126,12 +126,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Criar categoria
+    console.log('Tentando criar categoria:', { name, slug, description, icon, color, display_order })
+    
     const { data: category, error } = await supabase
       .from('kb_categories')
       .insert({
         name,
         slug,
-        description,
+        description: description || null,
         icon: icon || 'FileText',
         color: color || '#6366F1',
         display_order: display_order || 999
@@ -140,10 +142,35 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Erro ao criar categoria:', error)
-      return NextResponse.json({ error: 'Erro ao criar categoria' }, { status: 500 })
+      console.error('Erro detalhado ao criar categoria:', error)
+      console.error('Mensagem:', error.message)
+      console.error('Detalhes:', error.details)
+      console.error('Hint:', error.hint)
+      
+      // Retornar erro mais específico
+      if (error.message?.includes('duplicate')) {
+        return NextResponse.json({ 
+          error: 'Já existe uma categoria com este slug',
+          details: error.message 
+        }, { status: 400 })
+      }
+      
+      if (error.message?.includes('permission') || error.message?.includes('RLS')) {
+        return NextResponse.json({ 
+          error: 'Erro de permissão no banco de dados. Verifique as políticas RLS.',
+          details: error.message 
+        }, { status: 403 })
+      }
+      
+      return NextResponse.json({ 
+        error: 'Erro ao criar categoria',
+        details: error.message,
+        hint: error.hint
+      }, { status: 500 })
     }
 
+    console.log('Categoria criada com sucesso:', category)
+    
     return NextResponse.json({
       message: 'Categoria criada com sucesso',
       category
