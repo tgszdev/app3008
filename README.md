@@ -10,7 +10,8 @@
 - **Login**: `/login`
 - **Dashboard**: `/dashboard`
 - **Chamados**: `/dashboard/tickets`
-- **Comentários**: `/dashboard/comments` ✨ NOVO
+- **Base de Conhecimento**: `/dashboard/knowledge-base` 📚 NOVO
+- **Comentários**: `/dashboard/comments`
 - **Gerenciamento de Usuários**: `/dashboard/users`
 - **Supabase Dashboard**: https://supabase.com/dashboard/project/eyfvvximmeqmwdfqzqov
 
@@ -541,6 +542,43 @@ pm2 start ecosystem.config.cjs
   - Novo guia em `/docs/EMAIL_CONFIGURATION.md`
   - Instruções para criar App Password no Gmail
   - Troubleshooting e soluções para problemas comuns
+
+### v1.6.0 - Base de Conhecimento (KB) Completa (02/09/2025)
+- **📚 Sistema de Base de Conhecimento**:
+  - Nova página em `/dashboard/knowledge-base` totalmente funcional
+  - **Sistema de Categorias**:
+    - 8 categorias pré-configuradas com ícones e cores
+    - Contadores de artigos por categoria
+  - **Gestão de Artigos**:
+    - Criação, edição e exclusão (admin/analyst)
+    - Status: rascunho, publicado, arquivado
+    - Artigos em destaque
+    - Sistema de FAQ integrado
+  - **Funcionalidades de Busca**:
+    - Busca em tempo real em títulos e conteúdo
+    - Filtros por categoria
+    - Filtro específico para FAQ
+  - **Sistema de Tags**:
+    - Tags personalizadas para artigos
+    - Busca por tags
+  - **Estatísticas e Métricas**:
+    - Total de artigos e categorias
+    - Contador de visualizações
+    - Taxa de utilidade (helpful/not helpful)
+    - Artigos populares e recentes
+  - **Visualização Flexível**:
+    - Modo grid ou lista
+    - Design responsivo
+    - Suporte a dark mode
+  - **Estrutura de Dados**:
+    - 8 tabelas especializadas
+    - Sistema de feedback de artigos
+    - Artigos relacionados
+    - Anexos de artigos
+  - **APIs RESTful Completas**:
+    - CRUD de artigos
+    - Gestão de categorias
+    - Estatísticas em tempo real
 
 ### v1.5.2 - Página de Comentários Completa (01/09/2025)
 - **💬 Central de Comentários**:
