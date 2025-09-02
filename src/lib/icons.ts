@@ -24,6 +24,7 @@ import {
   Lightbulb,
   AlertCircle,
   Users,
+  User,
   Calendar,
   Clock,
   Search,
@@ -141,6 +142,15 @@ import {
   Slack,
   Trello,
   Figma,
+  Truck,
+  Box,
+  Container,
+  Plane,
+  Ship,
+  Car,
+  Bike,
+  Route,
+  MapPin
 } from 'lucide-react'
 import { LucideIcon } from 'lucide-react'
 
@@ -168,6 +178,17 @@ export const iconMap: Record<string, LucideIcon> = {
   'activity': Activity,
   'more-horizontal': MoreHorizontal,
   
+  // Logística e Transporte
+  'truck': Truck,
+  'box': Box,
+  'container': Container,
+  'plane': Plane,
+  'ship': Ship,
+  'car': Car,
+  'bike': Bike,
+  'route': Route,
+  'map-pin': MapPin,
+  
   // Ícones adicionais úteis
   'bug': Bug,
   'file-text': FileText,
@@ -175,6 +196,7 @@ export const iconMap: Record<string, LucideIcon> = {
   'lightbulb': Lightbulb,
   'alert-circle': AlertCircle,
   'users': Users,
+  'user': User,
   'calendar': Calendar,
   'clock': Clock,
   'search': Search,

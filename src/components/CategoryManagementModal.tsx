@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import toast from 'react-hot-toast'
 import {
   Plus,
@@ -17,7 +17,60 @@ import {
   FileText,
   Eye,
   EyeOff,
-  Folder
+  Folder,
+  Package,
+  Truck,
+  ShoppingCart,
+  ShoppingBag,
+  Archive,
+  Box,
+  Container,
+  Map,
+  Navigation,
+  Compass,
+  Plane,
+  Ship,
+  Car,
+  Bike,
+  Route,
+  MapPin,
+  Clipboard,
+  BookOpen,
+  Briefcase,
+  HelpCircle,
+  Info,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Calendar,
+  Settings,
+  Wrench,
+  Shield,
+  Lock,
+  Key,
+  Database,
+  Server,
+  Cloud,
+  Wifi,
+  Cpu,
+  Monitor,
+  Mail,
+  Phone,
+  MessageSquare,
+  Send,
+  DollarSign,
+  CreditCard,
+  BarChart,
+  TrendingUp,
+  Users,
+  User,
+  UserCheck,
+  Home,
+  Star,
+  Flag,
+  Tag,
+  Zap,
+  Activity
 } from 'lucide-react'
 import { getIcon } from '@/lib/icons'
 
@@ -51,6 +104,9 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
   const [showCategoryModal, setShowCategoryModal] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [showIconDropdown, setShowIconDropdown] = useState(false)
+  const [iconSearchTerm, setIconSearchTerm] = useState('')
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -66,6 +122,24 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
       fetchCategories()
     }
   }, [isOpen])
+
+  // Handle click outside of dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowIconDropdown(false)
+        setIconSearchTerm('')
+      }
+    }
+
+    if (showIconDropdown) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showIconDropdown])
 
   const fetchCategories = async () => {
     setLoading(true)
@@ -137,6 +211,8 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
       toast.success(editingCategory ? 'Categoria atualizada com sucesso!' : 'Categoria criada com sucesso!')
       
       setShowCategoryModal(false)
+      setShowIconDropdown(false)
+      setIconSearchTerm('')
       setEditingCategory(null)
       setFormData({
         name: '',
@@ -276,10 +352,81 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
     category.description?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  // Lista de ícones disponíveis com foco em logística e operações
   const iconsList = [
-    'BookOpen', 'FileText', 'HelpCircle', 'Info', 'AlertCircle', 
-    'CheckCircle', 'Settings', 'Tool', 'Shield', 'Lock',
-    'Key', 'Database', 'Server', 'Cloud', 'Folder'
+    // Logística e Transporte
+    { value: 'package', label: 'Pacote', icon: 'Package' },
+    { value: 'truck', label: 'Caminhão', icon: 'Truck' },
+    { value: 'shopping-cart', label: 'Carrinho', icon: 'ShoppingCart' },
+    { value: 'shopping-bag', label: 'Sacola', icon: 'ShoppingBag' },
+    { value: 'archive', label: 'Arquivo', icon: 'Archive' },
+    { value: 'box', label: 'Caixa', icon: 'Box' },
+    { value: 'container', label: 'Container', icon: 'Container' },
+    { value: 'map', label: 'Mapa', icon: 'Map' },
+    { value: 'navigation', label: 'Navegação', icon: 'Navigation' },
+    { value: 'compass', label: 'Bússola', icon: 'Compass' },
+    { value: 'plane', label: 'Avião', icon: 'Plane' },
+    { value: 'ship', label: 'Navio', icon: 'Ship' },
+    { value: 'car', label: 'Carro', icon: 'Car' },
+    { value: 'bike', label: 'Bicicleta', icon: 'Bike' },
+    { value: 'route', label: 'Rota', icon: 'Route' },
+    { value: 'map-pin', label: 'Local', icon: 'MapPin' },
+    
+    // Documentação e Gestão
+    { value: 'file-text', label: 'Documento', icon: 'FileText' },
+    { value: 'clipboard', label: 'Prancheta', icon: 'Clipboard' },
+    { value: 'book-open', label: 'Manual', icon: 'BookOpen' },
+    { value: 'folder', label: 'Pasta', icon: 'Folder' },
+    { value: 'briefcase', label: 'Maleta', icon: 'Briefcase' },
+    
+    // Status e Alertas
+    { value: 'help-circle', label: 'Ajuda', icon: 'HelpCircle' },
+    { value: 'info', label: 'Informação', icon: 'Info' },
+    { value: 'alert-circle', label: 'Alerta', icon: 'AlertCircle' },
+    { value: 'check-circle', label: 'Concluído', icon: 'CheckCircle' },
+    { value: 'clock', label: 'Tempo', icon: 'Clock' },
+    { value: 'calendar', label: 'Calendário', icon: 'Calendar' },
+    
+    // Ferramentas e Configurações
+    { value: 'settings', label: 'Configurações', icon: 'Settings' },
+    { value: 'tool', label: 'Ferramenta', icon: 'Wrench' },
+    { value: 'wrench', label: 'Chave Inglesa', icon: 'Wrench' },
+    { value: 'shield', label: 'Segurança', icon: 'Shield' },
+    { value: 'lock', label: 'Bloqueado', icon: 'Lock' },
+    { value: 'key', label: 'Chave', icon: 'Key' },
+    
+    // Tecnologia
+    { value: 'database', label: 'Banco de Dados', icon: 'Database' },
+    { value: 'server', label: 'Servidor', icon: 'Server' },
+    { value: 'cloud', label: 'Nuvem', icon: 'Cloud' },
+    { value: 'wifi', label: 'Wi-Fi', icon: 'Wifi' },
+    { value: 'cpu', label: 'Processador', icon: 'Cpu' },
+    { value: 'monitor', label: 'Monitor', icon: 'Monitor' },
+    
+    // Comunicação
+    { value: 'mail', label: 'E-mail', icon: 'Mail' },
+    { value: 'phone', label: 'Telefone', icon: 'Phone' },
+    { value: 'message-square', label: 'Mensagem', icon: 'MessageSquare' },
+    { value: 'send', label: 'Enviar', icon: 'Send' },
+    
+    // Finanças
+    { value: 'dollar-sign', label: 'Financeiro', icon: 'DollarSign' },
+    { value: 'credit-card', label: 'Cartão', icon: 'CreditCard' },
+    { value: 'bar-chart', label: 'Gráfico', icon: 'BarChart' },
+    { value: 'trending-up', label: 'Crescimento', icon: 'TrendingUp' },
+    
+    // Usuários
+    { value: 'users', label: 'Equipe', icon: 'Users' },
+    { value: 'user', label: 'Usuário', icon: 'User' },
+    { value: 'user-check', label: 'Usuário Verificado', icon: 'UserCheck' },
+    
+    // Outros
+    { value: 'home', label: 'Início', icon: 'Home' },
+    { value: 'star', label: 'Favorito', icon: 'Star' },
+    { value: 'flag', label: 'Bandeira', icon: 'Flag' },
+    { value: 'tag', label: 'Etiqueta', icon: 'Tag' },
+    { value: 'zap', label: 'Energia', icon: 'Zap' },
+    { value: 'activity', label: 'Atividade', icon: 'Activity' }
   ]
 
   if (!isOpen) return null
@@ -465,7 +612,11 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
             <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
               <div
                 className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-                onClick={() => setShowCategoryModal(false)}
+                onClick={() => {
+                  setShowCategoryModal(false)
+                  setShowIconDropdown(false)
+                  setIconSearchTerm('')
+                }}
               />
               <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <form onSubmit={handleSubmit}>
@@ -527,16 +678,68 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Ícone
                           </label>
-                          <select
-                            value={formData.icon}
-                            onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                          >
-                            <option value="">Selecione...</option>
-                            {iconsList.map(icon => (
-                              <option key={icon} value={icon}>{icon}</option>
-                            ))}
-                          </select>
+                          <div className="relative" ref={dropdownRef}>
+                            <button
+                              type="button"
+                              onClick={() => setShowIconDropdown(!showIconDropdown)}
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 flex items-center justify-between"
+                            >
+                              <div className="flex items-center space-x-2">
+                                {formData.icon ? (
+                                  <>
+                                    {(() => {
+                                      const IconComponent = getIcon(formData.icon)
+                                      return <IconComponent className="h-4 w-4" />
+                                    })()}
+                                    <span>{iconsList.find(i => i.value === formData.icon)?.label || formData.icon}</span>
+                                  </>
+                                ) : (
+                                  <span className="text-gray-500">Selecione...</span>
+                                )}
+                              </div>
+                              <ChevronDown className="h-4 w-4" />
+                            </button>
+                            
+                            {showIconDropdown && (
+                              <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                <div className="p-2 border-b border-gray-200 dark:border-gray-600">
+                                  <input
+                                    type="text"
+                                    placeholder="Buscar ícone..."
+                                    value={iconSearchTerm}
+                                    onChange={(e) => setIconSearchTerm(e.target.value)}
+                                    className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                                    onClick={(e) => e.stopPropagation()}
+                                  />
+                                </div>
+                                <div className="p-1">
+                                  {iconsList
+                                    .filter(icon => 
+                                      icon.label.toLowerCase().includes(iconSearchTerm.toLowerCase()) ||
+                                      icon.value.toLowerCase().includes(iconSearchTerm.toLowerCase())
+                                    )
+                                    .map(icon => {
+                                      const IconComponent = getIcon(icon.value)
+                                      return (
+                                        <button
+                                          key={icon.value}
+                                          type="button"
+                                          onClick={() => {
+                                            setFormData({ ...formData, icon: icon.value })
+                                            setShowIconDropdown(false)
+                                            setIconSearchTerm('')
+                                          }}
+                                          className="w-full px-2 py-2 flex items-center space-x-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded text-left"
+                                        >
+                                          <IconComponent className="h-4 w-4 flex-shrink-0" />
+                                          <span className="text-sm">{icon.label}</span>
+                                        </button>
+                                      )
+                                    })}
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
 
                         <div>
@@ -577,7 +780,11 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                     </button>
                     <button
                       type="button"
-                      onClick={() => setShowCategoryModal(false)}
+                      onClick={() => {
+                        setShowCategoryModal(false)
+                        setShowIconDropdown(false)
+                        setIconSearchTerm('')
+                      }}
                       className="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                     >
                       Cancelar
