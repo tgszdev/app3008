@@ -5,7 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase'
 // DELETE - Excluir backup específico
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -19,7 +19,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'Forbidden - Admin only' }, { status: 403 })
     }
 
-    const backupId = params.id
+    // Await params in Next.js 15
+    const { id: backupId } = await params
 
     const { error } = await supabaseAdmin
       .from('system_backups')
