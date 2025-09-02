@@ -21,6 +21,7 @@ import {
   FileText,
   Loader2,
   Folder,
+  BookOpen,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
@@ -29,6 +30,7 @@ import NotificationBell from '@/components/notifications/NotificationBell'
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Chamados', href: '/dashboard/tickets', icon: Ticket },
+  { name: 'Base de Conhecimento', href: '/dashboard/knowledge-base', icon: BookOpen },
   { name: 'Estatísticas', href: '/dashboard/analytics', icon: BarChart3 },
   { name: 'Comentários', href: '/dashboard/comments', icon: MessageSquare },
   { name: 'Relatórios', href: '/dashboard/reports', icon: FileText },
