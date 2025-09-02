@@ -82,27 +82,37 @@ export async function GET(request: NextRequest) {
     // Filtrar categorias baseado nas permissões do usuário
     let filteredCategories = categoriesWithCount
     
-    // Buscar permissões do role do usuário
-    try {
-      const { data: rolePermission } = await supabaseAdmin
-        .from('kb_role_permissions')
-        .select('allowed_categories')
-        .eq('role', userRole)
-        .single()
-      
-      if (rolePermission && rolePermission.allowed_categories && rolePermission.allowed_categories.length > 0) {
-        // Se há categorias específicas permitidas, filtrar
-        filteredCategories = categoriesWithCount.filter(cat => 
-          rolePermission.allowed_categories.includes(cat.id)
-        )
-        console.log('Categorias filtradas por permissão:', filteredCategories.length)
-      } else {
-        // Se não há restrições ou array vazio, mostrar todas
-        console.log('Sem restrições de categoria para o role:', userRole)
+    // Para administradores, sempre mostrar todas as categorias
+    if (userRole === 'admin') {
+      console.log('Usuário é admin, mostrando todas as categorias')
+      filteredCategories = categoriesWithCount
+    } else {
+      // Para outros roles, buscar permissões
+      try {
+        const { data: rolePermission } = await supabaseAdmin
+          .from('kb_role_permissions')
+          .select('allowed_categories')
+          .eq('role', userRole)
+          .single()
+        
+        console.log('Permissões encontradas para', userRole, ':', rolePermission)
+        
+        if (rolePermission && rolePermission.allowed_categories && rolePermission.allowed_categories.length > 0) {
+          // Se há categorias específicas permitidas, filtrar
+          filteredCategories = categoriesWithCount.filter(cat => 
+            rolePermission.allowed_categories.includes(cat.id)
+          )
+          console.log('Categorias filtradas por permissão:', filteredCategories.length, 'de', categoriesWithCount.length)
+        } else {
+          // Se não há restrições ou array vazio, mostrar todas
+          console.log('Sem restrições específicas para o role:', userRole, '- mostrando todas as categorias')
+          filteredCategories = categoriesWithCount
+        }
+      } catch (permError) {
+        console.log('Erro ao buscar permissões (mostrando todas as categorias):', permError)
+        // Se houver erro ou não existir registro, mostrar todas as categorias
+        filteredCategories = categoriesWithCount
       }
-    } catch (permError) {
-      console.log('Erro ao buscar permissões (usando todas as categorias):', permError)
-      // Se houver erro, mostrar todas as categorias
     }
     
     console.log('Categorias finais:', filteredCategories.length)

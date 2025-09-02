@@ -56,6 +56,46 @@ export async function GET(request: NextRequest) {
 }
 
 // POST - Salvar permissões de categorias por perfil
+// DELETE - Resetar permissões (remover todas as restrições)
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await auth()
+    
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+
+    // Verificar se é admin
+    const userRole = (session.user as any)?.role
+    
+    if (userRole !== 'admin') {
+      return NextResponse.json({ error: 'Apenas administradores podem resetar permissões' }, { status: 403 })
+    }
+
+    // Deletar todas as permissões existentes
+    const { error } = await supabaseAdmin
+      .from('kb_role_permissions')
+      .delete()
+      .neq('role', '')
+    
+    if (error) {
+      console.error('Erro ao deletar permissões:', error)
+    }
+
+    return NextResponse.json({ 
+      success: true,
+      message: 'Permissões resetadas com sucesso. Todos os roles agora podem ver todas as categorias.'
+    })
+
+  } catch (error) {
+    console.error('Erro ao resetar permissões:', error)
+    return NextResponse.json(
+      { error: 'Erro ao resetar permissões' },
+      { status: 500 }
+    )
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
