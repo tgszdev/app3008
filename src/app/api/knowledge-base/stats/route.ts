@@ -17,10 +17,23 @@ export async function GET(request: NextRequest) {
     }
 
     // Buscar total de artigos publicados
-    const { count: totalArticles } = await supabase
+    const { count: totalArticles, error: articlesError } = await supabase
       .from('kb_articles')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'published')
+
+    // Se a tabela não existir, retornar valores padrão
+    if (articlesError) {
+      console.error('Erro ao buscar artigos (tabela pode não existir):', articlesError)
+      return NextResponse.json({
+        total_articles: 0,
+        total_categories: 0,
+        total_views: 0,
+        helpful_percentage: 0,
+        popular_articles: [],
+        recent_articles: []
+      })
+    }
 
     // Buscar total de categorias
     const { count: totalCategories } = await supabase

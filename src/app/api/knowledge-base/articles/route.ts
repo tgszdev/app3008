@@ -59,11 +59,12 @@ export async function GET(request: NextRequest) {
     const { data: articles, error } = await query
 
     if (error) {
-      console.error('Erro ao buscar artigos:', error)
-      return NextResponse.json(
-        { error: 'Erro ao buscar artigos', details: error.message },
-        { status: 500 }
-      )
+      console.error('Erro ao buscar artigos (tabela pode não existir):', error)
+      // Se a tabela não existir, retornar array vazio
+      return NextResponse.json({
+        articles: [],
+        total: 0
+      })
     }
 
     // Buscar tags para cada artigo

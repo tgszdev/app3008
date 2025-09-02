@@ -34,6 +34,11 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import dynamic from 'next/dynamic'
+
+const KnowledgeBaseSetup = dynamic(() => import('@/components/KnowledgeBaseSetup'), {
+  ssr: false
+})
 
 interface Category {
   id: string
@@ -112,6 +117,7 @@ export default function KnowledgeBasePage() {
   const [faqArticles, setFaqArticles] = useState<Article[]>([])
   const [stats, setStats] = useState<Stats | null>(null)
   const [refreshing, setRefreshing] = useState(false)
+  const [setupNeeded, setSetupNeeded] = useState(false)
 
   const isAdmin = (session?.user as any)?.role === 'admin'
   const isAnalyst = (session?.user as any)?.role === 'analyst'
@@ -144,9 +150,17 @@ export default function KnowledgeBasePage() {
       setFeaturedArticles(articlesResponse.data.articles?.filter((a: Article) => a.is_featured) || [])
       setFaqArticles(articlesResponse.data.articles?.filter((a: Article) => a.is_faq) || [])
 
+      // Se chegou aqui e não tem dados, provavelmente as tabelas precisam ser criadas
+      if (categories.length === 0 && !searchTerm && !selectedCategory) {
+        setSetupNeeded(true)
+      } else {
+        setSetupNeeded(false)
+      }
+
     } catch (error: any) {
       console.error('Erro ao buscar base de conhecimento:', error)
-      toast.error('Erro ao carregar base de conhecimento')
+      // Não mostrar toast de erro, pois pode ser apenas tabelas não criadas
+      setSetupNeeded(true)
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -183,6 +197,11 @@ export default function KnowledgeBasePage() {
   const handleRefresh = () => {
     setRefreshing(true)
     fetchKnowledgeBase(false)
+  }
+
+  // Se precisa configurar, mostrar instruções
+  if (setupNeeded && !loading) {
+    return <KnowledgeBaseSetup />
   }
 
   return (

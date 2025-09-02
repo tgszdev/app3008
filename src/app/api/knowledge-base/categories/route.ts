@@ -26,8 +26,9 @@ export async function GET(request: NextRequest) {
       .order('display_order', { ascending: true })
 
     if (error) {
-      console.error('Erro ao buscar categorias:', error)
-      return NextResponse.json({ error: 'Erro ao buscar categorias' }, { status: 500 })
+      console.error('Erro ao buscar categorias (tabela pode não existir):', error)
+      // Se a tabela não existir, retornar array vazio
+      return NextResponse.json({ categories: [] })
     }
 
     // Formatar a resposta
