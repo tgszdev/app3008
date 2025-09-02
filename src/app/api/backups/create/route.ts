@@ -112,53 +112,16 @@ export async function POST(request: Request) {
       .single()
 
     if (insertError) {
-      // Se a tabela não existir, criar ela
-      if (insertError.code === '42P01') {
-        // Criar tabela de backups
-        await supabaseAdmin.rpc('create_backups_table', {
-          sql: `
-            CREATE TABLE IF NOT EXISTS system_backups (
-              id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-              name VARCHAR(255) NOT NULL,
-              description TEXT,
-              size BIGINT,
-              type VARCHAR(50) DEFAULT 'manual',
-              status VARCHAR(50) DEFAULT 'completed',
-              includes JSONB,
-              backup_data JSONB,
-              created_by UUID REFERENCES users(id),
-              created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-            );
-          `
-        }).catch(() => {
-          // Ignorar erro se a função não existir
-        })
-
-        // Tentar inserir novamente
-        const { data: retryBackup } = await supabaseAdmin
-          .from('system_backups')
-          .insert({
-            name,
-            description,
-            size: backupSize,
-            type: 'manual',
-            status: 'completed',
-            includes,
-            created_by: session.user.id,
-            backup_data: backupData
-          })
-          .select()
-          .single()
-
-        if (retryBackup) {
-          return NextResponse.json({
-            id: retryBackup.id,
-            message: 'Backup created successfully'
-          })
-        }
-      }
-
       console.error('Error creating backup:', insertError)
+      
+      // Se a tabela não existir, retornar erro apropriado
+      if (insertError.code === '42P01') {
+        return NextResponse.json({ 
+          error: 'Backup table not configured. Please contact system administrator.',
+          details: 'Table system_backups does not exist'
+        }, { status: 500 })
+      }
+      
       return NextResponse.json({ error: 'Failed to create backup' }, { status: 500 })
     }
 
