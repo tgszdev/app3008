@@ -39,7 +39,7 @@ const navigation = [
 const adminNavigation = [
   { name: 'Usuários', href: '/dashboard/users', icon: Users },
   { name: 'Categorias', href: '/dashboard/categories', icon: Folder },
-  { name: 'Configurações', href: '/dashboard/settings', icon: Settings },
+  { name: 'Config. Admin', href: '/dashboard/settings', icon: Settings },
 ]
 
 export default function DashboardLayout({
