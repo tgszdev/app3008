@@ -2,16 +2,18 @@
 
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
-import { BookOpen, Mail, Settings, Shield, Bell, Database } from 'lucide-react'
+import { BookOpen, Mail, Settings, Shield, Bell, Database, Folder } from 'lucide-react'
 import SQLInstructionsModal from '@/components/SQLInstructionsModal'
 import ProfileCategorySettings from '@/components/ProfileCategorySettings'
 import EmailConfigModal from '@/components/EmailConfigModal'
+import CategoryManagementModal from '@/components/CategoryManagementModal'
 import toast from 'react-hot-toast'
 
 export default function SettingsPage() {
   const { data: session } = useSession()
   const isAdmin = (session?.user as any)?.role === 'admin'
   const [emailModalOpen, setEmailModalOpen] = useState(false)
+  const [categoryModalOpen, setCategoryModalOpen] = useState(false)
   const [sqlModal, setSqlModal] = useState<{ isOpen: boolean; sql: string; instructions?: string[] }>({
     isOpen: false,
     sql: '',
@@ -103,6 +105,35 @@ export default function SettingsPage() {
           <div className="flex-grow flex flex-col">
             <ProfileCategorySettings />
           </div>
+        </div>
+
+        {/* Category Management Card */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
+          <div className="flex items-start mb-4">
+            <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex-shrink-0">
+              <Folder className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+            </div>
+            <div className="ml-3">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Gerenciar Categorias
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Categorias de chamados
+              </p>
+            </div>
+          </div>
+          
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-grow">
+            Gerencie as categorias utilizadas para classificar e organizar os chamados
+          </p>
+          
+          <button
+            onClick={() => setCategoryModalOpen(true)}
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
+          >
+            <Settings className="h-5 w-5 mr-2" />
+            Gerenciar Categorias
+          </button>
         </div>
 
         {/* Security Settings Card (Coming Soon) */}
@@ -207,6 +238,11 @@ export default function SettingsPage() {
             instructions: instructions || []
           })
         }}
+      />
+
+      <CategoryManagementModal
+        isOpen={categoryModalOpen}
+        onClose={() => setCategoryModalOpen(false)}
       />
 
       <SQLInstructionsModal
