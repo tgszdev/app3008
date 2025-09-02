@@ -105,14 +105,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    // Buscar usuário
-    const { data: userData } = await supabaseAdmin
-      .from('users')
-      .select('id, role')
-      .eq('email', session.user.email)
-      .single()
-
-    if (!userData || (userData.role !== 'admin' && userData.role !== 'analyst')) {
+    // Verificar permissão
+    const userRole = (session.user as any)?.role
+    const userId = (session.user as any)?.id || session.user.email
+    
+    if (userRole !== 'admin' && userRole !== 'analyst') {
+      console.log('Role do usuário:', userRole, 'Email:', session.user.email)
       return NextResponse.json(
         { error: 'Sem permissão para criar artigos' },
         { status: 403 }
@@ -165,7 +163,7 @@ export async function POST(request: NextRequest) {
         content,
         excerpt,
         category_id,
-        author_id: userData.id,
+        author_id: userId,
         status,
         is_featured,
         is_faq,

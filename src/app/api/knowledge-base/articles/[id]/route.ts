@@ -74,13 +74,10 @@ export async function PUT(
     }
 
     // Verificar permissão (admin ou analyst)
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('email', session.user.email)
-      .single()
-
-    if (!profile || (profile.role !== 'admin' && profile.role !== 'analyst')) {
+    const userRole = (session.user as any)?.role
+    
+    if (userRole !== 'admin' && userRole !== 'analyst') {
+      console.log('Role do usuário:', userRole, 'Email:', session.user.email)
       return NextResponse.json({ error: 'Sem permissão para editar artigos' }, { status: 403 })
     }
 
@@ -229,13 +226,10 @@ export async function DELETE(
     }
 
     // Verificar permissão (apenas admin)
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('email', session.user.email)
-      .single()
-
-    if (!profile || profile.role !== 'admin') {
+    const userRole = (session.user as any)?.role
+    
+    if (userRole !== 'admin') {
+      console.log('Role do usuário:', userRole, 'Email:', session.user.email)
       return NextResponse.json({ error: 'Apenas administradores podem excluir artigos' }, { status: 403 })
     }
 

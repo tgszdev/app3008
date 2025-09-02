@@ -93,13 +93,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar se é admin
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('email', session.user.email)
-      .single()
-
-    if (!profile || profile.role !== 'admin') {
+    const userRole = (session.user as any)?.role
+    
+    if (userRole !== 'admin') {
+      console.log('Role do usuário:', userRole, 'Email:', session.user.email)
       return NextResponse.json({ error: 'Apenas administradores podem criar categorias' }, { status: 403 })
     }
 
