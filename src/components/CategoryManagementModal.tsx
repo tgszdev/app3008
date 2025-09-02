@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import {
   Plus,
@@ -19,6 +19,14 @@ import {
   EyeOff,
   Folder,
   Package,
+  Package2,
+  PackageCheck,
+  PackageX,
+  PackageSearch,
+  PackagePlus,
+  PackageMinus,
+  Boxes,
+  Warehouse,
   Truck,
   ShoppingCart,
   ShoppingBag,
@@ -35,6 +43,15 @@ import {
   Route,
   MapPin,
   Clipboard,
+  ClipboardList,
+  ClipboardCheck,
+  ListChecks,
+  Layers,
+  LayoutGrid,
+  Grid3x3,
+  ScanLine,
+  QrCode,
+  Scan,
   BookOpen,
   Briefcase,
   HelpCircle,
@@ -106,7 +123,6 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [showIconDropdown, setShowIconDropdown] = useState(false)
   const [iconSearchTerm, setIconSearchTerm] = useState('')
-  const dropdownRef = useRef<HTMLDivElement>(null)
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -123,23 +139,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
     }
   }, [isOpen])
 
-  // Handle click outside of dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowIconDropdown(false)
-        setIconSearchTerm('')
-      }
-    }
 
-    if (showIconDropdown) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [showIconDropdown])
 
   const fetchCategories = async () => {
     setLoading(true)
@@ -352,16 +352,32 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
     category.description?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  // Lista de ícones disponíveis com foco em logística e operações
+  // Lista de ícones disponíveis com foco em logística e WMS
   const iconsList = [
-    // Logística e Transporte
+    // WMS - Warehouse Management System
+    { value: 'warehouse', label: 'Armazém', icon: 'Warehouse' },
     { value: 'package', label: 'Pacote', icon: 'Package' },
+    { value: 'package-2', label: 'Caixa Aberta', icon: 'Package2' },
+    { value: 'package-check', label: 'Pacote Verificado', icon: 'PackageCheck' },
+    { value: 'package-x', label: 'Pacote Rejeitado', icon: 'PackageX' },
+    { value: 'package-search', label: 'Buscar Pacote', icon: 'PackageSearch' },
+    { value: 'package-plus', label: 'Adicionar Pacote', icon: 'PackagePlus' },
+    { value: 'package-minus', label: 'Remover Pacote', icon: 'PackageMinus' },
+    { value: 'boxes', label: 'Múltiplas Caixas', icon: 'Boxes' },
+    { value: 'container', label: 'Container', icon: 'Container' },
+    { value: 'pallet', label: 'Palete', icon: 'Package' },
+    { value: 'barcode', label: 'Código de Barras', icon: 'ScanLine' },
+    { value: 'qr-code', label: 'QR Code', icon: 'QrCode' },
+    { value: 'scan', label: 'Scanner', icon: 'Scan' },
+    { value: 'forklift', label: 'Empilhadeira', icon: 'Truck' },
+    
+    // Logística e Transporte
     { value: 'truck', label: 'Caminhão', icon: 'Truck' },
+    { value: 'truck-delivery', label: 'Entrega', icon: 'Truck' },
     { value: 'shopping-cart', label: 'Carrinho', icon: 'ShoppingCart' },
     { value: 'shopping-bag', label: 'Sacola', icon: 'ShoppingBag' },
     { value: 'archive', label: 'Arquivo', icon: 'Archive' },
     { value: 'box', label: 'Caixa', icon: 'Box' },
-    { value: 'container', label: 'Container', icon: 'Container' },
     { value: 'map', label: 'Mapa', icon: 'Map' },
     { value: 'navigation', label: 'Navegação', icon: 'Navigation' },
     { value: 'compass', label: 'Bússola', icon: 'Compass' },
@@ -371,6 +387,14 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
     { value: 'bike', label: 'Bicicleta', icon: 'Bike' },
     { value: 'route', label: 'Rota', icon: 'Route' },
     { value: 'map-pin', label: 'Local', icon: 'MapPin' },
+    
+    // Inventário e Estoque
+    { value: 'clipboard-list', label: 'Lista de Inventário', icon: 'ClipboardList' },
+    { value: 'clipboard-check', label: 'Checklist', icon: 'ClipboardCheck' },
+    { value: 'list-checks', label: 'Lista de Tarefas', icon: 'ListChecks' },
+    { value: 'layers', label: 'Camadas/Níveis', icon: 'Layers' },
+    { value: 'layout-grid', label: 'Grade de Layout', icon: 'LayoutGrid' },
+    { value: 'grid-3x3', label: 'Grade 3x3', icon: 'Grid3x3' },
     
     // Documentação e Gestão
     { value: 'file-text', label: 'Documento', icon: 'FileText' },
@@ -678,7 +702,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Ícone
                           </label>
-                          <div className="relative" ref={dropdownRef}>
+                          <div className="relative">
                             <button
                               type="button"
                               onClick={() => setShowIconDropdown(!showIconDropdown)}
@@ -701,41 +725,97 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                             </button>
                             
                             {showIconDropdown && (
-                              <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                                <div className="p-2 border-b border-gray-200 dark:border-gray-600">
-                                  <input
-                                    type="text"
-                                    placeholder="Buscar ícone..."
-                                    value={iconSearchTerm}
-                                    onChange={(e) => setIconSearchTerm(e.target.value)}
-                                    className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                                    onClick={(e) => e.stopPropagation()}
-                                  />
-                                </div>
-                                <div className="p-1">
-                                  {iconsList
-                                    .filter(icon => 
+                              <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                                {/* Overlay */}
+                                <div 
+                                  className="fixed inset-0 bg-black bg-opacity-50" 
+                                  onClick={() => {
+                                    setShowIconDropdown(false)
+                                    setIconSearchTerm('')
+                                  }}
+                                />
+                                
+                                {/* Popup Modal */}
+                                <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+                                  {/* Header */}
+                                  <div className="bg-gray-50 dark:bg-gray-900 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                                    <div className="flex items-center justify-between">
+                                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Selecionar Ícone</h3>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setShowIconDropdown(false)
+                                          setIconSearchTerm('')
+                                        }}
+                                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                      >
+                                        <X className="h-5 w-5" />
+                                      </button>
+                                    </div>
+                                    
+                                    {/* Search Bar */}
+                                    <div className="mt-3">
+                                      <div className="relative">
+                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                        <input
+                                          type="text"
+                                          placeholder="Buscar ícone..."
+                                          value={iconSearchTerm}
+                                          onChange={(e) => setIconSearchTerm(e.target.value)}
+                                          className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                          autoFocus
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Icons Grid */}
+                                  <div className="p-4 overflow-y-auto max-h-[60vh]">
+                                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                                      {iconsList
+                                        .filter(icon => 
+                                          icon.label.toLowerCase().includes(iconSearchTerm.toLowerCase()) ||
+                                          icon.value.toLowerCase().includes(iconSearchTerm.toLowerCase())
+                                        )
+                                        .map(icon => {
+                                          const IconComponent = getIcon(icon.value)
+                                          const isSelected = formData.icon === icon.value
+                                          return (
+                                            <button
+                                              key={icon.value}
+                                              type="button"
+                                              onClick={() => {
+                                                setFormData({ ...formData, icon: icon.value })
+                                                setShowIconDropdown(false)
+                                                setIconSearchTerm('')
+                                              }}
+                                              className={`
+                                                flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all
+                                                ${isSelected 
+                                                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
+                                                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                                                }
+                                              `}
+                                              title={icon.label}
+                                            >
+                                              <IconComponent className={`h-6 w-6 mb-1 ${isSelected ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`} />
+                                              <span className={`text-xs ${isSelected ? 'text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-600 dark:text-gray-400'}`}>
+                                                {icon.label}
+                                              </span>
+                                            </button>
+                                          )
+                                        })}
+                                    </div>
+                                    
+                                    {iconsList.filter(icon => 
                                       icon.label.toLowerCase().includes(iconSearchTerm.toLowerCase()) ||
                                       icon.value.toLowerCase().includes(iconSearchTerm.toLowerCase())
-                                    )
-                                    .map(icon => {
-                                      const IconComponent = getIcon(icon.value)
-                                      return (
-                                        <button
-                                          key={icon.value}
-                                          type="button"
-                                          onClick={() => {
-                                            setFormData({ ...formData, icon: icon.value })
-                                            setShowIconDropdown(false)
-                                            setIconSearchTerm('')
-                                          }}
-                                          className="w-full px-2 py-2 flex items-center space-x-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded text-left"
-                                        >
-                                          <IconComponent className="h-4 w-4 flex-shrink-0" />
-                                          <span className="text-sm">{icon.label}</span>
-                                        </button>
-                                      )
-                                    })}
+                                    ).length === 0 && (
+                                      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                                        Nenhum ícone encontrado para "{iconSearchTerm}"
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             )}
