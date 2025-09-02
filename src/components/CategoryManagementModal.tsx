@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import toast from 'react-hot-toast'
 import {
   Plus,
@@ -71,11 +70,25 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
   const fetchCategories = async () => {
     setLoading(true)
     try {
-      const response = await axios.get('/api/categories')
-      setCategories(response.data.categories || [])
-    } catch (error) {
+      const response = await fetch('/api/categories', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      })
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      
+      const data = await response.json()
+      setCategories(data.categories || [])
+    } catch (error: any) {
       console.error('Erro ao buscar categorias:', error)
-      toast.error('Erro ao carregar categorias')
+      toast.error('Erro ao carregar categorias: ' + (error.message || 'Erro desconhecido'))
+      // Se não houver categorias, mostrar array vazio
+      setCategories([])
     } finally {
       setLoading(false)
     }
@@ -85,13 +98,25 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
     e.preventDefault()
     
     try {
-      if (editingCategory) {
-        await axios.put(`/api/categories/${editingCategory.id}`, formData)
-        toast.success('Categoria atualizada com sucesso!')
-      } else {
-        await axios.post('/api/categories', formData)
-        toast.success('Categoria criada com sucesso!')
+      const url = editingCategory 
+        ? `/api/categories/${editingCategory.id}`
+        : '/api/categories'
+      
+      const response = await fetch(url, {
+        method: editingCategory ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(formData)
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Erro ao salvar categoria')
       }
+      
+      toast.success(editingCategory ? 'Categoria atualizada com sucesso!' : 'Categoria criada com sucesso!')
       
       setShowCategoryModal(false)
       setEditingCategory(null)
@@ -106,7 +131,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
       })
       fetchCategories()
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Erro ao salvar categoria')
+      toast.error(error.message || 'Erro ao salvar categoria')
     }
   }
 
@@ -129,11 +154,20 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
     
     setDeletingId(id)
     try {
-      await axios.delete(`/api/categories/${id}`)
+      const response = await fetch(`/api/categories/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Erro ao excluir categoria')
+      }
+      
       toast.success('Categoria excluída com sucesso!')
       fetchCategories()
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Erro ao excluir categoria')
+      toast.error(error.message || 'Erro ao excluir categoria')
     } finally {
       setDeletingId(null)
     }
@@ -141,10 +175,22 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
 
   const handleToggleActive = async (category: Category) => {
     try {
-      await axios.put(`/api/categories/${category.id}`, {
-        ...category,
-        is_active: !category.is_active
+      const response = await fetch(`/api/categories/${category.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          ...category,
+          is_active: !category.is_active
+        })
       })
+      
+      if (!response.ok) {
+        throw new Error('Erro ao alterar status')
+      }
+      
       toast.success(`Categoria ${!category.is_active ? 'ativada' : 'desativada'} com sucesso!`)
       fetchCategories()
     } catch (error) {
@@ -166,13 +212,27 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
     // Update display_order for both categories
     try {
       await Promise.all([
-        axios.put(`/api/categories/${newCategories[currentIndex].id}`, {
-          ...newCategories[currentIndex],
-          display_order: currentIndex
+        fetch(`/api/categories/${newCategories[currentIndex].id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            ...newCategories[currentIndex],
+            display_order: currentIndex
+          })
         }),
-        axios.put(`/api/categories/${newCategories[newIndex].id}`, {
-          ...newCategories[newIndex],
-          display_order: newIndex
+        fetch(`/api/categories/${newCategories[newIndex].id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            ...newCategories[newIndex],
+            display_order: newIndex
+          })
         })
       ])
       
