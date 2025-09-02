@@ -186,8 +186,9 @@ export default function CategoriesPage() {
   }
 
   const handleDelete = async (category: Category) => {
-    if (category.article_count && category.article_count > 0) {
-      toast.error(`Esta categoria possui ${category.article_count} artigo(s) e não pode ser excluída`)
+    const articleCount = category.article_count || 0
+    if (articleCount > 0) {
+      toast.error(`Esta categoria possui ${articleCount} artigo(s) e não pode ser excluída`)
       return
     }
 
@@ -487,7 +488,7 @@ export default function CategoriesPage() {
                     
                     <button
                       onClick={() => handleDelete(category)}
-                      disabled={category.article_count && category.article_count > 0}
+                      disabled={!!category.article_count && category.article_count > 0}
                       className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       title={category.article_count && category.article_count > 0 ? 'Categoria possui artigos' : 'Excluir'}
                     >
