@@ -134,6 +134,7 @@ export default function KnowledgeBasePage() {
 
       // Buscar categorias
       const categoriesResponse = await axios.get('/api/knowledge-base/categories')
+      console.log('Categorias recebidas:', categoriesResponse.data)
       setCategories(categoriesResponse.data.categories || [])
 
       // Buscar artigos
@@ -150,12 +151,8 @@ export default function KnowledgeBasePage() {
       setFeaturedArticles(articlesResponse.data.articles?.filter((a: Article) => a.is_featured) || [])
       setFaqArticles(articlesResponse.data.articles?.filter((a: Article) => a.is_faq) || [])
 
-      // Se chegou aqui e não tem dados, provavelmente as tabelas precisam ser criadas
-      if (categories.length === 0 && !searchTerm && !selectedCategory) {
-        setSetupNeeded(true)
-      } else {
-        setSetupNeeded(false)
-      }
+      // Se chegou aqui sem erro, as tabelas existem
+      setSetupNeeded(false)
 
     } catch (error: any) {
       console.error('Erro ao buscar base de conhecimento:', error)
@@ -358,35 +355,52 @@ export default function KnowledgeBasePage() {
 
       {/* Categorias Rápidas */}
       {!searchTerm && !selectedCategory && !showFaqOnly && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {categories.slice(0, 8).map((category) => {
-            const Icon = getCategoryIcon(category.icon)
-            return (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow text-left"
-              >
-                <div className="flex items-start space-x-3">
-                  <div
-                    className="p-2 rounded-lg"
-                    style={{ backgroundColor: `${category.color}20` }}
+        <>
+          {categories.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {categories.slice(0, 8).map((category) => {
+                const Icon = getCategoryIcon(category.icon)
+                return (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.id)}
+                    className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow text-left"
                   >
-                    <Icon className="h-6 w-6" style={{ color: category.color }} />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-gray-900 dark:text-white">
-                      {category.name}
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      {category.article_count || 0} artigos
-                    </p>
-                  </div>
-                </div>
-              </button>
-            )
-          })}
-        </div>
+                    <div className="flex items-start space-x-3">
+                      <div
+                        className="p-2 rounded-lg"
+                        style={{ backgroundColor: `${category.color}20` }}
+                      >
+                        <Icon className="h-6 w-6" style={{ color: category.color }} />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-medium text-gray-900 dark:text-white">
+                          {category.name}
+                        </h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                          {category.article_count || 0} artigos
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
+              <p className="text-yellow-700 dark:text-yellow-300">
+                Nenhuma categoria encontrada. {canEdit && (
+                  <button
+                    onClick={() => router.push('/dashboard/knowledge-base/categories')}
+                    className="text-yellow-900 dark:text-yellow-100 underline font-medium"
+                  >
+                    Criar primeira categoria
+                  </button>
+                )}
+              </p>
+            </div>
+          )}
+        </>
       )}
 
       {/* Artigos em Destaque */}

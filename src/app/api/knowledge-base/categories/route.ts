@@ -26,15 +26,36 @@ export async function GET(request: NextRequest) {
       .order('display_order', { ascending: true })
 
     if (error) {
-      console.error('Erro ao buscar categorias (tabela pode não existir):', error)
-      // Se a tabela não existir, retornar array vazio
+      console.error('Erro ao buscar categorias:', error)
+      // Se houver erro, mas não é de tabela inexistente, tentar buscar sem o count
+      if (error.message?.includes('relation') || error.message?.includes('does not exist')) {
+        // Tabela não existe
+        return NextResponse.json({ categories: [] })
+      }
+      
+      // Tentar buscar categorias sem o count de artigos
+      const { data: simpleCats } = await supabase
+        .from('kb_categories')
+        .select('*')
+        .order('display_order', { ascending: true })
+      
+      if (simpleCats) {
+        const formatted = simpleCats.map(cat => ({
+          ...cat,
+          article_count: 0
+        }))
+        return NextResponse.json({ categories: formatted })
+      }
+      
       return NextResponse.json({ categories: [] })
     }
 
     // Formatar a resposta
     const formattedCategories = categories?.map(category => {
       // Extrair a contagem de artigos
-      const articleCount = (category.article_count as any)?.[0]?.count || 0
+      const articleCount = Array.isArray(category.article_count) 
+        ? (category.article_count[0] as any)?.count || 0
+        : 0
       
       return {
         id: category.id,
