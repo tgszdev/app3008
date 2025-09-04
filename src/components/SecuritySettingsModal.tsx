@@ -176,7 +176,7 @@ export default function SecuritySettingsModal({ isOpen, onClose }: SecuritySetti
           </div>
 
           {/* Content */}
-          <div className="px-6 py-4 max-h-[70vh] overflow-y-auto">
+          <div className="px-6 py-4 max-h-[70vh] overflow-y-auto bg-white dark:bg-gray-800">
             {loading ? (
               <div className="flex justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>

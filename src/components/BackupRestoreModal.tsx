@@ -350,7 +350,7 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
           </div>
 
           {/* Content */}
-          <div className="px-6 py-4 max-h-[65vh] overflow-y-auto">
+          <div className="px-6 py-4 max-h-[65vh] overflow-y-auto bg-white dark:bg-gray-800">
             {loading && activeTab !== 'settings' ? (
               <div className="flex justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>

@@ -393,7 +393,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
           </div>
 
           {/* Content */}
-          <div className="px-6 py-4 max-h-[60vh] overflow-y-auto">
+          <div className="px-6 py-4 max-h-[60vh] overflow-y-auto bg-white dark:bg-gray-800">
             {loading ? (
               <div className="flex justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
@@ -439,7 +439,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                           </div>
                           <div className="space-y-1">
                             {settings.email.defaultRecipients.map((email, index) => (
-                              <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded">
+                              <div key={index} className="flex items-center justify-between bg-gray-50 dark:bg-gray-700 px-3 py-2 rounded">
                                 <span className="text-sm text-gray-700 dark:text-gray-300">{email}</span>
                                 <button
                                   onClick={() => removeEmailRecipient(email)}
@@ -452,7 +452,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                           </div>
                         </div>
 
-                        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                           <label className="flex items-center mb-2">
                             <input
                               type="checkbox"
@@ -463,7 +463,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                               })}
                               className="mr-2"
                             />
-                            <span className="text-sm font-medium">Habilitar resumo de notificações</span>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Habilitar resumo de notificações</span>
                           </label>
                           
                           {settings.email.digestEnabled && (
@@ -475,7 +475,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                                   ...settings,
                                   email: { ...settings.email, digestFrequency: e.target.value as any }
                                 })}
-                                className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                                className="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500"
                               >
                                 <option value="daily">Diário</option>
                                 <option value="weekly">Semanal</option>
@@ -509,7 +509,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                       <>
                         {renderEventSettings('browser')}
                         
-                        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                           <label className="flex items-center mb-3">
                             <input
                               type="checkbox"
@@ -520,7 +520,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                               })}
                               className="mr-2"
                             />
-                            <span className="text-sm font-medium">Habilitar som de notificação</span>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Habilitar som de notificação</span>
                           </label>
                           
                           {settings.browser.soundEnabled && (
@@ -595,7 +595,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                                   slack: { ...settings.slack, channel: e.target.value }
                                 })}
                                 placeholder="#support"
-                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500"
                               />
                             </div>
                             
@@ -611,7 +611,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                                   slack: { ...settings.slack, username: e.target.value }
                                 })}
                                 placeholder="Support Bot"
-                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500"
                               />
                             </div>
                           </div>
@@ -685,7 +685,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                                   ...settings,
                                   webhook: { ...settings.webhook, method: e.target.value as 'POST' | 'PUT' }
                                 })}
-                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500"
                               >
                                 <option value="POST">POST</option>
                                 <option value="PUT">PUT</option>
@@ -705,7 +705,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                                   ...settings,
                                   webhook: { ...settings.webhook, retryAttempts: parseInt(e.target.value) }
                                 })}
-                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500"
                               />
                             </div>
                           </div>
@@ -720,14 +720,14 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                                 value={newWebhookHeader.key}
                                 onChange={(e) => setNewWebhookHeader({ ...newWebhookHeader, key: e.target.value })}
                                 placeholder="Nome do Header"
-                                className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500"
                               />
                               <input
                                 type="text"
                                 value={newWebhookHeader.value}
                                 onChange={(e) => setNewWebhookHeader({ ...newWebhookHeader, value: e.target.value })}
                                 placeholder="Valor"
-                                className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500"
                               />
                               <button
                                 onClick={addWebhookHeader}
@@ -738,7 +738,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                             </div>
                             <div className="space-y-1">
                               {settings.webhook.headers.map((header, index) => (
-                                <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded">
+                                <div key={index} className="flex items-center justify-between bg-gray-50 dark:bg-gray-700 px-3 py-2 rounded">
                                   <span className="text-sm text-gray-700 dark:text-gray-300">{header.key}: {header.value}</span>
                                   <button
                                     onClick={() => removeWebhookHeader(index)}
@@ -808,7 +808,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                                     ...settings,
                                     sms: { ...settings.sms, accountSid: e.target.value }
                                   })}
-                                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500"
                                 />
                               </div>
                               
@@ -823,7 +823,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                                     ...settings,
                                     sms: { ...settings.sms, authToken: e.target.value }
                                   })}
-                                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500"
                                 />
                               </div>
                               
@@ -839,7 +839,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                                     sms: { ...settings.sms, fromNumber: e.target.value }
                                   })}
                                   placeholder="+1234567890"
-                                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500"
                                 />
                               </div>
                             </>
@@ -853,7 +853,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                                 value={newSMSRecipient}
                                 onChange={(e) => setNewSMSRecipient(e.target.value)}
                                 placeholder="+5511999999999"
-                                className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500"
                               />
                               <button
                                 onClick={addSMSRecipient}
@@ -864,7 +864,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                             </div>
                             <div className="space-y-1">
                               {settings.sms.defaultRecipients.map((phone, index) => (
-                                <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded">
+                                <div key={index} className="flex items-center justify-between bg-gray-50 dark:bg-gray-700 px-3 py-2 rounded">
                                   <span className="text-sm text-gray-700 dark:text-gray-300">{phone}</span>
                                   <button
                                     onClick={() => removeSMSRecipient(phone)}
