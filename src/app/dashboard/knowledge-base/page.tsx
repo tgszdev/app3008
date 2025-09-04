@@ -204,45 +204,47 @@ export default function KnowledgeBasePage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-900 rounded-lg shadow-lg p-8 text-white">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-3">
-            <BookOpen className="h-10 w-10" />
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-900 rounded-lg shadow-lg p-4 md:p-8 text-white">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+          <div className="flex items-start md:items-center space-x-3">
+            <BookOpen className="h-8 w-8 md:h-10 md:w-10 flex-shrink-0 mt-1 md:mt-0" />
             <div>
-              <h1 className="text-3xl font-bold">Base de Conhecimento</h1>
-              <p className="text-blue-100 mt-1">
+              <h1 className="text-xl md:text-3xl font-bold">Base de Conhecimento</h1>
+              <p className="text-sm md:text-base text-blue-100 mt-1">
                 Encontre soluções, tutoriais e respostas para suas dúvidas
               </p>
             </div>
           </div>
           
-          <div className="flex items-center space-x-3">
+          <div className="flex flex-wrap items-center gap-2">
             {isAdmin && (
               <button
                 onClick={() => router.push('/dashboard/knowledge-base/categories')}
-                className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur border border-white/30 rounded-lg text-white hover:bg-white/30 transition-colors"
+                className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-white/20 backdrop-blur border border-white/30 rounded-lg text-sm md:text-base text-white hover:bg-white/30 transition-colors"
               >
-                <Grid className="h-5 w-5 mr-2" />
-                Nova Categoria
+                <Grid className="h-4 w-4 md:h-5 md:w-5 mr-1 md:mr-2" />
+                <span className="hidden sm:inline">Nova Categoria</span>
+                <span className="sm:hidden">Categoria</span>
               </button>
             )}
             
             {canEdit && (
               <button
                 onClick={createNewArticle}
-                className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur border border-white/30 rounded-lg text-white hover:bg-white/30 transition-colors"
+                className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-white/20 backdrop-blur border border-white/30 rounded-lg text-sm md:text-base text-white hover:bg-white/30 transition-colors"
               >
-                <Plus className="h-5 w-5 mr-2" />
-                Novo Artigo
+                <Plus className="h-4 w-4 md:h-5 md:w-5 mr-1 md:mr-2" />
+                <span className="hidden sm:inline">Novo Artigo</span>
+                <span className="sm:hidden">Artigo</span>
               </button>
             )}
             
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur border border-white/30 rounded-lg text-white hover:bg-white/30 transition-colors"
+              className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-white/20 backdrop-blur border border-white/30 rounded-lg text-sm md:text-base text-white hover:bg-white/30 transition-colors"
             >
-              <RefreshCw className={`h-5 w-5 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-4 w-4 md:h-5 md:w-5 mr-1 md:mr-2 ${refreshing ? 'animate-spin' : ''}`} />
               Atualizar
             </button>
           </div>
@@ -262,44 +264,44 @@ export default function KnowledgeBasePage() {
 
         {/* Estatísticas Rápidas */}
         {stats && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-            <div className="bg-white/10 backdrop-blur rounded-lg p-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mt-6">
+            <div className="bg-white/10 backdrop-blur rounded-lg p-2 md:p-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-100 text-sm">Artigos</p>
-                  <p className="text-2xl font-bold">{stats.total_articles}</p>
+                  <p className="text-blue-100 text-xs md:text-sm">Artigos</p>
+                  <p className="text-lg md:text-2xl font-bold">{stats.total_articles}</p>
                 </div>
-                <FileText className="h-8 w-8 text-blue-200" />
+                <FileText className="h-6 w-6 md:h-8 md:w-8 text-blue-200" />
               </div>
             </div>
             
-            <div className="bg-white/10 backdrop-blur rounded-lg p-3">
+            <div className="bg-white/10 backdrop-blur rounded-lg p-2 md:p-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-100 text-sm">Categorias</p>
-                  <p className="text-2xl font-bold">{stats.total_categories}</p>
+                  <p className="text-blue-100 text-xs md:text-sm">Categorias</p>
+                  <p className="text-lg md:text-2xl font-bold">{stats.total_categories}</p>
                 </div>
-                <Grid className="h-8 w-8 text-blue-200" />
+                <Grid className="h-6 w-6 md:h-8 md:w-8 text-blue-200" />
               </div>
             </div>
             
-            <div className="bg-white/10 backdrop-blur rounded-lg p-3">
+            <div className="bg-white/10 backdrop-blur rounded-lg p-2 md:p-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-100 text-sm">Visualizações</p>
-                  <p className="text-2xl font-bold">{stats.total_views.toLocaleString('pt-BR')}</p>
+                  <p className="text-blue-100 text-xs md:text-sm">Visualizações</p>
+                  <p className="text-lg md:text-2xl font-bold">{stats.total_views.toLocaleString('pt-BR')}</p>
                 </div>
-                <Eye className="h-8 w-8 text-blue-200" />
+                <Eye className="h-6 w-6 md:h-8 md:w-8 text-blue-200" />
               </div>
             </div>
             
-            <div className="bg-white/10 backdrop-blur rounded-lg p-3">
+            <div className="bg-white/10 backdrop-blur rounded-lg p-2 md:p-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-100 text-sm">Taxa de Ajuda</p>
-                  <p className="text-2xl font-bold">{stats.helpful_percentage}%</p>
+                  <p className="text-blue-100 text-xs md:text-sm">Taxa de Ajuda</p>
+                  <p className="text-lg md:text-2xl font-bold">{stats.helpful_percentage}%</p>
                 </div>
-                <ThumbsUp className="h-8 w-8 text-blue-200" />
+                <ThumbsUp className="h-6 w-6 md:h-8 md:w-8 text-blue-200" />
               </div>
             </div>
           </div>
@@ -365,27 +367,27 @@ export default function KnowledgeBasePage() {
 
       {/* Categorias Rápidas */}
       {!searchTerm && !selectedCategory && !showFaqOnly && categories.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {categories.slice(0, 8).map((category) => {
             const Icon = getCategoryIcon(category.icon)
             return (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow text-left"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3 md:p-4 hover:shadow-md transition-shadow text-left"
               >
                 <div className="flex items-start space-x-3">
                   <div
-                    className="p-2 rounded-lg"
+                    className="p-1.5 md:p-2 rounded-lg flex-shrink-0"
                     style={{ backgroundColor: `${category.color}20` }}
                   >
-                    <Icon className="h-6 w-6" style={{ color: category.color }} />
+                    <Icon className="h-5 w-5 md:h-6 md:w-6" style={{ color: category.color }} />
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-gray-900 dark:text-white">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-gray-900 dark:text-white text-sm md:text-base truncate">
                       {category.name}
                     </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1">
                       {category.article_count || 0} artigos
                     </p>
                   </div>
@@ -399,16 +401,16 @@ export default function KnowledgeBasePage() {
       {/* Artigos em Destaque */}
       {featuredArticles.length > 0 && !searchTerm && !selectedCategory && !showFaqOnly && (
         <div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
-            <Star className="h-5 w-5 mr-2 text-yellow-500" />
+          <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-3 md:mb-4 flex items-center">
+            <Star className="h-4 w-4 md:h-5 md:w-5 mr-2 text-yellow-500" />
             Artigos em Destaque
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
             {featuredArticles.slice(0, 3).map((article) => (
               <div
                 key={article.id}
                 onClick={() => navigateToArticle(article.slug)}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow cursor-pointer"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:p-6 hover:shadow-md transition-shadow cursor-pointer"
               >
                 <div className="flex items-start justify-between mb-3">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400">
@@ -419,10 +421,10 @@ export default function KnowledgeBasePage() {
                     {article.view_count}
                   </div>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
                   {article.title}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">
+                <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm line-clamp-2">
                   {article.excerpt}
                 </p>
                 <div className="mt-4 flex items-center text-blue-600 dark:text-blue-400 text-sm font-medium">
@@ -469,7 +471,7 @@ export default function KnowledgeBasePage() {
             )}
           </div>
         ) : viewMode === 'grid' ? (
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
             {articles.map((article) => {
               const categoryIcon = article.category ? getCategoryIcon(article.category.icon) : FileText
               const CategoryIcon = categoryIcon
@@ -478,24 +480,24 @@ export default function KnowledgeBasePage() {
                 <div
                   key={article.id}
                   onClick={() => navigateToArticle(article.slug)}
-                  className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
+                  className="border border-gray-200 dark:border-gray-700 rounded-lg p-3 md:p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
                 >
-                  <div className="flex items-start space-x-4">
+                  <div className="flex items-start space-x-3 md:space-x-4">
                     {article.category && (
                       <div
-                        className="p-2 rounded-lg flex-shrink-0"
+                        className="p-1.5 md:p-2 rounded-lg flex-shrink-0"
                         style={{ backgroundColor: `${article.category.color}20` }}
                       >
                         <CategoryIcon 
-                          className="h-5 w-5" 
+                          className="h-4 w-4 md:h-5 md:w-5" 
                           style={{ color: article.category.color }} 
                         />
                       </div>
                     )}
                     
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between">
-                        <h3 className="text-base font-medium text-gray-900 dark:text-white">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="text-sm md:text-base font-medium text-gray-900 dark:text-white line-clamp-2">
                           {article.title}
                         </h3>
                         {article.is_faq && (
@@ -505,12 +507,12 @@ export default function KnowledgeBasePage() {
                         )}
                       </div>
                       
-                      <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                      <p className="mt-1 text-xs md:text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
                         {article.excerpt}
                       </p>
                       
                       <div className="mt-3 flex items-center justify-between">
-                        <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
+                        <div className="flex flex-wrap items-center gap-2 md:gap-4 text-xs text-gray-500 dark:text-gray-400">
                           <span className="flex items-center">
                             <Eye className="h-3 w-3 mr-1" />
                             {article.view_count}
@@ -539,12 +541,12 @@ export default function KnowledgeBasePage() {
               <div
                 key={article.id}
                 onClick={() => navigateToArticle(article.slug)}
-                className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
+                className="p-4 md:p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
               >
                 <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2">
-                      <h3 className="text-base font-medium text-gray-900 dark:text-white">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-sm md:text-base font-medium text-gray-900 dark:text-white">
                         {article.title}
                       </h3>
                       {article.is_featured && (
@@ -557,11 +559,11 @@ export default function KnowledgeBasePage() {
                       )}
                     </div>
                     
-                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    <p className="mt-1 text-xs md:text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
                       {article.excerpt}
                     </p>
                     
-                    <div className="mt-2 flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
+                    <div className="mt-2 flex flex-wrap items-center gap-2 md:gap-4 text-xs text-gray-500 dark:text-gray-400">
                       {article.category && (
                         <span className="flex items-center">
                           <Tag className="h-3 w-3 mr-1" />
@@ -595,10 +597,10 @@ export default function KnowledgeBasePage() {
 
       {/* FAQ Rápido */}
       {faqArticles.length > 0 && !showFaqOnly && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-              <HelpCircle className="h-5 w-5 mr-2 text-blue-500" />
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:p-6">
+          <div className="flex items-center justify-between mb-3 md:mb-4">
+            <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white flex items-center">
+              <HelpCircle className="h-4 w-4 md:h-5 md:w-5 mr-2 text-blue-500" />
               Perguntas Frequentes
             </h2>
             <button
