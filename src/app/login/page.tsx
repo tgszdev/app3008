@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
-import { Eye, EyeOff, Loader2, Shield } from 'lucide-react'
+import { Eye, EyeOff, Loader2, Headphones } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -56,74 +56,58 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
-      {/* Background Image */}
-      <div 
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: 'url(https://page.gensparksite.com/v1/base64_upload/089f4dbd70e29e67854b198dbca7fa13)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      >
-        {/* Overlay for better readability */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-blue-800/30 to-gray-900/40" />
-      </div>
-      
-      {/* Login Card */}
-      <div className="relative z-10 w-full max-w-md px-4">
-        <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/20">
-          {/* Logo */}
-          <div className="flex justify-center mb-8">
-            <div className="relative">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform">
-                <Shield className="w-12 h-12 text-white" />
-              </div>
-              {/* Decorative dots */}
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-400 rounded-full animate-pulse" />
-              <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-blue-600 rounded-full animate-pulse delay-150" />
+    <div className="min-h-screen flex">
+      {/* Left Side - Login Form */}
+      <div className="w-full lg:w-1/2 xl:w-2/5 flex items-center justify-center p-8 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+        <div className="w-full max-w-md">
+          {/* Logo Section */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl shadow-xl mb-4 transform hover:scale-105 transition-transform">
+              <Headphones className="w-12 h-12 text-white" />
             </div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Sistema de Suporte
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
+              Entre com suas credenciais para continuar
+            </p>
           </div>
 
-          {/* Title */}
-          <h1 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-2">
-            Bem-vindo de volta
-          </h1>
-          <p className="text-center text-gray-600 dark:text-gray-400 mb-8">
-            Faça login para acessar o sistema
-          </p>
-
-          {/* Form */}
+          {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email
               </label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300/50 dark:border-gray-600/50 bg-white/80 dark:bg-gray-700/80 backdrop-blur text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:bg-white/90 dark:hover:bg-gray-700/90"
-                placeholder="seu@email.com"
-                disabled={isLoading}
-                required
-                autoComplete="email"
-              />
+              <div className="relative">
+                <input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all outline-none"
+                  placeholder="seu@email.com"
+                  disabled={isLoading}
+                  required
+                  autoComplete="email"
+                />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <div className="w-5 h-px bg-gradient-to-r from-cyan-500 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity" />
+                </div>
+              </div>
             </div>
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Senha
               </label>
-              <div className="relative">
+              <div className="relative group">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300/50 dark:border-gray-600/50 bg-white/80 dark:bg-gray-700/80 backdrop-blur text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all pr-12 hover:bg-white/90 dark:hover:bg-gray-700/90"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all pr-12 outline-none"
                   placeholder="••••••••"
                   disabled={isLoading}
                   required
@@ -132,7 +116,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors p-1"
                   disabled={isLoading}
                 >
                   {showPassword ? (
@@ -141,13 +125,26 @@ export default function LoginPage() {
                     <Eye className="w-5 h-5" />
                   )}
                 </button>
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <div className="w-5 h-px bg-gradient-to-r from-cyan-500 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity" />
+                </div>
               </div>
+            </div>
+
+            <div className="flex items-center justify-between text-sm">
+              <label className="flex items-center">
+                <input type="checkbox" className="rounded border-gray-300 text-cyan-600 focus:ring-cyan-500" />
+                <span className="ml-2 text-gray-600 dark:text-gray-400">Lembrar de mim</span>
+              </label>
+              <a href="#" className="text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300">
+                Esqueceu a senha?
+              </a>
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3.5 px-4 rounded-lg transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center shadow-lg"
+              className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold py-3.5 px-4 rounded-xl transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center shadow-lg"
             >
               {isLoading ? (
                 <>
@@ -160,15 +157,76 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Decorative bottom element */}
-          <div className="mt-8 flex items-center justify-center space-x-2">
-            <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent flex-1" />
-            <div className="flex space-x-1">
-              <div className="w-1 h-1 bg-blue-400 rounded-full" />
-              <div className="w-1 h-1 bg-blue-500 rounded-full" />
-              <div className="w-1 h-1 bg-blue-600 rounded-full" />
+          {/* Footer */}
+          <div className="mt-8 text-center">
+            <div className="flex items-center justify-center space-x-2 mb-4">
+              <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent flex-1" />
+              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">ou</span>
+              <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent flex-1" />
             </div>
-            <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent flex-1" />
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Precisa de ajuda? 
+              <a href="#" className="text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300 ml-1">
+                Contate o suporte
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Background Image */}
+      <div className="hidden lg:block lg:w-1/2 xl:w-3/5 relative">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: 'url(/login-background.jpg)',
+          }}
+        >
+          {/* Overlay gradient for better visual */}
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-blue-900/30 to-gray-900/40" />
+          
+          {/* Content overlay */}
+          <div className="relative h-full flex items-center justify-center p-12">
+            <div className="text-center text-white max-w-2xl">
+              <div className="mb-8">
+                {/* Animated circuit lines */}
+                <svg className="w-full h-32 opacity-30" viewBox="0 0 400 100">
+                  <path 
+                    d="M 50 50 L 150 50 L 200 20 L 250 50 L 350 50" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    fill="none"
+                    strokeDasharray="5,5"
+                    className="animate-pulse"
+                  />
+                  <circle cx="50" cy="50" r="4" fill="currentColor" className="animate-pulse" />
+                  <circle cx="150" cy="50" r="4" fill="currentColor" className="animate-pulse delay-75" />
+                  <circle cx="200" cy="20" r="4" fill="currentColor" className="animate-pulse delay-150" />
+                  <circle cx="250" cy="50" r="4" fill="currentColor" className="animate-pulse delay-200" />
+                  <circle cx="350" cy="50" r="4" fill="currentColor" className="animate-pulse delay-300" />
+                </svg>
+              </div>
+              
+              <h2 className="text-4xl font-bold mb-4 drop-shadow-lg">
+                Suporte Inteligente
+              </h2>
+              <p className="text-xl text-white/90 drop-shadow mb-8">
+                Conectando você às soluções que precisa, quando precisa.
+              </p>
+              
+              {/* Feature badges */}
+              <div className="flex flex-wrap justify-center gap-4">
+                <div className="bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-sm">
+                  ✓ Atendimento 24/7
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-sm">
+                  ✓ Respostas Rápidas
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-sm">
+                  ✓ Suporte Especializado
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
