@@ -5,6 +5,19 @@ import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { Eye, EyeOff, Loader2, Headphones } from 'lucide-react'
+import { Inter, Poppins } from 'next/font/google'
+
+const poppins = Poppins({ 
+  weight: ['300', '400', '600', '700', '800'],
+  subsets: ['latin'],
+  display: 'swap'
+})
+
+const inter = Inter({ 
+  weight: ['300', '400', '500', '600'],
+  subsets: ['latin'],
+  display: 'swap'
+})
 
 export default function LoginPage() {
   const router = useRouter()
@@ -192,14 +205,33 @@ export default function LoginPage() {
           />
           
           {/* Content positioned in lower left area */}
-          <div className="absolute bottom-0 left-0 p-12 lg:p-16 max-w-2xl">
-            <div className="bg-gradient-to-r from-black/40 to-transparent p-8 rounded-2xl backdrop-blur-sm">
-              <h2 className="text-4xl lg:text-5xl font-bold mb-3 text-white drop-shadow-2xl">
-                Suporte Inteligente
+          <div className="absolute bottom-0 left-0 p-12 lg:p-16 max-w-3xl">
+            <div className="bg-gradient-to-r from-black/50 via-black/30 to-transparent p-10 rounded-3xl backdrop-blur-md">
+              <h2 className={`${poppins.className} text-5xl lg:text-6xl font-extrabold mb-4 text-white drop-shadow-2xl tracking-tight`}>
+                <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+                  Suporte
+                </span>
+                <span className="text-white ml-3">
+                  Inteligente
+                </span>
               </h2>
-              <p className="text-lg lg:text-xl text-white/95 drop-shadow-lg">
-                Conectando você às soluções que precisa, quando precisa.
+              <p className={`${inter.className} text-xl lg:text-2xl text-gray-100 font-light mb-6 leading-relaxed`}>
+                Transformando desafios em soluções com <span className="font-semibold text-cyan-400">tecnologia</span> e <span className="font-semibold text-purple-400">inovação</span>.
               </p>
+              <div className="flex items-center gap-6 text-sm lg:text-base text-gray-300">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span>Atendimento 24/7</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                  <span>IA Integrada</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                  <span>Resposta Rápida</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
