@@ -56,18 +56,38 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: 'url(https://page.gensparksite.com/v1/base64_upload/089f4dbd70e29e67854b198dbca7fa13)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        {/* Overlay for better readability */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-blue-800/30 to-gray-900/40" />
+      </div>
+      
+      {/* Login Card */}
+      <div className="relative z-10 w-full max-w-md px-4">
+        <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/20">
           {/* Logo */}
           <div className="flex justify-center mb-8">
-            <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center">
-              <Shield className="w-10 h-10 text-white" />
+            <div className="relative">
+              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform">
+                <Shield className="w-12 h-12 text-white" />
+              </div>
+              {/* Decorative dots */}
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-400 rounded-full animate-pulse" />
+              <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-blue-600 rounded-full animate-pulse delay-150" />
             </div>
           </div>
 
           {/* Title */}
-          <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-2">
+          <h1 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-2">
             Bem-vindo de volta
           </h1>
           <p className="text-center text-gray-600 dark:text-gray-400 mb-8">
@@ -85,10 +105,11 @@ export default function LoginPage() {
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300/50 dark:border-gray-600/50 bg-white/80 dark:bg-gray-700/80 backdrop-blur text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all hover:bg-white/90 dark:hover:bg-gray-700/90"
                 placeholder="seu@email.com"
                 disabled={isLoading}
                 required
+                autoComplete="email"
               />
             </div>
 
@@ -102,15 +123,16 @@ export default function LoginPage() {
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors pr-12"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300/50 dark:border-gray-600/50 bg-white/80 dark:bg-gray-700/80 backdrop-blur text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all pr-12 hover:bg-white/90 dark:hover:bg-gray-700/90"
                   placeholder="••••••••"
                   disabled={isLoading}
                   required
+                  autoComplete="current-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
                   disabled={isLoading}
                 >
                   {showPassword ? (
@@ -125,7 +147,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3.5 px-4 rounded-lg transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center shadow-lg"
             >
               {isLoading ? (
                 <>
@@ -138,7 +160,16 @@ export default function LoginPage() {
             </button>
           </form>
 
-
+          {/* Decorative bottom element */}
+          <div className="mt-8 flex items-center justify-center space-x-2">
+            <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent flex-1" />
+            <div className="flex space-x-1">
+              <div className="w-1 h-1 bg-blue-400 rounded-full" />
+              <div className="w-1 h-1 bg-blue-500 rounded-full" />
+              <div className="w-1 h-1 bg-blue-600 rounded-full" />
+            </div>
+            <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent flex-1" />
+          </div>
         </div>
       </div>
     </div>
