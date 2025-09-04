@@ -136,9 +136,6 @@ export default function LoginPage() {
                 <input type="checkbox" className="rounded border-gray-300 text-cyan-600 focus:ring-cyan-500" />
                 <span className="ml-2 text-gray-600 dark:text-gray-400">Lembrar de mim</span>
               </label>
-              <a href="#" className="text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300">
-                Esqueceu a senha?
-              </a>
             </div>
 
             <button
@@ -161,14 +158,9 @@ export default function LoginPage() {
           <div className="mt-8 text-center">
             <div className="flex items-center justify-center space-x-2 mb-4">
               <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent flex-1" />
-              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">ou</span>
-              <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent flex-1" />
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Precisa de ajuda? 
-              <a href="#" className="text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300 ml-1">
-                Contate o suporte
-              </a>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Desenvolvido por <span className="font-medium text-gray-700 dark:text-gray-300">Thiago Souza</span>
             </p>
           </div>
         </div>
@@ -214,18 +206,7 @@ export default function LoginPage() {
                 Conectando você às soluções que precisa, quando precisa.
               </p>
               
-              {/* Feature badges */}
-              <div className="flex flex-wrap justify-center gap-4">
-                <div className="bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-sm">
-                  ✓ Atendimento 24/7
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-sm">
-                  ✓ Respostas Rápidas
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-sm">
-                  ✓ Suporte Especializado
-                </div>
-              </div>
+
             </div>
           </div>
         </div>
