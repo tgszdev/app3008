@@ -2,7 +2,8 @@
 import { toast } from 'react-hot-toast'
 
 // VAPID public key - você precisa gerar isso no servidor
-const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || ''
+// Para gerar: npx web-push generate-vapid-keys
+const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || 'BPjH0w6RqJmzR9x0FMfp6dVkSY_lPYXKOYZlkdDD2jhwSBvfDdEz8wDsW8XaA7G9k2TbALGYhO3mGqCZKl0xRvQ'
 
 export class PushNotificationManager {
   private registration: ServiceWorkerRegistration | null = null
@@ -90,12 +91,33 @@ export class PushNotificationManager {
 
       // Create new subscription if needed
       if (!subscription) {
-        const convertedVapidKey = this.urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-        
-        subscription = await this.registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: convertedVapidKey as BufferSource
-        })
+        // Check if VAPID key is configured
+        if (!VAPID_PUBLIC_KEY || VAPID_PUBLIC_KEY === '') {
+          console.error('VAPID public key not configured')
+          toast.error('Notificações push não configuradas. Entre em contato com o suporte.')
+          return null
+        }
+
+        try {
+          const convertedVapidKey = this.urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+          
+          subscription = await this.registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: convertedVapidKey as BufferSource
+          })
+        } catch (subscribeError: any) {
+          console.error('Push subscription error:', subscribeError)
+          
+          // Provide user-friendly error messages
+          if (subscribeError.name === 'NotAllowedError') {
+            toast.error('Permissão negada pelo navegador. Verifique as configurações do site.')
+          } else if (subscribeError.name === 'NotSupportedError') {
+            toast.error('Navegador não suporta notificações push.')
+          } else {
+            toast.error('Erro ao configurar notificações. Tente novamente mais tarde.')
+          }
+          return null
+        }
       }
 
       this.subscription = subscription
@@ -105,9 +127,16 @@ export class PushNotificationManager {
 
       console.log('Push subscription:', subscription)
       return subscription
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to subscribe to push notifications:', error)
-      toast.error('Erro ao ativar notificações push')
+      
+      // Provide specific error messages
+      if (error.message?.includes('Service Worker')) {
+        toast.error('Erro ao registrar Service Worker. Recarregue a página.')
+      } else {
+        toast.error('Erro ao ativar notificações push. Tente novamente.')
+      }
+      
       return null
     }
   }
