@@ -5,6 +5,7 @@ import { Bell, Mail, Smartphone, Clock, Save, TestTube, Loader2, Send } from 'lu
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
+import { useSession } from 'next-auth/react'
 
 interface NotificationPreferences {
   email_enabled: boolean
@@ -43,10 +44,14 @@ const notificationTypes = [
 ]
 
 export default function NotificationSettingsPage() {
+  const { data: session } = useSession()
   const [preferences, setPreferences] = useState<NotificationPreferences>(defaultPreferences)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const { isSupported, isSubscribed, isLoading, subscribe, unsubscribe, testNotification } = usePushNotifications()
+  
+  // Check if user is admin
+  const isAdmin = (session?.user as any)?.role === 'admin'
 
   // Buscar preferências
   useEffect(() => {
@@ -327,36 +332,47 @@ export default function NotificationSettingsPage() {
 
         {/* Ações */}
         <div className="p-6 flex justify-between">
-          <div className="flex gap-2">
-            <button
-              onClick={sendTestNotification}
-              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center gap-2"
-            >
-              <TestTube className="h-4 w-4" />
-              Teste Notificação
-            </button>
-            
-            <button
-              onClick={async () => {
-                try {
-                  const response = await axios.post('/api/test-email')
-                  if (response.data.success) {
-                    toast.success(response.data.message)
-                  } else {
-                    toast.error(response.data.error || 'Erro ao enviar email de teste')
-                  }
-                } catch (error: any) {
-                  console.error('Erro ao testar email:', error)
-                  const errorMsg = error.response?.data?.error || 'Erro ao enviar email de teste'
-                  const helpMsg = error.response?.data?.help
-                  toast.error(helpMsg ? `${errorMsg}\n${helpMsg}` : errorMsg)
-                }
-              }}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
-            >
-              <Send className="h-4 w-4" />
-              Teste Email
-            </button>
+          <div className="flex gap-2 items-center">
+            {/* Botões de teste - visíveis apenas para admin */}
+            {isAdmin ? (
+              <>
+                <button
+                  onClick={sendTestNotification}
+                  className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center gap-2"
+                  title="Enviar notificação de teste"
+                >
+                  <TestTube className="h-4 w-4" />
+                  Teste Notificação
+                </button>
+                
+                <button
+                  onClick={async () => {
+                    try {
+                      const response = await axios.post('/api/test-email')
+                      if (response.data.success) {
+                        toast.success(response.data.message)
+                      } else {
+                        toast.error(response.data.error || 'Erro ao enviar email de teste')
+                      }
+                    } catch (error: any) {
+                      console.error('Erro ao testar email:', error)
+                      const errorMsg = error.response?.data?.error || 'Erro ao enviar email de teste'
+                      const helpMsg = error.response?.data?.help
+                      toast.error(helpMsg ? `${errorMsg}\n${helpMsg}` : errorMsg)
+                    }
+                  }}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+                  title="Enviar email de teste"
+                >
+                  <Send className="h-4 w-4" />
+                  Teste Email
+                </button>
+              </>
+            ) : (
+              <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                As configurações serão aplicadas automaticamente
+              </p>
+            )}
           </div>
           
           <button
