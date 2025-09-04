@@ -204,9 +204,9 @@ export default function LoginPage() {
             }}
           />
           
-          {/* Content positioned in lower left area */}
-          <div className="absolute bottom-0 left-0 p-12 lg:p-16 max-w-3xl">
-            <div className="bg-gradient-to-r from-black/50 via-black/30 to-transparent p-10 rounded-3xl backdrop-blur-md">
+          {/* Content positioned in upper left area (red highlighted zone) */}
+          <div className="absolute top-0 left-0 p-12 lg:p-16 max-w-3xl">
+            <div className="bg-gradient-to-r from-black/50 via-black/30 to-transparent p-10 rounded-3xl backdrop-blur-md mt-8">
               <h2 className={`${poppins.className} text-4xl lg:text-5xl font-bold mb-4 text-white drop-shadow-2xl`}>
                 <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
                   O Futuro do Atendimento
