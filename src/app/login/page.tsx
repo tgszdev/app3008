@@ -204,20 +204,25 @@ export default function LoginPage() {
             }}
           />
           
-          {/* Content positioned in upper left area (red highlighted zone) */}
-          <div className="absolute top-0 left-0 p-8 lg:p-12 max-w-2xl">
-            <div className="bg-gradient-to-r from-black/50 via-black/30 to-transparent p-6 rounded-2xl backdrop-blur-md mt-6">
-              <h2 className={`${poppins.className} text-3xl lg:text-4xl font-bold mb-3 text-white drop-shadow-2xl`}>
-                <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  O Futuro do Atendimento
-                </span>
-                <span className="text-white ml-2">
-                  é Agora
-                </span>
-              </h2>
-              <p className={`${inter.className} text-base lg:text-lg text-gray-100 font-light leading-relaxed`}>
-                Tecnologia feita para <span className="font-semibold text-cyan-400">simplificar</span>, não complicar.
-              </p>
+          {/* Content positioned in upper left area with better UX */}
+          <div className="absolute top-12 left-12 lg:top-16 lg:left-16">
+            <div className="bg-black/40 p-8 lg:p-10 rounded-2xl backdrop-blur-sm border border-white/10 shadow-2xl max-w-lg">
+              <div className="space-y-4">
+                <h2 className={`${poppins.className} text-3xl lg:text-4xl font-bold text-white drop-shadow-2xl leading-tight`}>
+                  <span className="block bg-gradient-to-r from-cyan-300 to-purple-400 bg-clip-text text-transparent">
+                    O Futuro do
+                  </span>
+                  <span className="block bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    Atendimento é Agora
+                  </span>
+                </h2>
+                <div className="h-1 w-20 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full"></div>
+                <p className={`${inter.className} text-lg lg:text-xl text-white/90 font-light leading-relaxed max-w-md`}>
+                  Tecnologia feita para <span className="font-medium text-cyan-300">simplificar</span>, 
+                  <br className="hidden sm:block" />
+                  não complicar.
+                </p>
+              </div>
             </div>
           </div>
         </div>
