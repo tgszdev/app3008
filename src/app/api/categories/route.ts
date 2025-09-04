@@ -3,7 +3,7 @@ import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 
 // GET - Listar categorias
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const session = await auth()
     
@@ -11,10 +11,24 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: categories, error } = await supabaseAdmin
+    // Parse query parameters
+    const { searchParams } = new URL(request.url)
+    const activeOnly = searchParams.get('active_only') === 'true'
+
+    // Build query
+    let query = supabaseAdmin
       .from('categories')
       .select('*')
-      .order('display_order', { ascending: true })
+
+    // Filter by active status if requested
+    if (activeOnly) {
+      query = query.eq('is_active', true)
+    }
+
+    // Order by display_order
+    query = query.order('display_order', { ascending: true })
+
+    const { data: categories, error } = await query
 
     if (error) {
       console.error('Error fetching categories:', error)
