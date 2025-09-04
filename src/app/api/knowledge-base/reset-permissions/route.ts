@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
       success: true,
       message: `Permissões resetadas com sucesso. Todos os roles agora podem ver todas as ${allCategoryIds.length} categorias.`,
       categories_count: allCategoryIds.length,
-      roles_updated: roles
+      roles_updated: ['admin', 'agent', 'user']
     })
 
   } catch (error) {
