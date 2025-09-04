@@ -15,7 +15,10 @@
 - **Gerenciamento de Usuários**: `/dashboard/users`
 - **Supabase Dashboard**: https://supabase.com/dashboard/project/eyfvvximmeqmwdfqzqov
 
-## 🆕 Últimas Correções (09/01/2025)
+## 🆕 Últimas Atualizações (09/01/2025)
+
+### ✅ Nova Funcionalidade:
+- **Upload de Arquivos na Criação de Tickets**: Agora é possível anexar até 5 arquivos ao criar um novo ticket, com interface drag-and-drop intuitiva
 
 ### ✅ Problemas Resolvidos:
 1. **Categorias diferentes entre mobile e desktop**: Corrigido filtro `active_only` na API `/api/categories`
@@ -26,6 +29,7 @@
 6. **Responsividade**: Melhorado layout da Knowledge Base para mobile
 7. **Segurança**: Removido credenciais demo visíveis, botões de teste restritos a admin
 8. **Tickets e Comentários Internos**: Implementado sistema completo de tickets/comentários internos com controle de visibilidade baseado em roles
+9. **Tickets Internos em Chamados Recentes**: Corrigido problema de tickets internos aparecendo no dashboard para usuários comuns
 
 ## ✅ Funcionalidades Implementadas
 
@@ -163,12 +167,21 @@
 - ✅ **Interface Admin**: Página exclusiva para administradores
 - ✅ **API RESTful**: Endpoints completos em `/api/categories`
 - ✅ **10 Categorias Padrão**: Geral, Hardware, Software, Rede, etc.
-- ✅ **Upload de Arquivos**: Anexar arquivos aos chamados (máx. 10MB)
-- ✅ **Tipos Suportados**: Imagens (PNG, JPG, GIF), Documentos (PDF, DOC, DOCX, XLS, XLSX, TXT)
+
+### 10. **Sistema de Upload de Arquivos**
+- ✅ **Upload na Criação**: Anexar até 5 arquivos ao criar um novo ticket
+- ✅ **Upload em Tickets Existentes**: Adicionar anexos a qualquer momento
+- ✅ **Interface Drag-and-Drop**: Arrastar e soltar arquivos para upload
+- ✅ **Limite de Tamanho**: Máximo 10MB por arquivo
+- ✅ **Tipos Suportados**: Imagens (PNG, JPG, GIF), Documentos (PDF, DOC, DOCX, XLS, XLSX, TXT, ZIP)
 - ✅ **Visualização**: Preview de imagens diretamente na página
+- ✅ **Lista Visual**: Exibição dos arquivos selecionados com nome e tamanho
+- ✅ **Remoção Fácil**: Botão para remover arquivos antes do upload
 - ✅ **Download**: Baixar anexos dos chamados
 - ✅ **Integração Supabase Storage**: Armazenamento seguro em bucket dedicado
-- ✅ **Validação**: Verificação de tipo e tamanho de arquivo
+- ✅ **Validação**: Verificação automática de tipo e tamanho de arquivo
+- ✅ **Feedback Visual**: Indicadores de progresso durante o upload
+- ✅ **Upload Assíncrono**: Arquivos são enviados após a criação do ticket
 
 ## 📈 APIs Disponíveis
 
