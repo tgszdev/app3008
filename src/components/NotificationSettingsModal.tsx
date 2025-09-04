@@ -320,7 +320,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
     
     return (
       <div className="space-y-2">
-        <h4 className="text-sm font-medium text-gray-700 mb-3">Eventos para Notificar:</h4>
+        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Eventos para Notificar:</h4>
         {Object.entries(eventLabels).map(([key, label]) => (
           <label key={key} className="flex items-center">
             <input
@@ -340,7 +340,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
               }}
               className="mr-2"
             />
-            <span className="text-sm">{label}</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">{label}</span>
           </label>
         ))}
       </div>
@@ -352,7 +352,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
       <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
         <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onClick={onClose} />
         
-        <div className="inline-block w-full max-w-4xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white rounded-lg shadow-xl">
+        <div className="inline-block w-full max-w-4xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 rounded-lg shadow-xl">
           {/* Header */}
           <div className="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
             <div className="flex items-center justify-between">
@@ -367,7 +367,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
           </div>
 
           {/* Tabs */}
-          <div className="border-b">
+          <div className="border-b border-gray-200 dark:border-gray-700">
             <div className="flex space-x-1 px-6 pt-4">
               {[
                 { id: 'email', label: 'E-mail', icon: Mail },
@@ -381,8 +381,8 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`flex items-center px-4 py-2 rounded-t-lg transition-colors ${
                     activeTab === tab.id
-                      ? 'bg-white border-t border-l border-r text-purple-600'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-white dark:bg-gray-800 border-t border-l border-r border-gray-200 dark:border-gray-700 text-purple-600 dark:text-purple-400'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   <tab.icon className="w-4 h-4 mr-2" />
@@ -428,7 +428,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                               value={newEmailRecipient}
                               onChange={(e) => setNewEmailRecipient(e.target.value)}
                               placeholder="email@exemplo.com"
-                              className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500"
                             />
                             <button
                               onClick={addEmailRecipient}
@@ -440,7 +440,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                           <div className="space-y-1">
                             {settings.email.defaultRecipients.map((email, index) => (
                               <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded">
-                                <span className="text-sm">{email}</span>
+                                <span className="text-sm text-gray-700 dark:text-gray-300">{email}</span>
                                 <button
                                   onClick={() => removeEmailRecipient(email)}
                                   className="text-red-600 hover:text-red-800"
@@ -567,7 +567,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                         
                         <div className="mt-4 space-y-3">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                               Webhook URL
                             </label>
                             <input
@@ -584,7 +584,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                           
                           <div className="grid grid-cols-2 gap-3">
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 Canal
                               </label>
                               <input
@@ -600,7 +600,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                             </div>
                             
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 Nome do Bot
                               </label>
                               <input
@@ -617,7 +617,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                           </div>
                           
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                               Emoji do Ícone
                             </label>
                             <input
@@ -659,7 +659,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                         
                         <div className="mt-4 space-y-3">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                               URL do Webhook
                             </label>
                             <input
@@ -676,7 +676,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                           
                           <div className="grid grid-cols-2 gap-3">
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 Método HTTP
                               </label>
                               <select
@@ -693,7 +693,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                             </div>
                             
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 Tentativas de Retry
                               </label>
                               <input
@@ -739,7 +739,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                             <div className="space-y-1">
                               {settings.webhook.headers.map((header, index) => (
                                 <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded">
-                                  <span className="text-sm">{header.key}: {header.value}</span>
+                                  <span className="text-sm text-gray-700 dark:text-gray-300">{header.key}: {header.value}</span>
                                   <button
                                     onClick={() => removeWebhookHeader(index)}
                                     className="text-red-600 hover:text-red-800"
@@ -778,7 +778,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                         
                         <div className="mt-4 space-y-3">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                               Provedor de SMS
                             </label>
                             <select
@@ -798,7 +798,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                           {settings.sms.provider === 'twilio' && (
                             <>
                               <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                   Account SID
                                 </label>
                                 <input
@@ -813,7 +813,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                               </div>
                               
                               <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                   Auth Token
                                 </label>
                                 <input
@@ -828,7 +828,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                               </div>
                               
                               <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                   Número de Origem
                                 </label>
                                 <input
@@ -865,7 +865,7 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
                             <div className="space-y-1">
                               {settings.sms.defaultRecipients.map((phone, index) => (
                                 <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded">
-                                  <span className="text-sm">{phone}</span>
+                                  <span className="text-sm text-gray-700 dark:text-gray-300">{phone}</span>
                                   <button
                                     onClick={() => removeSMSRecipient(phone)}
                                     className="text-red-600 hover:text-red-800"
@@ -921,10 +921,10 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
           </div>
 
           {/* Footer */}
-          <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-3">
+          <div className="bg-gray-50 dark:bg-gray-900 px-6 py-4 flex justify-end space-x-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               Cancelar
             </button>

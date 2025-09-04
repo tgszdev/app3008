@@ -311,7 +311,7 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
       <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
         <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onClick={onClose} />
         
-        <div className="inline-block w-full max-w-5xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white rounded-lg shadow-xl">
+        <div className="inline-block w-full max-w-5xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 rounded-lg shadow-xl">
           {/* Header */}
           <div className="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
             <div className="flex items-center justify-between">
@@ -326,7 +326,7 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
           </div>
 
           {/* Tabs */}
-          <div className="border-b">
+          <div className="border-b border-gray-200 dark:border-gray-700">
             <div className="flex space-x-1 px-6 pt-4">
               {[
                 { id: 'backup', label: 'Criar Backup', icon: Download },
@@ -338,8 +338,8 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`flex items-center px-4 py-2 rounded-t-lg transition-colors ${
                     activeTab === tab.id
-                      ? 'bg-white border-t border-l border-r text-green-600'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-white dark:bg-gray-800 border-t border-l border-r border-gray-200 dark:border-gray-700 text-green-600 dark:text-green-400'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   <tab.icon className="w-4 h-4 mr-2" />
@@ -360,12 +360,12 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
                 {/* Create Backup Tab */}
                 {activeTab === 'backup' && (
                   <div className="space-y-4">
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                       <div className="flex items-start">
                         <Shield className="w-5 h-5 text-blue-600 mt-0.5 mr-3" />
                         <div>
-                          <h3 className="font-medium text-blue-900">Criar Novo Backup</h3>
-                          <p className="text-sm text-blue-700 mt-1">
+                          <h3 className="font-medium text-blue-900 dark:text-blue-200">Criar Novo Backup</h3>
+                          <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
                             Crie um backup completo do sistema incluindo banco de dados, arquivos e configurações.
                           </p>
                         </div>
@@ -374,7 +374,7 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
 
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Nome do Backup
                         </label>
                         <input
@@ -382,12 +382,12 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
                           value={backupName}
                           onChange={(e) => setBackupName(e.target.value)}
                           placeholder="Ex: Backup Completo - Janeiro 2025"
-                          className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500"
                         />
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Descrição (opcional)
                         </label>
                         <textarea
@@ -395,7 +395,7 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
                           onChange={(e) => setBackupDescription(e.target.value)}
                           placeholder="Descreva o conteúdo ou motivo deste backup..."
                           rows={3}
-                          className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500"
                         />
                       </div>
 
@@ -619,7 +619,7 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
                       {settings.autoBackup.enabled && (
                         <div className="grid grid-cols-2 gap-4 ml-6">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                               Frequência
                             </label>
                             <select
@@ -628,7 +628,7 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
                                 ...settings,
                                 autoBackup: { ...settings.autoBackup, frequency: e.target.value as any }
                               })}
-                              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500"
                             >
                               <option value="daily">Diário</option>
                               <option value="weekly">Semanal</option>
@@ -637,7 +637,7 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
                           </div>
                           
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                               Horário
                             </label>
                             <input
@@ -647,12 +647,12 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
                                 ...settings,
                                 autoBackup: { ...settings.autoBackup, time: e.target.value }
                               })}
-                              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500"
                             />
                           </div>
                           
                           <div className="col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                               Retenção (dias)
                             </label>
                             <input
@@ -664,7 +664,7 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
                                 ...settings,
                                 autoBackup: { ...settings.autoBackup, retention: parseInt(e.target.value) }
                               })}
-                              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500"
                             />
                             <p className="text-xs text-gray-500 mt-1">
                               Backups mais antigos que {settings.autoBackup.retention} dias serão excluídos automaticamente
@@ -683,7 +683,7 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
                       
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Local de Armazenamento
                           </label>
                           <select
@@ -692,7 +692,7 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
                               ...settings,
                               storage: { ...settings.storage, location: e.target.value as 'local' | 'cloud' }
                             })}
-                            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500"
                           >
                             <option value="local">Armazenamento Local</option>
                             <option value="cloud">Armazenamento na Nuvem</option>
@@ -702,7 +702,7 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
                         {settings.storage.location === 'cloud' && (
                           <>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 Provedor de Nuvem
                               </label>
                               <select
@@ -711,7 +711,7 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
                                   ...settings,
                                   storage: { ...settings.storage, cloudProvider: e.target.value as any }
                                 })}
-                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500"
                               >
                                 <option value="aws">Amazon S3</option>
                                 <option value="google">Google Cloud Storage</option>
@@ -720,7 +720,7 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
                             </div>
                             
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 Bucket/Container
                               </label>
                               <input
@@ -731,7 +731,7 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
                                   storage: { ...settings.storage, cloudBucket: e.target.value }
                                 })}
                                 placeholder="nome-do-bucket"
-                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500"
                               />
                             </div>
                           </>
@@ -739,7 +739,7 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
 
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                               Nível de Compressão
                             </label>
                             <select
@@ -748,7 +748,7 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
                                 ...settings,
                                 storage: { ...settings.storage, compressionLevel: e.target.value as any }
                               })}
-                              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500"
                             >
                               <option value="none">Sem compressão</option>
                               <option value="low">Baixa</option>
@@ -798,10 +798,10 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
           </div>
 
           {/* Footer */}
-          <div className="bg-gray-50 px-6 py-4 flex justify-end">
+          <div className="bg-gray-50 dark:bg-gray-900 px-6 py-4 flex justify-end">
             <button
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               Fechar
             </button>
