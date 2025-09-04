@@ -10,6 +10,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Obter dados do usuário e role
+    const { data: userData, error: userError } = await supabaseAdmin
+      .from('users')
+      .select('id, role')
+      .eq('email', session.user.email)
+      .single()
+
+    if (userError || !userData) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      )
+    }
+
+    const currentUserId = userData.id
+    const userRole = userData.role || 'user'
+
     const searchParams = request.nextUrl.searchParams
     const userId = searchParams.get('user_id')
     const startDate = searchParams.get('start_date')
@@ -23,7 +40,7 @@ export async function GET(request: NextRequest) {
     // Get ticket statistics
     let query = supabaseAdmin
       .from('tickets')
-      .select('id, status, created_at, updated_at, created_by')
+      .select('id, status, created_at, updated_at, created_by, is_internal')
     
     // Apply date filter
     query = query
@@ -42,12 +59,21 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch tickets' }, { status: 500 })
     }
 
-    // Calculate statistics
-    const totalTickets = tickets?.length || 0
-    const openTickets = tickets?.filter(t => t.status === 'open').length || 0
-    const inProgressTickets = tickets?.filter(t => t.status === 'in_progress').length || 0
-    const resolvedTickets = tickets?.filter(t => t.status === 'resolved').length || 0
-    const cancelledTickets = tickets?.filter(t => t.status === 'cancelled').length || 0
+    // Filtrar tickets internos para usuários comuns
+    let filteredTickets = tickets || []
+    if (userRole === 'user') {
+      filteredTickets = filteredTickets.filter((ticket: any) => {
+        // Usuários só podem ver tickets não internos ou criados por eles
+        return !ticket.is_internal || ticket.created_by === currentUserId
+      })
+    }
+
+    // Calculate statistics (usando filteredTickets em vez de tickets)
+    const totalTickets = filteredTickets?.length || 0
+    const openTickets = filteredTickets?.filter((t: any) => t.status === 'open').length || 0
+    const inProgressTickets = filteredTickets?.filter((t: any) => t.status === 'in_progress').length || 0
+    const resolvedTickets = filteredTickets?.filter((t: any) => t.status === 'resolved').length || 0
+    const cancelledTickets = filteredTickets?.filter((t: any) => t.status === 'cancelled').length || 0
 
     // Removed average resolution time calculation - not needed anymore
 
@@ -55,14 +81,14 @@ export async function GET(request: NextRequest) {
     const thirtyDaysAgo = new Date()
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
     
-    const recentTickets = tickets?.filter(t => 
+    const recentTickets = filteredTickets?.filter((t: any) => 
       new Date(t.created_at) > thirtyDaysAgo
     ).length || 0
     
     const previousThirtyDays = new Date()
     previousThirtyDays.setDate(previousThirtyDays.getDate() - 60)
     
-    const previousTickets = tickets?.filter(t => 
+    const previousTickets = filteredTickets?.filter((t: any) => 
       new Date(t.created_at) > previousThirtyDays && 
       new Date(t.created_at) <= thirtyDaysAgo
     ).length || 0
@@ -84,6 +110,7 @@ export async function GET(request: NextRequest) {
         priority,
         created_at,
         created_by,
+        is_internal,
         created_by_user:users!tickets_created_by_fkey(
           id,
           name,
@@ -93,7 +120,6 @@ export async function GET(request: NextRequest) {
       .gte('created_at', `${defaultStartDate}T00:00:00`)
       .lte('created_at', `${defaultEndDate}T23:59:59`)
       .order('created_at', { ascending: false })
-      .limit(5)
     
     // Apply user filter to recent tickets as well
     if (userId) {
@@ -110,7 +136,6 @@ export async function GET(request: NextRequest) {
         .from('tickets')
         .select('*')
         .order('created_at', { ascending: false })
-        .limit(5)
       
       if (userId) {
         simpleQuery = simpleQuery.eq('created_by', userId)
@@ -119,23 +144,35 @@ export async function GET(request: NextRequest) {
       const { data: simpleTickets, error: simpleError } = await simpleQuery
         
       if (!simpleError && simpleTickets) {
+        // Filtrar tickets internos para usuários comuns
+        let filteredSimpleTickets = simpleTickets
+        if (userRole === 'user') {
+          filteredSimpleTickets = filteredSimpleTickets.filter((ticket: any) => {
+            return !ticket.is_internal || ticket.created_by === currentUserId
+          })
+        }
+        
+        // Limitar a 5 tickets após filtragem
+        filteredSimpleTickets = filteredSimpleTickets.slice(0, 5)
+        
         // Fetch users separately
-        const userIds = [...new Set(simpleTickets.map(t => t.created_by).filter(Boolean))]
+        const userIds = [...new Set(filteredSimpleTickets.map((t: any) => t.created_by).filter(Boolean))]
         const { data: users } = await supabaseAdmin
           .from('users')
           .select('id, name, email')
           .in('id', userIds)
           
-        const usersMap = new Map(users?.map(u => [u.id, u]) || [])
+        const usersMap = new Map(users?.map((u: any) => [u.id, u]) || [])
         
-        const formattedRecentTickets = simpleTickets.map((ticket: any) => ({
+        const formattedRecentTickets = filteredSimpleTickets.map((ticket: any) => ({
           id: ticket.id,
           ticket_number: ticket.ticket_number,
           title: ticket.title,
           status: ticket.status,
           priority: ticket.priority,
           requester: usersMap.get(ticket.created_by)?.name || 'Desconhecido',
-          created_at: ticket.created_at
+          created_at: ticket.created_at,
+          is_internal: ticket.is_internal || false
         }))
         
         return NextResponse.json({
@@ -152,8 +189,20 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Filtrar tickets internos para usuários comuns
+    let filteredRecentTickets = recentTicketsList || []
+    if (userRole === 'user') {
+      filteredRecentTickets = filteredRecentTickets.filter((ticket: any) => {
+        // Usuários só podem ver tickets não internos ou criados por eles
+        return !ticket.is_internal || ticket.created_by === currentUserId
+      })
+    }
+
+    // Limitar a 5 tickets após filtragem
+    filteredRecentTickets = filteredRecentTickets.slice(0, 5)
+
     // Format recent tickets (when the join worked)
-    const formattedRecentTickets = recentTicketsList?.map((ticket: any) => {
+    const formattedRecentTickets = filteredRecentTickets?.map((ticket: any) => {
       // Handle both array and object responses from Supabase
       const user = Array.isArray(ticket.created_by_user) 
         ? ticket.created_by_user[0] 
@@ -166,7 +215,8 @@ export async function GET(request: NextRequest) {
         status: ticket.status,
         priority: ticket.priority,
         requester: user?.name || 'Desconhecido',
-        created_at: ticket.created_at
+        created_at: ticket.created_at,
+        is_internal: ticket.is_internal || false
       }
     }) || []
 
