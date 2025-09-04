@@ -185,7 +185,9 @@ export default function NewTicketPage() {
       // Se há arquivos selecionados, fazer upload deles
       if (selectedFiles.length > 0) {
         setUploadingFiles(true)
-        toast.info(`Enviando ${selectedFiles.length} arquivo(s)...`)
+        toast(`Enviando ${selectedFiles.length} arquivo(s)...`, {
+          icon: '📎',
+        })
         
         try {
           // Upload de cada arquivo
