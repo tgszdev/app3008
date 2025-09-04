@@ -31,14 +31,17 @@ export async function GET(request: NextRequest) {
         category_info:categories!tickets_category_id_fkey(id, name, slug, color, icon),
         comments:ticket_comments(count)
       `)
-      .order('created_at', { ascending: false })
 
-    // Filtrar tickets internos para usuários comuns
-    if (userRole === 'user') {
-      // Users só veem tickets não internos ou criados por eles
-      query = query.or(`is_internal.eq.false,is_internal.is.null,created_by.eq.${userId}`)
+    // IMPORTANTE: Filtrar tickets internos ANTES de outros filtros
+    if (userRole === 'user' && userId) {
+      // Users só veem:
+      // 1. Tickets não internos (is_internal = false ou null)
+      // 2. OU tickets criados por eles mesmos (mesmo se internos)
+      query = query.or(`and(is_internal.eq.false),and(is_internal.is.null),and(created_by.eq.${userId})`)
     }
-    // Admin e analyst veem todos os tickets
+    // Admin e analyst veem todos os tickets (não aplicar filtro)
+    
+    query = query.order('created_at', { ascending: false })
 
     // Aplicar filtros
     if (status && status !== 'all') {
@@ -61,13 +64,24 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    // Filtro adicional para garantir que usuários comuns não vejam tickets internos
+    let filteredTickets = tickets || []
+    if (userRole === 'user' && userId) {
+      filteredTickets = filteredTickets.filter(ticket => {
+        // Permite ver ticket se:
+        // 1. Não é interno (is_internal é false ou null/undefined)
+        // 2. OU foi criado pelo próprio usuário
+        return !ticket.is_internal || ticket.created_by === userId
+      })
+    }
+
     // Formatar resposta
-    const formattedTickets = tickets?.map(ticket => ({
+    const formattedTickets = filteredTickets.map(ticket => ({
       ...ticket,
       created_by_user: ticket.created_by_user || null,
       assigned_to_user: ticket.assigned_to_user || null,
       comment_count: ticket.comments?.[0]?.count || 0
-    })) || []
+    }))
 
     return NextResponse.json(formattedTickets)
   } catch (error: any) {

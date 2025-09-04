@@ -56,11 +56,9 @@ export async function GET(request: NextRequest) {
       query = query.eq('user_id', userId)
     }
     
-    // Filtrar comentários internos para usuários comuns
-    if (userRole === 'user') {
-      // Users não veem comentários internos
-      query = query.or('is_internal.eq.false,is_internal.is.null')
-    } else if (internalOnly) {
+    // Remover filtro RLS aqui, pois supabaseAdmin bypassa RLS
+    // Vamos filtrar manualmente após buscar os dados
+    if (internalOnly && userRole !== 'user') {
       // Admin/analyst podem filtrar por comentários internos
       query = query.eq('is_internal', true)
     }
@@ -77,11 +75,11 @@ export async function GET(request: NextRequest) {
       query = query.order('created_at', { ascending: true })
     }
 
-    // Aplicar paginação
-    query = query.range(offset, offset + limit - 1)
+    // Não aplicar paginação ainda para permitir filtragem manual
+    // query = query.range(offset, offset + limit - 1)
 
     // Executar query
-    const { data: comments, error, count } = await query
+    const { data: comments, error } = await query
 
     if (error) {
       console.error('Erro ao buscar comentários:', error)
@@ -94,9 +92,43 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Filtrar comentários manualmente para usuários comuns
+    let filteredComments = comments || []
+    
+    // Se é um usuário comum, filtrar comentários internos
+    if (userRole === 'user') {
+      // Obter o ID do usuário atual
+      const { data: currentUser } = await supabaseAdmin
+        .from('users')
+        .select('id')
+        .eq('email', session.user.email)
+        .single()
+      
+      const currentUserId = currentUser?.id
+
+      filteredComments = filteredComments.filter(comment => {
+        // Usuários só podem ver:
+        // 1. Comentários não internos
+        // 2. Comentários internos criados por eles mesmos
+        const isCommentInternal = comment.is_internal === true
+        const isOwnComment = comment.user_id === currentUserId
+        
+        // Se o comentário é interno e não é do próprio usuário, não mostrar
+        if (isCommentInternal && !isOwnComment) {
+          return false
+        }
+        
+        return true
+      })
+    }
+
+    // Aplicar paginação manualmente após filtragem
+    const totalFiltered = filteredComments.length
+    const paginatedComments = filteredComments.slice(offset, offset + limit)
+
     // Para cada comentário, buscar anexos se houver
     const commentsWithAttachments = await Promise.all(
-      (comments || []).map(async (comment) => {
+      paginatedComments.map(async (comment) => {
         // Buscar anexos do comentário
         const { data: attachments } = await supabaseAdmin
           .from('ticket_attachments')
@@ -112,10 +144,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       comments: commentsWithAttachments,
-      total: count || 0,
+      total: totalFiltered,
       page,
       limit,
-      totalPages: Math.ceil((count || 0) / limit)
+      totalPages: Math.ceil(totalFiltered / limit)
     })
 
   } catch (error: any) {

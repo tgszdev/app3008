@@ -1,111 +1,119 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 
-// GET - Buscar ticket específico
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await context.params
-    
-    console.log('=== DEBUG API TICKET ===')
-    console.log('ID recebido:', id)
-
-    if (!id) {
-      return NextResponse.json({ error: 'ID do ticket é obrigatório' }, { status: 400 })
+    // Verificar autenticação
+    const session = await auth()
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    // Buscar ticket com informações relacionadas incluindo categoria
+    // Obter dados do usuário e role
+    const { data: userData, error: userError } = await supabaseAdmin
+      .from('users')
+      .select('id, role')
+      .eq('email', session.user.email)
+      .single()
+
+    if (userError || !userData) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      )
+    }
+
+    const userId = userData.id
+    const userRole = userData.role || 'user'
+    const ticketId = params.id
+
+    // Buscar o ticket com todas as informações relacionadas
     const { data: ticket, error } = await supabaseAdmin
       .from('tickets')
       .select(`
         *,
-        created_by_user:users!tickets_created_by_fkey(id, name, email, role),
-        assigned_to_user:users!tickets_assigned_to_fkey(id, name, email, role),
-        category_info:categories!tickets_category_id_fkey(id, name, slug, color, icon)
+        created_by_user:users!tickets_created_by_fkey(id, name, email),
+        assigned_to_user:users!tickets_assigned_to_fkey(id, name, email),
+        category_info:categories!tickets_category_id_fkey(id, name, slug, color, icon),
+        comments:ticket_comments(
+          id,
+          content,
+          created_at,
+          is_internal,
+          user:users(id, name, email)
+        )
       `)
-      .eq('id', id)
+      .eq('id', ticketId)
       .single()
 
-    console.log('Ticket encontrado:', ticket ? 'SIM' : 'NÃO')
-    if (ticket) {
-      console.log('Título do ticket:', ticket.title)
-      console.log('ID do ticket:', ticket.id)
-    }
-    
     if (error) {
       console.error('Erro ao buscar ticket:', error)
-      
-      // Se for erro de foreign key, tentar buscar sem as relações
-      if (error.message.includes('relationship')) {
-        const { data: simpleTicket, error: simpleError } = await supabaseAdmin
-          .from('tickets')
-          .select('*')
-          .eq('id', id)
-          .single()
-
-        if (simpleError) {
-          return NextResponse.json({ error: 'Ticket não encontrado' }, { status: 404 })
-        }
-
-        // Buscar usuários manualmente
-        let created_by_user = null
-        let assigned_to_user = null
-
-        if (simpleTicket.created_by) {
-          const { data: creator } = await supabaseAdmin
-            .from('users')
-            .select('id, name, email, role')
-            .eq('id', simpleTicket.created_by)
-            .single()
-          
-          created_by_user = creator
-        }
-
-        if (simpleTicket.assigned_to) {
-          const { data: assignee } = await supabaseAdmin
-            .from('users')
-            .select('id, name, email, role')
-            .eq('id', simpleTicket.assigned_to)
-            .single()
-          
-          assigned_to_user = assignee
-        }
-
-        return NextResponse.json({
-          ...simpleTicket,
-          created_by_user,
-          assigned_to_user
-        })
-      }
-
-      return NextResponse.json({ error: 'Ticket não encontrado' }, { status: 404 })
+      return NextResponse.json(
+        { error: 'Erro ao buscar ticket', details: error.message },
+        { status: 500 }
+      )
     }
 
     if (!ticket) {
-      return NextResponse.json({ error: 'Ticket não encontrado' }, { status: 404 })
+      return NextResponse.json(
+        { error: 'Ticket não encontrado' },
+        { status: 404 }
+      )
     }
 
-    // Buscar comentários do ticket
-    const { data: comments } = await supabaseAdmin
-      .from('ticket_comments')
-      .select(`
-        *,
-        user:users(id, name, email, role)
-      `)
-      .eq('ticket_id', id)
-      .order('created_at', { ascending: true })
+    // Verificar se o usuário tem permissão para ver este ticket
+    if (userRole === 'user') {
+      // Se é um ticket interno e não foi criado pelo usuário, negar acesso
+      if (ticket.is_internal && ticket.created_by !== userId) {
+        return NextResponse.json(
+          { error: 'Acesso negado. Você não tem permissão para ver este ticket.' },
+          { status: 403 }
+        )
+      }
 
-    // Adicionar comentários ao ticket
-    const ticketWithComments = {
+      // Filtrar comentários internos se o usuário não é admin/analyst
+      if (ticket.comments && Array.isArray(ticket.comments)) {
+        ticket.comments = ticket.comments.filter(comment => {
+          // Usuário só vê comentários não internos ou criados por ele
+          return !comment.is_internal || comment.user?.id === userId
+        })
+      }
+    }
+
+    // Formatar categoria - garantir que seja sempre um objeto
+    let categoryInfo = null
+    if (ticket.category_info) {
+      // Se category_info é um array, pegar o primeiro elemento
+      if (Array.isArray(ticket.category_info) && ticket.category_info.length > 0) {
+        categoryInfo = ticket.category_info[0]
+      } else if (!Array.isArray(ticket.category_info)) {
+        // Se já é um objeto, usar diretamente
+        categoryInfo = ticket.category_info
+      }
+    }
+
+    // Formatar resposta
+    const formattedTicket = {
       ...ticket,
-      comments: comments || []
+      category_info: categoryInfo,
+      // Manter compatibilidade com campo category
+      category: categoryInfo?.name || ticket.category || 'Sem categoria'
     }
 
-    return NextResponse.json(ticketWithComments)
+    return NextResponse.json(formattedTicket)
+
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
-    return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
+    console.error('Erro no endpoint de ticket individual:', error)
+    return NextResponse.json(
+      { 
+        error: 'Erro interno do servidor',
+        message: error.message 
+      },
+      { status: 500 }
+    )
   }
 }
