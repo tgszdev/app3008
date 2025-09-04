@@ -15,7 +15,7 @@
 - **Gerenciamento de Usuários**: `/dashboard/users`
 - **Supabase Dashboard**: https://supabase.com/dashboard/project/eyfvvximmeqmwdfqzqov
 
-## 🆕 Últimas Correções (04/09/2024)
+## 🆕 Últimas Correções (09/01/2025)
 
 ### ✅ Problemas Resolvidos:
 1. **Categorias diferentes entre mobile e desktop**: Corrigido filtro `active_only` na API `/api/categories`
@@ -25,6 +25,7 @@
 5. **Push notifications**: Adicionado VAPID keys e correção de erros
 6. **Responsividade**: Melhorado layout da Knowledge Base para mobile
 7. **Segurança**: Removido credenciais demo visíveis, botões de teste restritos a admin
+8. **Tickets e Comentários Internos**: Implementado sistema completo de tickets/comentários internos com controle de visibilidade baseado em roles
 
 ## ✅ Funcionalidades Implementadas
 
@@ -92,6 +93,14 @@
 - ✅ **Histórico**: Registro de todas as alterações
 - ✅ **Filtros**: Por status, prioridade, usuário
 - ✅ **Relacionamentos**: Integração com tabela de usuários
+- ✅ **Tickets Internos**: 
+  - Checkbox "Ticket Interno" disponível para Admin e Analyst ao criar tickets
+  - Tickets internos são visíveis apenas para Admin, Analyst e o criador do ticket
+  - Badge visual indicando quando um ticket é interno
+- ✅ **Comentários Internos**:
+  - Checkbox "Comentário Interno" disponível para Admin e Analyst
+  - Comentários internos visíveis apenas para Admin, Analyst e autor do comentário
+  - Badge visual indicando quando um comentário é interno
 - ✅ **Permissões por Perfil**:
   - Admin: Todas as ações incluindo exclusão, cancelamento e reativação de tickets cancelados
   - Analyst: Criar, editar, alterar status (exceto cancelar), atribuir (sem poder excluir ou cancelar)
@@ -253,9 +262,10 @@
 - ticket_number: SERIAL (unique)
 - title: TEXT
 - description: TEXT
-- status: TEXT (open|in_progress|resolved|closed)
+- status: TEXT (open|in_progress|resolved|closed|cancelled)
 - priority: TEXT (low|medium|high|critical)
 - category: TEXT
+- is_internal: BOOLEAN (default false)
 - created_by: UUID (FK users)
 - assigned_to: UUID (FK users)
 - resolution_notes: TEXT
