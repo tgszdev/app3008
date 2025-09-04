@@ -4,9 +4,12 @@ import { supabaseAdmin } from '@/lib/supabase'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Aguardar os parâmetros (necessário no Next.js 15)
+    const { id: ticketId } = await params
+
     // Verificar autenticação
     const session = await auth()
     if (!session || !session.user) {
@@ -29,7 +32,6 @@ export async function GET(
 
     const userId = userData.id
     const userRole = userData.role || 'user'
-    const ticketId = params.id
 
     // Buscar o ticket com todas as informações relacionadas
     const { data: ticket, error } = await supabaseAdmin
