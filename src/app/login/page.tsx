@@ -174,39 +174,32 @@ export default function LoginPage() {
             backgroundImage: 'url(/images/login-background.jpg)',
           }}
         >
-          {/* Overlay gradient for better visual */}
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-blue-900/30 to-gray-900/40" />
+          {/* Overlay with blur effect - watermark style */}
+          <div className="absolute inset-0 backdrop-blur-[2px] bg-gradient-to-br from-slate-900/10 via-blue-900/20 to-purple-900/10" />
           
-          {/* Content overlay */}
-          <div className="relative h-full flex items-center justify-center p-12">
-            <div className="text-center text-white max-w-2xl">
-              <div className="mb-8">
-                {/* Animated circuit lines */}
-                <svg className="w-full h-32 opacity-30" viewBox="0 0 400 100">
-                  <path 
-                    d="M 50 50 L 150 50 L 200 20 L 250 50 L 350 50" 
-                    stroke="currentColor" 
-                    strokeWidth="2" 
-                    fill="none"
-                    strokeDasharray="5,5"
-                    className="animate-pulse"
-                  />
-                  <circle cx="50" cy="50" r="4" fill="currentColor" className="animate-pulse" />
-                  <circle cx="150" cy="50" r="4" fill="currentColor" className="animate-pulse delay-75" />
-                  <circle cx="200" cy="20" r="4" fill="currentColor" className="animate-pulse delay-150" />
-                  <circle cx="250" cy="50" r="4" fill="currentColor" className="animate-pulse delay-200" />
-                  <circle cx="350" cy="50" r="4" fill="currentColor" className="animate-pulse delay-300" />
-                </svg>
-              </div>
-              
-              <h2 className="text-4xl font-bold mb-4 drop-shadow-lg">
+          {/* Pattern overlay for watermark effect */}
+          <div 
+            className="absolute inset-0 opacity-5"
+            style={{
+              backgroundImage: `repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 35px,
+                rgba(255,255,255,.05) 35px,
+                rgba(255,255,255,.05) 70px
+              )`
+            }}
+          />
+          
+          {/* Content positioned in lower left area */}
+          <div className="absolute bottom-0 left-0 p-12 lg:p-16 max-w-2xl">
+            <div className="bg-gradient-to-r from-black/40 to-transparent p-8 rounded-2xl backdrop-blur-sm">
+              <h2 className="text-4xl lg:text-5xl font-bold mb-3 text-white drop-shadow-2xl">
                 Suporte Inteligente
               </h2>
-              <p className="text-xl text-white/90 drop-shadow mb-8">
+              <p className="text-lg lg:text-xl text-white/95 drop-shadow-lg">
                 Conectando você às soluções que precisa, quando precisa.
               </p>
-              
-
             </div>
           </div>
         </div>
