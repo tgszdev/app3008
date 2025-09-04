@@ -79,7 +79,7 @@ export async function GET(
 
       // Filtrar comentários internos se o usuário não é admin/analyst
       if (ticket.comments && Array.isArray(ticket.comments)) {
-        ticket.comments = ticket.comments.filter(comment => {
+        ticket.comments = ticket.comments.filter((comment: any) => {
           // Usuário só vê comentários não internos ou criados por ele
           return !comment.is_internal || comment.user?.id === userId
         })
