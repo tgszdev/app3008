@@ -171,7 +171,7 @@ export default function LoginPage() {
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: 'url(/login-background.jpg)',
+            backgroundImage: 'url(/images/login-background.jpg)',
           }}
         >
           {/* Overlay gradient for better visual */}
