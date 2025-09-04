@@ -205,17 +205,17 @@ export default function LoginPage() {
           />
           
           {/* Content positioned in upper left area (red highlighted zone) */}
-          <div className="absolute top-0 left-0 p-12 lg:p-16 max-w-3xl">
-            <div className="bg-gradient-to-r from-black/50 via-black/30 to-transparent p-10 rounded-3xl backdrop-blur-md mt-8">
-              <h2 className={`${poppins.className} text-4xl lg:text-5xl font-bold mb-4 text-white drop-shadow-2xl`}>
+          <div className="absolute top-0 left-0 p-8 lg:p-12 max-w-2xl">
+            <div className="bg-gradient-to-r from-black/50 via-black/30 to-transparent p-6 rounded-2xl backdrop-blur-md mt-6">
+              <h2 className={`${poppins.className} text-3xl lg:text-4xl font-bold mb-3 text-white drop-shadow-2xl`}>
                 <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
                   O Futuro do Atendimento
                 </span>
-                <span className="text-white ml-3">
+                <span className="text-white ml-2">
                   é Agora
                 </span>
               </h2>
-              <p className={`${inter.className} text-xl lg:text-2xl text-gray-100 font-light leading-relaxed`}>
+              <p className={`${inter.className} text-base lg:text-lg text-gray-100 font-light leading-relaxed`}>
                 Tecnologia feita para <span className="font-semibold text-cyan-400">simplificar</span>, não complicar.
               </p>
             </div>
