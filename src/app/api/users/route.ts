@@ -9,21 +9,11 @@ export async function GET(request: NextRequest) {
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       console.error('Variáveis de ambiente do Supabase não configuradas')
       
-      // Retornar dados de exemplo para desenvolvimento
-      const mockUsers = [
-        {
-          id: '1',
-          email: 'admin@example.com',
-          name: 'Administrador (Mock - Configure Supabase)',
-          role: 'admin',
-          department: 'TI',
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }
-      ]
-      
-      return NextResponse.json(mockUsers)
+      // Retornar erro se Supabase não estiver configurado
+      return NextResponse.json(
+        { error: 'Banco de dados não configurado' },
+        { status: 500 }
+      )
     }
 
     const { data: users, error } = await supabaseAdmin

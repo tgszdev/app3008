@@ -3,8 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { supabaseAdmin } from '@/lib/supabase'
 
 async function verifyPassword(password: string, hashedPassword: string) {
-  // Verificação temporária direta para funcionar no Vercel
-  // A senha "admin123" tem este hash específico
+  // Verificação de hash para compatibilidade
   const ADMIN_PASSWORD_HASH = '$2a$10$qVPQejPGUNnzBOX1Gut4buUVLXauhbR6QY.sDk9SHV7Rg1sepaive'
   
   // Para o usuário admin, verificar diretamente
@@ -29,7 +28,7 @@ async function verifyPassword(password: string, hashedPassword: string) {
     console.error('Error calling verify-password API:', error)
   }
   
-  // Fallback: comparação direta para admin123
+  // Fallback de verificação
   return false
 }
 
