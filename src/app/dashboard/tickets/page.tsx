@@ -20,6 +20,7 @@ import {
   MessageSquare,
   Loader2,
   RefreshCw,
+  Lock,
 } from 'lucide-react'
 import { getIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
@@ -58,6 +59,7 @@ interface Ticket {
   created_by_user: User
   assigned_to_user: User | null
   comment_count?: number
+  is_internal?: boolean // Novo campo para tickets internos
   created_at: string
   updated_at: string
   resolved_at?: string
@@ -431,6 +433,12 @@ export default function TicketsPage() {
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-2 mb-1">
                       <span className="text-xs font-mono text-gray-500">#{ticket.ticket_number}</span>
+                      {ticket.is_internal && (
+                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">
+                          <Lock className="h-3 w-3 mr-1" />
+                          Interno
+                        </span>
+                      )}
                       <span className={cn(
                         "inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full",
                         status.color

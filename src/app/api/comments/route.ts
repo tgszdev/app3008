@@ -9,6 +9,9 @@ export async function GET(request: NextRequest) {
     if (!session || !session.user) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
+    
+    // Obter role do usuário
+    const userRole = (session.user as any).role || 'user'
 
     // Extrair parâmetros de query
     const searchParams = request.nextUrl.searchParams
@@ -39,7 +42,8 @@ export async function GET(request: NextRequest) {
           ticket_number,
           title,
           status,
-          priority
+          priority,
+          is_internal
         )
       `, { count: 'exact' })
 
@@ -51,8 +55,13 @@ export async function GET(request: NextRequest) {
     if (userId) {
       query = query.eq('user_id', userId)
     }
-
-    if (internalOnly) {
+    
+    // Filtrar comentários internos para usuários comuns
+    if (userRole === 'user') {
+      // Users não veem comentários internos
+      query = query.or('is_internal.eq.false,is_internal.is.null')
+    } else if (internalOnly) {
+      // Admin/analyst podem filtrar por comentários internos
       query = query.eq('is_internal', true)
     }
 

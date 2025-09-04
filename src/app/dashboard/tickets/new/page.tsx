@@ -13,6 +13,8 @@ import {
   User,
   FileText,
   Loader2,
+  Lock,
+  Eye,
 } from 'lucide-react'
 import { getIcon } from '@/lib/icons'
 import Link from 'next/link'
@@ -52,6 +54,7 @@ export default function NewTicketPage() {
     category_id: '', // Mudando de category para category_id
     assigned_to: '',
     due_date: '',
+    is_internal: false, // Novo campo para tickets internos
   })
 
   // Buscar lista de analistas e categorias
@@ -325,6 +328,32 @@ export default function NewTicketPage() {
               </div>
             )}
           </div>
+          
+          {/* Internal Ticket Checkbox - Only visible for admin and analyst */}
+          {(session?.user?.role === 'admin' || session?.user?.role === 'analyst') && (
+            <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+              <label className="flex items-start space-x-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.is_internal}
+                  onChange={(e) => setFormData({ ...formData, is_internal: e.target.checked })}
+                  className="mt-1 rounded border-gray-300 text-amber-600 focus:ring-amber-500 dark:border-gray-600 dark:bg-gray-700"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <Lock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                    <span className="font-medium text-gray-900 dark:text-white">
+                      Ticket Interno
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Marque esta opção para tornar o ticket visível apenas para administradores e analistas. 
+                    Usuários comuns não poderão ver este ticket.
+                  </p>
+                </div>
+              </label>
+            </div>
+          )}
         </div>
 
         {/* Actions */}

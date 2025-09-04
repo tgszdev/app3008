@@ -12,10 +12,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
     
+    // Obter role do usuário
+    const userRole = (session.user as any).role || 'user'
+    const userId = session.user?.id
+    
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
     const priority = searchParams.get('priority')
-    const userId = searchParams.get('userId')
+    const userIdFilter = searchParams.get('userId')
     const assignedTo = searchParams.get('assignedTo')
 
     let query = supabaseAdmin
@@ -29,6 +33,13 @@ export async function GET(request: NextRequest) {
       `)
       .order('created_at', { ascending: false })
 
+    // Filtrar tickets internos para usuários comuns
+    if (userRole === 'user') {
+      // Users só veem tickets não internos ou criados por eles
+      query = query.or(`is_internal.eq.false,is_internal.is.null,created_by.eq.${userId}`)
+    }
+    // Admin e analyst veem todos os tickets
+
     // Aplicar filtros
     if (status && status !== 'all') {
       query = query.eq('status', status)
@@ -36,8 +47,8 @@ export async function GET(request: NextRequest) {
     if (priority && priority !== 'all') {
       query = query.eq('priority', priority)
     }
-    if (userId) {
-      query = query.eq('created_by', userId)
+    if (userIdFilter) {
+      query = query.eq('created_by', userIdFilter)
     }
     if (assignedTo) {
       query = query.eq('assigned_to', assignedTo)
@@ -68,14 +79,29 @@ export async function GET(request: NextRequest) {
 // POST - Criar novo ticket
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth()
+    if (!session) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+    
+    const userRole = (session.user as any).role || 'user'
+    
     const body = await request.json()
-    const { title, description, priority, category, category_id, created_by, assigned_to, due_date } = body
+    const { title, description, priority, category, category_id, created_by, assigned_to, due_date, is_internal } = body
 
     // Validação básica
     if (!title || !description || !created_by) {
       return NextResponse.json(
         { error: 'Título, descrição e criador são obrigatórios' },
         { status: 400 }
+      )
+    }
+    
+    // Apenas admin e analyst podem criar tickets internos
+    if (is_internal && userRole === 'user') {
+      return NextResponse.json(
+        { error: 'Apenas administradores e analistas podem criar tickets internos' },
+        { status: 403 }
       )
     }
 
@@ -89,6 +115,7 @@ export async function POST(request: NextRequest) {
       created_by,
       assigned_to,
       due_date,
+      is_internal: is_internal || false, // Adicionar campo is_internal
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     }

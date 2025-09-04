@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import axios from 'axios'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { ArrowLeft, Clock, User, Tag, AlertCircle, MessageSquare, Paperclip, Edit, Trash2, Send, CheckCircle, XCircle, AlertTriangle, ChevronDown } from 'lucide-react'
+import { ArrowLeft, Clock, User, Tag, AlertCircle, MessageSquare, Paperclip, Edit, Trash2, Send, CheckCircle, XCircle, AlertTriangle, ChevronDown, Lock, Eye, EyeOff } from 'lucide-react'
 import { getIcon } from '@/lib/icons'
 import toast from 'react-hot-toast'
 import { useSession } from 'next-auth/react'
@@ -43,6 +43,7 @@ interface Ticket {
   category: string // Mantém compatibilidade
   category_id?: string
   category_info?: Category[] | Category // Pode vir como array ou objeto
+  is_internal?: boolean // Novo campo para tickets internos
   created_at: string
   updated_at: string
   due_date?: string
@@ -88,6 +89,7 @@ export default function TicketDetailsPage() {
   const [loading, setLoading] = useState(true)
   const [comment, setComment] = useState('')
   const [submittingComment, setSubmittingComment] = useState(false)
+  const [isInternalComment, setIsInternalComment] = useState(false)
   const [editingStatus, setEditingStatus] = useState(false)
   const [newStatus, setNewStatus] = useState<string>('')
   const [users, setUsers] = useState<User[]>([])
@@ -369,11 +371,12 @@ export default function TicketDetailsPage() {
         ticket_id: ticket.id,
         user_id: session?.user?.id,
         content: comment,
-        is_internal: false
+        is_internal: isInternalComment
       })
       
-      toast.success('Comentário adicionado!')
+      toast.success(isInternalComment ? 'Comentário interno adicionado!' : 'Comentário adicionado!')
       setComment('')
+      setIsInternalComment(false)
       fetchTicket()
     } catch (error) {
       console.error('Erro ao adicionar comentário:', error)
@@ -438,9 +441,17 @@ export default function TicketDetailsPage() {
         
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 break-all">
-              Chamado #{ticket.ticket_number?.toString().padStart(10, '0') || ticket.id.slice(0, 8)}
-            </h1>
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold break-all">
+                Chamado #{ticket.ticket_number?.toString().padStart(10, '0') || ticket.id.slice(0, 8)}
+              </h1>
+              {ticket.is_internal && (
+                <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">
+                  <Lock className="h-4 w-4 mr-1" />
+                  Interno
+                </span>
+              )}
+            </div>
             <p className="text-gray-600 dark:text-gray-400">
               Criado em {format(new Date(ticket.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
             </p>
@@ -626,15 +637,32 @@ export default function TicketDetailsPage() {
                   rows={3}
                   disabled={ticket.status === 'cancelled' && session?.user?.role !== 'admin'}
                 />
-                <div className="flex justify-end mt-2">
-                  <button
-                    type="submit"
-                    disabled={submittingComment || !comment.trim() || (ticket.status === 'cancelled' && session?.user?.role !== 'admin')}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Send size={16} />
-                    Enviar
-                  </button>
+                <div className="flex justify-between items-center mt-2">
+                  {/* Checkbox para comentário interno - apenas para admin e analyst */}
+                  {(session?.user?.role === 'admin' || session?.user?.role === 'analyst') && (
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={isInternalComment}
+                        onChange={(e) => setIsInternalComment(e.target.checked)}
+                        className="rounded border-gray-300 text-amber-600 focus:ring-amber-500 dark:border-gray-600 dark:bg-gray-700"
+                      />
+                      <span className="flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300">
+                        <Lock className="h-3 w-3" />
+                        Comentário Interno
+                      </span>
+                    </label>
+                  )}
+                  <div className={!session?.user?.role || session?.user?.role === 'user' ? 'w-full flex justify-end' : ''}>
+                    <button
+                      type="submit"
+                      disabled={submittingComment || !comment.trim() || (ticket.status === 'cancelled' && session?.user?.role !== 'admin')}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Send size={16} />
+                      {isInternalComment ? 'Enviar Interno' : 'Enviar'}
+                    </button>
+                  </div>
                 </div>
               </form>
             )}
