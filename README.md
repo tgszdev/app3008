@@ -15,6 +15,17 @@
 - **Gerenciamento de Usuários**: `/dashboard/users`
 - **Supabase Dashboard**: https://supabase.com/dashboard/project/eyfvvximmeqmwdfqzqov
 
+## 🆕 Últimas Correções (04/09/2024)
+
+### ✅ Problemas Resolvidos:
+1. **Categorias diferentes entre mobile e desktop**: Corrigido filtro `active_only` na API `/api/categories`
+2. **Autenticação**: Resolvido problema de login redirecionando corretamente para dashboard
+3. **Sidebar colapsável**: Implementado com persistência em localStorage
+4. **Dark mode**: Corrigido estilos em modais (Notificações, Segurança, Backup)
+5. **Push notifications**: Adicionado VAPID keys e correção de erros
+6. **Responsividade**: Melhorado layout da Knowledge Base para mobile
+7. **Segurança**: Removido credenciais demo visíveis, botões de teste restritos a admin
+
 ## ✅ Funcionalidades Implementadas
 
 ### 1. **Dashboard 100% Funcional com Dados Reais**
@@ -176,7 +187,8 @@
   - Métricas de desempenho
 
 ### `/api/categories`
-- **GET**: Lista todas as categorias (com filtro `?active_only=true`)
+- **GET**: Lista categorias
+  - Query param: `active_only=true` para filtrar apenas categorias ativas (com filtro `?active_only=true`)
 - **POST**: Cria nova categoria (admin only)
 - **PUT**: Atualiza categoria (admin only)
 - **DELETE**: Exclui categoria (admin only, `?id=uuid`)
