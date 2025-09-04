@@ -15,6 +15,10 @@ import {
   Loader2,
   Lock,
   Eye,
+  Paperclip,
+  Upload,
+  File,
+  Trash2,
 } from 'lucide-react'
 import { getIcon } from '@/lib/icons'
 import Link from 'next/link'
@@ -56,6 +60,10 @@ export default function NewTicketPage() {
     due_date: '',
     is_internal: false, // Novo campo para tickets internos
   })
+  
+  // Estados para upload de arquivos
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [uploadingFiles, setUploadingFiles] = useState(false)
 
   // Buscar lista de analistas e categorias
   useEffect(() => {
@@ -93,6 +101,47 @@ export default function NewTicketPage() {
     }
   }
 
+  // Função para lidar com seleção de arquivos
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files) return
+
+    // Validar tamanho máximo (10MB por arquivo)
+    const maxSize = 10 * 1024 * 1024
+    const validFiles: File[] = []
+    
+    Array.from(files).forEach(file => {
+      if (file.size > maxSize) {
+        toast.error(`Arquivo "${file.name}" muito grande. Máximo permitido: 10MB`)
+      } else {
+        validFiles.push(file)
+      }
+    })
+
+    // Limitar a 5 arquivos no total
+    const totalFiles = selectedFiles.length + validFiles.length
+    if (totalFiles > 5) {
+      toast.error('Máximo de 5 arquivos permitidos')
+      return
+    }
+
+    setSelectedFiles([...selectedFiles, ...validFiles])
+  }
+
+  // Função para remover arquivo selecionado
+  const handleRemoveFile = (index: number) => {
+    setSelectedFiles(selectedFiles.filter((_, i) => i !== index))
+  }
+
+  // Função para formatar tamanho de arquivo
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -125,22 +174,60 @@ export default function NewTicketPage() {
         due_date: formData.due_date || null,
       }
 
+      // Criar o ticket primeiro
       const response = await axios.post('/api/tickets', ticketData)
+      const ticketId = response.data.id
       
       console.log('=== DEBUG CRIAÇÃO DE TICKET ===')
       console.log('Resposta da API:', response.data)
-      console.log('ID do ticket criado:', response.data.id)
-      console.log('Categoria ID:', formData.category_id)
-      console.log('Categoria slug:', selectedCategory?.slug)
-      console.log('Redirecionando para:', `/dashboard/tickets/${response.data.id}`)
+      console.log('ID do ticket criado:', ticketId)
+      
+      // Se há arquivos selecionados, fazer upload deles
+      if (selectedFiles.length > 0) {
+        setUploadingFiles(true)
+        toast.info(`Enviando ${selectedFiles.length} arquivo(s)...`)
+        
+        try {
+          // Upload de cada arquivo
+          const uploadPromises = selectedFiles.map(async (file) => {
+            const formData = new FormData()
+            formData.append('file', file)
+            formData.append('ticketId', ticketId)
+            formData.append('userId', session.user.id || '')
+            
+            return axios.post('/api/tickets/upload', formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            })
+          })
+          
+          const results = await Promise.allSettled(uploadPromises)
+          
+          // Verificar resultados
+          const successCount = results.filter(r => r.status === 'fulfilled').length
+          const failCount = results.filter(r => r.status === 'rejected').length
+          
+          if (successCount > 0) {
+            toast.success(`${successCount} arquivo(s) anexado(s) com sucesso!`)
+          }
+          if (failCount > 0) {
+            toast.error(`${failCount} arquivo(s) falharam no upload`)
+          }
+        } catch (uploadError) {
+          console.error('Erro ao fazer upload de arquivos:', uploadError)
+          toast.error('Alguns arquivos não puderam ser anexados, mas o ticket foi criado')
+        }
+      }
       
       toast.success('Chamado criado com sucesso!')
-      router.push(`/dashboard/tickets/${response.data.id}`)
+      router.push(`/dashboard/tickets/${ticketId}`)
     } catch (error: any) {
       console.error('Erro ao criar chamado:', error)
       toast.error(error.response?.data?.error || 'Erro ao criar chamado')
     } finally {
       setLoading(false)
+      setUploadingFiles(false)
     }
   }
 
@@ -354,6 +441,102 @@ export default function NewTicketPage() {
               </label>
             </div>
           )}
+
+          {/* File Upload Section */}
+          <div className="mt-6">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <Paperclip className="inline h-4 w-4 mr-1" />
+              Anexar Arquivos (opcional)
+            </label>
+            
+            {/* Upload Area */}
+            <div className="relative">
+              <input
+                type="file"
+                id="file-upload"
+                multiple
+                onChange={handleFileSelect}
+                className="hidden"
+                accept="image/*,.pdf,.doc,.docx,.txt,.xls,.xlsx,.zip"
+                disabled={loading || selectedFiles.length >= 5}
+              />
+              <label
+                htmlFor="file-upload"
+                className={cn(
+                  "flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors",
+                  selectedFiles.length >= 5 
+                    ? "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 cursor-not-allowed"
+                    : "border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800"
+                )}
+              >
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <Upload className={cn(
+                    "w-8 h-8 mb-2",
+                    selectedFiles.length >= 5 
+                      ? "text-gray-400 dark:text-gray-600" 
+                      : "text-gray-400 dark:text-gray-500"
+                  )} />
+                  <p className={cn(
+                    "mb-2 text-sm",
+                    selectedFiles.length >= 5 
+                      ? "text-gray-400 dark:text-gray-600" 
+                      : "text-gray-500 dark:text-gray-400"
+                  )}>
+                    {selectedFiles.length >= 5 
+                      ? "Limite máximo de arquivos atingido" 
+                      : (
+                        <>
+                          <span className="font-semibold">Clique para anexar</span> ou arraste arquivos aqui
+                        </>
+                      )}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {selectedFiles.length >= 5 
+                      ? "Remova arquivos para adicionar novos" 
+                      : `Máximo 10MB por arquivo • ${5 - selectedFiles.length} arquivo(s) restante(s)`}
+                  </p>
+                </div>
+              </label>
+            </div>
+
+            {/* Selected Files List */}
+            {selectedFiles.length > 0 && (
+              <div className="mt-4 space-y-2">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Arquivos selecionados ({selectedFiles.length}/5):
+                </p>
+                {selectedFiles.map((file, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <File className="h-5 w-5 text-gray-400" />
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-xs">
+                          {file.name}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {formatFileSize(file.size)}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveFile(index)}
+                      className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+              Formatos aceitos: Imagens, PDF, DOC, DOCX, TXT, XLS, XLSX, ZIP
+            </p>
+          </div>
         </div>
 
         {/* Actions */}
@@ -367,16 +550,16 @@ export default function NewTicketPage() {
           </Link>
           <button
             type="submit"
-            disabled={loading || loadingCategories}
+            disabled={loading || loadingCategories || uploadingFiles}
             className={cn(
               "px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center",
-              (loading || loadingCategories) && "opacity-50 cursor-not-allowed"
+              (loading || loadingCategories || uploadingFiles) && "opacity-50 cursor-not-allowed"
             )}
           >
-            {loading ? (
+            {loading || uploadingFiles ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Criando...
+                {uploadingFiles ? 'Enviando arquivos...' : 'Criando...'}
               </>
             ) : (
               <>
