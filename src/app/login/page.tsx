@@ -169,9 +169,12 @@ export default function LoginPage() {
       {/* Right Side - Background Image */}
       <div className="hidden lg:block lg:w-1/2 xl:w-3/5 relative">
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0"
           style={{
             backgroundImage: 'url(/images/login-background.jpg)',
+            backgroundSize: 'auto',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
           }}
         >
           {/* Overlay gradient for better visual */}
