@@ -58,11 +58,11 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Login Form */}
-      <div className="w-full lg:w-1/2 xl:w-2/5 flex items-center justify-center p-8 bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-950">
+      <div className="w-full lg:w-1/2 xl:w-2/5 flex items-center justify-center p-8 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <div className="w-full max-w-md">
           {/* Logo Section */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-pink-500 via-purple-500 to-cyan-500 rounded-2xl shadow-xl mb-4 transform hover:scale-105 transition-transform">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl shadow-xl mb-4 transform hover:scale-105 transition-transform">
               <Headphones className="w-12 h-12 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -85,14 +85,14 @@ export default function LoginPage() {
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white/80 backdrop-blur-sm dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all outline-none"
                   placeholder="seu@email.com"
                   disabled={isLoading}
                   required
                   autoComplete="email"
                 />
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <div className="w-5 h-px bg-gradient-to-r from-purple-500 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity" />
+                  <div className="w-5 h-px bg-gradient-to-r from-cyan-500 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity" />
                 </div>
               </div>
             </div>
@@ -107,7 +107,7 @@ export default function LoginPage() {
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white/80 backdrop-blur-sm dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all pr-12 outline-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all pr-12 outline-none"
                   placeholder="••••••••"
                   disabled={isLoading}
                   required
@@ -126,14 +126,14 @@ export default function LoginPage() {
                   )}
                 </button>
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <div className="w-5 h-px bg-gradient-to-r from-purple-500 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity" />
+                  <div className="w-5 h-px bg-gradient-to-r from-cyan-500 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity" />
                 </div>
               </div>
             </div>
 
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center">
-                <input type="checkbox" className="rounded border-gray-300 text-purple-600 focus:ring-purple-500" />
+                <input type="checkbox" className="rounded border-gray-300 text-cyan-600 focus:ring-cyan-500" />
                 <span className="ml-2 text-gray-600 dark:text-gray-400">Lembrar de mim</span>
               </label>
             </div>
@@ -141,7 +141,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-600 hover:from-purple-700 hover:via-pink-700 hover:to-cyan-700 text-white font-semibold py-3.5 px-4 rounded-xl transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center shadow-lg"
+              className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold py-3.5 px-4 rounded-xl transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center shadow-lg"
             >
               {isLoading ? (
                 <>
@@ -171,50 +171,42 @@ export default function LoginPage() {
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: 'url(/images/login-background.jpg)',
+            backgroundImage: 'url(/login-background.jpg)',
           }}
         >
           {/* Overlay gradient for better visual */}
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/10 via-blue-900/20 to-purple-900/30" />
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-blue-900/30 to-gray-900/40" />
           
           {/* Content overlay */}
           <div className="relative h-full flex items-center justify-center p-12">
             <div className="text-center text-white max-w-2xl">
-              {/* Glowing chat bubble icon matching the image theme */}
-              <div className="mb-8 flex justify-center">
-                <div className="relative">
-                  <div className="absolute inset-0 animate-ping">
-                    <div className="w-24 h-24 bg-pink-400/30 rounded-2xl blur-xl"></div>
-                  </div>
-                  <div className="relative w-24 h-24 bg-gradient-to-br from-pink-400/20 to-cyan-400/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/20">
-                    <svg className="w-12 h-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                  </div>
-                </div>
+              <div className="mb-8">
+                {/* Animated circuit lines */}
+                <svg className="w-full h-32 opacity-30" viewBox="0 0 400 100">
+                  <path 
+                    d="M 50 50 L 150 50 L 200 20 L 250 50 L 350 50" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    fill="none"
+                    strokeDasharray="5,5"
+                    className="animate-pulse"
+                  />
+                  <circle cx="50" cy="50" r="4" fill="currentColor" className="animate-pulse" />
+                  <circle cx="150" cy="50" r="4" fill="currentColor" className="animate-pulse delay-75" />
+                  <circle cx="200" cy="20" r="4" fill="currentColor" className="animate-pulse delay-150" />
+                  <circle cx="250" cy="50" r="4" fill="currentColor" className="animate-pulse delay-200" />
+                  <circle cx="350" cy="50" r="4" fill="currentColor" className="animate-pulse delay-300" />
+                </svg>
               </div>
               
-              <h2 className="text-5xl font-bold mb-4 drop-shadow-2xl bg-gradient-to-r from-white to-pink-100 bg-clip-text text-transparent">
+              <h2 className="text-4xl font-bold mb-4 drop-shadow-lg">
                 Suporte Inteligente
               </h2>
-              <p className="text-xl text-white/95 drop-shadow-lg mb-8 font-light">
-                Tecnologia e inovação conectando você às melhores soluções
+              <p className="text-xl text-white/90 drop-shadow mb-8">
+                Conectando você às soluções que precisa, quando precisa.
               </p>
               
-              <div className="grid grid-cols-3 gap-8 mt-12">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-pink-200">24/7</div>
-                  <div className="text-sm text-white/70 mt-1">Disponível</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-cyan-200">IA</div>
-                  <div className="text-sm text-white/70 mt-1">Assistida</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-purple-200">100%</div>
-                  <div className="text-sm text-white/70 mt-1">Seguro</div>
-                </div>
-              </div>
+
             </div>
           </div>
         </div>
