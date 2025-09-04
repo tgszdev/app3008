@@ -207,31 +207,17 @@ export default function LoginPage() {
           {/* Content positioned in lower left area */}
           <div className="absolute bottom-0 left-0 p-12 lg:p-16 max-w-3xl">
             <div className="bg-gradient-to-r from-black/50 via-black/30 to-transparent p-10 rounded-3xl backdrop-blur-md">
-              <h2 className={`${poppins.className} text-5xl lg:text-6xl font-extrabold mb-4 text-white drop-shadow-2xl tracking-tight`}>
+              <h2 className={`${poppins.className} text-4xl lg:text-5xl font-bold mb-4 text-white drop-shadow-2xl`}>
                 <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  Suporte
+                  O Futuro do Atendimento
                 </span>
                 <span className="text-white ml-3">
-                  Inteligente
+                  é Agora
                 </span>
               </h2>
-              <p className={`${inter.className} text-xl lg:text-2xl text-gray-100 font-light mb-6 leading-relaxed`}>
-                Transformando desafios em soluções com <span className="font-semibold text-cyan-400">tecnologia</span> e <span className="font-semibold text-purple-400">inovação</span>.
+              <p className={`${inter.className} text-xl lg:text-2xl text-gray-100 font-light leading-relaxed`}>
+                Tecnologia feita para <span className="font-semibold text-cyan-400">simplificar</span>, não complicar.
               </p>
-              <div className="flex items-center gap-6 text-sm lg:text-base text-gray-300">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span>Atendimento 24/7</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                  <span>IA Integrada</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-                  <span>Resposta Rápida</span>
-                </div>
-              </div>
             </div>
           </div>
         </div>
