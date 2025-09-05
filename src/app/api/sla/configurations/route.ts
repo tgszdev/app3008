@@ -1,19 +1,16 @@
-import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-config'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/lib/auth'
+import { supabaseAdmin } from '@/lib/supabase/server'
 
 // GET - Listar configurações de SLA
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
+    const session = await auth()
+    if (!session) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
-
-    const supabase = await createClient()
     
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('sla_configurations')
       .select(`
         *,
@@ -35,10 +32,11 @@ export async function GET(request: Request) {
 }
 
 // POST - Criar nova configuração de SLA
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user || session.user.role !== 'admin') {
+    const session = await auth()
+    const userRole = (session?.user as any)?.role
+    if (!session || userRole !== 'admin') {
       return NextResponse.json({ error: 'Apenas administradores podem criar configurações de SLA' }, { status: 403 })
     }
 
@@ -71,7 +69,7 @@ export async function POST(request: Request) {
       }, { status: 400 })
     }
 
-    const supabase = await createClient()
+
     
     // Verifica se já existe configuração para categoria/prioridade
     if (category_id) {
@@ -90,7 +88,7 @@ export async function POST(request: Request) {
     }
 
     // Cria a configuração
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('sla_configurations')
       .insert({
         name,

@@ -1,24 +1,27 @@
-import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-config'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/lib/auth'
+import { supabaseAdmin } from '@/lib/supabase/server'
 import { calculateTargetDate } from '@/lib/sla-utils'
+
+type RouteParams = {
+  params: Promise<{ id: string }>
+}
 
 // GET - Obter SLA de um ticket específico
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: RouteParams
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
+    const session = await auth()
+    if (!session) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    const supabase = await createClient()
+    const params = await context.params
     
     // Buscar ticket
-    const { data: ticket, error: ticketError } = await supabase
+    const { data: ticket, error: ticketError } = await supabaseAdmin
       .from('tickets')
       .select('id, priority, category_id, created_at, status')
       .eq('id', params.id)
@@ -29,7 +32,7 @@ export async function GET(
     }
 
     // Buscar configuração de SLA aplicável
-    const { data: slaConfig } = await supabase
+    const { data: slaConfig } = await supabaseAdmin
       .from('sla_configurations')
       .select('*')
       .eq('priority', ticket.priority)
@@ -49,7 +52,7 @@ export async function GET(
     }
 
     // Buscar ou criar registro de SLA do ticket
-    let { data: ticketSLA } = await supabase
+    let { data: ticketSLA } = await supabaseAdmin
       .from('ticket_sla')
       .select('*')
       .eq('ticket_id', params.id)
@@ -69,7 +72,7 @@ export async function GET(
         slaConfig
       )
 
-      const { data: newSLA, error: createError } = await supabase
+      const { data: newSLA, error: createError } = await supabaseAdmin
         .from('ticket_sla')
         .insert({
           ticket_id: params.id,
@@ -102,22 +105,21 @@ export async function GET(
 
 // POST - Atualizar status de SLA (primeira resposta, resolução, etc)
 export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: RouteParams
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
+    const session = await auth()
+    if (!session) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
+    const params = await context.params
     const body = await request.json()
     const { action, timestamp } = body
-
-    const supabase = await createClient()
     
     // Buscar registro de SLA do ticket
-    const { data: ticketSLA, error: slaError } = await supabase
+    const { data: ticketSLA, error: slaError } = await supabaseAdmin
       .from('ticket_sla')
       .select('*')
       .eq('ticket_id', params.id)
@@ -162,14 +164,14 @@ export async function POST(
           updateData.total_paused_time = (ticketSLA.total_paused_time || 0) + pausedMinutes
           
           // Criar registro no histórico de pausas
-          await supabase
+          await supabaseAdmin
             .from('sla_pause_history')
             .insert({
               ticket_sla_id: ticketSLA.id,
               paused_at: ticketSLA.paused_at,
               resumed_at: resumedAt.toISOString(),
               duration_minutes: pausedMinutes,
-              paused_by: session.user.id
+              paused_by: session.user?.id
             })
         }
         break
@@ -179,7 +181,7 @@ export async function POST(
     }
 
     // Atualizar registro de SLA
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('ticket_sla')
       .update(updateData)
       .eq('id', ticketSLA.id)
@@ -196,7 +198,7 @@ export async function POST(
       (action === 'first_response' && updateData.first_response_status === 'breached') ||
       (action === 'resolved' && updateData.resolution_status === 'breached')
     ) {
-      await supabase
+      await supabaseAdmin
         .from('sla_breaches')
         .insert({
           ticket_id: params.id,

@@ -1,23 +1,27 @@
-import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-config'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/lib/auth'
+import { supabaseAdmin } from '@/lib/supabase/server'
+
+type RouteParams = {
+  params: Promise<{ id: string }>
+}
 
 // PUT - Atualizar configuração de SLA
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: RouteParams
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user || session.user.role !== 'admin') {
+    const session = await auth()
+    const userRole = (session?.user as any)?.role
+    if (!session || userRole !== 'admin') {
       return NextResponse.json({ error: 'Apenas administradores podem atualizar configurações de SLA' }, { status: 403 })
     }
 
+    const params = await context.params
     const body = await request.json()
-    const supabase = await createClient()
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('sla_configurations')
       .update(body)
       .eq('id', params.id)
@@ -38,19 +42,20 @@ export async function PUT(
 
 // DELETE - Desativar configuração de SLA
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: RouteParams
 ) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user || session.user.role !== 'admin') {
+    const session = await auth()
+    const userRole = (session?.user as any)?.role
+    if (!session || userRole !== 'admin') {
       return NextResponse.json({ error: 'Apenas administradores podem deletar configurações de SLA' }, { status: 403 })
     }
 
-    const supabase = await createClient()
+    const params = await context.params
 
     // Soft delete - apenas desativa
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('sla_configurations')
       .update({ is_active: false })
       .eq('id', params.id)
