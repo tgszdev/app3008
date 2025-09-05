@@ -18,6 +18,18 @@ Sistema completo de gerenciamento de tickets de suporte com autenticação, cate
 - ✅ **Redirecionamento automático** após login para dashboard
 - ✅ **Logout seguro** com limpeza de sessão
 
+### Sistema de SLA (Service Level Agreement) 🆕
+- ✅ **Configuração de SLA** por prioridade e categoria
+- ✅ **Tempo de primeira resposta** e tempo de resolução
+- ✅ **Cálculo automático** considerando horário comercial
+- ✅ **Dias úteis configuráveis** (Segunda a Domingo)
+- ✅ **Indicadores visuais** de status (Pendente, Atendido, Em Risco, Violado)
+- ✅ **Sistema de alertas** quando atingir % configurado
+- ✅ **Histórico de pausas** para tickets em espera
+- ✅ **Registro de violações** com justificativas
+- ✅ **Interface de configuração** para administradores
+- ✅ **Barras de progresso** em tempo real
+
 ### Sistema de Tickets
 - ✅ **CRUD completo** de tickets com numeração automática
 - ✅ **Categorização** com ícones e cores personalizadas
@@ -67,6 +79,12 @@ Sistema completo de gerenciamento de tickets de suporte com autenticação, cate
 - `comments` - Comentários em tickets
 - `attachments` - Arquivos anexados
 - `audit_logs` - Logs de auditoria
+
+### Tabelas de SLA
+- `sla_configurations` - Configurações de SLA por prioridade/categoria
+- `ticket_sla` - Rastreamento de SLA por ticket
+- `sla_pause_history` - Histórico de pausas no SLA
+- `sla_breaches` - Registro de violações de SLA
 
 ## 🚀 Comandos Úteis
 
@@ -142,8 +160,16 @@ Para problemas ou dúvidas, abra um ticket no sistema ou entre em contato com a 
 ---
 
 **Última Atualização**: 05/09/2025
-**Versão**: 1.5.6
+**Versão**: 2.0.0
 **Status**: ✅ Em Produção
+
+## 🎉 Novidades da Versão 2.0.0
+### Sistema de SLA (Service Level Agreement)
+- ✅ **Configuração completa de SLA** com interface administrativa
+- ✅ **Cálculo automático** de tempos e prazos
+- ✅ **Indicadores visuais** em tempo real
+- ✅ **Suporte a horário comercial** e dias úteis
+- ✅ **Sistema de alertas e violações**
 
 ## 🔧 Correções Recentes (v1.5.6)
 - ✅ Corrigido erro React #306 (importação de módulos)
