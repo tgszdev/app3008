@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     
     // Verifica se já existe configuração para categoria/prioridade
     if (category_id) {
-      const { data: existing } = await supabase
+      const { data: existing } = await supabaseAdmin
         .from('sla_configurations')
         .select('id')
         .eq('category_id', category_id)
