@@ -52,7 +52,7 @@ export default function SLAConfigurationPage() {
     name: '',
     description: '',
     category_id: '',
-    priority: 'medium' as const,
+    priority: 'medium' as 'low' | 'medium' | 'high' | 'critical',
     first_response_time: 60,
     resolution_time: 240,
     business_hours_only: true,
@@ -237,7 +237,7 @@ export default function SLAConfigurationPage() {
                 <label className="block text-sm font-medium mb-1">Prioridade*</label>
                 <select
                   value={formData.priority}
-                  onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
+                  onChange={(e) => setFormData({ ...formData, priority: e.target.value as 'low' | 'medium' | 'high' | 'critical' })}
                   className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700"
                   required
                 >
