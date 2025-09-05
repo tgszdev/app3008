@@ -71,28 +71,8 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Configurar políticas RLS se necessário
-    if (results.created.includes('attachments')) {
-      // Permitir leitura pública
-      await supabaseAdmin.rpc('create_storage_policy', {
-        bucket_name: 'attachments',
-        policy_name: 'Public read access',
-        definition: 'true',
-        operation: 'SELECT'
-      }).catch(() => {
-        // Ignorar erro se a política já existir
-      })
-
-      // Permitir upload para usuários autenticados
-      await supabaseAdmin.rpc('create_storage_policy', {
-        bucket_name: 'attachments',
-        policy_name: 'Authenticated users can upload',
-        definition: 'auth.uid() IS NOT NULL',
-        operation: 'INSERT'
-      }).catch(() => {
-        // Ignorar erro se a política já existir
-      })
-    }
+    // Nota: As políticas RLS devem ser configuradas diretamente no Supabase Dashboard
+    // ou através de SQL migrations, não através da API JavaScript
 
     return NextResponse.json({
       success: true,
@@ -100,7 +80,18 @@ export async function GET(request: NextRequest) {
       results,
       instructions: results.errors.length > 0 
         ? 'Alguns buckets não puderam ser criados. Verifique o Supabase Dashboard.'
-        : 'Todos os buckets foram configurados com sucesso!'
+        : results.created.length > 0
+        ? 'Buckets criados com sucesso! Configure as políticas RLS no Supabase Dashboard se necessário.'
+        : 'Todos os buckets já existem.',
+      nextSteps: results.created.includes('attachments') 
+        ? [
+            '1. Acesse o Supabase Dashboard',
+            '2. Vá em Storage > Policies',
+            '3. Para o bucket "attachments", adicione:',
+            '   - Policy para SELECT: true (permite leitura pública)',
+            '   - Policy para INSERT: auth.uid() IS NOT NULL (permite upload para usuários autenticados)'
+          ]
+        : null
     })
 
   } catch (error) {
