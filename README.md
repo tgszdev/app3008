@@ -142,5 +142,12 @@ Para problemas ou dúvidas, abra um ticket no sistema ou entre em contato com a 
 ---
 
 **Última Atualização**: 05/09/2025
-**Versão**: 1.5.3
+**Versão**: 1.5.6
 **Status**: ✅ Em Produção
+
+## 🔧 Correções Recentes (v1.5.6)
+- ✅ Corrigido erro React #306 (importação de módulos)
+- ✅ Corrigido erro React #130 (componente retornando undefined)
+- ✅ Implementado SimplePrintButton com impressão via iframe
+- ✅ Removidas importações dinâmicas problemáticas
+- ✅ Sistema de impressão robusto e confiável
