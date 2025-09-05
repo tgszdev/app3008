@@ -10,6 +10,7 @@ import { getIcon } from '@/lib/icons'
 import toast from 'react-hot-toast'
 import { useSession } from 'next-auth/react'
 import ImageModal from '@/components/ImageModal'
+import { getAttachmentUrl, isImageFile } from '@/lib/storage-utils'
 
 interface User {
   id: string
@@ -557,15 +558,10 @@ export default function TicketDetailsPage() {
               <div className="space-y-2">
                 {attachments.map((attachment) => {
                   // Verificar se é uma imagem
-                  const isImage = attachment.file_type?.startsWith('image/') || 
-                                 /\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(attachment.file_name)
+                  const isImage = isImageFile(attachment.file_name, attachment.file_type)
                   
-                  // Corrigir URL do arquivo se necessário
-                  const fileUrl = attachment.file_url?.startsWith('http') 
-                    ? attachment.file_url 
-                    : attachment.storage_path 
-                      ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/attachments/${attachment.storage_path}`
-                      : attachment.file_url
+                  // Obter URL correta do arquivo
+                  const fileUrl = getAttachmentUrl(attachment)
                   
                   return (
                     <div

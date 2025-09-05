@@ -22,8 +22,25 @@ export async function GET(request: NextRequest) {
       errors: [] as any[]
     }
 
-    // Buckets necessários
+    // Buckets necessários (usando os nomes que já existem no Supabase)
     const requiredBuckets = [
+      {
+        name: 'ticket-attachments',
+        options: {
+          public: false, // Controlaremos acesso via políticas
+          fileSizeLimit: 10485760, // 10MB
+          allowedMimeTypes: [
+            'image/*',
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.ms-excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'text/plain',
+            'text/csv'
+          ]
+        }
+      },
       {
         name: 'attachments',
         options: {
