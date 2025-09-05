@@ -1,5 +1,23 @@
 declare module 'react-to-print' {
-  import { ReactInstance, RefObject } from 'react'
+  import { ComponentType, ReactInstance, RefObject } from 'react'
+
+  export interface ReactToPrintProps {
+    bodyClass?: string
+    content: () => ReactInstance | null
+    copyStyles?: boolean
+    documentTitle?: string
+    fonts?: { family: string; source: string }[]
+    onAfterPrint?: () => void | Promise<void>
+    onBeforeGetContent?: () => void | Promise<void>
+    onBeforePrint?: () => void | Promise<void>
+    onPrintError?: (errorLocation: string, error: Error) => void
+    pageStyle?: string | (() => string)
+    print?: (iframe: HTMLIFrameElement) => void | Promise<any>
+    removeAfterPrint?: boolean
+    suppressErrors?: boolean
+    nonce?: string
+    trigger?: () => React.ReactElement
+  }
 
   export interface UseReactToPrintOptions {
     bodyClass?: string
@@ -7,7 +25,7 @@ declare module 'react-to-print' {
     copyStyles?: boolean
     documentTitle?: string
     fonts?: { family: string; source: string }[]
-    onAfterPrint?: () => void
+    onAfterPrint?: () => void | Promise<void>
     onBeforeGetContent?: () => void | Promise<void>
     onBeforePrint?: () => void | Promise<void>
     onPrintError?: (errorLocation: string, error: Error) => void
@@ -20,9 +38,6 @@ declare module 'react-to-print' {
 
   export function useReactToPrint(options: UseReactToPrintOptions): () => void
 
-  export interface ReactToPrintProps extends UseReactToPrintOptions {
-    trigger?: () => React.ReactElement
-  }
-
-  export default class ReactToPrint extends React.Component<ReactToPrintProps> {}
+  const ReactToPrint: ComponentType<ReactToPrintProps>
+  export default ReactToPrint
 }
