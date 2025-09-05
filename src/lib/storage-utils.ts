@@ -1,8 +1,8 @@
 // Configuração dos buckets do Supabase Storage
 export const STORAGE_BUCKETS = {
-  TICKET_ATTACHMENTS: 'ticket-attachments',
-  ATTACHMENTS: 'attachments', 
-  AVATARS: 'avatars'
+  TICKET_ATTACHMENTS: 'TICKET-ATTACHMENTS', // Nome exato como no Supabase
+  ATTACHMENTS: 'ATTACHMENTS', 
+  AVATARS: 'AVATARS'
 } as const
 
 // Função para obter a URL pública de um arquivo

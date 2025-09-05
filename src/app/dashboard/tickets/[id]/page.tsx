@@ -5,12 +5,14 @@ import { useParams, useRouter } from 'next/navigation'
 import axios from 'axios'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { ArrowLeft, Clock, User, Tag, AlertCircle, MessageSquare, Paperclip, Edit, Trash2, Send, CheckCircle, XCircle, AlertTriangle, ChevronDown, Lock, Eye, EyeOff, Image as ImageIcon } from 'lucide-react'
+import { ArrowLeft, Clock, User, Tag, AlertCircle, MessageSquare, Paperclip, Edit, Trash2, Send, CheckCircle, XCircle, AlertTriangle, ChevronDown, Lock, Eye, EyeOff, Image as ImageIcon, FileDown } from 'lucide-react'
 import { getIcon } from '@/lib/icons'
 import toast from 'react-hot-toast'
 import { useSession } from 'next-auth/react'
 import ImageModal from '@/components/ImageModal'
 import { getAttachmentUrl, isImageFile } from '@/lib/storage-utils'
+import { TicketPDF } from '@/components/TicketPDF'
+import { useReactToPrint } from 'react-to-print'
 
 interface User {
   id: string
@@ -86,6 +88,7 @@ export default function TicketDetailsPage() {
   const router = useRouter()
   const { data: session } = useSession()
   const ticketId = params?.id as string
+  const pdfRef = useRef<HTMLDivElement>(null)
   
   const [ticket, setTicket] = useState<Ticket | null>(null)
   const [loading, setLoading] = useState(true)
@@ -104,6 +107,23 @@ export default function TicketDetailsPage() {
   const [showReactivateModal, setShowReactivateModal] = useState(false)
   const [reactivateReason, setReactivateReason] = useState('')
   const [selectedImage, setSelectedImage] = useState<{url: string, name: string, size?: number, type?: string} | null>(null)
+  
+  // Função para gerar PDF
+  const handlePrint = useReactToPrint({
+    content: () => pdfRef.current,
+    documentTitle: `Ticket_${ticket?.ticket_number}_${format(new Date(), 'dd-MM-yyyy')}`,
+    pageStyle: `
+      @page {
+        size: A4;
+        margin: 25mm;
+      }
+      @media print {
+        body {
+          -webkit-print-color-adjust: exact;
+        }
+      }
+    `
+  })
 
   useEffect(() => {
     if (ticketId) {
@@ -433,14 +453,27 @@ export default function TicketDetailsPage() {
     <div className="p-4 sm:p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <button
-          onClick={() => router.push('/dashboard/tickets')}
-          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-4 text-sm sm:text-base"
-        >
-          <ArrowLeft size={20} />
-          <span className="hidden sm:inline">Voltar para Chamados</span>
-          <span className="sm:hidden">Voltar</span>
-        </button>
+        <div className="flex justify-between items-center mb-4">
+          <button
+            onClick={() => router.push('/dashboard/tickets')}
+            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 text-sm sm:text-base"
+          >
+            <ArrowLeft size={20} />
+            <span className="hidden sm:inline">Voltar para Chamados</span>
+            <span className="sm:hidden">Voltar</span>
+          </button>
+          
+          {/* Botão Gerar PDF - Disponível para todos */}
+          <button
+            onClick={handlePrint}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+            title="Gerar PDF do Ticket"
+          >
+            <FileDown size={20} />
+            <span className="hidden sm:inline">Gerar PDF</span>
+            <span className="sm:hidden">PDF</span>
+          </button>
+        </div>
         
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
@@ -1006,6 +1039,11 @@ export default function TicketDetailsPage() {
           fileType={selectedImage.type}
         />
       )}
+      
+      {/* Componente PDF oculto para impressão */}
+      <div style={{ display: 'none' }}>
+        <TicketPDF ref={pdfRef} ticket={ticket} />
+      </div>
     </div>
   )
 }
