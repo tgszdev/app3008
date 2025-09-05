@@ -23,6 +23,7 @@ import {
   BookOpen,
   ChevronLeft,
   ChevronRight,
+  Clock,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
@@ -40,6 +41,7 @@ const navigation = [
 
 const adminNavigation = [
   { name: 'Usuários', href: '/dashboard/users', icon: Users },
+  { name: 'SLA', href: '/dashboard/sla', icon: Clock },
   { name: 'Configurações', href: '/dashboard/settings', icon: Settings },
 ]
 
