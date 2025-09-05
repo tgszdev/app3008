@@ -246,3 +246,5 @@ export const TicketPDF = forwardRef<HTMLDivElement, TicketPDFProps>(
 )
 
 TicketPDF.displayName = 'TicketPDF'
+
+export default TicketPDF
