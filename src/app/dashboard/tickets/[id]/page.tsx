@@ -5,10 +5,11 @@ import { useParams, useRouter } from 'next/navigation'
 import axios from 'axios'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { ArrowLeft, Clock, User, Tag, AlertCircle, MessageSquare, Paperclip, Edit, Trash2, Send, CheckCircle, XCircle, AlertTriangle, ChevronDown, Lock, Eye, EyeOff } from 'lucide-react'
+import { ArrowLeft, Clock, User, Tag, AlertCircle, MessageSquare, Paperclip, Edit, Trash2, Send, CheckCircle, XCircle, AlertTriangle, ChevronDown, Lock, Eye, EyeOff, Image as ImageIcon } from 'lucide-react'
 import { getIcon } from '@/lib/icons'
 import toast from 'react-hot-toast'
 import { useSession } from 'next-auth/react'
+import ImageModal from '@/components/ImageModal'
 
 interface User {
   id: string
@@ -101,6 +102,7 @@ export default function TicketDetailsPage() {
   const [cancelReason, setCancelReason] = useState('')
   const [showReactivateModal, setShowReactivateModal] = useState(false)
   const [reactivateReason, setReactivateReason] = useState('')
+  const [selectedImage, setSelectedImage] = useState<{url: string, name: string, size?: number, type?: string} | null>(null)
 
   useEffect(() => {
     if (ticketId) {
@@ -553,34 +555,65 @@ export default function TicketDetailsPage() {
               </h2>
               
               <div className="space-y-2">
-                {attachments.map((attachment) => (
-                  <div
-                    key={attachment.id}
-                    className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Paperclip className="h-4 w-4 text-gray-400" />
-                      <div>
-                        <a
-                          href={attachment.file_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
-                        >
-                          {attachment.file_name}
-                        </a>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {formatFileSize(attachment.file_size)} • {format(new Date(attachment.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
-                        </p>
+                {attachments.map((attachment) => {
+                  // Verificar se é uma imagem
+                  const isImage = attachment.file_type?.startsWith('image/') || 
+                                 /\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(attachment.file_name)
+                  
+                  // Corrigir URL do arquivo se necessário
+                  const fileUrl = attachment.file_url?.startsWith('http') 
+                    ? attachment.file_url 
+                    : attachment.storage_path 
+                      ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/attachments/${attachment.storage_path}`
+                      : attachment.file_url
+                  
+                  return (
+                    <div
+                      key={attachment.id}
+                      className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900"
+                    >
+                      <div className="flex items-center gap-3">
+                        {isImage ? (
+                          <ImageIcon className="h-4 w-4 text-blue-500" />
+                        ) : (
+                          <Paperclip className="h-4 w-4 text-gray-400" />
+                        )}
+                        <div>
+                          {isImage ? (
+                            <button
+                              onClick={() => setSelectedImage({
+                                url: fileUrl,
+                                name: attachment.file_name,
+                                size: attachment.file_size,
+                                type: attachment.file_type
+                              })}
+                              className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium hover:underline text-left"
+                            >
+                              {attachment.file_name}
+                            </button>
+                          ) : (
+                            <a
+                              href={fileUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium hover:underline"
+                            >
+                              {attachment.file_name}
+                            </a>
+                          )}
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {formatFileSize(attachment.file_size)} • {format(new Date(attachment.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+                          </p>
+                        </div>
                       </div>
+                      {attachment.uploader && (
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          {attachment.uploader.name}
+                        </span>
+                      )}
                     </div>
-                    {attachment.uploader && (
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {attachment.uploader.name}
-                      </span>
-                    )}
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           )}
@@ -964,6 +997,18 @@ export default function TicketDetailsPage() {
             </div>
           </div>
         </div>
+      )}
+      
+      {/* Image Modal */}
+      {selectedImage && (
+        <ImageModal
+          isOpen={!!selectedImage}
+          onClose={() => setSelectedImage(null)}
+          imageUrl={selectedImage.url}
+          fileName={selectedImage.name}
+          fileSize={selectedImage.size}
+          fileType={selectedImage.type}
+        />
       )}
     </div>
   )
