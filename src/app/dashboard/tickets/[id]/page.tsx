@@ -9,9 +9,26 @@ import { ArrowLeft, Clock, User, Tag, AlertCircle, MessageSquare, Paperclip, Edi
 import { getIcon } from '@/lib/icons'
 import toast from 'react-hot-toast'
 import { useSession } from 'next-auth/react'
-import ImageModal from '@/components/ImageModal'
+import dynamic from 'next/dynamic'
 import { getAttachmentUrl, isImageFile } from '@/lib/storage-utils'
-import { PrintButton } from '@/components/PrintButton'
+
+// Importar componentes dinamicamente para evitar problemas de SSR
+const ImageModal = dynamic(() => import('@/components/ImageModal'), {
+  ssr: false,
+  loading: () => <div>Carregando...</div>
+})
+
+const PrintButton = dynamic(
+  () => import('@/components/PrintButton').then(mod => ({ default: mod.PrintButton })),
+  {
+    ssr: false,
+    loading: () => (
+      <button disabled className="flex items-center gap-2 px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed opacity-50 text-sm sm:text-base">
+        <span>Carregando...</span>
+      </button>
+    )
+  }
+)
 
 interface User {
   id: string
@@ -159,7 +176,7 @@ export default function TicketDetailsPage() {
     if (!file || !ticket) return
 
     // Block non-admin users from uploading to cancelled tickets
-    if (ticket.status === 'cancelled' && session?.user?.role !== 'admin') {
+    if (ticket.status === 'cancelled' && session?.user && 'role' in session.user && session.user.role !== 'admin') {
       toast.error('Apenas administradores podem anexar arquivos em tickets cancelados')
       event.target.value = ''
       return

@@ -2,10 +2,15 @@
 
 import { FileDown } from 'lucide-react'
 import { useRef, useCallback } from 'react'
-import ReactToPrint from 'react-to-print'
+import dynamic from 'next/dynamic'
 import { TicketPDF } from './TicketPDF'
 import { format } from 'date-fns'
 import toast from 'react-hot-toast'
+
+// Importar ReactToPrint dinamicamente para evitar problemas de SSR
+const ReactToPrint = dynamic(() => import('react-to-print'), {
+  ssr: false,
+})
 
 interface PrintButtonProps {
   ticket: any
@@ -28,6 +33,13 @@ export function PrintButton({ ticket, loading }: PrintButtonProps) {
   const handlePrintError = useCallback((errorLocation: string, error: Error) => {
     console.error('Erro na impressão:', errorLocation, error)
     toast.error('Erro ao gerar PDF')
+  }, [])
+
+  // Fallback para window.print se ReactToPrint não carregar
+  const handlePrintFallback = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      window.print()
+    }
   }, [])
 
   const pageStyle = `
@@ -73,6 +85,29 @@ export function PrintButton({ ticket, loading }: PrintButtonProps) {
         <span className="hidden sm:inline">Gerar PDF</span>
         <span className="sm:hidden">PDF</span>
       </button>
+    )
+  }
+
+  // Se ReactToPrint não carregar, usar botão de fallback
+  if (!ReactToPrint) {
+    return (
+      <>
+        <button
+          onClick={handlePrintFallback}
+          disabled={loading}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Gerar PDF do Ticket"
+        >
+          <FileDown size={20} />
+          <span className="hidden sm:inline">Gerar PDF</span>
+          <span className="sm:hidden">PDF</span>
+        </button>
+        
+        {/* Componente para impressão com @media print */}
+        <div className="hidden print:block">
+          <TicketPDF ref={componentRef} ticket={ticket} />
+        </div>
+      </>
     )
   }
 
