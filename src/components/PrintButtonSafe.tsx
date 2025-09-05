@@ -1,19 +1,10 @@
 'use client'
 
-import dynamic from 'next/dynamic'
 import { PrintButton } from './PrintButton'
 
-// Tenta carregar o componente com react-to-print
-const PrintButtonWithLibrary = dynamic(
-  () => import('./PrintButtonWrapper'),
-  {
-    ssr: false,
-    loading: () => null,
-    // Se falhar ao carregar, usa o componente fallback
-    // @ts-ignore
-    fallback: PrintButton
-  }
-)
+// Por enquanto, vamos usar apenas o PrintButton simples
+// que funciona com window.print() até resolver o problema
+// com o react-to-print em produção
 
 interface PrintButtonSafeProps {
   ticket: any
@@ -21,16 +12,6 @@ interface PrintButtonSafeProps {
 }
 
 export function PrintButtonSafe(props: PrintButtonSafeProps) {
-  // Tenta usar o componente com react-to-print
-  // Se falhar, o ErrorBoundary vai capturar e usar o fallback
-  try {
-    if (PrintButtonWithLibrary) {
-      return <PrintButtonWithLibrary {...props} />
-    }
-  } catch (error) {
-    console.error('Erro ao carregar PrintButton com react-to-print:', error)
-  }
-
-  // Fallback para o botão simples com window.print()
+  // Usa o botão simples que sempre funciona
   return <PrintButton {...props} />
 }

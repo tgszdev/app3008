@@ -9,15 +9,9 @@ import { ArrowLeft, Clock, User, Tag, AlertCircle, MessageSquare, Paperclip, Edi
 import { getIcon } from '@/lib/icons'
 import toast from 'react-hot-toast'
 import { useSession } from 'next-auth/react'
-import dynamic from 'next/dynamic'
 import { getAttachmentUrl, isImageFile } from '@/lib/storage-utils'
-import { PrintButtonSafe as PrintButton } from '@/components/PrintButtonSafe'
-
-// Importar ImageModal dinamicamente para evitar problemas de SSR
-const ImageModal = dynamic(() => import('@/components/ImageModal'), {
-  ssr: false,
-  loading: () => <div>Carregando...</div>
-})
+import { SimplePrintButton as PrintButton } from '@/components/SimplePrintButton'
+import ImageModal from '@/components/ImageModal'
 
 interface User {
   id: string
