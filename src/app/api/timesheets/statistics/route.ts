@@ -168,3 +168,5 @@ function processStatistics(timesheets: any[], groupBy: string) {
     users: undefined    // Remove Set from response
   })).sort((a: any, b: any) => b.total_hours - a.total_hours);
 }
+
+export const runtime = 'nodejs';

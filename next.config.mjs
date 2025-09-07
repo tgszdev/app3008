@@ -32,7 +32,15 @@ const nextConfig = {
   // Otimizações para reduzir uso de memória no build
   experimental: {
     workerThreads: false,
-    cpus: 1
+    cpus: 1,
+    serverComponentsExternalPackages: ['@supabase/supabase-js']
+  },
+  // Configuração para APIs
+  api: {
+    bodyParser: {
+      sizeLimit: '1mb',
+    },
+    responseLimit: '8mb',
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {
