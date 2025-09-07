@@ -464,7 +464,7 @@ export default function TimesheetsPage() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {tickets.map(ticket => {
           const ticketTimesheets = getTicketTimesheets(ticket.id);
           const pendingCount = ticketTimesheets.filter(t => t.status === 'pending').length;
@@ -478,7 +478,7 @@ export default function TimesheetsPage() {
           return (
             <Card 
               key={ticket.id} 
-              className="relative overflow-hidden hover:shadow-lg transition-all bg-gradient-to-br from-slate-900 to-slate-800 text-white"
+              className="relative hover:shadow-lg transition-all bg-gradient-to-br from-slate-900 to-slate-800 text-white h-fit"
             >
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start mb-2">
@@ -494,12 +494,12 @@ export default function TimesheetsPage() {
                 <div className="mt-3">
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-slate-400">Progresso</span>
-                    <span className="text-slate-300">{percentComplete}% aprovado</span>
+                    <span className="text-slate-300">{percentComplete || 0}% aprovado</span>
                   </div>
-                  <div className="w-full bg-slate-700 rounded-full h-2">
+                  <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
                     <div 
-                      className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${percentComplete}%` }}
+                      className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-500 ease-out"
+                      style={{ width: `${Math.min(percentComplete || 0, 100)}%` }}
                     />
                   </div>
                 </div>

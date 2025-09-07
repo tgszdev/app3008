@@ -10,7 +10,7 @@ import CategoryManagementModal from '@/components/CategoryManagementModal'
 import SecuritySettingsModal from '@/components/SecuritySettingsModal'
 import NotificationSettingsModal from '@/components/NotificationSettingsModal'
 import BackupRestoreModal from '@/components/BackupRestoreModal'
-import TimesheetPermissionsModal from '@/components/TimesheetPermissionsModal'
+import TimesheetPermissionsModalV2 from '@/components/TimesheetPermissionsModalV2'
 import toast from 'react-hot-toast'
 
 export default function SettingsPage() {
@@ -294,7 +294,7 @@ export default function SettingsPage() {
         onClose={() => setBackupModalOpen(false)}
       />
 
-      <TimesheetPermissionsModal
+      <TimesheetPermissionsModalV2
         isOpen={timesheetPermissionsModalOpen}
         onClose={() => setTimesheetPermissionsModalOpen(false)}
       />
