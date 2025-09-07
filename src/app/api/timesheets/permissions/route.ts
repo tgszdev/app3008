@@ -9,6 +9,43 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { searchParams } = new URL(request.url);
+    const listAll = searchParams.get('all') === 'true';
+    
+    // If admin wants to list all permissions
+    if (session.user.role === 'admin' && listAll) {
+      const userId = searchParams.get('user_id');
+      const department = searchParams.get('department');
+      const role = searchParams.get('role');
+
+      let query = supabaseAdmin
+        .from('timesheet_permissions')
+        .select(`
+          *,
+          user:users!timesheet_permissions_user_id_fkey(id, name, email, department, role)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (userId) {
+        query = query.eq('user_id', userId);
+      }
+      if (department) {
+        query = query.eq('department', department);
+      }
+      if (role) {
+        query = query.eq('role', role);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Error fetching all permissions:', error);
+        return NextResponse.json({ error: 'Failed to fetch permissions' }, { status: 500 });
+      }
+
+      return NextResponse.json(data || []);
+    }
+
     // Fetch user's permissions
     const { data, error } = await supabaseAdmin
       .from('timesheet_permissions')
@@ -38,42 +75,6 @@ export async function GET(request: Request) {
       can_submit_timesheet: session.user.role === 'admin',
       can_approve_timesheet: session.user.role === 'admin'
     });
-    
-    // Admin listing all permissions (moved this check after single user fetch)
-    if (session.user.role === 'admin' && request.url.includes('all=true')) {
-
-    // Admins can see all permissions
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('user_id');
-    const department = searchParams.get('department');
-    const role = searchParams.get('role');
-
-    let query = supabaseAdmin
-      .from('timesheet_permissions')
-      .select(`
-        *,
-        user:users!timesheet_permissions_user_id_fkey(id, name, email, department, role)
-      `)
-      .order('created_at', { ascending: false });
-
-    if (userId) {
-      query = query.eq('user_id', userId);
-    }
-    if (department) {
-      query = query.eq('department', department);
-    }
-    if (role) {
-      query = query.eq('role', role);
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
-      console.error('Error fetching permissions:', error);
-      return NextResponse.json({ error: 'Failed to fetch permissions' }, { status: 500 });
-    }
-
-    return NextResponse.json(data || []);
   } catch (error) {
     console.error('Permissions GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

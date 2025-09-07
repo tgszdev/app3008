@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import { X, Save, UserPlus, Trash2, Check, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -26,6 +27,7 @@ interface TimesheetPermissionsModalProps {
 }
 
 export default function TimesheetPermissionsModal({ isOpen, onClose }: TimesheetPermissionsModalProps) {
+  const { data: session } = useSession();
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
@@ -33,7 +35,7 @@ export default function TimesheetPermissionsModal({ isOpen, onClose }: Timesheet
   const [bulkAction, setBulkAction] = useState<'department' | 'role' | ''>('');
   const [bulkValue, setBulkValue] = useState('');
   const [departments, setDepartments] = useState<string[]>([]);
-  const [roles] = useState(['admin', 'agent', 'user']);
+  const [roles] = useState(['admin', 'analyst', 'user']);
 
   useEffect(() => {
     if (isOpen) {
@@ -45,8 +47,11 @@ export default function TimesheetPermissionsModal({ isOpen, onClose }: Timesheet
     try {
       setLoading(true);
 
-      // Fetch permissions
-      const permRes = await fetch('/api/timesheets/permissions');
+      // Fetch permissions - if admin, get all permissions
+      const url = session?.user?.role === 'admin' 
+        ? '/api/timesheets/permissions?all=true'
+        : '/api/timesheets/permissions';
+      const permRes = await fetch(url);
       if (permRes.ok) {
         const permData = await permRes.json();
         setPermissions(Array.isArray(permData) ? permData : []);
