@@ -46,6 +46,14 @@ export default function TimesheetsPage() {
   const [workDate, setWorkDate] = useState<Date>(new Date());
   const [editingTimesheet, setEditingTimesheet] = useState<Timesheet | null>(null);
 
+  // Filter states
+  const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+  const [filterTicketId, setFilterTicketId] = useState<string>('all');
+  const [filterDateRange, setFilterDateRange] = useState<{ start: Date | null; end: Date | null }>({
+    start: null,
+    end: null
+  });
+
   useEffect(() => {
     fetchData();
   }, [session]);
@@ -72,11 +80,19 @@ export default function TimesheetsPage() {
         }
       }
 
-      // Fetch assigned tickets
-      const ticketsRes = await fetch(`/api/tickets?assignee_id=${session.user.id}`);
+      // Fetch all tickets (will be filtered by API based on user role)
+      // We'll get tickets the user created or is assigned to
+      const ticketsRes = await fetch(`/api/tickets`);
       if (ticketsRes.ok) {
         const ticketsData = await ticketsRes.json();
-        setTickets(ticketsData.filter((t: Ticket) => t.status !== 'closed'));
+        // Filter to show tickets that are either assigned to user or created by user
+        const userTickets = ticketsData.filter((t: any) => 
+          (t.assigned_to === session.user.id || 
+           t.assignee_id === session.user.id || 
+           t.created_by === session.user.id) &&
+          t.status !== 'closed'
+        );
+        setTickets(userTickets);
       }
 
       // Fetch timesheets
@@ -204,6 +220,33 @@ export default function TimesheetsPage() {
       .toFixed(1);
   };
 
+  // Filter timesheets based on selected filters
+  const getFilteredTimesheets = () => {
+    let filtered = [...timesheets];
+
+    // Filter by status
+    if (filterStatus !== 'all') {
+      filtered = filtered.filter(t => t.status === filterStatus);
+    }
+
+    // Filter by ticket
+    if (filterTicketId !== 'all') {
+      filtered = filtered.filter(t => t.ticket_id === filterTicketId);
+    }
+
+    // Filter by date range
+    if (filterDateRange.start) {
+      filtered = filtered.filter(t => new Date(t.work_date) >= filterDateRange.start!);
+    }
+    if (filterDateRange.end) {
+      filtered = filtered.filter(t => new Date(t.work_date) <= filterDateRange.end!);
+    }
+
+    return filtered;
+  };
+
+  const filteredTimesheets = getFilteredTimesheets();
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -238,6 +281,126 @@ export default function TimesheetsPage() {
         <h1 className="text-3xl font-bold">Apontamento de Horas</h1>
         <p className="text-muted-foreground">Registre suas horas trabalhadas nos tickets</p>
       </div>
+
+      {/* Filters */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="text-lg">Filtros</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-4">
+            {/* Status Filter */}
+            <div>
+              <label className="text-sm font-medium mb-2 block">Status</label>
+              <select
+                className="w-full px-3 py-2 border rounded-md"
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value as any)}
+              >
+                <option value="all">Todos</option>
+                <option value="pending">Pendente</option>
+                <option value="approved">Aprovado</option>
+                <option value="rejected">Recusado</option>
+              </select>
+            </div>
+
+            {/* Ticket Filter */}
+            <div>
+              <label className="text-sm font-medium mb-2 block">Ticket</label>
+              <select
+                className="w-full px-3 py-2 border rounded-md"
+                value={filterTicketId}
+                onChange={(e) => setFilterTicketId(e.target.value)}
+              >
+                <option value="all">Todos os Tickets</option>
+                {tickets.map(ticket => (
+                  <option key={ticket.id} value={ticket.id}>
+                    {ticket.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Date Range Start */}
+            <div>
+              <label className="text-sm font-medium mb-2 block">Data Início</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !filterDateRange.start && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {filterDateRange.start ? (
+                      format(filterDateRange.start, "dd/MM/yyyy", { locale: ptBR })
+                    ) : (
+                      "Selecione..."
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={filterDateRange.start || undefined}
+                    onSelect={(date) => setFilterDateRange(prev => ({ ...prev, start: date || null }))}
+                    initialFocus
+                    locale={ptBR}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Date Range End */}
+            <div>
+              <label className="text-sm font-medium mb-2 block">Data Fim</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !filterDateRange.end && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {filterDateRange.end ? (
+                      format(filterDateRange.end, "dd/MM/yyyy", { locale: ptBR })
+                    ) : (
+                      "Selecione..."
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={filterDateRange.end || undefined}
+                    onSelect={(date) => setFilterDateRange(prev => ({ ...prev, end: date || null }))}
+                    initialFocus
+                    locale={ptBR}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+
+          {/* Clear Filters Button */}
+          <div className="mt-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setFilterStatus('all');
+                setFilterTicketId('all');
+                setFilterDateRange({ start: null, end: null });
+              }}
+            >
+              Limpar Filtros
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {tickets.map(ticket => {

@@ -102,15 +102,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'You do not have permission to submit timesheets' }, { status: 403 });
     }
 
-    // Check if user is assigned to the ticket
+    // Check if ticket exists
     const { data: ticket } = await supabaseAdmin
       .from('tickets')
-      .select('id, assignee_id')
+      .select('id, assignee_id, assigned_to')
       .eq('id', data.ticket_id)
       .single();
 
-    if (!ticket || ticket.assignee_id !== session.user.id) {
-      return NextResponse.json({ error: 'You are not assigned to this ticket' }, { status: 403 });
+    if (!ticket) {
+      return NextResponse.json({ error: 'Ticket not found' }, { status: 404 });
+    }
+
+    // Allow submission if user is assigned OR if they have permission
+    // This is more flexible - users with permission can log hours on any ticket
+    const isAssigned = ticket.assignee_id === session.user.id || ticket.assigned_to === session.user.id;
+    
+    // If not assigned, check if user has general permission (already checked above)
+    // So we just log a warning but allow it
+    if (!isAssigned) {
+      console.log(`User ${session.user.id} logging hours on unassigned ticket ${data.ticket_id}`);
     }
 
     // Create timesheet

@@ -8,8 +8,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 import { 
   CalendarIcon, 
   Clock, 
@@ -49,10 +52,19 @@ export default function TimesheetAdminPage() {
     can_approve_timesheet: false
   });
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
+  
+  // Additional filters
+  const [filterTicketId, setFilterTicketId] = useState<string>('all');
+  const [filterUserId, setFilterUserId] = useState<string>('all');
+  const [filterDateRange, setFilterDateRange] = useState<{ start: Date | null; end: Date | null }>({
+    start: null,
+    end: null
+  });
+  const [allUsers, setAllUsers] = useState<Array<{ id: string; name: string; email: string }>>([]);
 
   useEffect(() => {
     fetchData();
-  }, [session, filter]);
+  }, [session, filter, filterTicketId, filterUserId, filterDateRange]);
 
   const fetchData = async () => {
     if (!session?.user) return;
@@ -69,15 +81,31 @@ export default function TimesheetAdminPage() {
         }
       }
 
-      // Fetch all timesheets
-      let url = '/api/timesheets';
-      if (filter !== 'all') {
-        url += `?status=${filter}`;
-      }
-
+      // Build URL with filters
+      const params = new URLSearchParams();
+      if (filter !== 'all') params.append('status', filter);
+      if (filterTicketId !== 'all') params.append('ticket_id', filterTicketId);
+      if (filterUserId !== 'all') params.append('user_id', filterUserId);
+      if (filterDateRange.start) params.append('start_date', format(filterDateRange.start, 'yyyy-MM-dd'));
+      if (filterDateRange.end) params.append('end_date', format(filterDateRange.end, 'yyyy-MM-dd'));
+      
+      const url = `/api/timesheets${params.toString() ? '?' + params.toString() : ''}`;
       const timesheetsRes = await fetch(url);
       if (timesheetsRes.ok) {
         const timesheetsData: Timesheet[] = await timesheetsRes.json();
+        
+        // Extract unique users for filter
+        const usersMap = new Map<string, { id: string; name: string; email: string }>();
+        timesheetsData.forEach(timesheet => {
+          if (timesheet.user && !usersMap.has(timesheet.user.id)) {
+            usersMap.set(timesheet.user.id, {
+              id: timesheet.user.id,
+              name: timesheet.user.name || 'Unknown',
+              email: timesheet.user.email
+            });
+          }
+        });
+        setAllUsers(Array.from(usersMap.values()));
         
         // Group timesheets by ticket
         const ticketMap = new Map<string, TicketWithTimesheets>();
@@ -229,6 +257,144 @@ export default function TimesheetAdminPage() {
         <h1 className="text-3xl font-bold">Administração de Apontamentos</h1>
         <p className="text-muted-foreground">Aprove ou recuse apontamentos de horas da equipe</p>
       </div>
+
+      {/* Filters */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="text-lg">Filtros</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-5">
+            {/* Status Filter */}
+            <div>
+              <label className="text-sm font-medium mb-2 block">Status</label>
+              <select
+                className="w-full px-3 py-2 border rounded-md"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value as any)}
+              >
+                <option value="all">Todos</option>
+                <option value="pending">Pendente</option>
+                <option value="approved">Aprovado</option>
+                <option value="rejected">Recusado</option>
+              </select>
+            </div>
+
+            {/* User Filter */}
+            <div>
+              <label className="text-sm font-medium mb-2 block">Usuário</label>
+              <select
+                className="w-full px-3 py-2 border rounded-md"
+                value={filterUserId}
+                onChange={(e) => setFilterUserId(e.target.value)}
+              >
+                <option value="all">Todos os Usuários</option>
+                {allUsers.map(user => (
+                  <option key={user.id} value={user.id}>
+                    {user.name} ({user.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Ticket Filter */}
+            <div>
+              <label className="text-sm font-medium mb-2 block">Ticket</label>
+              <select
+                className="w-full px-3 py-2 border rounded-md"
+                value={filterTicketId}
+                onChange={(e) => setFilterTicketId(e.target.value)}
+              >
+                <option value="all">Todos os Tickets</option>
+                {tickets.map(ticket => (
+                  <option key={ticket.id} value={ticket.id}>
+                    {ticket.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Date Range Start */}
+            <div>
+              <label className="text-sm font-medium mb-2 block">Data Início</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !filterDateRange.start && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {filterDateRange.start ? (
+                      format(filterDateRange.start, "dd/MM/yyyy", { locale: ptBR })
+                    ) : (
+                      "Selecione..."
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={filterDateRange.start || undefined}
+                    onSelect={(date) => setFilterDateRange(prev => ({ ...prev, start: date || null }))}
+                    initialFocus
+                    locale={ptBR}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Date Range End */}
+            <div>
+              <label className="text-sm font-medium mb-2 block">Data Fim</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !filterDateRange.end && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {filterDateRange.end ? (
+                      format(filterDateRange.end, "dd/MM/yyyy", { locale: ptBR })
+                    ) : (
+                      "Selecione..."
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={filterDateRange.end || undefined}
+                    onSelect={(date) => setFilterDateRange(prev => ({ ...prev, end: date || null }))}
+                    initialFocus
+                    locale={ptBR}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+
+          {/* Clear Filters Button */}
+          <div className="mt-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setFilter('pending');
+                setFilterTicketId('all');
+                setFilterUserId('all');
+                setFilterDateRange({ start: null, end: null });
+              }}
+            >
+              Limpar Filtros
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       <Tabs value={filter} onValueChange={(value) => setFilter(value as any)}>
         <TabsList className="mb-6">
