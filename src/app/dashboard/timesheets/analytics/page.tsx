@@ -129,7 +129,7 @@ export default function TimesheetAnalyticsPage() {
   };
 
   const getApprovalRate = () => {
-    if (!statistics || statistics.summary.total_hours === 0) return 0;
+    if (!statistics || statistics.summary.total_hours === 0) return '0';
     return ((statistics.summary.approved_hours / statistics.summary.total_hours) * 100).toFixed(1);
   };
 
