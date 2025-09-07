@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
-import { CalendarIcon, Clock, CheckCircle, XCircle, AlertCircle, Plus, Edit, Trash } from 'lucide-react';
+import { CalendarIcon, Clock, CheckCircle, XCircle, AlertCircle, Plus, Edit, Trash, ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Timesheet } from '@/types/timesheet';
 
@@ -24,6 +24,7 @@ interface Ticket {
   priority: string;
   description?: string;
   assignee_id: string;
+  ticket_number?: number;
 }
 
 export default function TimesheetsPage() {
@@ -35,6 +36,7 @@ export default function TimesheetsPage() {
   const [showRejectionDialog, setShowRejectionDialog] = useState(false);
   const [selectedRejection, setSelectedRejection] = useState<Timesheet | null>(null);
   const [loading, setLoading] = useState(true);
+  const [expandedTicket, setExpandedTicket] = useState<string | null>(null);
   const [permissions, setPermissions] = useState({
     can_submit_timesheet: false,
     can_approve_timesheet: false
@@ -134,6 +136,8 @@ export default function TimesheetsPage() {
             hours_worked: parseFloat(hoursWorked),
             work_date: format(workDate, 'yyyy-MM-dd')
           };
+
+      console.log('Submitting timesheet:', { url, method, body });
 
       const response = await fetch(url, {
         method,
@@ -468,17 +472,18 @@ export default function TimesheetsPage() {
           const totalHours = parseFloat(getTotalHours(ticket.id));
           const approvedHours = parseFloat(getApprovedHours(ticket.id));
           const percentComplete = totalHours > 0 ? Math.round((approvedHours / totalHours) * 100) : 0;
+          const isExpanded = expandedTicket === ticket.id;
 
           return (
             <Card 
               key={ticket.id} 
-              className="relative overflow-hidden hover:shadow-lg transition-shadow bg-gradient-to-br from-slate-900 to-slate-800 text-white"
+              className="relative overflow-hidden hover:shadow-lg transition-all bg-gradient-to-br from-slate-900 to-slate-800 text-white"
             >
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start mb-2">
                   <div>
-                    <p className="text-xs text-slate-400 uppercase tracking-wider">Ticket</p>
-                    <CardTitle className="text-2xl font-bold">#{ticket.id.substring(0, 8)}</CardTitle>
+                    <p className="text-xs text-slate-400 uppercase tracking-wider">Chamado</p>
+                    <CardTitle className="text-2xl font-bold">#{ticket.ticket_number || ticket.id.substring(0, 8)}</CardTitle>
                   </div>
                   <div className="text-right">
                     <p className="text-3xl font-bold">{ticketTimesheets.length}</p>
@@ -514,97 +519,102 @@ export default function TimesheetsPage() {
                   </div>
                 </div>
                 
-                <Button 
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedTicket(ticket);
-                    setShowAddDialog(true);
-                  }}
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Adicionar Apontamento
-                </Button>
+                <div className="space-y-2">
+                  <Button 
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedTicket(ticket);
+                      setShowAddDialog(true);
+                    }}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Adicionar Apontamento
+                  </Button>
+
+                  {ticketTimesheets.length > 0 && (
+                    <Button
+                      variant="ghost"
+                      className="w-full text-slate-300 hover:text-white hover:bg-slate-700"
+                      onClick={() => setExpandedTicket(isExpanded ? null : ticket.id)}
+                    >
+                      {isExpanded ? (
+                        <><ChevronUp className="w-4 h-4 mr-2" /> Ocultar Apontamentos</>
+                      ) : (
+                        <><ChevronDown className="w-4 h-4 mr-2" /> Ver Apontamentos</>
+                      )}
+                    </Button>
+                  )}
+                </div>
+
+                {/* Lista de Apontamentos dentro do card */}
+                {isExpanded && ticketTimesheets.length > 0 && (
+                  <div className="mt-4 space-y-2 max-h-60 overflow-y-auto">
+                    {ticketTimesheets.map(timesheet => (
+                      <div
+                        key={timesheet.id}
+                        className="bg-slate-800 rounded p-3 border border-slate-700"
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex-1">
+                            <p className="text-xs text-slate-400">
+                              {format(new Date(timesheet.work_date), 'dd/MM/yyyy', { locale: ptBR })}
+                            </p>
+                            <p className="text-sm mt-1">{timesheet.activity_description}</p>
+                          </div>
+                          <div className="text-right ml-2">
+                            <p className="text-sm font-bold">{timesheet.hours_worked}h</p>
+                            {timesheet.status === 'approved' && (
+                              <Badge className="bg-green-600 text-xs mt-1">
+                                <CheckCircle className="w-3 h-3 mr-1" />
+                                Aprovado
+                              </Badge>
+                            )}
+                            {timesheet.status === 'pending' && (
+                              <Badge className="bg-yellow-600 text-xs mt-1">
+                                <AlertCircle className="w-3 h-3 mr-1" />
+                                Pendente
+                              </Badge>
+                            )}
+                            {timesheet.status === 'rejected' && (
+                              <Badge className="bg-red-600 text-xs mt-1">
+                                <XCircle className="w-3 h-3 mr-1" />
+                                Recusado
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                        {timesheet.status === 'pending' && (
+                          <div className="flex gap-1 mt-2">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-slate-400 hover:text-white hover:bg-slate-700 p-1 h-auto"
+                              onClick={() => openEditDialog(timesheet)}
+                            >
+                              <Edit className="w-3 h-3" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-slate-400 hover:text-red-400 hover:bg-slate-700 p-1 h-auto"
+                              onClick={() => handleDeleteTimesheet(timesheet.id)}
+                            >
+                              <Trash className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           );
         })}
       </div>
 
-      {/* Detalhes do Ticket Selecionado */}
-      {selectedTicket && !showAddDialog && (
-        <Card className="mt-6">
-          <CardHeader>
-            <div className="flex justify-between items-start">
-              <div>
-                <CardTitle>{selectedTicket.title}</CardTitle>
-                <p className="text-muted-foreground mt-2">{selectedTicket.description}</p>
-              </div>
-              <Button onClick={() => setShowAddDialog(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Novo Apontamento
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {getTicketTimesheets(selectedTicket.id).map(timesheet => (
-                <Card key={timesheet.id}>
-                  <CardContent className="pt-6">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <CalendarIcon className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-sm">
-                            {format(new Date(timesheet.work_date), 'dd/MM/yyyy', { locale: ptBR })}
-                          </span>
-                          <Clock className="w-4 h-4 text-muted-foreground ml-4" />
-                          <span className="text-sm font-semibold">{timesheet.hours_worked}h</span>
-                          {getStatusBadge(timesheet.status)}
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          {timesheet.activity_description}
-                        </p>
-                        {timesheet.status === 'rejected' && timesheet.rejection_reason && (
-                          <div 
-                            className="bg-red-50 border border-red-200 rounded p-2 mt-2 cursor-pointer"
-                            onClick={() => {
-                              setSelectedRejection(timesheet);
-                              setShowRejectionDialog(true);
-                            }}
-                          >
-                            <p className="text-sm text-red-700">
-                              <strong>Motivo da recusa:</strong> {timesheet.rejection_reason}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                      {timesheet.status === 'pending' && (
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => openEditDialog(timesheet)}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleDeleteTimesheet(timesheet.id)}
-                          >
-                            <Trash className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+
 
       {/* Dialog de Adicionar/Editar Apontamento */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
@@ -614,7 +624,7 @@ export default function TimesheetsPage() {
               {editingTimesheet ? 'Editar Apontamento' : 'Novo Apontamento'}
             </DialogTitle>
             <DialogDescription>
-              {selectedTicket?.title}
+              Chamado #{selectedTicket?.ticket_number || selectedTicket?.id.substring(0, 8)}
             </DialogDescription>
           </DialogHeader>
           
