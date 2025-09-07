@@ -275,12 +275,69 @@ export default function TimesheetsPage() {
     );
   }
 
+  // Calcular estatísticas gerais
+  const totalTickets = tickets.length;
+  const totalTimesheets = timesheets.length;
+  const totalHoursWorked = timesheets.reduce((sum, t) => sum + parseFloat(t.hours_worked.toString()), 0);
+  const totalApprovedHours = timesheets
+    .filter(t => t.status === 'approved')
+    .reduce((sum, t) => sum + parseFloat(t.hours_worked.toString()), 0);
+  const overallProgress = totalHoursWorked > 0 ? Math.round((totalApprovedHours / totalHoursWorked) * 100) : 0;
+
   return (
     <div className="container mx-auto p-6">
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Apontamento de Horas</h1>
         <p className="text-muted-foreground">Registre suas horas trabalhadas nos tickets</p>
       </div>
+
+      {/* Card de Resumo Geral */}
+      <Card className="mb-6 bg-gradient-to-br from-purple-900 to-purple-800 text-white">
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle className="text-xl">Resumo Geral</CardTitle>
+              <p className="text-sm text-purple-200 mt-1">{overallProgress}% do total aprovado</p>
+            </div>
+            <div className="text-right">
+              <p className="text-3xl font-bold">{totalTickets}</p>
+              <p className="text-xs text-purple-200">tickets</p>
+            </div>
+          </div>
+          <div className="mt-4">
+            <div className="w-full bg-purple-700 rounded-full h-3">
+              <div 
+                className="bg-gradient-to-r from-blue-400 to-blue-600 h-3 rounded-full transition-all duration-500"
+                style={{ width: `${overallProgress}%` }}
+              />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-4 gap-4 text-center">
+            <div>
+              <p className="text-xs text-purple-300">Aprovadas</p>
+              <p className="text-2xl font-bold">{totalApprovedHours.toFixed(1)}h</p>
+            </div>
+            <div>
+              <p className="text-xs text-purple-300">Pendentes</p>
+              <p className="text-2xl font-bold text-yellow-400">
+                {timesheets.filter(t => t.status === 'pending').length}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-purple-300">Rejeitadas</p>
+              <p className="text-2xl font-bold text-red-400">
+                {timesheets.filter(t => t.status === 'rejected').length}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-purple-300">Total</p>
+              <p className="text-2xl font-bold">{totalHoursWorked.toFixed(1)}h</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Filters */}
       <Card className="mb-6">
@@ -402,50 +459,63 @@ export default function TimesheetsPage() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {tickets.map(ticket => {
           const ticketTimesheets = getTicketTimesheets(ticket.id);
-          const hasPending = ticketTimesheets.some(t => t.status === 'pending');
+          const pendingCount = ticketTimesheets.filter(t => t.status === 'pending').length;
+          const approvedCount = ticketTimesheets.filter(t => t.status === 'approved').length;
+          const rejectedCount = ticketTimesheets.filter(t => t.status === 'rejected').length;
+          const totalHours = parseFloat(getTotalHours(ticket.id));
+          const approvedHours = parseFloat(getApprovedHours(ticket.id));
+          const percentComplete = totalHours > 0 ? Math.round((approvedHours / totalHours) * 100) : 0;
 
           return (
             <Card 
               key={ticket.id} 
-              className="cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => setSelectedTicket(ticket)}
+              className="relative overflow-hidden hover:shadow-lg transition-shadow bg-gradient-to-br from-slate-900 to-slate-800 text-white"
             >
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <CardTitle className="text-lg">{ticket.title}</CardTitle>
-                  {hasPending && (
-                    <Badge className="bg-yellow-500">
-                      <AlertCircle className="w-3 h-3 mr-1" />
-                      Pendente
-                    </Badge>
-                  )}
+              <CardHeader className="pb-2">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <p className="text-xs text-slate-400 uppercase tracking-wider">Ticket</p>
+                    <CardTitle className="text-2xl font-bold">#{ticket.id.substring(0, 8)}</CardTitle>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-3xl font-bold">{ticketTimesheets.length}</p>
+                    <p className="text-xs text-slate-400">apontamentos</p>
+                  </div>
                 </div>
-                <div className="flex gap-2 mt-2">
-                  <Badge variant="outline">{ticket.status}</Badge>
-                  <Badge variant="outline">{ticket.priority}</Badge>
+                <div className="mt-3">
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-slate-400">Progresso</span>
+                    <span className="text-slate-300">{percentComplete}% aprovado</span>
+                  </div>
+                  <div className="w-full bg-slate-700 rounded-full h-2">
+                    <div 
+                      className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${percentComplete}%` }}
+                    />
+                  </div>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Total de horas:</span>
-                    <span className="font-semibold">{getTotalHours(ticket.id)}h</span>
+              <CardContent className="pt-3">
+                <div className="grid grid-cols-3 gap-2 text-center mb-4">
+                  <div>
+                    <p className="text-xs text-slate-400">A:</p>
+                    <p className="text-lg font-semibold text-green-400">{approvedCount}</p>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Horas aprovadas:</span>
-                    <span className="font-semibold text-green-600">{getApprovedHours(ticket.id)}h</span>
+                  <div>
+                    <p className="text-xs text-slate-400">P:</p>
+                    <p className="text-lg font-semibold text-yellow-400">{pendingCount}</p>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Apontamentos:</span>
-                    <span className="font-semibold">{ticketTimesheets.length}</span>
+                  <div>
+                    <p className="text-xs text-slate-400">R:</p>
+                    <p className="text-lg font-semibold text-red-400">{rejectedCount}</p>
                   </div>
                 </div>
                 
                 <Button 
-                  className="w-full mt-4" 
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white" 
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedTicket(ticket);
