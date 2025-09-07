@@ -549,63 +549,93 @@ export default function TimesheetsPage() {
 
                 {/* Lista de Apontamentos dentro do card */}
                 {isExpanded && ticketTimesheets.length > 0 && (
-                  <div className="mt-4 space-y-2 max-h-60 overflow-y-auto">
-                    {ticketTimesheets.map(timesheet => (
-                      <div
-                        key={timesheet.id}
-                        className="bg-slate-800 rounded p-3 border border-slate-700"
-                      >
-                        <div className="flex justify-between items-start mb-2">
-                          <div className="flex-1">
-                            <p className="text-xs text-slate-400">
-                              {format(new Date(timesheet.work_date), 'dd/MM/yyyy', { locale: ptBR })}
-                            </p>
-                            <p className="text-sm mt-1">{timesheet.activity_description}</p>
+                  <div className="mt-4">
+                    <div className="border-t border-slate-700 pt-3 mb-2">
+                      <p className="text-xs text-slate-400 uppercase tracking-wider mb-2">Histórico de Apontamentos</p>
+                    </div>
+                    <div className="space-y-2 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
+                      {ticketTimesheets.map((timesheet, index) => (
+                        <div
+                          key={timesheet.id}
+                          className="bg-slate-800/50 rounded-lg p-3 border border-slate-700/50 hover:border-slate-600 transition-colors"
+                        >
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xs font-mono text-slate-500">#{index + 1}</span>
+                                <p className="text-xs text-slate-400">
+                                  {format(new Date(timesheet.work_date), "EEEE, dd 'de' MMMM", { locale: ptBR })}
+                                </p>
+                                <span className="text-xs text-slate-600">•</span>
+                                <p className="text-xs font-semibold text-blue-400">{timesheet.hours_worked}h</p>
+                              </div>
+                              <p className="text-sm text-slate-200 line-clamp-2">
+                                {timesheet.activity_description}
+                              </p>
+                            </div>
+                            <div className="flex flex-col items-end gap-1 ml-2">
+                              {timesheet.status === 'approved' && (
+                                <Badge className="bg-green-600/20 text-green-400 border-green-600/30 text-xs">
+                                  <CheckCircle className="w-3 h-3 mr-1" />
+                                  Aprovado
+                                </Badge>
+                              )}
+                              {timesheet.status === 'pending' && (
+                                <Badge className="bg-yellow-600/20 text-yellow-400 border-yellow-600/30 text-xs">
+                                  <AlertCircle className="w-3 h-3 mr-1" />
+                                  Pendente
+                                </Badge>
+                              )}
+                              {timesheet.status === 'rejected' && (
+                                <Badge className="bg-red-600/20 text-red-400 border-red-600/30 text-xs">
+                                  <XCircle className="w-3 h-3 mr-1" />
+                                  Recusado
+                                </Badge>
+                              )}
+                              {timesheet.status === 'pending' && (
+                                <div className="flex gap-1 mt-1">
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="text-slate-500 hover:text-white hover:bg-slate-700 p-1 h-6 w-6"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      openEditDialog(timesheet);
+                                    }}
+                                  >
+                                    <Edit className="w-3 h-3" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="text-slate-500 hover:text-red-400 hover:bg-slate-700 p-1 h-6 w-6"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteTimesheet(timesheet.id);
+                                    }}
+                                  >
+                                    <Trash className="w-3 h-3" />
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                          <div className="text-right ml-2">
-                            <p className="text-sm font-bold">{timesheet.hours_worked}h</p>
-                            {timesheet.status === 'approved' && (
-                              <Badge className="bg-green-600 text-xs mt-1">
-                                <CheckCircle className="w-3 h-3 mr-1" />
-                                Aprovado
-                              </Badge>
-                            )}
-                            {timesheet.status === 'pending' && (
-                              <Badge className="bg-yellow-600 text-xs mt-1">
-                                <AlertCircle className="w-3 h-3 mr-1" />
-                                Pendente
-                              </Badge>
-                            )}
-                            {timesheet.status === 'rejected' && (
-                              <Badge className="bg-red-600 text-xs mt-1">
-                                <XCircle className="w-3 h-3 mr-1" />
-                                Recusado
-                              </Badge>
-                            )}
-                          </div>
+                          {timesheet.status === 'rejected' && timesheet.rejection_reason && (
+                            <div className="mt-2 p-2 bg-red-900/20 rounded border border-red-800/30">
+                              <p className="text-xs text-red-400">
+                                <span className="font-semibold">Motivo:</span> {timesheet.rejection_reason}
+                              </p>
+                            </div>
+                          )}
                         </div>
-                        {timesheet.status === 'pending' && (
-                          <div className="flex gap-1 mt-2">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="text-slate-400 hover:text-white hover:bg-slate-700 p-1 h-auto"
-                              onClick={() => openEditDialog(timesheet)}
-                            >
-                              <Edit className="w-3 h-3" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="text-slate-400 hover:text-red-400 hover:bg-slate-700 p-1 h-auto"
-                              onClick={() => handleDeleteTimesheet(timesheet.id)}
-                            >
-                              <Trash className="w-3 h-3" />
-                            </Button>
-                          </div>
-                        )}
+                      ))}
+                    </div>
+                    <div className="border-t border-slate-700 mt-3 pt-3">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-slate-500">Total de apontamentos: {ticketTimesheets.length}</span>
+                        <span className="text-slate-400 font-semibold">Total: {getTotalHours(ticket.id)}h</span>
                       </div>
-                    ))}
+                    </div>
                   </div>
                 )}
               </CardContent>

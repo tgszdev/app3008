@@ -85,6 +85,7 @@ export async function POST(request: Request) {
     }
 
     const data: CreateTimesheetData = await request.json();
+    console.log('POST /api/timesheets - Received data:', data);
 
     // Validate required fields
     if (!data.ticket_id || !data.activity_description || !data.hours_worked || !data.work_date) {
@@ -158,3 +159,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export const runtime = 'nodejs';
