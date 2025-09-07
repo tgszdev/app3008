@@ -27,8 +27,7 @@ import {
   SelectTrigger,
   SelectValue 
 } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+// Switch implementado inline com checkbox customizado
 
 interface User {
   id: string;
