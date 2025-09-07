@@ -55,9 +55,20 @@ export default function TimesheetsPage() {
     try {
       // Fetch user permissions
       const permRes = await fetch('/api/timesheets/permissions');
+      console.log('Permission response status:', permRes.status);
       if (permRes.ok) {
         const permData = await permRes.json();
+        console.log('Permission data:', permData);
         setPermissions(permData);
+      } else {
+        console.error('Failed to fetch permissions:', await permRes.text());
+        // Set default permissions for admin
+        if (session.user.role === 'admin') {
+          setPermissions({
+            can_submit_timesheet: true,
+            can_approve_timesheet: true
+          });
+        }
       }
 
       // Fetch assigned tickets

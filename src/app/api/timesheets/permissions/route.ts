@@ -9,25 +9,38 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check if user is admin
-    if (session.user.role !== 'admin') {
-      // Non-admins can only see their own permissions
-      const { data, error } = await supabaseAdmin
-        .from('timesheet_permissions')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .single();
+    // Fetch user's permissions
+    const { data, error } = await supabaseAdmin
+      .from('timesheet_permissions')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .single();
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows
-        console.error('Error fetching permissions:', error);
-        return NextResponse.json({ error: 'Failed to fetch permissions' }, { status: 500 });
-      }
+    console.log('Fetching permissions for user:', session.user.id, session.user.email);
+    console.log('Permission data:', data);
+    console.log('Permission error:', error);
 
-      return NextResponse.json(data || {
-        can_submit_timesheet: false,
-        can_approve_timesheet: false
+    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows
+      console.error('Error fetching permissions:', error);
+    }
+
+    // If no permissions found and user is admin, return default admin permissions
+    if (!data && session.user.role === 'admin') {
+      console.log('No permissions found for admin, returning defaults');
+      return NextResponse.json({
+        can_submit_timesheet: true,
+        can_approve_timesheet: true
       });
     }
+
+    // Return found permissions or default based on role
+    return NextResponse.json(data || {
+      can_submit_timesheet: session.user.role === 'admin',
+      can_approve_timesheet: session.user.role === 'admin'
+    });
+    
+    // Admin listing all permissions (moved this check after single user fetch)
+    if (session.user.role === 'admin' && request.url.includes('all=true')) {
 
     // Admins can see all permissions
     const { searchParams } = new URL(request.url);
