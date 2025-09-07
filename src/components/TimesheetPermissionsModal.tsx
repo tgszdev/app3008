@@ -59,7 +59,7 @@ export default function TimesheetPermissionsModal({ isOpen, onClose }: Timesheet
         setUsers(usersData);
         
         // Extract unique departments
-        const uniqueDepts = [...new Set(usersData.map((u: User) => u.department).filter(Boolean))];
+        const uniqueDepts = [...new Set(usersData.map((u: User) => u.department).filter(Boolean))] as string[];
         setDepartments(uniqueDepts);
       }
     } catch (error) {
