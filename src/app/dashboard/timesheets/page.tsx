@@ -12,6 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 import { CalendarIcon, Clock, CheckCircle, XCircle, AlertCircle, Plus, Edit, Trash } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Timesheet } from '@/types/timesheet';
@@ -386,15 +387,24 @@ export default function TimesheetsPage() {
           
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Data do Trabalho</label>
+              <label className="text-sm font-medium">Data do Trabalho *</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full justify-start text-left font-normal"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !workDate && "text-muted-foreground"
+                    )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {format(workDate, 'dd/MM/yyyy', { locale: ptBR })}
+                    {workDate ? (
+                      <>
+                        {format(workDate, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                      </>
+                    ) : (
+                      <span>Selecione a data</span>
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -403,32 +413,112 @@ export default function TimesheetsPage() {
                     selected={workDate}
                     onSelect={(date) => date && setWorkDate(date)}
                     locale={ptBR}
+                    disabled={(date) => date > new Date() || date < new Date(new Date().setMonth(new Date().getMonth() - 3))}
+                    modifiers={{
+                      today: new Date()
+                    }}
+                    modifiersStyles={{
+                      today: {
+                        fontWeight: 'bold',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        color: 'rgb(59, 130, 246)'
+                      }
+                    }}
+                    footer={
+                      <div className="flex justify-between px-2 py-2 text-xs text-muted-foreground">
+                        <button
+                          onClick={() => setWorkDate(new Date())}
+                          className="hover:text-primary"
+                        >
+                          Hoje
+                        </button>
+                        <button
+                          onClick={() => {
+                            const yesterday = new Date();
+                            yesterday.setDate(yesterday.getDate() - 1);
+                            setWorkDate(yesterday);
+                          }}
+                          className="hover:text-primary"
+                        >
+                          Ontem
+                        </button>
+                      </div>
+                    }
                   />
                 </PopoverContent>
               </Popover>
             </div>
 
             <div>
-              <label className="text-sm font-medium">Horas Trabalhadas</label>
-              <Input
-                type="number"
-                step="0.5"
-                min="0.5"
-                max="24"
-                placeholder="Ex: 2.5"
-                value={hoursWorked}
-                onChange={(e) => setHoursWorked(e.target.value)}
-              />
+              <label className="text-sm font-medium">Horas Trabalhadas *</label>
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  step="0.5"
+                  min="0.5"
+                  max="24"
+                  placeholder="Ex: 2.5"
+                  value={hoursWorked}
+                  onChange={(e) => setHoursWorked(e.target.value)}
+                  className="flex-1"
+                />
+                <div className="flex gap-1">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setHoursWorked('1')}
+                  >
+                    1h
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setHoursWorked('2')}
+                  >
+                    2h
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setHoursWorked('4')}
+                  >
+                    4h
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setHoursWorked('8')}
+                  >
+                    8h
+                  </Button>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Use decimais para minutos: 1.5 = 1h30min, 2.25 = 2h15min
+              </p>
             </div>
 
             <div>
-              <label className="text-sm font-medium">Descrição da Atividade</label>
+              <label className="text-sm font-medium">Descrição da Atividade *</label>
               <Textarea
-                placeholder="Descreva as atividades realizadas..."
+                placeholder="Descreva detalhadamente as atividades realizadas..."
                 rows={4}
                 value={activityDescription}
                 onChange={(e) => setActivityDescription(e.target.value)}
+                className="resize-none"
               />
+              <div className="flex justify-between mt-1">
+                <p className="text-xs text-muted-foreground">
+                  Seja específico sobre o que foi feito
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {activityDescription.length}/500 caracteres
+                </p>
+              </div>
             </div>
           </div>
 
