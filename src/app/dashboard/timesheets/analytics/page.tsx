@@ -59,7 +59,7 @@ export default function TimesheetAnalyticsPage() {
   const { data: session } = useSession();
   const [statistics, setStatistics] = useState<Statistics | null>(null);
   const [loading, setLoading] = useState(true);
-  const [dateRange, setDateRange] = useState({
+  const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: startOfMonth(new Date()),
     to: endOfMonth(new Date())
   });
@@ -193,7 +193,11 @@ export default function TimesheetAnalyticsPage() {
               <label className="text-sm font-medium mb-2 block">Período</label>
               <DatePickerWithRange
                 date={dateRange}
-                onDateChange={(range) => range && setDateRange(range)}
+                onDateChange={(range) => {
+                  if (range?.from && range?.to) {
+                    setDateRange({ from: range.from, to: range.to });
+                  }
+                }}
               />
             </div>
 
