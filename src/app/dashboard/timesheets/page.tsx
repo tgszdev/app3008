@@ -118,9 +118,10 @@ export default function TimesheetsPage() {
     }
 
     try {
+      // Temporariamente usando nova API para debug
       const url = editingTimesheet 
         ? `/api/timesheets/${editingTimesheet.id}`
-        : '/api/timesheets';
+        : '/api/timesheet-add';  // Usando API alternativa
       
       const method = editingTimesheet ? 'PATCH' : 'POST';
       
