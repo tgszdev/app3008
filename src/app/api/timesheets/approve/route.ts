@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Atualizar apontamento
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('timesheets')
       .update(updateData)
       .eq('id', id)
