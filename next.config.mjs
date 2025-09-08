@@ -34,6 +34,7 @@ const nextConfig = {
     workerThreads: false,
     cpus: 1
   },
+  serverExternalPackages: ['@supabase/supabase-js'],
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {

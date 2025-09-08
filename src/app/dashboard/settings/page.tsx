@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
-import { BookOpen, Mail, Settings, Shield, Bell, Database, Folder } from 'lucide-react'
+import { BookOpen, Mail, Settings, Shield, Bell, Database, Folder, Clock } from 'lucide-react'
 import SQLInstructionsModal from '@/components/SQLInstructionsModal'
 import ProfileCategorySettings from '@/components/ProfileCategorySettings'
 import EmailConfigModal from '@/components/EmailConfigModal'
@@ -10,6 +10,7 @@ import CategoryManagementModal from '@/components/CategoryManagementModal'
 import SecuritySettingsModal from '@/components/SecuritySettingsModal'
 import NotificationSettingsModal from '@/components/NotificationSettingsModal'
 import BackupRestoreModal from '@/components/BackupRestoreModal'
+import TimesheetPermissionsModalV2 from '@/components/TimesheetPermissionsModalV2'
 import toast from 'react-hot-toast'
 
 export default function SettingsPage() {
@@ -20,6 +21,7 @@ export default function SettingsPage() {
   const [securityModalOpen, setSecurityModalOpen] = useState(false)
   const [notificationModalOpen, setNotificationModalOpen] = useState(false)
   const [backupModalOpen, setBackupModalOpen] = useState(false)
+  const [timesheetPermissionsModalOpen, setTimesheetPermissionsModalOpen] = useState(false)
   const [sqlModal, setSqlModal] = useState<{ isOpen: boolean; sql: string; instructions?: string[] }>({
     isOpen: false,
     sql: '',
@@ -228,6 +230,35 @@ export default function SettingsPage() {
             Gerenciar Backups
           </button>
         </div>
+
+        {/* Timesheet Permissions Card */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
+          <div className="flex items-start mb-4">
+            <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex-shrink-0">
+              <Clock className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+            </div>
+            <div className="ml-3">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Permissões de Apontamento
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Controle de horas trabalhadas
+              </p>
+            </div>
+          </div>
+          
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-grow">
+            Configure quem pode fazer apontamentos e aprovar horas trabalhadas
+          </p>
+          
+          <button
+            onClick={() => setTimesheetPermissionsModalOpen(true)}
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+          >
+            <Settings className="h-5 w-5 mr-2" />
+            Configurar Permissões
+          </button>
+        </div>
       </div>
 
       {/* Modals */}
@@ -261,6 +292,11 @@ export default function SettingsPage() {
       <BackupRestoreModal
         isOpen={backupModalOpen}
         onClose={() => setBackupModalOpen(false)}
+      />
+
+      <TimesheetPermissionsModalV2
+        isOpen={timesheetPermissionsModalOpen}
+        onClose={() => setTimesheetPermissionsModalOpen(false)}
       />
 
       <SQLInstructionsModal
