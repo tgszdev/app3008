@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { auth } from '@/lib/auth'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export const runtime = 'nodejs'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
-    
-    // Verificar autenticação
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
+    // Verificar autenticação com NextAuth
+    const session = await auth()
+    if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

@@ -1,17 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { auth } from '@/lib/auth'
+import { supabaseAdmin } from '@/lib/supabase'
 
 // Força o runtime do Node.js para evitar erros 404 em produção
 export const runtime = 'nodejs'
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
-    
-    // Verificar autenticação
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
+    // Verificar autenticação com NextAuth
+    const session = await auth()
+    if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -22,8 +20,8 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get('start_date')
     const endDate = searchParams.get('end_date')
 
-    // Query base
-    let query = supabase
+    // Query base usando supabaseAdmin
+    let query = supabaseAdmin
       .from('timesheets')
       .select(`
         *,
@@ -66,11 +64,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
-    
-    // Verificar autenticação
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
+    // Verificar autenticação com NextAuth
+    const session = await auth()
+    if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -84,8 +80,8 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // Verificar se o ticket existe
-    const { data: ticket, error: ticketError } = await supabase
+    // Verificar se o ticket existe usando supabaseAdmin
+    const { data: ticket, error: ticketError } = await supabaseAdmin
       .from('tickets')
       .select('id')
       .eq('id', ticket_id)
@@ -96,7 +92,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar permissão de submissão
-    const { data: permission } = await supabase
+    const { data: permission } = await supabaseAdmin
       .from('timesheet_permissions')
       .select('can_submit')
       .eq('user_id', session.user.id)
@@ -104,7 +100,7 @@ export async function POST(request: NextRequest) {
 
     // Se não houver registro de permissão, criar um com permissão padrão
     if (!permission) {
-      await supabase
+      await supabaseAdmin
         .from('timesheet_permissions')
         .insert({
           user_id: session.user.id,
@@ -149,11 +145,9 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
-    
-    // Verificar autenticação
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
+    // Verificar autenticação com NextAuth
+    const session = await auth()
+    if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -167,13 +161,13 @@ export async function PUT(request: NextRequest) {
     }
 
     // Verificar permissão de aprovação
-    const { data: userInfo } = await supabase
+    const { data: userInfo } = await supabaseAdmin
       .from('users')
       .select('role')
       .eq('id', session.user.id)
       .single()
 
-    const { data: permission } = await supabase
+    const { data: permission } = await supabaseAdmin
       .from('timesheet_permissions')
       .select('can_approve')
       .eq('user_id', session.user.id)
@@ -224,11 +218,9 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
-    
-    // Verificar autenticação
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
+    // Verificar autenticação com NextAuth
+    const session = await auth()
+    if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -240,7 +232,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Verificar se o usuário é o dono do apontamento e está pendente
-    const { data: timesheet } = await supabase
+    const { data: timesheet } = await supabaseAdmin
       .from('timesheets')
       .select('user_id, status')
       .eq('id', id)
