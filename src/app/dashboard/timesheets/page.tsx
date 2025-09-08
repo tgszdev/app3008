@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
-import axios from 'axios'
+import apiClient from '@/lib/api-client'
 import { format, startOfMonth, endOfMonth, parseISO } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import toast from 'react-hot-toast'
@@ -20,7 +20,8 @@ import {
   AlertCircle,
   CheckCircle,
   XCircle,
-  User
+  User,
+  Ticket
 } from 'lucide-react'
 
 interface Ticket {
@@ -91,13 +92,13 @@ export default function TimesheetsPage() {
       setLoading(true)
       
       // Buscar permissões
-      const permResponse = await axios.get('/api/timesheets/permissions')
+      const permResponse = await apiClient.get('/api/timesheets/permissions')
       if (permResponse.data) {
         setPermissions(permResponse.data)
       }
       
       // Buscar tickets disponíveis
-      const ticketsResponse = await axios.get('/api/tickets')
+      const ticketsResponse = await apiClient.get('/api/tickets')
       setTickets(ticketsResponse.data || [])
       
       // Buscar apontamentos com filtros
@@ -107,7 +108,7 @@ export default function TimesheetsPage() {
       if (filterStartDate) params.append('start_date', filterStartDate)
       if (filterEndDate) params.append('end_date', filterEndDate)
       
-      const timesheetsResponse = await axios.get(`/api/timesheets?${params.toString()}`)
+      const timesheetsResponse = await apiClient.get(`/api/timesheets?${params.toString()}`)
       setTimesheets(timesheetsResponse.data || [])
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -133,7 +134,7 @@ export default function TimesheetsPage() {
     try {
       setSubmitting(true)
       
-      const response = await axios.post('/api/timesheets', {
+      const response = await apiClient.post('/api/timesheets', {
         ticket_id: selectedTicket,
         hours_worked: parseFloat(hoursWorked),
         description,
@@ -161,9 +162,9 @@ export default function TimesheetsPage() {
 
   const handleApprove = async (id: string) => {
     try {
-      const response = await axios.put('/api/timesheets', {
+      const response = await apiClient.post('/api/timesheets/approve', {
         id,
-        status: 'approved'
+        action: 'approve'
       })
       
       if (response.status === 200) {
@@ -183,9 +184,9 @@ export default function TimesheetsPage() {
     if (!reason) return
     
     try {
-      const response = await axios.put('/api/timesheets', {
+      const response = await apiClient.post('/api/timesheets/approve', {
         id,
-        status: 'rejected',
+        action: 'reject',
         rejection_reason: reason
       })
       
@@ -205,7 +206,7 @@ export default function TimesheetsPage() {
     if (!confirm('Tem certeza que deseja excluir este apontamento?')) return
     
     try {
-      await axios.delete(`/api/timesheets?id=${id}`)
+      await apiClient.delete(`/api/timesheets?id=${id}`)
       toast.success('Apontamento excluído')
       setTimesheets(timesheets.filter(t => t.id !== id))
     } catch (error: any) {
@@ -303,13 +304,14 @@ export default function TimesheetsPage() {
       </div>
 
       {/* Cards de Tickets com Apontamentos */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Agrupar apontamentos por ticket */}
-        {(() => {
-          const ticketsWithTimesheets = tickets.filter(ticket => {
-            const ticketTimesheets = timesheets.filter(t => t.ticket_id === ticket.id)
-            return ticketTimesheets.length > 0
-          }).map(ticket => {
+      {tickets.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Agrupar apontamentos por ticket */}
+          {(() => {
+            const ticketsWithTimesheets = tickets.filter(ticket => {
+              const ticketTimesheets = timesheets.filter(t => t.ticket_id === ticket.id)
+              return ticketTimesheets.length > 0
+            }).map(ticket => {
             const ticketTimesheets = timesheets.filter(t => t.ticket_id === ticket.id)
             const totalHours = ticketTimesheets.reduce((sum, t) => sum + parseFloat(t.hours_worked.toString()), 0)
             const approvedHours = ticketTimesheets
@@ -336,6 +338,25 @@ export default function TimesheetsPage() {
               rejectedCount: ticketTimesheets.filter(t => t.status === 'rejected').length
             }
           })
+          
+          if (ticketsWithTimesheets.length === 0) {
+            return (
+              <div className="col-span-full text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500 dark:text-gray-400">
+                  Nenhum apontamento encontrado
+                </p>
+                {permissions.can_submit && (
+                  <button
+                    onClick={() => setShowAddForm(true)}
+                    className="mt-4 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                  >
+                    Adicionar primeiro apontamento
+                  </button>
+                )}
+              </div>
+            )
+          }
           
           return ticketsWithTimesheets.map(({ ticket, timesheets: ticketTimesheets, totalHours, approvedHours, pendingHours, rejectedHours, percentComplete, approvedCount, pendingCount, rejectedCount }) => (
             <div key={ticket.id} className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl shadow-xl border border-slate-700 overflow-hidden">
@@ -498,23 +519,19 @@ export default function TimesheetsPage() {
             </div>
           ))
         })()}
-      </div>
+        </div>
+      )}
       
-      {/* Mensagem quando não há apontamentos */}
-      {timesheets.length === 0 && (
+      {/* Mensagem quando não há tickets */}
+      {tickets.length === 0 && (
         <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-          <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <Ticket className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-500 dark:text-gray-400">
-            Nenhum apontamento encontrado
+            Nenhum ticket disponível para apontamento
           </p>
-          {permissions.can_submit && (
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="mt-4 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-            >
-              Adicionar primeiro apontamento
-            </button>
-          )}
+          <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+            Crie tickets primeiro para poder adicionar apontamentos de horas
+          </p>
         </div>
       )}
 
