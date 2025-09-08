@@ -107,7 +107,7 @@ export default function TimesheetPermissionsPage() {
 
   const handleSaveAll = async () => {
     if (Object.keys(changes).length === 0) {
-      toast.info('Nenhuma alteração para salvar')
+      toast('Nenhuma alteração para salvar', { icon: 'ℹ️' })
       return
     }
     
