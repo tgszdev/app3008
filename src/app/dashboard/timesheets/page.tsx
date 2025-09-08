@@ -6,6 +6,7 @@ import apiClient from '@/lib/api-client'
 import { format, startOfMonth, endOfMonth, parseISO } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import toast from 'react-hot-toast'
+import TimesheetNavigation from '@/components/TimesheetNavigation'
 import {
   Clock,
   Calendar,
@@ -21,7 +22,10 @@ import {
   CheckCircle,
   XCircle,
   User,
-  Ticket
+  Ticket,
+  Shield,
+  BarChart3,
+  Settings
 } from 'lucide-react'
 
 interface Ticket {
@@ -91,25 +95,44 @@ export default function TimesheetsPage() {
     try {
       setLoading(true)
       
-      // Buscar permissões
-      const permResponse = await apiClient.get('/api/timesheets/permissions')
-      if (permResponse.data) {
-        setPermissions(permResponse.data)
+      // Buscar permissões - com fallback se falhar
+      try {
+        const permResponse = await apiClient.get('/api/timesheets/permissions')
+        if (permResponse.data) {
+          setPermissions(permResponse.data)
+        }
+      } catch (permError) {
+        console.log('Usando permissões padrão')
+        // Usar permissões padrão se falhar
+        setPermissions({ 
+          can_submit: true, 
+          can_approve: (session?.user as any)?.role === 'admin' 
+        })
       }
       
       // Buscar tickets disponíveis
-      const ticketsResponse = await apiClient.get('/api/tickets')
-      setTickets(ticketsResponse.data || [])
+      try {
+        const ticketsResponse = await apiClient.get('/api/tickets')
+        setTickets(ticketsResponse.data || [])
+      } catch (ticketError) {
+        console.error('Erro ao buscar tickets:', ticketError)
+        setTickets([])
+      }
       
       // Buscar apontamentos com filtros
-      const params = new URLSearchParams()
-      if (filterStatus !== 'all') params.append('status', filterStatus)
-      if (filterTicket !== 'all') params.append('ticket_id', filterTicket)
-      if (filterStartDate) params.append('start_date', filterStartDate)
-      if (filterEndDate) params.append('end_date', filterEndDate)
-      
-      const timesheetsResponse = await apiClient.get(`/api/timesheets?${params.toString()}`)
-      setTimesheets(timesheetsResponse.data || [])
+      try {
+        const params = new URLSearchParams()
+        if (filterStatus !== 'all') params.append('status', filterStatus)
+        if (filterTicket !== 'all') params.append('ticket_id', filterTicket)
+        if (filterStartDate) params.append('start_date', filterStartDate)
+        if (filterEndDate) params.append('end_date', filterEndDate)
+        
+        const timesheetsResponse = await apiClient.get(`/api/timesheets?${params.toString()}`)
+        setTimesheets(timesheetsResponse.data || [])
+      } catch (timesheetError) {
+        console.error('Erro ao buscar apontamentos:', timesheetError)
+        setTimesheets([])
+      }
     } catch (error) {
       console.error('Error fetching data:', error)
       toast.error('Erro ao carregar dados')
@@ -270,6 +293,9 @@ export default function TimesheetsPage() {
 
   return (
     <div className="space-y-6">
+      {/* Navigation */}
+      <TimesheetNavigation />
+      
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>

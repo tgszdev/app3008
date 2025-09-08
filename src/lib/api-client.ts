@@ -23,12 +23,7 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Redirecionar para login se não autenticado
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login'
-      }
-    }
+    // Não redirecionar automaticamente - deixar cada componente tratar o erro
     return Promise.reject(error)
   }
 )
