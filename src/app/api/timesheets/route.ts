@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Inserir apontamento
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('timesheets')
       .insert({
         ticket_id,
@@ -192,7 +192,7 @@ export async function PUT(request: NextRequest) {
       updateData.rejection_reason = rejection_reason
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('timesheets')
       .update(updateData)
       .eq('id', id)
@@ -255,7 +255,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Deletar apontamento
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('timesheets')
       .delete()
       .eq('id', id)
