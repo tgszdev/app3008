@@ -703,7 +703,6 @@ export default function TimesheetsPage() {
             </h2>
           </div>
           
-          {
           <div className="divide-y divide-gray-200 dark:divide-gray-700">
             {timesheets.map((timesheet) => (
               <div key={timesheet.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50">
