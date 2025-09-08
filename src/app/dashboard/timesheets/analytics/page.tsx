@@ -1,436 +1,539 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { DatePickerWithRange } from '@/components/ui/date-range-picker';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { 
-  BarChart, 
-  Bar, 
-  LineChart,
-  Line,
-  PieChart, 
-  Pie, 
-  Cell,
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
-  ResponsiveContainer 
-} from 'recharts';
-import { 
-  Clock, 
-  Users, 
-  FileText, 
-  TrendingUp,
+import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
+import apiClient from '@/lib/api-client'
+import { format, startOfMonth, endOfMonth, parseISO, eachDayOfInterval, startOfWeek, endOfWeek } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
+import toast from 'react-hot-toast'
+import TimesheetNavigation from '@/components/TimesheetNavigation'
+import {
+  Clock,
   Calendar,
+  TrendingUp,
+  TrendingDown,
+  Users,
+  Ticket,
+  BarChart3,
+  PieChart,
   Activity,
-  Award,
-  AlertCircle
-} from 'lucide-react';
-import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { toast } from 'sonner';
+  Loader2,
+  AlertCircle,
+  Download,
+  Filter,
+  ChevronDown,
+  ChevronUp
+} from 'lucide-react'
 
-interface Statistics {
-  summary: {
-    total_hours: number;
-    approved_hours: number;
-    pending_hours: number;
-    rejected_hours: number;
-    total_entries: number;
-    unique_tickets: number;
-    unique_users: number;
-    period: {
-      start_date: string;
-      end_date: string;
-    };
-  };
-  statistics: any[];
-  raw_data: any[];
+interface TimeSheetData {
+  id: string
+  ticket_id: string
+  user_id: string
+  hours_worked: number
+  description: string
+  work_date: string
+  status: 'pending' | 'approved' | 'rejected'
+  ticket: {
+    id: string
+    ticket_number: number
+    title: string
+  }
+  user: {
+    id: string
+    name: string
+    email: string
+  }
 }
 
-export default function TimesheetAnalyticsPage() {
-  const { data: session } = useSession();
-  const [statistics, setStatistics] = useState<Statistics | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
-    from: startOfMonth(new Date()),
-    to: endOfMonth(new Date())
-  });
-  const [groupBy, setGroupBy] = useState<'user' | 'ticket' | 'date' | 'department'>('user');
-  const [selectedUserId, setSelectedUserId] = useState<string>('');
-  const [users, setUsers] = useState<any[]>([]);
-  const [permissions, setPermissions] = useState({
-    can_submit_timesheet: false,
-    can_approve_timesheet: false
-  });
+interface Analytics {
+  totalHours: number
+  approvedHours: number
+  pendingHours: number
+  rejectedHours: number
+  totalTimesheets: number
+  uniqueUsers: number
+  uniqueTickets: number
+  averageHoursPerDay: number
+  averageHoursPerUser: number
+  topUsers: Array<{ user: string; hours: number }>
+  topTickets: Array<{ ticket: string; hours: number }>
+  dailyData: Array<{ date: string; hours: number }>
+  weeklyData: Array<{ week: string; hours: number }>
+}
+
+export default function TimesheetsAnalyticsPage() {
+  const { data: session } = useSession()
+  const [timesheets, setTimesheets] = useState<TimeSheetData[]>([])
+  const [analytics, setAnalytics] = useState<Analytics | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [showFilters, setShowFilters] = useState(false)
+  
+  // Filter states
+  const [filterStartDate, setFilterStartDate] = useState(format(startOfMonth(new Date()), 'yyyy-MM-dd'))
+  const [filterEndDate, setFilterEndDate] = useState(format(endOfMonth(new Date()), 'yyyy-MM-dd'))
+  const [filterStatus, setFilterStatus] = useState<string>('all')
 
   useEffect(() => {
-    fetchData();
-  }, [session, dateRange, groupBy, selectedUserId]);
+    fetchData()
+  }, [filterStartDate, filterEndDate, filterStatus])
 
   const fetchData = async () => {
-    if (!session?.user) return;
-
     try {
-      setLoading(true);
-
-      // Check permissions
-      const permRes = await fetch('/api/timesheets/permissions');
-      if (permRes.ok) {
-        const permData = await permRes.json();
-        setPermissions(permData);
+      setLoading(true)
+      
+      // Verificar se é admin
+      const userRole = (session?.user as any)?.role
+      if (userRole !== 'admin') {
+        toast.error('Acesso negado. Apenas administradores podem acessar esta página.')
+        return
       }
-
-      // Fetch users if admin
-      if (session.user.role === 'admin') {
-        const usersRes = await fetch('/api/users');
-        if (usersRes.ok) {
-          const usersData = await usersRes.json();
-          setUsers(usersData);
-        }
-      }
-
-      // Build query params
-      const params = new URLSearchParams({
-        start_date: format(dateRange.from, 'yyyy-MM-dd'),
-        end_date: format(dateRange.to, 'yyyy-MM-dd'),
-        group_by: groupBy
-      });
-
-      if (selectedUserId) {
-        params.append('user_id', selectedUserId);
-      } else if (!permissions.can_approve_timesheet) {
-        params.append('user_id', session.user.id);
-      }
-
-      // Fetch statistics
-      const statsRes = await fetch(`/api/timesheets/statistics?${params}`);
-      if (statsRes.ok) {
-        const statsData = await statsRes.json();
-        setStatistics(statsData);
-      }
+      
+      // Buscar apontamentos com filtros
+      const params = new URLSearchParams()
+      if (filterStatus !== 'all') params.append('status', filterStatus)
+      if (filterStartDate) params.append('start_date', filterStartDate)
+      if (filterEndDate) params.append('end_date', filterEndDate)
+      
+      const response = await apiClient.get(`/api/timesheets?${params.toString()}`)
+      const data = response.data || []
+      setTimesheets(data)
+      
+      // Calcular analytics
+      calculateAnalytics(data)
     } catch (error) {
-      console.error('Error fetching data:', error);
-      toast.error('Erro ao carregar dados');
+      console.error('Error fetching data:', error)
+      toast.error('Erro ao carregar dados')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const formatHours = (hours: number) => {
-    return `${hours.toFixed(1)}h`;
-  };
-
-  const getApprovalRate = () => {
-    if (!statistics || statistics.summary.total_hours === 0) return '0';
-    return ((statistics.summary.approved_hours / statistics.summary.total_hours) * 100).toFixed(1);
-  };
-
-  const getPieChartData = () => {
-    if (!statistics) return [];
+  const calculateAnalytics = (data: TimeSheetData[]) => {
+    const totalHours = data.reduce((sum, t) => sum + parseFloat(t.hours_worked.toString()), 0)
+    const approvedHours = data
+      .filter(t => t.status === 'approved')
+      .reduce((sum, t) => sum + parseFloat(t.hours_worked.toString()), 0)
+    const pendingHours = data
+      .filter(t => t.status === 'pending')
+      .reduce((sum, t) => sum + parseFloat(t.hours_worked.toString()), 0)
+    const rejectedHours = data
+      .filter(t => t.status === 'rejected')
+      .reduce((sum, t) => sum + parseFloat(t.hours_worked.toString()), 0)
     
-    return [
-      { name: 'Aprovadas', value: statistics.summary.approved_hours, color: '#10b981' },
-      { name: 'Pendentes', value: statistics.summary.pending_hours, color: '#eab308' },
-      { name: 'Recusadas', value: statistics.summary.rejected_hours, color: '#ef4444' }
-    ].filter(item => item.value > 0);
-  };
-
-  const getBarChartData = () => {
-    if (!statistics) return [];
+    // Usuários únicos
+    const uniqueUserIds = new Set(data.map(t => t.user_id))
+    const uniqueUsers = uniqueUserIds.size
     
-    return statistics.statistics.slice(0, 10).map(item => ({
-      name: item.label,
-      aprovadas: item.approved_hours,
-      pendentes: item.pending_hours,
-      recusadas: item.rejected_hours,
-      total: item.total_hours
-    }));
-  };
-
-  const getTimelineData = () => {
-    if (!statistics || groupBy !== 'date') return [];
+    // Tickets únicos
+    const uniqueTicketIds = new Set(data.map(t => t.ticket_id))
+    const uniqueTickets = uniqueTicketIds.size
     
-    return statistics.statistics.map(item => ({
-      date: format(new Date(item.key), 'dd/MM', { locale: ptBR }),
-      horas: item.total_hours
-    }));
-  };
+    // Top usuários
+    const userHours = new Map<string, number>()
+    data.forEach(t => {
+      const current = userHours.get(t.user.name) || 0
+      userHours.set(t.user.name, current + parseFloat(t.hours_worked.toString()))
+    })
+    const topUsers = Array.from(userHours.entries())
+      .map(([user, hours]) => ({ user, hours }))
+      .sort((a, b) => b.hours - a.hours)
+      .slice(0, 5)
+    
+    // Top tickets
+    const ticketHours = new Map<string, number>()
+    data.forEach(t => {
+      const ticketLabel = `#${t.ticket.ticket_number}`
+      const current = ticketHours.get(ticketLabel) || 0
+      ticketHours.set(ticketLabel, current + parseFloat(t.hours_worked.toString()))
+    })
+    const topTickets = Array.from(ticketHours.entries())
+      .map(([ticket, hours]) => ({ ticket, hours }))
+      .sort((a, b) => b.hours - a.hours)
+      .slice(0, 5)
+    
+    // Dados diários
+    const dailyMap = new Map<string, number>()
+    data.forEach(t => {
+      const date = format(parseISO(t.work_date), 'yyyy-MM-dd')
+      const current = dailyMap.get(date) || 0
+      dailyMap.set(date, current + parseFloat(t.hours_worked.toString()))
+    })
+    
+    const startDate = filterStartDate ? parseISO(filterStartDate) : startOfMonth(new Date())
+    const endDate = filterEndDate ? parseISO(filterEndDate) : endOfMonth(new Date())
+    const allDays = eachDayOfInterval({ start: startDate, end: endDate })
+    
+    const dailyData = allDays.map(day => ({
+      date: format(day, 'yyyy-MM-dd'),
+      hours: dailyMap.get(format(day, 'yyyy-MM-dd')) || 0
+    }))
+    
+    // Dados semanais
+    const weeklyMap = new Map<string, number>()
+    data.forEach(t => {
+      const date = parseISO(t.work_date)
+      const weekStart = startOfWeek(date, { locale: ptBR })
+      const weekLabel = format(weekStart, "'Semana de' dd/MM", { locale: ptBR })
+      const current = weeklyMap.get(weekLabel) || 0
+      weeklyMap.set(weekLabel, current + parseFloat(t.hours_worked.toString()))
+    })
+    const weeklyData = Array.from(weeklyMap.entries())
+      .map(([week, hours]) => ({ week, hours }))
+      .slice(-4)
+    
+    // Médias
+    const daysWithWork = new Set(data.map(t => t.work_date)).size
+    const averageHoursPerDay = daysWithWork > 0 ? totalHours / daysWithWork : 0
+    const averageHoursPerUser = uniqueUsers > 0 ? totalHours / uniqueUsers : 0
+    
+    setAnalytics({
+      totalHours,
+      approvedHours,
+      pendingHours,
+      rejectedHours,
+      totalTimesheets: data.length,
+      uniqueUsers,
+      uniqueTickets,
+      averageHoursPerDay,
+      averageHoursPerUser,
+      topUsers,
+      topTickets,
+      dailyData,
+      weeklyData
+    })
+  }
+
+  const exportToCSV = () => {
+    if (!timesheets.length) {
+      toast.error('Não há dados para exportar')
+      return
+    }
+    
+    const headers = ['Data', 'Usuário', 'Ticket', 'Horas', 'Status', 'Descrição']
+    const rows = timesheets.map(t => [
+      format(parseISO(t.work_date), 'dd/MM/yyyy'),
+      t.user.name,
+      `#${t.ticket.ticket_number} - ${t.ticket.title}`,
+      t.hours_worked.toString(),
+      t.status === 'approved' ? 'Aprovado' : t.status === 'pending' ? 'Pendente' : 'Rejeitado',
+      `"${t.description.replace(/"/g, '""')}"`
+    ])
+    
+    const csv = [headers, ...rows].map(row => row.join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `apontamentos_${format(new Date(), 'yyyy-MM-dd')}.csv`
+    link.click()
+    URL.revokeObjectURL(url)
+    
+    toast.success('Relatório exportado com sucesso!')
+  }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Carregando...</p>
-        </div>
+      <div className="flex justify-center items-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
       </div>
-    );
+    )
+  }
+
+  const userRole = (session?.user as any)?.role
+  if (userRole !== 'admin') {
+    return (
+      <div className="text-center py-12">
+        <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+          Acesso Negado
+        </h2>
+        <p className="text-gray-600 dark:text-gray-400">
+          Você não tem permissão para acessar esta página.
+        </p>
+      </div>
+    )
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">Analytics de Apontamentos</h1>
-        <p className="text-muted-foreground">Visualize métricas e tendências dos apontamentos de horas</p>
+    <div className="space-y-6">
+      {/* Navigation */}
+      <TimesheetNavigation />
+      
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Analytics de Apontamentos
+          </h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            Visualize métricas e tendências dos apontamentos
+          </p>
+        </div>
+        
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          >
+            <Filter className="h-4 w-4" />
+            Filtros
+            {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </button>
+          
+          <button
+            onClick={exportToCSV}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Download className="h-4 w-4" />
+            Exportar CSV
+          </button>
+        </div>
       </div>
 
       {/* Filtros */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Filtros</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-4">
+      {showFilters && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="text-sm font-medium mb-2 block">Período</label>
-              <DatePickerWithRange
-                date={dateRange}
-                onDateChange={(range) => {
-                  if (range?.from && range?.to) {
-                    setDateRange({ from: range.from, to: range.to });
-                  }
-                }}
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Data Início
+              </label>
+              <input
+                type="date"
+                value={filterStartDate}
+                onChange={(e) => setFilterStartDate(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
-
+            
             <div>
-              <label className="text-sm font-medium mb-2 block">Agrupar por</label>
-              <Select value={groupBy} onValueChange={(value: any) => setGroupBy(value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="user">Usuário</SelectItem>
-                  <SelectItem value="ticket">Ticket</SelectItem>
-                  <SelectItem value="date">Data</SelectItem>
-                  <SelectItem value="department">Departamento</SelectItem>
-                </SelectContent>
-              </Select>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Data Fim
+              </label>
+              <input
+                type="date"
+                value={filterEndDate}
+                onChange={(e) => setFilterEndDate(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              />
             </div>
-
-            {permissions.can_approve_timesheet && (
-              <div>
-                <label className="text-sm font-medium mb-2 block">Usuário</label>
-                <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Todos" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
-                    {users.map(user => (
-                      <SelectItem key={user.id} value={user.id}>
-                        {user.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            <div className="flex items-end">
-              <Button onClick={fetchData} className="w-full">
-                Atualizar
-              </Button>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Status
+              </label>
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              >
+                <option value="all">Todos</option>
+                <option value="approved">Aprovados</option>
+                <option value="pending">Pendentes</option>
+                <option value="rejected">Rejeitados</option>
+              </select>
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Cards de Resumo */}
-      <div className="grid gap-6 md:grid-cols-4 mb-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Horas</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatHours(statistics?.summary.total_hours || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {statistics?.summary.total_entries || 0} apontamentos
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Taxa de Aprovação</CardTitle>
-            <Award className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{getApprovalRate()}%</div>
-            <Progress value={parseFloat(getApprovalRate())} className="mt-2" />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tickets Ativos</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {statistics?.summary.unique_tickets || 0}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Tickets com apontamentos
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Colaboradores</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {statistics?.summary.unique_users || 0}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Usuários ativos
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Gráficos */}
-      <div className="grid gap-6 md:grid-cols-2 mb-6">
-        {/* Gráfico de Pizza - Distribuição por Status */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Distribuição por Status</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={getPieChartData()}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, value }) => `${name}: ${formatHours(value)}`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {getPieChartData().map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value: number) => formatHours(value)} />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Gráfico de Barras - Top 10 */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Top 10 - {groupBy === 'user' ? 'Colaboradores' : groupBy === 'ticket' ? 'Tickets' : groupBy === 'department' ? 'Departamentos' : 'Dias'}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={getBarChartData()}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
-                <YAxis />
-                <Tooltip formatter={(value: number) => formatHours(value)} />
-                <Legend />
-                <Bar dataKey="aprovadas" fill="#10b981" name="Aprovadas" />
-                <Bar dataKey="pendentes" fill="#eab308" name="Pendentes" />
-                <Bar dataKey="recusadas" fill="#ef4444" name="Recusadas" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Timeline de Horas (apenas quando agrupado por data) */}
-      {groupBy === 'date' && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Evolução Temporal</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={getTimelineData()}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip formatter={(value: number) => formatHours(value)} />
-                <Line 
-                  type="monotone" 
-                  dataKey="horas" 
-                  stroke="#8b5cf6" 
-                  strokeWidth={2}
-                  name="Horas"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        </div>
       )}
 
-      {/* Tabela Detalhada */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Detalhamento</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left p-2">
-                    {groupBy === 'user' ? 'Colaborador' : groupBy === 'ticket' ? 'Ticket' : groupBy === 'department' ? 'Departamento' : 'Data'}
-                  </th>
-                  <th className="text-right p-2">Total</th>
-                  <th className="text-right p-2">Aprovadas</th>
-                  <th className="text-right p-2">Pendentes</th>
-                  <th className="text-right p-2">Recusadas</th>
-                  <th className="text-right p-2">Taxa Aprovação</th>
-                  <th className="text-right p-2">Apontamentos</th>
-                </tr>
-              </thead>
-              <tbody>
-                {statistics?.statistics.map((item, index) => (
-                  <tr key={index} className="border-b hover:bg-muted/50">
-                    <td className="p-2">{item.label}</td>
-                    <td className="text-right p-2 font-semibold">
-                      {formatHours(item.total_hours)}
-                    </td>
-                    <td className="text-right p-2 text-green-600">
-                      {formatHours(item.approved_hours)}
-                    </td>
-                    <td className="text-right p-2 text-yellow-600">
-                      {formatHours(item.pending_hours)}
-                    </td>
-                    <td className="text-right p-2 text-red-600">
-                      {formatHours(item.rejected_hours)}
-                    </td>
-                    <td className="text-right p-2">
-                      <Badge variant={parseFloat(item.approval_rate) >= 80 ? 'default' : 'secondary'}>
-                        {item.approval_rate}%
-                      </Badge>
-                    </td>
-                    <td className="text-right p-2">{item.entries}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {analytics && (
+        <>
+          {/* Cards de Métricas Principais */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white">
+              <div className="flex items-center justify-between mb-2">
+                <Clock className="h-8 w-8 opacity-80" />
+                <span className="text-xs uppercase tracking-wider opacity-80">Total</span>
+              </div>
+              <p className="text-3xl font-bold">{analytics.totalHours.toFixed(1)}h</p>
+              <p className="text-sm opacity-90 mt-1">Horas registradas</p>
+            </div>
+
+            <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white">
+              <div className="flex items-center justify-between mb-2">
+                <Activity className="h-8 w-8 opacity-80" />
+                <span className="text-xs uppercase tracking-wider opacity-80">Aprovadas</span>
+              </div>
+              <p className="text-3xl font-bold">{analytics.approvedHours.toFixed(1)}h</p>
+              <p className="text-sm opacity-90 mt-1">
+                {analytics.totalHours > 0 
+                  ? `${Math.round((analytics.approvedHours / analytics.totalHours) * 100)}% do total`
+                  : '0% do total'}
+              </p>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white">
+              <div className="flex items-center justify-between mb-2">
+                <Users className="h-8 w-8 opacity-80" />
+                <span className="text-xs uppercase tracking-wider opacity-80">Equipe</span>
+              </div>
+              <p className="text-3xl font-bold">{analytics.uniqueUsers}</p>
+              <p className="text-sm opacity-90 mt-1">Usuários ativos</p>
+            </div>
+
+            <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white">
+              <div className="flex items-center justify-between mb-2">
+                <Ticket className="h-8 w-8 opacity-80" />
+                <span className="text-xs uppercase tracking-wider opacity-80">Tickets</span>
+              </div>
+              <p className="text-3xl font-bold">{analytics.uniqueTickets}</p>
+              <p className="text-sm opacity-90 mt-1">Com apontamentos</p>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Métricas Secundárias */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Médias
+                </h3>
+                <TrendingUp className="h-5 w-5 text-gray-400" />
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Por dia trabalhado</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {analytics.averageHoursPerDay.toFixed(1)}h
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Por usuário</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {analytics.averageHoursPerUser.toFixed(1)}h
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Status dos Apontamentos
+                </h3>
+                <PieChart className="h-5 w-5 text-gray-400" />
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-green-600 dark:text-green-400">Aprovados</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                    {analytics.approvedHours.toFixed(1)}h
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-yellow-600 dark:text-yellow-400">Pendentes</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                    {analytics.pendingHours.toFixed(1)}h
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-red-600 dark:text-red-400">Rejeitados</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                    {analytics.rejectedHours.toFixed(1)}h
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Resumo
+                </h3>
+                <BarChart3 className="h-5 w-5 text-gray-400" />
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Total de Apontamentos</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                    {analytics.totalTimesheets}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Taxa de Aprovação</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                    {analytics.totalHours > 0 
+                      ? `${Math.round((analytics.approvedHours / analytics.totalHours) * 100)}%`
+                      : '0%'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Taxa de Rejeição</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                    {analytics.totalHours > 0 
+                      ? `${Math.round((analytics.rejectedHours / analytics.totalHours) * 100)}%`
+                      : '0%'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Rankings */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Top Usuários */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Top Colaboradores
+              </h3>
+              <div className="space-y-3">
+                {analytics.topUsers.map((item, index) => (
+                  <div key={item.user} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className={`
+                        w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
+                        ${index === 0 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100' :
+                          index === 1 ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100' :
+                          index === 2 ? 'bg-orange-100 text-orange-800 dark:bg-orange-800 dark:text-orange-100' :
+                          'bg-gray-50 text-gray-600 dark:bg-gray-700 dark:text-gray-300'}
+                      `}>
+                        {index + 1}º
+                      </span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {item.user}
+                      </span>
+                    </div>
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                      {item.hours.toFixed(1)}h
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Top Tickets */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Tickets com Mais Horas
+              </h3>
+              <div className="space-y-3">
+                {analytics.topTickets.map((item, index) => (
+                  <div key={item.ticket} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className={`
+                        w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
+                        ${index === 0 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100' :
+                          index === 1 ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100' :
+                          index === 2 ? 'bg-orange-100 text-orange-800 dark:bg-orange-800 dark:text-orange-100' :
+                          'bg-gray-50 text-gray-600 dark:bg-gray-700 dark:text-gray-300'}
+                      `}>
+                        {index + 1}º
+                      </span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {item.ticket}
+                      </span>
+                    </div>
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                      {item.hours.toFixed(1)}h
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
-  );
+  )
 }

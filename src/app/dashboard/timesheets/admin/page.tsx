@@ -1,630 +1,499 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { cn } from '@/lib/utils';
-import { 
-  CalendarIcon, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
-  AlertCircle, 
+import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
+import apiClient from '@/lib/api-client'
+import { format, parseISO } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
+import toast from 'react-hot-toast'
+import TimesheetNavigation from '@/components/TimesheetNavigation'
+import {
+  Clock,
+  Calendar,
+  Check,
+  X,
+  Filter,
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
   User,
-  FileText,
-  ThumbsUp,
-  ThumbsDown
-} from 'lucide-react';
-import { toast } from 'sonner';
-import type { Timesheet } from '@/types/timesheet';
+  Ticket,
+  Search
+} from 'lucide-react'
 
-interface TicketWithTimesheets {
-  id: string;
-  title: string;
-  status: string;
-  priority: string;
-  description?: string;
-  timesheets: Timesheet[];
-  pendingCount: number;
-  totalHours: number;
-  approvedHours: number;
+interface Ticket {
+  id: string
+  ticket_number: number
+  title: string
 }
 
-export default function TimesheetAdminPage() {
-  const { data: session } = useSession();
-  const [tickets, setTickets] = useState<TicketWithTimesheets[]>([]);
-  const [selectedTicket, setSelectedTicket] = useState<TicketWithTimesheets | null>(null);
-  const [showRejectDialog, setShowRejectDialog] = useState(false);
-  const [selectedTimesheet, setSelectedTimesheet] = useState<Timesheet | null>(null);
-  const [rejectionReason, setRejectionReason] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [permissions, setPermissions] = useState({
-    can_submit_timesheet: false,
-    can_approve_timesheet: false
-  });
-  const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
+interface User {
+  id: string
+  name: string
+  email: string
+}
+
+interface Timesheet {
+  id: string
+  ticket_id: string
+  user_id: string
+  hours_worked: number
+  description: string
+  work_date: string
+  status: 'pending' | 'approved' | 'rejected'
+  approved_by: string | null
+  approval_date: string | null
+  rejection_reason: string | null
+  created_at: string
+  ticket: Ticket
+  user: User
+  approver?: User
+}
+
+export default function TimesheetsAdminPage() {
+  const { data: session } = useSession()
+  const [timesheets, setTimesheets] = useState<Timesheet[]>([])
+  const [loading, setLoading] = useState(true)
+  const [showFilters, setShowFilters] = useState(false)
   
-  // Additional filters
-  const [filterTicketId, setFilterTicketId] = useState<string>('all');
-  const [filterUserId, setFilterUserId] = useState<string>('all');
-  const [filterDateRange, setFilterDateRange] = useState<{ start: Date | null; end: Date | null }>({
-    start: null,
-    end: null
-  });
-  const [allUsers, setAllUsers] = useState<Array<{ id: string; name: string; email: string }>>([]);
+  // Filter states
+  const [filterStatus, setFilterStatus] = useState<string>('pending')
+  const [filterUser, setFilterUser] = useState<string>('all')
+  const [searchQuery, setSearchQuery] = useState('')
+  
+  // Expanded rows
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
 
   useEffect(() => {
-    fetchData();
-  }, [session, filter, filterTicketId, filterUserId, filterDateRange]);
+    fetchData()
+  }, [filterStatus, filterUser])
 
   const fetchData = async () => {
-    if (!session?.user) return;
-
     try {
-      // Check permissions
-      const permRes = await fetch('/api/timesheets/permissions');
-      if (permRes.ok) {
-        const permData = await permRes.json();
-        setPermissions(permData);
-        
-        if (!permData.can_approve_timesheet) {
-          return;
-        }
-      }
-
-      // Build URL with filters
-      const params = new URLSearchParams();
-      if (filter !== 'all') params.append('status', filter);
-      if (filterTicketId !== 'all') params.append('ticket_id', filterTicketId);
-      if (filterUserId !== 'all') params.append('user_id', filterUserId);
-      if (filterDateRange.start) params.append('start_date', format(filterDateRange.start, 'yyyy-MM-dd'));
-      if (filterDateRange.end) params.append('end_date', format(filterDateRange.end, 'yyyy-MM-dd'));
+      setLoading(true)
       
-      const url = `/api/timesheets${params.toString() ? '?' + params.toString() : ''}`;
-      const timesheetsRes = await fetch(url);
-      if (timesheetsRes.ok) {
-        const timesheetsData: Timesheet[] = await timesheetsRes.json();
-        
-        // Extract unique users for filter
-        const usersMap = new Map<string, { id: string; name: string; email: string }>();
-        timesheetsData.forEach(timesheet => {
-          if (timesheet.user && !usersMap.has(timesheet.user.id)) {
-            usersMap.set(timesheet.user.id, {
-              id: timesheet.user.id,
-              name: timesheet.user.name || 'Unknown',
-              email: timesheet.user.email
-            });
-          }
-        });
-        setAllUsers(Array.from(usersMap.values()));
-        
-        // Group timesheets by ticket
-        const ticketMap = new Map<string, TicketWithTimesheets>();
-        
-        timesheetsData.forEach(timesheet => {
-          if (!timesheet.ticket) return;
-          
-          const ticketId = timesheet.ticket_id;
-          if (!ticketMap.has(ticketId)) {
-            ticketMap.set(ticketId, {
-              id: ticketId,
-              title: timesheet.ticket.title,
-              status: timesheet.ticket.status,
-              priority: timesheet.ticket.priority,
-              timesheets: [],
-              pendingCount: 0,
-              totalHours: 0,
-              approvedHours: 0
-            });
-          }
-          
-          const ticket = ticketMap.get(ticketId)!;
-          ticket.timesheets.push(timesheet);
-          ticket.totalHours += parseFloat(timesheet.hours_worked.toString());
-          
-          if (timesheet.status === 'pending') {
-            ticket.pendingCount++;
-          } else if (timesheet.status === 'approved') {
-            ticket.approvedHours += parseFloat(timesheet.hours_worked.toString());
-          }
-        });
-        
-        setTickets(Array.from(ticketMap.values()));
+      // Verificar se é admin
+      const userRole = (session?.user as any)?.role
+      if (userRole !== 'admin') {
+        toast.error('Acesso negado. Apenas administradores podem acessar esta página.')
+        return
       }
+      
+      // Buscar apontamentos com filtros
+      const params = new URLSearchParams()
+      if (filterStatus !== 'all') params.append('status', filterStatus)
+      if (filterUser !== 'all') params.append('user_id', filterUser)
+      
+      const response = await apiClient.get(`/api/timesheets?${params.toString()}`)
+      setTimesheets(response.data || [])
     } catch (error) {
-      console.error('Error fetching data:', error);
-      toast.error('Erro ao carregar dados');
+      console.error('Error fetching data:', error)
+      toast.error('Erro ao carregar apontamentos')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const handleApprove = async (timesheet: Timesheet) => {
+  const handleApprove = async (id: string) => {
     try {
-      const response = await fetch(`/api/timesheets/${timesheet.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'approved' })
-      });
-
-      if (response.ok) {
-        toast.success('Apontamento aprovado');
-        fetchData();
-      } else {
-        const error = await response.json();
-        toast.error(error.error || 'Erro ao aprovar apontamento');
+      const response = await apiClient.post('/api/timesheets/approve', {
+        id,
+        action: 'approve'
+      })
+      
+      if (response.status === 200) {
+        toast.success('Apontamento aprovado!')
+        setTimesheets(timesheets.map(t => 
+          t.id === id ? response.data : t
+        ))
       }
-    } catch (error) {
-      console.error('Error approving timesheet:', error);
-      toast.error('Erro ao aprovar apontamento');
+    } catch (error: any) {
+      console.error('Error approving timesheet:', error)
+      toast.error(error.response?.data?.error || 'Erro ao aprovar apontamento')
     }
-  };
+  }
 
-  const handleReject = async () => {
-    if (!selectedTimesheet || !rejectionReason.trim()) {
-      toast.error('Informe o motivo da recusa');
-      return;
-    }
-
+  const handleReject = async (id: string) => {
+    const reason = prompt('Motivo da rejeição:')
+    if (!reason) return
+    
     try {
-      const response = await fetch(`/api/timesheets/${selectedTimesheet.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          status: 'rejected',
-          rejection_reason: rejectionReason 
-        })
-      });
-
-      if (response.ok) {
-        toast.success('Apontamento recusado');
-        setShowRejectDialog(false);
-        setRejectionReason('');
-        setSelectedTimesheet(null);
-        fetchData();
-      } else {
-        const error = await response.json();
-        toast.error(error.error || 'Erro ao recusar apontamento');
+      const response = await apiClient.post('/api/timesheets/approve', {
+        id,
+        action: 'reject',
+        rejection_reason: reason
+      })
+      
+      if (response.status === 200) {
+        toast.success('Apontamento rejeitado')
+        setTimesheets(timesheets.map(t => 
+          t.id === id ? response.data : t
+        ))
       }
-    } catch (error) {
-      console.error('Error rejecting timesheet:', error);
-      toast.error('Erro ao recusar apontamento');
+    } catch (error: any) {
+      console.error('Error rejecting timesheet:', error)
+      toast.error(error.response?.data?.error || 'Erro ao rejeitar apontamento')
     }
-  };
+  }
+
+  const toggleRow = (id: string) => {
+    const newExpanded = new Set(expandedRows)
+    if (newExpanded.has(id)) {
+      newExpanded.delete(id)
+    } else {
+      newExpanded.add(id)
+    }
+    setExpandedRows(newExpanded)
+  }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'approved':
-        return <Badge className="bg-green-500"><CheckCircle className="w-3 h-3 mr-1" /> Aprovado</Badge>;
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+            <CheckCircle className="h-3 w-3" />
+            Aprovado
+          </span>
+        )
       case 'rejected':
-        return <Badge className="bg-red-500"><XCircle className="w-3 h-3 mr-1" /> Recusado</Badge>;
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
+            <XCircle className="h-3 w-3" />
+            Rejeitado
+          </span>
+        )
       default:
-        return <Badge className="bg-yellow-500"><AlertCircle className="w-3 h-3 mr-1" /> Pendente</Badge>;
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">
+            <AlertCircle className="h-3 w-3" />
+            Pendente
+          </span>
+        )
     }
-  };
+  }
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'text-red-600';
-      case 'medium':
-        return 'text-yellow-600';
-      default:
-        return 'text-green-600';
-    }
-  };
+  // Filtrar por busca
+  const filteredTimesheets = timesheets.filter(timesheet => {
+    if (!searchQuery) return true
+    
+    const query = searchQuery.toLowerCase()
+    return (
+      timesheet.ticket.title.toLowerCase().includes(query) ||
+      timesheet.ticket.ticket_number.toString().includes(query) ||
+      timesheet.user.name.toLowerCase().includes(query) ||
+      timesheet.description.toLowerCase().includes(query)
+    )
+  })
+
+  // Estatísticas
+  const stats = {
+    pending: filteredTimesheets.filter(t => t.status === 'pending').length,
+    approved: filteredTimesheets.filter(t => t.status === 'approved').length,
+    rejected: filteredTimesheets.filter(t => t.status === 'rejected').length,
+    totalHours: filteredTimesheets.reduce((sum, t) => sum + parseFloat(t.hours_worked.toString()), 0)
+  }
+
+  // Obter lista única de usuários
+  const uniqueUsers = Array.from(new Set(timesheets.map(t => t.user_id)))
+    .map(userId => timesheets.find(t => t.user_id === userId)?.user)
+    .filter(Boolean) as User[]
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Carregando...</p>
-        </div>
+      <div className="flex justify-center items-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
       </div>
-    );
+    )
   }
 
-  if (!permissions.can_approve_timesheet) {
+  const userRole = (session?.user as any)?.role
+  if (userRole !== 'admin') {
     return (
-      <div className="container mx-auto p-6">
-        <Card>
-          <CardContent className="text-center py-12">
-            <AlertCircle className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Acesso Restrito</h2>
-            <p className="text-muted-foreground">
-              Você não tem permissão para aprovar apontamentos de horas.
-              Entre em contato com o administrador.
-            </p>
-          </CardContent>
-        </Card>
+      <div className="text-center py-12">
+        <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+          Acesso Negado
+        </h2>
+        <p className="text-gray-600 dark:text-gray-400">
+          Você não tem permissão para acessar esta página.
+        </p>
       </div>
-    );
+    )
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">Administração de Apontamentos</h1>
-        <p className="text-muted-foreground">Aprove ou recuse apontamentos de horas da equipe</p>
+    <div className="space-y-6">
+      {/* Navigation */}
+      <TimesheetNavigation />
+      
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Aprovação de Apontamentos
+          </h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            Gerencie e aprove apontamentos de horas da equipe
+          </p>
+        </div>
+        
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        >
+          <Filter className="h-4 w-4" />
+          Filtros
+          {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </button>
       </div>
 
-      {/* Filters */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-lg">Filtros</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-5">
-            {/* Status Filter */}
+      {/* Estatísticas */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+          <div className="flex items-center justify-between">
             <div>
-              <label className="text-sm font-medium mb-2 block">Status</label>
+              <p className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">
+                Pendentes
+              </p>
+              <p className="text-2xl font-bold text-yellow-900 dark:text-yellow-100">
+                {stats.pending}
+              </p>
+            </div>
+            <AlertCircle className="h-8 w-8 text-yellow-500" />
+          </div>
+        </div>
+
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-green-600 dark:text-green-400 text-sm font-medium">
+                Aprovadas
+              </p>
+              <p className="text-2xl font-bold text-green-900 dark:text-green-100">
+                {stats.approved}
+              </p>
+            </div>
+            <CheckCircle className="h-8 w-8 text-green-500" />
+          </div>
+        </div>
+
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-red-600 dark:text-red-400 text-sm font-medium">
+                Rejeitadas
+              </p>
+              <p className="text-2xl font-bold text-red-900 dark:text-red-100">
+                {stats.rejected}
+              </p>
+            </div>
+            <XCircle className="h-8 w-8 text-red-500" />
+          </div>
+        </div>
+
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-blue-600 dark:text-blue-400 text-sm font-medium">
+                Total de Horas
+              </p>
+              <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                {stats.totalHours.toFixed(1)}h
+              </p>
+            </div>
+            <Clock className="h-8 w-8 text-blue-500" />
+          </div>
+        </div>
+      </div>
+
+      {/* Filtros */}
+      {showFilters && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Status
+              </label>
               <select
-                className="w-full px-3 py-2 border rounded-md"
-                value={filter}
-                onChange={(e) => setFilter(e.target.value as any)}
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="all">Todos</option>
-                <option value="pending">Pendente</option>
-                <option value="approved">Aprovado</option>
-                <option value="rejected">Recusado</option>
+                <option value="pending">Pendentes</option>
+                <option value="approved">Aprovados</option>
+                <option value="rejected">Rejeitados</option>
               </select>
             </div>
-
-            {/* User Filter */}
+            
             <div>
-              <label className="text-sm font-medium mb-2 block">Usuário</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Usuário
+              </label>
               <select
-                className="w-full px-3 py-2 border rounded-md"
-                value={filterUserId}
-                onChange={(e) => setFilterUserId(e.target.value)}
+                value={filterUser}
+                onChange={(e) => setFilterUser(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
-                <option value="all">Todos os Usuários</option>
-                {allUsers.map(user => (
+                <option value="all">Todos</option>
+                {uniqueUsers.map(user => (
                   <option key={user.id} value={user.id}>
-                    {user.name} ({user.email})
+                    {user.name}
                   </option>
                 ))}
               </select>
             </div>
-
-            {/* Ticket Filter */}
+            
             <div>
-              <label className="text-sm font-medium mb-2 block">Ticket</label>
-              <select
-                className="w-full px-3 py-2 border rounded-md"
-                value={filterTicketId}
-                onChange={(e) => setFilterTicketId(e.target.value)}
-              >
-                <option value="all">Todos os Tickets</option>
-                {tickets.map(ticket => (
-                  <option key={ticket.id} value={ticket.id}>
-                    {ticket.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Date Range Start */}
-            <div>
-              <label className="text-sm font-medium mb-2 block">Data Início</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !filterDateRange.start && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {filterDateRange.start ? (
-                      format(filterDateRange.start, "dd/MM/yyyy", { locale: ptBR })
-                    ) : (
-                      "Selecione..."
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={filterDateRange.start || undefined}
-                    onSelect={(date) => setFilterDateRange(prev => ({ ...prev, start: date || null }))}
-                    initialFocus
-                    locale={ptBR}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {/* Date Range End */}
-            <div>
-              <label className="text-sm font-medium mb-2 block">Data Fim</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !filterDateRange.end && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {filterDateRange.end ? (
-                      format(filterDateRange.end, "dd/MM/yyyy", { locale: ptBR })
-                    ) : (
-                      "Selecione..."
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={filterDateRange.end || undefined}
-                    onSelect={(date) => setFilterDateRange(prev => ({ ...prev, end: date || null }))}
-                    initialFocus
-                    locale={ptBR}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
-
-          {/* Clear Filters Button */}
-          <div className="mt-4">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setFilter('pending');
-                setFilterTicketId('all');
-                setFilterUserId('all');
-                setFilterDateRange({ start: null, end: null });
-              }}
-            >
-              Limpar Filtros
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Tabs value={filter} onValueChange={(value) => setFilter(value as any)}>
-        <TabsList className="mb-6">
-          <TabsTrigger value="pending">Pendentes</TabsTrigger>
-          <TabsTrigger value="all">Todos</TabsTrigger>
-          <TabsTrigger value="approved">Aprovados</TabsTrigger>
-          <TabsTrigger value="rejected">Recusados</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value={filter}>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {tickets.map(ticket => (
-              <Card 
-                key={ticket.id} 
-                className={`cursor-pointer hover:shadow-lg transition-shadow ${
-                  ticket.pendingCount > 0 ? 'ring-2 ring-yellow-500' : ''
-                }`}
-                onClick={() => setSelectedTicket(ticket)}
-              >
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <CardTitle className="text-lg">{ticket.title}</CardTitle>
-                    {ticket.pendingCount > 0 && (
-                      <Badge className="bg-yellow-500">
-                        {ticket.pendingCount} Pendente{ticket.pendingCount > 1 ? 's' : ''}
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="flex gap-2 mt-2">
-                    <Badge variant="outline">{ticket.status}</Badge>
-                    <Badge variant="outline" className={getPriorityColor(ticket.priority)}>
-                      {ticket.priority}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Total de horas:</span>
-                      <span className="font-semibold">{ticket.totalHours.toFixed(1)}h</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Horas aprovadas:</span>
-                      <span className="font-semibold text-green-600">
-                        {ticket.approvedHours.toFixed(1)}h
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Apontamentos:</span>
-                      <span className="font-semibold">{ticket.timesheets.length}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {tickets.length === 0 && (
-            <Card>
-              <CardContent className="text-center py-12">
-                <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">
-                  Nenhum apontamento {filter !== 'all' ? filter === 'pending' ? 'pendente' : filter === 'approved' ? 'aprovado' : 'recusado' : ''} encontrado
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-      </Tabs>
-
-      {/* Detalhes do Ticket Selecionado */}
-      {selectedTicket && (
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>{selectedTicket.title}</CardTitle>
-            <div className="flex gap-2 mt-2">
-              <Badge variant="outline">{selectedTicket.status}</Badge>
-              <Badge variant="outline" className={getPriorityColor(selectedTicket.priority)}>
-                {selectedTicket.priority}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {selectedTicket.timesheets
-                .sort((a, b) => {
-                  // Ordenar pendentes primeiro, depois por data
-                  if (a.status === 'pending' && b.status !== 'pending') return -1;
-                  if (a.status !== 'pending' && b.status === 'pending') return 1;
-                  return new Date(b.work_date).getTime() - new Date(a.work_date).getTime();
-                })
-                .map(timesheet => (
-                <Card key={timesheet.id} className={timesheet.status === 'pending' ? 'border-yellow-500' : ''}>
-                  <CardContent className="pt-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="bg-muted rounded-full p-2">
-                          <User className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <p className="font-semibold">{timesheet.user?.name}</p>
-                          <p className="text-sm text-muted-foreground">{timesheet.user?.email}</p>
-                        </div>
-                      </div>
-                      {getStatusBadge(timesheet.status)}
-                    </div>
-
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center gap-4 text-sm">
-                        <div className="flex items-center gap-1">
-                          <CalendarIcon className="w-4 h-4 text-muted-foreground" />
-                          <span>{format(new Date(timesheet.work_date), 'dd/MM/yyyy', { locale: ptBR })}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-4 h-4 text-muted-foreground" />
-                          <span className="font-semibold">{timesheet.hours_worked}h</span>
-                        </div>
-                      </div>
-                      
-                      <div className="bg-muted rounded p-3">
-                        <p className="text-sm">{timesheet.activity_description}</p>
-                      </div>
-
-                      {timesheet.status === 'rejected' && timesheet.rejection_reason && (
-                        <div className="bg-red-50 border border-red-200 rounded p-3">
-                          <p className="text-sm text-red-700">
-                            <strong>Motivo da recusa:</strong> {timesheet.rejection_reason}
-                          </p>
-                        </div>
-                      )}
-
-                      {timesheet.status === 'approved' && timesheet.approver && (
-                        <div className="text-sm text-muted-foreground">
-                          Aprovado por {timesheet.approver.name} em{' '}
-                          {format(new Date(timesheet.approved_at!), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
-                        </div>
-                      )}
-                    </div>
-
-                    {timesheet.status === 'pending' && (
-                      <div className="flex gap-2">
-                        <Button 
-                          className="flex-1"
-                          onClick={() => handleApprove(timesheet)}
-                        >
-                          <ThumbsUp className="w-4 h-4 mr-2" />
-                          Aprovar
-                        </Button>
-                        <Button 
-                          variant="destructive"
-                          className="flex-1"
-                          onClick={() => {
-                            setSelectedTimesheet(timesheet);
-                            setShowRejectDialog(true);
-                          }}
-                        >
-                          <ThumbsDown className="w-4 h-4 mr-2" />
-                          Recusar
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Dialog de Recusa */}
-      <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Recusar Apontamento</DialogTitle>
-            <DialogDescription>
-              Informe o motivo da recusa. Esta informação será enviada ao colaborador.
-            </DialogDescription>
-          </DialogHeader>
-          
-          {selectedTimesheet && (
-            <div className="space-y-4">
-              <div className="bg-muted rounded p-3 space-y-2">
-                <p className="text-sm">
-                  <strong>Colaborador:</strong> {selectedTimesheet.user?.name}
-                </p>
-                <p className="text-sm">
-                  <strong>Data:</strong> {format(new Date(selectedTimesheet.work_date), 'dd/MM/yyyy', { locale: ptBR })}
-                </p>
-                <p className="text-sm">
-                  <strong>Horas:</strong> {selectedTimesheet.hours_worked}h
-                </p>
-                <p className="text-sm">
-                  <strong>Atividade:</strong> {selectedTimesheet.activity_description}
-                </p>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium">Motivo da Recusa *</label>
-                <Textarea
-                  placeholder="Explique o motivo da recusa..."
-                  rows={4}
-                  value={rejectionReason}
-                  onChange={(e) => setRejectionReason(e.target.value)}
-                  className="mt-2"
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Buscar
+              </label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Buscar por ticket, usuário ou descrição..."
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
             </div>
-          )}
+          </div>
+        </div>
+      )}
 
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                setShowRejectDialog(false);
-                setRejectionReason('');
-                setSelectedTimesheet(null);
-              }}
-            >
-              Cancelar
-            </Button>
-            <Button 
-              variant="destructive"
-              onClick={handleReject}
-              disabled={!rejectionReason.trim()}
-            >
-              Confirmar Recusa
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Lista de Apontamentos */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Apontamentos para Aprovação
+          </h2>
+        </div>
+        
+        {filteredTimesheets.length === 0 ? (
+          <div className="text-center py-12">
+            <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500 dark:text-gray-400">
+              Nenhum apontamento encontrado
+            </p>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-200 dark:divide-gray-700">
+            {filteredTimesheets.map((timesheet) => (
+              <div key={timesheet.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => toggleRow(timesheet.id)}
+                        className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
+                      >
+                        {expandedRows.has(timesheet.id) ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                      </button>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-gray-900 dark:text-white">
+                            #{timesheet.ticket.ticket_number}
+                          </span>
+                          <span className="text-gray-600 dark:text-gray-400">
+                            {timesheet.ticket.title}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center gap-4 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                          <span className="flex items-center gap-1">
+                            <User className="h-3 w-3" />
+                            {timesheet.user.name}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            {format(parseISO(timesheet.work_date), "dd 'de' MMMM", { locale: ptBR })}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {timesheet.hours_worked}h
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        {getStatusBadge(timesheet.status)}
+                        
+                        {timesheet.status === 'pending' && (
+                          <>
+                            <button
+                              onClick={() => handleApprove(timesheet.id)}
+                              className="p-2 text-green-600 hover:bg-green-100 dark:text-green-400 dark:hover:bg-green-900/20 rounded-lg transition-colors"
+                              title="Aprovar"
+                            >
+                              <Check className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleReject(timesheet.id)}
+                              className="p-2 text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                              title="Rejeitar"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {expandedRows.has(timesheet.id) && (
+                  <div className="mt-4 pl-12 space-y-2">
+                    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Descrição do Trabalho:
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {timesheet.description}
+                      </p>
+                    </div>
+                    
+                    {timesheet.status === 'approved' && timesheet.approver && (
+                      <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
+                        <p className="text-sm text-green-800 dark:text-green-200">
+                          <span className="font-medium">Aprovado por:</span> {timesheet.approver.name}
+                        </p>
+                        {timesheet.approval_date && (
+                          <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+                            <span className="font-medium">Data:</span> {format(parseISO(timesheet.approval_date), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    
+                    {timesheet.status === 'rejected' && timesheet.rejection_reason && (
+                      <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3">
+                        <p className="text-sm text-red-800 dark:text-red-200">
+                          <span className="font-medium">Motivo da Rejeição:</span> {timesheet.rejection_reason}
+                        </p>
+                        {timesheet.approver && (
+                          <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+                            <span className="font-medium">Rejeitado por:</span> {timesheet.approver.name}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
-  );
+  )
 }

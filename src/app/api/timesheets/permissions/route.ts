@@ -1,180 +1,122 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { auth } from '@/lib/auth'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export const runtime = 'nodejs'
 
+// GET - Obter permissões do usuário atual
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
-    
-    // Verificar autenticação
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
+    const session = await auth()
+    if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Verificar se é admin
-    const { data: userInfo } = await supabase
+    // Buscar informações do usuário
+    const { data: userInfo } = await supabaseAdmin
       .from('users')
       .select('role')
       .eq('id', session.user.id)
       .single()
 
-    if (userInfo?.role !== 'admin') {
-      // Usuários não-admin só podem ver suas próprias permissões
-      const { data, error } = await supabase
-        .from('timesheet_permissions')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .single()
-
-      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-        console.error('Error fetching permissions:', error)
-        return NextResponse.json({ error: error.message }, { status: 500 })
-      }
-
-      return NextResponse.json(data || { can_submit: true, can_approve: false })
-    }
-
-    // Admin pode ver todas as permissões
-    const { data, error } = await supabase
+    // Buscar permissões específicas se existirem
+    const { data: permission } = await supabaseAdmin
       .from('timesheet_permissions')
-      .select(`
-        *,
-        user:users!timesheet_permissions_user_id_fkey(id, name, email, role)
-      `)
-      .order('created_at', { ascending: false })
+      .select('*')
+      .eq('user_id', session.user.id)
+      .single()
 
-    if (error) {
-      console.error('Error fetching all permissions:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+    // Se não houver permissões específicas, usar padrões baseados no cargo
+    if (!permission) {
+      const defaultPermissions = {
+        can_submit: true,
+        can_approve: userInfo?.role === 'admin'
+      }
+      return NextResponse.json(defaultPermissions)
     }
 
-    return NextResponse.json(data || [])
+    return NextResponse.json({
+      can_submit: permission.can_submit,
+      can_approve: permission.can_approve || userInfo?.role === 'admin'
+    })
   } catch (error) {
-    console.error('Unexpected error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    console.error('Error fetching permissions:', error)
+    // Retornar permissões padrão em caso de erro
+    return NextResponse.json({
+      can_submit: true,
+      can_approve: false
+    })
   }
 }
 
+// POST - Atualizar permissões (apenas admin)
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
-    
-    // Verificar autenticação
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
+    const session = await auth()
+    if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Verificar se é admin
-    const { data: userInfo } = await supabase
+    const { data: userInfo } = await supabaseAdmin
       .from('users')
       .select('role')
       .eq('id', session.user.id)
       .single()
 
     if (userInfo?.role !== 'admin') {
-      return NextResponse.json({ 
-        error: 'Only administrators can manage permissions' 
-      }, { status: 403 })
+      return NextResponse.json({ error: 'Forbidden. Only admins can manage permissions.' }, { status: 403 })
     }
 
     const body = await request.json()
     const { user_id, can_submit, can_approve } = body
 
     if (!user_id) {
-      return NextResponse.json({ 
-        error: 'Missing required field: user_id' 
-      }, { status: 400 })
+      return NextResponse.json({ error: 'user_id is required' }, { status: 400 })
     }
 
-    // Upsert permissão (insert ou update)
-    const { data, error } = await supabase
+    // Verificar se já existe permissão para este usuário
+    const { data: existing } = await supabaseAdmin
       .from('timesheet_permissions')
-      .upsert({
-        user_id,
-        can_submit: can_submit ?? true,
-        can_approve: can_approve ?? false
-      })
-      .select(`
-        *,
-        user:users!timesheet_permissions_user_id_fkey(id, name, email, role)
-      `)
+      .select('*')
+      .eq('user_id', user_id)
       .single()
 
-    if (error) {
-      console.error('Error upserting permission:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json(data)
-  } catch (error) {
-    console.error('Unexpected error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-  }
-}
-
-export async function PUT(request: NextRequest) {
-  try {
-    const supabase = createRouteHandlerClient({ cookies })
-    
-    // Verificar autenticação
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Verificar se é admin
-    const { data: userInfo } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', session.user.id)
-      .single()
-
-    if (userInfo?.role !== 'admin') {
-      return NextResponse.json({ 
-        error: 'Only administrators can manage permissions' 
-      }, { status: 403 })
-    }
-
-    const body = await request.json()
-    const { permissions } = body // Array de permissões para atualizar em lote
-
-    if (!permissions || !Array.isArray(permissions)) {
-      return NextResponse.json({ 
-        error: 'Missing or invalid permissions array' 
-      }, { status: 400 })
-    }
-
-    // Processar atualizações em lote
-    const results = []
-    for (const perm of permissions) {
-      const { data, error } = await supabase
+    let result
+    if (existing) {
+      // Atualizar permissão existente
+      const { data, error } = await supabaseAdmin
         .from('timesheet_permissions')
-        .upsert({
-          user_id: perm.user_id,
-          can_submit: perm.can_submit ?? true,
-          can_approve: perm.can_approve ?? false
+        .update({
+          can_submit: can_submit ?? existing.can_submit,
+          can_approve: can_approve ?? existing.can_approve,
+          updated_at: new Date().toISOString()
         })
-        .select(`
-          *,
-          user:users!timesheet_permissions_user_id_fkey(id, name, email, role)
-        `)
+        .eq('user_id', user_id)
+        .select()
         .single()
 
-      if (error) {
-        console.error('Error updating permission for user', perm.user_id, error)
-        results.push({ user_id: perm.user_id, error: error.message })
-      } else {
-        results.push(data)
-      }
+      if (error) throw error
+      result = data
+    } else {
+      // Criar nova permissão
+      const { data, error } = await supabaseAdmin
+        .from('timesheet_permissions')
+        .insert({
+          user_id,
+          can_submit: can_submit ?? true,
+          can_approve: can_approve ?? false
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+      result = data
     }
 
-    return NextResponse.json(results)
+    return NextResponse.json(result)
   } catch (error) {
-    console.error('Unexpected error:', error)
+    console.error('Error updating permissions:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -16,6 +16,7 @@ import {
   Moon,
   Sun,
   ChevronDown,
+  ChevronUp,
   BarChart3,
   MessageSquare,
   FileText,
@@ -24,6 +25,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
+  Shield,
+  TrendingUp,
+  UserCheck,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
@@ -33,7 +37,17 @@ import { Tooltip } from '@/components/ui/tooltip'
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Chamados', href: '/dashboard/tickets', icon: Ticket },
-  { name: 'Apontamentos', href: '/dashboard/timesheets', icon: Clock },
+  { 
+    name: 'Apontamentos', 
+    href: '/dashboard/timesheets', 
+    icon: Clock,
+    subItems: [
+      { name: 'Meus Apontamentos', href: '/dashboard/timesheets', icon: Clock },
+      { name: 'Aprovações', href: '/dashboard/timesheets/admin', icon: Shield, adminOnly: true },
+      { name: 'Analytics', href: '/dashboard/timesheets/analytics', icon: TrendingUp, adminOnly: true },
+      { name: 'Permissões', href: '/dashboard/timesheets/permissions', icon: UserCheck, adminOnly: true },
+    ]
+  },
   { name: 'Base de Conhecimento', href: '/dashboard/knowledge-base', icon: BookOpen },
   { name: 'Estatísticas', href: '/dashboard/analytics', icon: BarChart3 },
   { name: 'Comentários', href: '/dashboard/comments', icon: MessageSquare },
@@ -59,6 +73,17 @@ export default function DashboardLayout({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set())
+
+  const toggleExpanded = (itemName: string) => {
+    const newExpanded = new Set(expandedItems)
+    if (newExpanded.has(itemName)) {
+      newExpanded.delete(itemName)
+    } else {
+      newExpanded.add(itemName)
+    }
+    setExpandedItems(newExpanded)
+  }
   
   // Load sidebar collapsed state from localStorage
   useEffect(() => {
@@ -126,22 +151,72 @@ export default function DashboardLayout({
           <nav className="flex-1 space-y-1 px-3 py-4">
             {allNavigation.map((item) => {
               const Icon = item.icon
-              const isActive = pathname === item.href
+              const hasSubItems = 'subItems' in item && item.subItems
+              const isExpanded = expandedItems.has(item.name)
+              const isActive = pathname === item.href || (hasSubItems && item.subItems.some((sub: any) => pathname === sub.href))
+              
               return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors",
-                    isActive
-                      ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
-                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                <div key={item.name}>
+                  {hasSubItems ? (
+                    <>
+                      <button
+                        onClick={() => toggleExpanded(item.name)}
+                        className={cn(
+                          "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors",
+                          isActive
+                            ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                            : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                        )}
+                      >
+                        <div className="flex items-center">
+                          <Icon className="mr-3 h-5 w-5" />
+                          {item.name}
+                        </div>
+                        {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      </button>
+                      {isExpanded && (
+                        <div className="ml-4 mt-1 space-y-1">
+                          {item.subItems
+                            .filter((subItem: any) => !subItem.adminOnly || isAdmin)
+                            .map((subItem: any) => {
+                              const SubIcon = subItem.icon
+                              const isSubActive = pathname === subItem.href
+                              return (
+                                <Link
+                                  key={subItem.name}
+                                  href={subItem.href}
+                                  className={cn(
+                                    "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors",
+                                    isSubActive
+                                      ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                                      : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+                                  )}
+                                  onClick={() => setSidebarOpen(false)}
+                                >
+                                  <SubIcon className="mr-3 h-4 w-4" />
+                                  {subItem.name}
+                                </Link>
+                              )
+                            })}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className={cn(
+                        "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors",
+                        isActive
+                          ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                          : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                      )}
+                      onClick={() => setSidebarOpen(false)}
+                    >
+                      <Icon className="mr-3 h-5 w-5" />
+                      {item.name}
+                    </Link>
                   )}
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <Icon className="mr-3 h-5 w-5" />
-                  {item.name}
-                </Link>
+                </div>
               )
             })}
           </nav>
@@ -193,36 +268,116 @@ export default function DashboardLayout({
           <nav className="flex-1 space-y-1 px-3 py-4">
             {allNavigation.map((item) => {
               const Icon = item.icon
-              const isActive = pathname === item.href
-              const linkElement = (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center text-sm font-medium rounded-lg transition-all duration-200",
-                    sidebarCollapsed ? "px-2.5 py-2.5 justify-center" : "px-3 py-2",
-                    isActive
-                      ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
-                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                  )}
-                >
-                  <Icon className={cn(
-                    "h-5 w-5 flex-shrink-0",
-                    !sidebarCollapsed && "mr-3"
-                  )} />
-                  {!sidebarCollapsed && (
-                    <span className="truncate">{item.name}</span>
-                  )}
-                </Link>
-              )
-
-              return sidebarCollapsed ? (
-                <Tooltip key={item.name} content={item.name} side="right">
-                  {linkElement}
-                </Tooltip>
-              ) : (
-                linkElement
-              )
+              const hasSubItems = 'subItems' in item && item.subItems
+              const isExpanded = expandedItems.has(item.name)
+              const isActive = pathname === item.href || (hasSubItems && item.subItems.some((sub: any) => pathname === sub.href))
+              
+              if (sidebarCollapsed) {
+                // Collapsed sidebar - show tooltip for main item
+                if (hasSubItems) {
+                  // For items with subitems, clicking expands the sidebar
+                  return (
+                    <Tooltip key={item.name} content={item.name} side="right">
+                      <button
+                        onClick={() => {
+                          setSidebarCollapsed(false)
+                          toggleExpanded(item.name)
+                        }}
+                        className={cn(
+                          "w-full flex items-center justify-center px-2.5 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
+                          isActive
+                            ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                            : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                        )}
+                      >
+                        <Icon className="h-5 w-5 flex-shrink-0" />
+                      </button>
+                    </Tooltip>
+                  )
+                } else {
+                  const linkElement = (
+                    <Link
+                      href={item.href}
+                      className={cn(
+                        "flex items-center justify-center px-2.5 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
+                        isActive
+                          ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                          : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                      )}
+                    >
+                      <Icon className="h-5 w-5 flex-shrink-0" />
+                    </Link>
+                  )
+                  return (
+                    <Tooltip key={item.name} content={item.name} side="right">
+                      {linkElement}
+                    </Tooltip>
+                  )
+                }
+              } else {
+                // Expanded sidebar - show full menu with subitems
+                return (
+                  <div key={item.name}>
+                    {hasSubItems ? (
+                      <>
+                        <button
+                          onClick={() => toggleExpanded(item.name)}
+                          className={cn(
+                            "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors",
+                            isActive
+                              ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                              : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                          )}
+                        >
+                          <div className="flex items-center">
+                            <Icon className="mr-3 h-5 w-5" />
+                            <span className="truncate">{item.name}</span>
+                          </div>
+                          {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                        </button>
+                        {isExpanded && (
+                          <div className="ml-4 mt-1 space-y-1">
+                            {item.subItems
+                              .filter((subItem: any) => !subItem.adminOnly || isAdmin)
+                              .map((subItem: any) => {
+                                const SubIcon = subItem.icon
+                                const isSubActive = pathname === subItem.href
+                                return (
+                                  <Link
+                                    key={subItem.name}
+                                    href={subItem.href}
+                                    className={cn(
+                                      "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors",
+                                      isSubActive
+                                        ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                                        : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+                                    )}
+                                  >
+                                    <SubIcon className="mr-3 h-4 w-4" />
+                                    <span className="truncate">{subItem.name}</span>
+                                  </Link>
+                                )
+                              })}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <Link
+                        href={item.href}
+                        className={cn(
+                          "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors",
+                          isActive
+                            ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                            : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                        )}
+                      >
+                        <Icon className="mr-3 h-5 w-5" />
+                        <span className="truncate">{item.name}</span>
+                      </Link>
+                    )}
+                  </div>
+                )
+              }
             })}
           </nav>
           
