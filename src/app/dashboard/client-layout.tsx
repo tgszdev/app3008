@@ -168,7 +168,7 @@ export default function DashboardLayout({
               const Icon = item.icon
               const hasSubItems = item.subItems && item.subItems.length > 0
               const isExpanded = expandedItems.has(item.name)
-              const isActive = pathname === item.href || (hasSubItems && item.subItems.some((sub) => pathname === sub.href))
+              const isActive = pathname === item.href || (hasSubItems && item.subItems?.some((sub) => pathname === sub.href))
               
               return (
                 <div key={item.name}>
@@ -192,7 +192,7 @@ export default function DashboardLayout({
                       {isExpanded && (
                         <div className="ml-4 mt-1 space-y-1">
                           {item.subItems
-                            .filter((subItem) => !subItem.adminOnly || isAdmin)
+                            ?.filter((subItem) => !subItem.adminOnly || isAdmin)
                             .map((subItem) => {
                               const SubIcon = subItem.icon
                               const isSubActive = pathname === subItem.href
@@ -285,7 +285,7 @@ export default function DashboardLayout({
               const Icon = item.icon
               const hasSubItems = item.subItems && item.subItems.length > 0
               const isExpanded = expandedItems.has(item.name)
-              const isActive = pathname === item.href || (hasSubItems && item.subItems.some((sub) => pathname === sub.href))
+              const isActive = pathname === item.href || (hasSubItems && item.subItems?.some((sub) => pathname === sub.href))
               
               if (sidebarCollapsed) {
                 // Collapsed sidebar - show tooltip for main item
@@ -353,8 +353,8 @@ export default function DashboardLayout({
                         {isExpanded && (
                           <div className="ml-4 mt-1 space-y-1">
                             {item.subItems
-                              .filter((subItem: any) => !subItem.adminOnly || isAdmin)
-                              .map((subItem: any) => {
+                              ?.filter((subItem) => !subItem.adminOnly || isAdmin)
+                              .map((subItem) => {
                                 const SubIcon = subItem.icon
                                 const isSubActive = pathname === subItem.href
                                 return (
