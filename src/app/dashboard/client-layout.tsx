@@ -33,6 +33,7 @@ import { Tooltip } from '@/components/ui/tooltip'
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Chamados', href: '/dashboard/tickets', icon: Ticket },
+  { name: 'Apontamentos', href: '/dashboard/timesheets', icon: Clock },
   { name: 'Base de Conhecimento', href: '/dashboard/knowledge-base', icon: BookOpen },
   { name: 'Estatísticas', href: '/dashboard/analytics', icon: BarChart3 },
   { name: 'Comentários', href: '/dashboard/comments', icon: MessageSquare },
