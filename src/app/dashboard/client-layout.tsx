@@ -33,8 +33,23 @@ import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
 import NotificationBell from '@/components/notifications/NotificationBell'
 import { Tooltip } from '@/components/ui/tooltip'
+import { LucideIcon } from 'lucide-react'
 
-const navigation = [
+interface NavigationSubItem {
+  name: string
+  href: string
+  icon: LucideIcon
+  adminOnly?: boolean
+}
+
+interface NavigationItem {
+  name: string
+  href: string
+  icon: LucideIcon
+  subItems?: NavigationSubItem[]
+}
+
+const navigation: NavigationItem[] = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Chamados', href: '/dashboard/tickets', icon: Ticket },
   { 
@@ -54,7 +69,7 @@ const navigation = [
   { name: 'Relatórios', href: '/dashboard/reports', icon: FileText },
 ]
 
-const adminNavigation = [
+const adminNavigation: NavigationItem[] = [
   { name: 'Usuários', href: '/dashboard/users', icon: Users },
   { name: 'SLA', href: '/dashboard/sla', icon: Clock },
   { name: 'Configurações', href: '/dashboard/settings', icon: Settings },
@@ -151,9 +166,9 @@ export default function DashboardLayout({
           <nav className="flex-1 space-y-1 px-3 py-4">
             {allNavigation.map((item) => {
               const Icon = item.icon
-              const hasSubItems = 'subItems' in item && item.subItems
+              const hasSubItems = item.subItems && item.subItems.length > 0
               const isExpanded = expandedItems.has(item.name)
-              const isActive = pathname === item.href || (hasSubItems && item.subItems.some((sub: any) => pathname === sub.href))
+              const isActive = pathname === item.href || (hasSubItems && item.subItems.some((sub) => pathname === sub.href))
               
               return (
                 <div key={item.name}>
@@ -177,8 +192,8 @@ export default function DashboardLayout({
                       {isExpanded && (
                         <div className="ml-4 mt-1 space-y-1">
                           {item.subItems
-                            .filter((subItem: any) => !subItem.adminOnly || isAdmin)
-                            .map((subItem: any) => {
+                            .filter((subItem) => !subItem.adminOnly || isAdmin)
+                            .map((subItem) => {
                               const SubIcon = subItem.icon
                               const isSubActive = pathname === subItem.href
                               return (
@@ -268,9 +283,9 @@ export default function DashboardLayout({
           <nav className="flex-1 space-y-1 px-3 py-4">
             {allNavigation.map((item) => {
               const Icon = item.icon
-              const hasSubItems = 'subItems' in item && item.subItems
+              const hasSubItems = item.subItems && item.subItems.length > 0
               const isExpanded = expandedItems.has(item.name)
-              const isActive = pathname === item.href || (hasSubItems && item.subItems.some((sub: any) => pathname === sub.href))
+              const isActive = pathname === item.href || (hasSubItems && item.subItems.some((sub) => pathname === sub.href))
               
               if (sidebarCollapsed) {
                 // Collapsed sidebar - show tooltip for main item
