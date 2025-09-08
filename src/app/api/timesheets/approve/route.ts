@@ -22,13 +22,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar permissão de aprovação
-    const { data: userInfo } = await supabase
+    const { data: userInfo } = await supabaseAdmin
       .from('users')
       .select('role')
       .eq('id', session.user.id)
       .single()
 
-    const { data: permission } = await supabase
+    const { data: permission } = await supabaseAdmin
       .from('timesheet_permissions')
       .select('can_approve')
       .eq('user_id', session.user.id)
