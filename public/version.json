@@ -1,6 +1,6 @@
 {
-  "version": "1.5.4",
-  "buildDate": "2025-09-08T16:45:00Z",
+  "version": "1.5.5",
+  "buildDate": "2025-09-08T16:50:00Z",
   "features": {
     "timesheets": true,
     "timesheetPermissions": true,
