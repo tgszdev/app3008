@@ -427,7 +427,7 @@ export default function TimesheetsPage() {
 
       {/* Cards de Tickets com Apontamentos */}
       {tickets.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
           {/* Agrupar apontamentos por ticket */}
           {(() => {
             const ticketsWithTimesheets = tickets.filter(ticket => {
@@ -481,82 +481,78 @@ export default function TimesheetsPage() {
           }
           
           return ticketsWithTimesheets.map(({ ticket, timesheets: ticketTimesheets, totalHours, approvedHours, pendingHours, rejectedHours, percentComplete, approvedCount, pendingCount, rejectedCount }) => (
-            <div key={ticket.id} className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl shadow-xl border border-slate-700 overflow-hidden">
-              {/* Header do Card */}
-              <div className="p-6 pb-4">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <p className="text-xs uppercase tracking-wider text-slate-400 mb-1">CHAMADO</p>
-                    <h3 className="text-2xl font-bold text-white">#{ticket.ticket_number}</h3>
+            <div key={ticket.id} className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden hover:border-slate-600 transition-colors">
+              {/* Card Compacto */}
+              <div className="p-4">
+                {/* Header Minimalista */}
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-lg font-semibold text-white">#{ticket.ticket_number}</h3>
+                    <span className="text-sm text-slate-400">{ticket.title.toUpperCase()}</span>
                   </div>
-                  <div className="text-right">
-                    <div className="text-3xl font-bold text-white">{ticketTimesheets.length}</div>
-                    <div className="text-xs text-slate-400">apontamentos</div>
+                  <span className="text-sm text-slate-500">
+                    {ticketTimesheets.length} {ticketTimesheets.length === 1 ? 'apontamento' : 'apontamentos'}
+                  </span>
+                </div>
+                
+                {/* Barra de Progresso Inline */}
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex-1">
+                    <div className="w-full bg-slate-700 rounded-full h-1.5 overflow-hidden">
+                      <div 
+                        className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
+                        style={{ width: `${percentComplete}%` }}
+                      />
+                    </div>
+                  </div>
+                  <span className="text-xs text-slate-400 min-w-fit">
+                    {percentComplete}% aprovado
+                  </span>
+                </div>
+                
+                {/* Estatísticas Inline */}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-4 text-sm">
+                    <span className="text-green-400">
+                      <span className="font-semibold">{approvedCount}</span>
+                      <span className="text-xs text-slate-500 ml-1">aprovadas</span>
+                    </span>
+                    <span className="text-yellow-400">
+                      <span className="font-semibold">{pendingCount}</span>
+                      <span className="text-xs text-slate-500 ml-1">pendentes</span>
+                    </span>
+                    <span className="text-red-400">
+                      <span className="font-semibold">{rejectedCount}</span>
+                      <span className="text-xs text-slate-500 ml-1">rejeitadas</span>
+                    </span>
+                  </div>
+                  <div className="text-sm text-slate-400">
+                    {totalHours.toFixed(1)}h total
                   </div>
                 </div>
                 
-                {/* Título do Ticket */}
-                <p className="text-sm text-slate-300 mb-4 line-clamp-2">
-                  {ticket.title.toUpperCase()}
-                </p>
-                
-                {/* Barra de Progresso */}
-                <div className="mb-2">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs text-slate-400">Progresso</span>
-                    <span className="text-sm font-semibold text-white">{percentComplete}% aprovado</span>
-                  </div>
-                  <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
-                    <div 
-                      className="bg-gradient-to-r from-blue-500 to-blue-400 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${percentComplete}%` }}
-                    />
-                  </div>
-                </div>
-                
-                {/* Estatísticas */}
-                <div className="grid grid-cols-3 gap-2 mt-4 p-3 bg-slate-700/50 rounded-lg">
-                  <div className="text-center">
-                    <div className="text-xs text-slate-400 mb-1">Aprovadas</div>
-                    <div className="text-lg font-bold text-green-400">{approvedCount}</div>
-                  </div>
-                  <div className="text-center border-x border-slate-600">
-                    <div className="text-xs text-slate-400 mb-1">Pendentes</div>
-                    <div className="text-lg font-bold text-yellow-400">{pendingCount}</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-xs text-slate-400 mb-1">Rejeitadas</div>
-                    <div className="text-lg font-bold text-red-400">{rejectedCount}</div>
-                  </div>
-                </div>
-                
-                {/* Botões de Ação */}
-                <div className="mt-4 space-y-2">
+                {/* Botões Compactos */}
+                <div className="flex gap-2">
                   <button
                     onClick={() => {
                       setSelectedTicket(ticket.id)
                       setShowAddForm(true)
                     }}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
                   >
-                    <Plus className="h-4 w-4" />
-                    Adicionar Apontamento
+                    <Plus className="h-3.5 w-3.5" />
+                    Adicionar
                   </button>
                   <button
                     onClick={() => toggleRow(ticket.id)}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-slate-700 text-slate-300 rounded-lg hover:bg-slate-600 transition-colors"
+                    className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-slate-700 text-slate-300 text-sm rounded hover:bg-slate-600 transition-colors"
                   >
                     {expandedRows.has(ticket.id) ? (
-                      <>
-                        <ChevronUp className="h-4 w-4" />
-                        Ocultar Apontamentos
-                      </>
+                      <ChevronUp className="h-3.5 w-3.5" />
                     ) : (
-                      <>
-                        <ChevronDown className="h-4 w-4" />
-                        Ver Apontamentos
-                      </>
+                      <ChevronDown className="h-3.5 w-3.5" />
                     )}
+                    {expandedRows.has(ticket.id) ? 'Ocultar' : 'Detalhes'}
                   </button>
                 </div>
               </div>
