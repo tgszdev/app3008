@@ -808,15 +808,21 @@ export default function TimesheetsAnalyticsPage() {
 
               {/* Status Distribution */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-help group relative">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Distribuição por Status</h3>
                     <Activity className="h-5 w-5 text-gray-400" />
                   </div>
-                  {/* Tooltip */}
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                    Percentual de horas por situação de aprovação
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                  {/* Info Icon with Popover */}
+                  <div className="absolute top-2 right-2">
+                    <div className="group/tooltip relative">
+                      <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help" />
+                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
+                        <p className="font-semibold mb-1">Distribuição por Status</p>
+                        <p>Percentual de horas por situação de aprovação (aprovado, pendente, rejeitado)</p>
+                        <div className="absolute top-0 right-2 transform -translate-y-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                      </div>
+                    </div>
                   </div>
                   <div className="space-y-3">
                     <div>
@@ -859,15 +865,21 @@ export default function TimesheetsAnalyticsPage() {
                 </div>
 
                 {/* Top Chamados */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 lg:col-span-2 cursor-help group relative">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 lg:col-span-2 relative">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Top 5 Chamados Consumidores de Tempo</h3>
                     <Ticket className="h-5 w-5 text-gray-400" />
                   </div>
-                  {/* Tooltip */}
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                    Chamados que mais consumiram horas no período
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                  {/* Info Icon with Popover */}
+                  <div className="absolute top-2 right-2">
+                    <div className="group/tooltip relative">
+                      <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help" />
+                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
+                        <p className="font-semibold mb-1">Top Chamados</p>
+                        <p>Os 5 chamados que mais consumiram horas no período selecionado</p>
+                        <div className="absolute top-0 right-2 transform -translate-y-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                      </div>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     {analytics.topTickets.slice(0, 5).map((ticket, index) => (
@@ -899,7 +911,7 @@ export default function TimesheetsAnalyticsPage() {
               {/* Horas por Categoria e Prioridade */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Horas por Categoria */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-help group relative">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -908,10 +920,16 @@ export default function TimesheetsAnalyticsPage() {
                     </div>
                     <FolderOpen className="h-5 w-5 text-gray-400" />
                   </div>
-                  {/* Tooltip */}
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                    Distribuição de horas por tipo de categoria
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                  {/* Info Icon with Popover */}
+                  <div className="absolute top-2 right-2">
+                    <div className="group/tooltip relative">
+                      <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help" />
+                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
+                        <p className="font-semibold mb-1">Horas por Categoria</p>
+                        <p>Distribuição total de horas trabalhadas por categoria de chamado</p>
+                        <div className="absolute top-0 right-2 transform -translate-y-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                      </div>
+                    </div>
                   </div>
                   <div className="space-y-3">
                     {analytics?.categoryDistribution.slice(0, 5).map((category, index) => (
@@ -950,7 +968,7 @@ export default function TimesheetsAnalyticsPage() {
                 </div>
 
                 {/* Horas por Prioridade */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-help group relative">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -959,10 +977,16 @@ export default function TimesheetsAnalyticsPage() {
                     </div>
                     <AlertTriangle className="h-5 w-5 text-gray-400" />
                   </div>
-                  {/* Tooltip */}
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                    Distribuição de horas por nível de prioridade
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                  {/* Info Icon with Popover */}
+                  <div className="absolute top-2 right-2">
+                    <div className="group/tooltip relative">
+                      <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help" />
+                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
+                        <p className="font-semibold mb-1">Horas por Prioridade</p>
+                        <p>Distribuição de horas trabalhadas por nível de prioridade dos chamados</p>
+                        <div className="absolute top-0 right-2 transform -translate-y-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                      </div>
+                    </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     {analytics?.priorityDistribution.map((priority, index) => {
@@ -1047,138 +1071,170 @@ export default function TimesheetsAnalyticsPage() {
               </div>
 
               {/* Gráfico de Tendências - Horas Diárias */}
-              <div className="bg-gradient-to-br from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-900 rounded-xl shadow-xl border border-gray-700 p-6">
+              <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h3 className="text-lg font-semibold text-white">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                       Horas Diárias
                     </h3>
-                    <p className="text-sm text-gray-400 mt-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       {filterStartDate && filterEndDate 
                         ? `${format(parseISO(filterStartDate), 'dd/MM', { locale: ptBR })} a ${format(parseISO(filterEndDate), 'dd/MM', { locale: ptBR })}`
                         : `${format(startOfMonth(new Date()), 'dd/MM', { locale: ptBR })} a ${format(endOfMonth(new Date()), 'dd/MM', { locale: ptBR })}`
                       }
                     </p>
                   </div>
-                  <Calendar className="h-5 w-5 text-gray-500" />
+                  <div className="group/tooltip relative">
+                    <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help" />
+                    <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
+                      <p className="font-semibold mb-1">Gráfico de Horas</p>
+                      <p>Visualização diária das horas trabalhadas com status de aprovação</p>
+                      <div className="absolute top-0 right-2 transform -translate-y-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                    </div>
+                  </div>
                 </div>
                 <div className="overflow-x-auto">
-                  <div className="min-w-[600px] h-72 relative">
-                    {/* Grid de fundo */}
-                    <div className="absolute inset-0 grid grid-rows-4 gap-0">
-                      {[100, 75, 50, 25].map((value) => (
-                        <div key={value} className="border-t border-gray-700/30" />
-                      ))}
-                    </div>
-                    <div className="flex items-end justify-between h-full gap-2 relative z-10">
-                      {analytics.dailyData.map((day, index) => {
-                        const maxHours = Math.max(...analytics.dailyData.map(d => d.hours)) || 1
-                        const heightPercentage = (day.hours / maxHours) * 100
-                        const approvedPercentage = day.hours > 0 ? (day.approved / day.hours) * 100 : 0
-                        const pendingPercentage = day.hours > 0 ? (day.pending / day.hours) * 100 : 0
-                        const rejectedPercentage = day.hours > 0 ? (day.rejected / day.hours) * 100 : 0
+                  <div className="min-w-[800px] relative">
+                    {/* Y-axis labels and grid */}
+                    <div className="flex">
+                      <div className="w-12 pr-2 flex flex-col justify-between py-4 text-right">
+                        {(() => {
+                          const maxHours = Math.max(...analytics.dailyData.map(d => d.hours)) || 10
+                          const step = Math.ceil(maxHours / 4)
+                          return [4, 3, 2, 1, 0].map((i) => (
+                            <span key={i} className="text-xs text-gray-500 dark:text-gray-400">
+                              {i === 0 ? '0' : `${step * i}`}h
+                            </span>
+                          ))
+                        })()}
+                      </div>
+                      
+                      {/* Chart area */}
+                      <div className="flex-1 relative h-64 border-l border-b border-gray-300 dark:border-gray-600">
+                        {/* Horizontal grid lines */}
+                        <div className="absolute inset-0">
+                          {[0, 25, 50, 75, 100].map((percent) => (
+                            <div
+                              key={percent}
+                              className="absolute w-full border-t border-gray-200 dark:border-gray-700/50"
+                              style={{ bottom: `${percent}%` }}
+                            />
+                          ))}
+                        </div>
                         
-                        return (
-                          <div key={index} className="flex-1 flex flex-col items-center group">
-                            <div className="w-full flex flex-col justify-end h-64 relative">
-                              {/* Valor total no topo ao hover */}
-                              <div className="absolute left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none" style={{ bottom: `calc(${heightPercentage}% + 10px)`, zIndex: 50 }}>
-                                <div className="bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-2xl whitespace-nowrap border border-gray-700">
-                                  <div className="font-semibold text-sm mb-1">{day.hours.toFixed(1)}h</div>
-                                  {day.approved > 0 && (
-                                    <div className="flex items-center gap-1">
-                                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                      <span className="text-green-400">{day.approved.toFixed(1)}h</span>
+                        {/* Bars container */}
+                        <div className="absolute inset-0 flex items-end justify-around px-4">
+                          {analytics.dailyData.map((day, index) => {
+                            const maxHours = Math.max(...analytics.dailyData.map(d => d.hours)) || 10
+                            const approvedHeight = (day.approved / maxHours) * 100
+                            const pendingHeight = (day.pending / maxHours) * 100
+                            const rejectedHeight = (day.rejected / maxHours) * 100
+                            
+                            return (
+                              <div key={index} className="flex gap-1 items-end group relative" style={{ width: `${100 / analytics.dailyData.length - 2}%` }}>
+                                {/* Tooltip */}
+                                <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50">
+                                  <div className="bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-xl whitespace-nowrap">
+                                    <div className="font-semibold text-sm mb-1">{format(parseISO(day.date), 'dd/MM')}</div>
+                                    <div className="space-y-1">
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-emerald-500 rounded-sm"></div>
+                                        <span>Aprovadas: {day.approved.toFixed(1)}h</span>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-amber-500 rounded-sm"></div>
+                                        <span>Pendentes: {day.pending.toFixed(1)}h</span>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-red-500 rounded-sm"></div>
+                                        <span>Rejeitadas: {day.rejected.toFixed(1)}h</span>
+                                      </div>
+                                      <div className="border-t border-gray-700 mt-2 pt-2">
+                                        <span className="font-semibold">Total: {day.hours.toFixed(1)}h</span>
+                                      </div>
                                     </div>
-                                  )}
-                                  {day.pending > 0 && (
-                                    <div className="flex items-center gap-1">
-                                      <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                                      <span className="text-yellow-400">{day.pending.toFixed(1)}h</span>
-                                    </div>
-                                  )}
-                                  {day.rejected > 0 && (
-                                    <div className="flex items-center gap-1">
-                                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                                      <span className="text-red-400">{day.rejected.toFixed(1)}h</span>
-                                    </div>
-                                  )}
-                                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1 w-2 h-2 bg-black/95 rotate-45"></div>
+                                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                                  </div>
+                                </div>
+                                
+                                {/* Approved bar */}
+                                <div className="flex-1 flex flex-col justify-end">
+                                  <div
+                                    className="w-full bg-emerald-500 hover:bg-emerald-600 rounded-t transition-all duration-300 relative"
+                                    style={{ height: `${approvedHeight}%`, minHeight: day.approved > 0 ? '2px' : '0' }}
+                                  >
+                                    {day.approved > 0 && (
+                                      <div className="absolute -top-5 left-0 right-0 text-center">
+                                        <span className="text-xs font-medium text-gray-600 dark:text-gray-400 hidden group-hover:inline">
+                                          {day.approved.toFixed(1)}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                                
+                                {/* Pending bar */}
+                                <div className="flex-1 flex flex-col justify-end">
+                                  <div
+                                    className="w-full bg-amber-500 hover:bg-amber-600 rounded-t transition-all duration-300 relative"
+                                    style={{ height: `${pendingHeight}%`, minHeight: day.pending > 0 ? '2px' : '0' }}
+                                  >
+                                    {day.pending > 0 && (
+                                      <div className="absolute -top-5 left-0 right-0 text-center">
+                                        <span className="text-xs font-medium text-gray-600 dark:text-gray-400 hidden group-hover:inline">
+                                          {day.pending.toFixed(1)}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                                
+                                {/* Rejected bar */}
+                                <div className="flex-1 flex flex-col justify-end">
+                                  <div
+                                    className="w-full bg-red-500 hover:bg-red-600 rounded-t transition-all duration-300 relative"
+                                    style={{ height: `${rejectedHeight}%`, minHeight: day.rejected > 0 ? '2px' : '0' }}
+                                  >
+                                    {day.rejected > 0 && (
+                                      <div className="absolute -top-5 left-0 right-0 text-center">
+                                        <span className="text-xs font-medium text-gray-600 dark:text-gray-400 hidden group-hover:inline">
+                                          {day.rejected.toFixed(1)}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
-                              
-                              {/* Barra com gradiente e animação */}
-                              <div 
-                                className="w-full rounded-t-lg overflow-hidden relative transition-all duration-500 hover:scale-105 cursor-pointer"
-                                style={{ 
-                                  height: `${heightPercentage}%`,
-                                  background: 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%)'
-                                }}
-                              >
-                                {/* Fundo com opacidade */}
-                                <div className="absolute inset-0 bg-gray-600/20 backdrop-blur-sm"></div>
-                                
-                                {/* Barra de aprovadas (verde) com gradiente */}
-                                <div 
-                                  className="absolute bottom-0 w-full transition-all duration-300"
-                                  style={{ 
-                                    height: `${approvedPercentage}%`,
-                                    background: 'linear-gradient(180deg, #10b981 0%, #059669 100%)',
-                                    boxShadow: '0 -2px 10px rgba(16, 185, 129, 0.3)'
-                                  }}
-                                />
-                                
-                                {/* Barra de pendentes (amarelo) com gradiente */}
-                                {pendingPercentage > 0 && (
-                                  <div 
-                                    className="absolute w-full transition-all duration-300"
-                                    style={{ 
-                                      height: `${pendingPercentage}%`,
-                                      bottom: `${approvedPercentage}%`,
-                                      background: 'linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%)',
-                                      boxShadow: '0 -2px 10px rgba(251, 191, 36, 0.3)'
-                                    }}
-                                  />
-                                )}
-                                
-                                {/* Barra de rejeitadas (vermelho) com gradiente */}
-                                {rejectedPercentage > 0 && (
-                                  <div 
-                                    className="absolute w-full transition-all duration-300"
-                                    style={{ 
-                                      height: `${rejectedPercentage}%`,
-                                      bottom: `${approvedPercentage + pendingPercentage}%`,
-                                      background: 'linear-gradient(180deg, #ef4444 0%, #dc2626 100%)',
-                                      boxShadow: '0 -2px 10px rgba(239, 68, 68, 0.3)'
-                                    }}
-                                  />
-                                )}
-                                
-                                {/* Linha de topo animada */}
-                                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-white to-transparent opacity-50"></div>
-                              </div>
-                            </div>
-                            <div className="text-xs text-gray-400 mt-3 font-medium">
+                            )
+                          })}
+                        </div>
+                        
+                        {/* X-axis labels */}
+                        <div className="absolute -bottom-6 left-0 right-0 flex justify-around px-4">
+                          {analytics.dailyData.map((day, index) => (
+                            <div key={index} className="text-xs text-gray-500 dark:text-gray-400 text-center" style={{ width: `${100 / analytics.dailyData.length - 2}%` }}>
                               {format(parseISO(day.date), 'dd/MM')}
                             </div>
-                          </div>
-                        )
-                      })}
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-center gap-6 mt-6 pt-4 border-t border-gray-700/30">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-gradient-to-b from-green-400 to-green-600 shadow-sm"></div>
-                    <span className="text-xs text-gray-400 font-medium">Aprovadas</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-gradient-to-b from-yellow-400 to-yellow-600 shadow-sm"></div>
-                    <span className="text-xs text-gray-400 font-medium">Pendentes</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-gradient-to-b from-red-400 to-red-600 shadow-sm"></div>
-                    <span className="text-xs text-gray-400 font-medium">Rejeitadas</span>
+                    
+                    {/* Legend */}
+                    <div className="flex items-center justify-center gap-6 mt-10 pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-emerald-500 rounded"></div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Aprovadas</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-amber-500 rounded"></div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Pendentes</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-red-500 rounded"></div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Rejeitadas</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
