@@ -1,12 +1,20 @@
 {
-  "version": "1.5.5",
-  "buildDate": "2025-09-08T16:50:00Z",
+  "version": "1.5.7",
+  "buildDate": "2025-01-09T19:45:00Z",
   "features": {
-    "timesheets": true,
-    "timesheetPermissions": true,
-    "timesheetApproval": true,
-    "modernUI": true
+    "tooltipsFixed": true,
+    "infoIconsKPI": true,
+    "ticketDeletionValidation": true,
+    "filtersOnTop": true,
+    "uppercaseTitles": true,
+    "sidebarReorganized": true
   },
-  "lastDeployCommit": "d5a15f4",
-  "status": "production-ready"
+  "lastChanges": [
+    "Corrigido tooltip do gráfico que estava sendo cortado",
+    "Melhorado UX dos tooltips com ícones Info",
+    "Adicionada validação para impedir exclusão de tickets com apontamentos",
+    "Filtros movidos para o topo das páginas",
+    "Títulos de tickets em maiúsculas",
+    "Sidebar reorganizada logicamente"
+  ]
 }
