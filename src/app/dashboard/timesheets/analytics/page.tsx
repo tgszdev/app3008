@@ -1191,7 +1191,7 @@ export default function TimesheetsAnalyticsPage() {
                             'text-indigo-500'
                           ]
                           
-                          return analytics.categoryDistribution.slice(0, 6).map((category, index) => {
+                          return analytics?.categoryDistribution.slice(0, 6).map((category, index) => {
                             const startAngle = (cumulativePercentage * 360) / 100
                             const endAngle = ((cumulativePercentage + category.percentage) * 360) / 100
                             cumulativePercentage += category.percentage
