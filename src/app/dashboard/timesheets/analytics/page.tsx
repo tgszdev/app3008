@@ -762,7 +762,7 @@ export default function TimesheetsAnalyticsPage() {
                 
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-help group relative">
                   <div className="flex items-center justify-between mb-2">
-                    <BarChart className="h-8 w-8 text-yellow-500" />
+                    <BarChart3 className="h-8 w-8 text-yellow-500" />
                     <span className="text-2xl font-bold text-gray-900 dark:text-white">
                       {analytics.averageHoursPerDay.toFixed(1)}h
                     </span>
