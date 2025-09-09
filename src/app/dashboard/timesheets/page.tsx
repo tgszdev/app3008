@@ -1058,33 +1058,6 @@ export default function TimesheetsPage() {
                     />
                   </div>
                 </div>
-                
-                {/* Botões de seleção rápida */}
-                <div className="mt-3">
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      { label: '0h30', value: '0:30' },
-                      { label: '1h', value: '1:00' },
-                      { label: '2h', value: '2:00' },
-                      { label: '4h', value: '4:00' },
-                      { label: '6h', value: '6:00' },
-                      { label: '8h', value: '8:00' }
-                    ].map(({ label, value }) => (
-                      <button
-                        key={value}
-                        type="button"
-                        onClick={() => setHoursWorked(value)}
-                        className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
-                          hoursWorked === value
-                            ? 'bg-blue-600 text-white border border-blue-500'
-                            : 'bg-slate-800 dark:bg-slate-900 text-slate-300 hover:bg-slate-700 dark:hover:bg-slate-800 border border-slate-600 dark:border-slate-700'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
               </div>
               
               <div>
