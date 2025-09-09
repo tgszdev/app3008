@@ -103,6 +103,7 @@ export default function TimesheetsPage() {
   const [filterTicket, setFilterTicket] = useState<string>('all')
   const [filterStartDate, setFilterStartDate] = useState(format(startOfMonth(new Date()), 'yyyy-MM-dd'))
   const [filterEndDate, setFilterEndDate] = useState(format(endOfMonth(new Date()), 'yyyy-MM-dd'))
+  const [quickSearchTicket, setQuickSearchTicket] = useState<string>('') // Busca rápida por número de chamado
   
   // Expanded rows
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
@@ -398,6 +399,42 @@ export default function TimesheetsPage() {
         </div>
         
         <div className="flex gap-2 w-full sm:w-auto">
+          {/* Busca Rápida por Número de Chamado */}
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="#chamado"
+              value={quickSearchTicket}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9]/g, '')
+                setQuickSearchTicket(value)
+                if (value) {
+                  const foundTicket = tickets.find(t => t.ticket_number.toString() === value)
+                  if (foundTicket) {
+                    setFilterTicket(foundTicket.id)
+                  } else {
+                    setFilterTicket('all')
+                  }
+                } else {
+                  setFilterTicket('all')
+                }
+              }}
+              className="w-20 sm:w-24 px-2 py-2 pl-7 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-sm focus:w-32 transition-all"
+            />
+            <Ticket className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            {quickSearchTicket && (
+              <button
+                onClick={() => {
+                  setQuickSearchTicket('')
+                  setFilterTicket('all')
+                }}
+                className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-0.5"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            )}
+          </div>
+          
           <button
             onClick={() => setShowFilters(!showFilters)}
             className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm sm:text-base"
@@ -445,13 +482,24 @@ export default function TimesheetsPage() {
               </label>
               <select
                 value={filterTicket}
-                onChange={(e) => setFilterTicket(e.target.value)}
+                onChange={(e) => {
+                  setFilterTicket(e.target.value)
+                  // Atualizar busca rápida se selecionar um ticket específico
+                  if (e.target.value !== 'all') {
+                    const ticket = tickets.find(t => t.id === e.target.value)
+                    if (ticket) {
+                      setQuickSearchTicket(ticket.ticket_number.toString())
+                    }
+                  } else {
+                    setQuickSearchTicket('')
+                  }
+                }}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="all">Todos</option>
                 {tickets.map(ticket => (
                   <option key={ticket.id} value={ticket.id}>
-                    #{ticket.ticket_number} - {ticket.title.toUpperCase()}
+                    #{String(ticket.ticket_number).padStart(3, '0')} - {formatTicketTitle(ticket.title, 30)}
                   </option>
                 ))}
               </select>
@@ -943,8 +991,8 @@ export default function TimesheetsPage() {
         </div>
       )}
 
-      {/* Lista Completa de Apontamentos (apenas se houver filtros ativos) */}
-      {(filterStatus !== 'all' || filterTicket !== 'all' || filterStartDate || filterEndDate) && timesheets.length > 0 && (
+      {/* Seção de Resultados Filtrados removida - os resultados já aparecem nos cards acima */}
+      {false && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
