@@ -1023,7 +1023,7 @@ export default function TimesheetsAnalyticsPage() {
                         <div key={index} className="flex items-center justify-between text-sm">
                           <div className="flex items-center gap-2">
                             <div className={`w-3 h-3 rounded ${colors[index % colors.length]}`} />
-                            <span className="text-slate-300">{category.category}</span>
+                            <span className="text-slate-300">{category.category.toUpperCase()}</span>
                           </div>
                           <div className="flex items-center gap-3">
                             <span className="text-slate-500 text-xs">
