@@ -910,73 +910,136 @@ export default function TimesheetsAnalyticsPage() {
 
               {/* Horas por Categoria e Prioridade */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* Horas por Categoria */}
-                <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl shadow-xl p-6 relative">
+                {/* Horas por Categoria - Gráfico Polar */}
+                <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl shadow-xl p-6 relative overflow-hidden">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-white">
                       Horas por Categoria
                     </h3>
-                    <FolderOpen className="h-5 w-5 text-slate-500" />
-                  </div>
-                  {/* Info Icon with Popover */}
-                  <div className="absolute top-2 right-2">
                     <div className="group/tooltip relative">
                       <Info className="h-4 w-4 text-slate-500 hover:text-slate-300 cursor-help" />
                       <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
-                        <p className="font-semibold mb-1">Horas por Categoria</p>
-                        <p>Distribuição total de horas trabalhadas por categoria de chamado</p>
+                        <p className="font-semibold mb-1">Gráfico Polar</p>
+                        <p>Visualização da distribuição de horas por categoria em formato polar</p>
                         <div className="absolute top-0 right-2 transform -translate-y-1 w-2 h-2 bg-gray-900 rotate-45"></div>
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-4">
+                  
+                  {/* Polar Area Chart */}
+                  <div className="relative h-64 flex items-center justify-center">
+                    {analytics?.categoryDistribution.length > 0 ? (
+                      <div className="relative w-56 h-56">
+                        {/* Background circles */}
+                        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 224 224">
+                          <defs>
+                            <radialGradient id="polarGradient">
+                              <stop offset="0%" stopColor="rgba(148, 163, 184, 0.1)" />
+                              <stop offset="100%" stopColor="rgba(148, 163, 184, 0.05)" />
+                            </radialGradient>
+                          </defs>
+                          {/* Grid circles */}
+                          {[80, 60, 40, 20].map((radius) => (
+                            <circle
+                              key={radius}
+                              cx="112"
+                              cy="112"
+                              r={radius * 1.12}
+                              fill="none"
+                              stroke="rgba(148, 163, 184, 0.1)"
+                              strokeWidth="1"
+                            />
+                          ))}
+                          
+                          {/* Polar segments */}
+                          {analytics.categoryDistribution.slice(0, 5).map((category, index) => {
+                            const totalHours = analytics.categoryDistribution.slice(0, 5).reduce((sum, cat) => sum + cat.hours, 0)
+                            const angle = (360 / Math.min(5, analytics.categoryDistribution.length)) * index
+                            const nextAngle = (360 / Math.min(5, analytics.categoryDistribution.length)) * (index + 1)
+                            const radius = (category.hours / Math.max(...analytics.categoryDistribution.slice(0, 5).map(c => c.hours))) * 90
+                            
+                            const startAngleRad = (angle - 90) * Math.PI / 180
+                            const endAngleRad = (nextAngle - 90) * Math.PI / 180
+                            
+                            const x1 = 112 + radius * Math.cos(startAngleRad)
+                            const y1 = 112 + radius * Math.sin(startAngleRad)
+                            const x2 = 112 + radius * Math.cos(endAngleRad)
+                            const y2 = 112 + radius * Math.sin(endAngleRad)
+                            
+                            const largeArcFlag = (nextAngle - angle) > 180 ? 1 : 0
+                            
+                            const colors = [
+                              'rgba(236, 72, 153, 0.8)', // Pink
+                              'rgba(59, 130, 246, 0.8)', // Blue  
+                              'rgba(34, 197, 94, 0.8)',  // Green
+                              'rgba(251, 146, 60, 0.8)', // Orange
+                              'rgba(168, 85, 247, 0.8)'  // Purple
+                            ]
+                            
+                            return (
+                              <g key={index} className="group/segment cursor-pointer">
+                                <path
+                                  d={`M 112 112 L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`}
+                                  fill={colors[index % colors.length]}
+                                  stroke="rgba(30, 41, 59, 0.5)"
+                                  strokeWidth="2"
+                                  className="transition-all duration-300 hover:opacity-90"
+                                />
+                                
+                                {/* Label */}
+                                <text
+                                  x={112 + (radius * 0.7) * Math.cos((angle + (nextAngle - angle) / 2 - 90) * Math.PI / 180)}
+                                  y={112 + (radius * 0.7) * Math.sin((angle + (nextAngle - angle) / 2 - 90) * Math.PI / 180)}
+                                  textAnchor="middle"
+                                  dominantBaseline="middle"
+                                  className="fill-white text-xs font-semibold opacity-0 group-hover/segment:opacity-100 transition-opacity"
+                                >
+                                  {category.hours.toFixed(0)}h
+                                </text>
+                              </g>
+                            )
+                          })}
+                        </svg>
+                      </div>
+                    ) : (
+                      <div className="text-center py-4 text-slate-400">
+                        <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        <p className="text-sm">Nenhuma categoria encontrada</p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Legend */}
+                  <div className="mt-4 space-y-2">
                     {analytics?.categoryDistribution.slice(0, 5).map((category, index) => {
-                      // Cores diferentes para cada categoria
                       const colors = [
-                        'from-purple-500 to-pink-500',
-                        'from-blue-500 to-cyan-500',
-                        'from-green-500 to-emerald-500',
-                        'from-orange-500 to-red-500',
-                        'from-indigo-500 to-purple-500'
+                        'bg-pink-500',
+                        'bg-blue-500',
+                        'bg-green-500',
+                        'bg-orange-500',
+                        'bg-purple-500'
                       ]
                       return (
-                        <div key={index} className="group">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="text-sm font-medium text-slate-100">
-                              {category.category}
-                            </span>
-                            <div className="flex items-center gap-3">
-                              <span className="text-xs text-slate-400">
-                                {category.ticketCount} {category.ticketCount === 1 ? 'chamado' : 'chamados'}
-                              </span>
-                              <span className="text-sm font-bold text-white">
-                                {category.hours.toFixed(1)}h
-                              </span>
-                            </div>
+                        <div key={index} className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-3 h-3 rounded ${colors[index % colors.length]}`} />
+                            <span className="text-slate-300">{category.category}</span>
                           </div>
-                          <div className="relative">
-                            <div className="bg-slate-700/50 rounded-full h-3 overflow-hidden">
-                              <div 
-                                className={`bg-gradient-to-r ${colors[index % colors.length]} h-full rounded-full transition-all duration-500 relative`}
-                                style={{ width: `${category.percentage}%` }}
-                              >
-                                <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                              </div>
-                            </div>
-                            <span className="absolute -bottom-5 left-0 text-xs text-slate-500">
-                              {category.percentage.toFixed(1)}% do total
+                          <div className="flex items-center gap-3">
+                            <span className="text-slate-500 text-xs">
+                              {category.ticketCount} chamado{category.ticketCount !== 1 ? 's' : ''}
+                            </span>
+                            <span className="text-white font-semibold">
+                              {category.hours.toFixed(0)}h
+                            </span>
+                            <span className="text-slate-400 text-xs">
+                              {category.percentage.toFixed(0)}%
                             </span>
                           </div>
                         </div>
                       )
                     })}
                   </div>
-                  {analytics?.categoryDistribution.length === 0 && (
-                    <div className="text-center py-4 text-slate-400">
-                      <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">Nenhuma categoria encontrada</p>
-                    </div>
-                  )}
                 </div>
 
                 {/* Horas por Prioridade */}
@@ -1106,140 +1169,183 @@ export default function TimesheetsAnalyticsPage() {
                   </div>
                 </div>
                 <div className="relative">
-                  {/* Y-axis scale */}
-                  <div className="absolute left-0 top-0 bottom-8 w-12 flex flex-col justify-between text-right pr-2">
-                    {(() => {
-                      const maxHours = Math.max(...analytics.dailyData.map(d => d.hours)) || 10
-                      const roundedMax = Math.ceil(maxHours / 5) * 5
-                      return [roundedMax, Math.round(roundedMax * 0.75), Math.round(roundedMax * 0.5), Math.round(roundedMax * 0.25), 0].map((value) => (
-                        <span key={value} className="text-xs text-slate-400">
-                          {value}h
-                        </span>
-                      ))
-                    })()}
-                  </div>
-                  
-                  {/* Chart area */}
-                  <div className="ml-14 relative h-64">
-                    {/* Grid lines */}
-                    <div className="absolute inset-0">
-                      {[0, 25, 50, 75, 100].map((percent) => (
-                        <div
-                          key={percent}
-                          className="absolute w-full border-t border-slate-700/30"
-                          style={{ top: `${percent}%` }}
+                  {/* Line Chart */}
+                  <div className="relative h-64">
+                    <svg className="w-full h-full" viewBox="0 0 800 256">
+                      <defs>
+                        <linearGradient id="approvedGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="rgba(16, 185, 129, 0.3)" />
+                          <stop offset="100%" stopColor="rgba(16, 185, 129, 0)" />
+                        </linearGradient>
+                        <linearGradient id="pendingGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="rgba(245, 158, 11, 0.3)" />
+                          <stop offset="100%" stopColor="rgba(245, 158, 11, 0)" />
+                        </linearGradient>
+                        <linearGradient id="rejectedGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="rgba(239, 68, 68, 0.3)" />
+                          <stop offset="100%" stopColor="rgba(239, 68, 68, 0)" />
+                        </linearGradient>
+                      </defs>
+                      
+                      {/* Grid lines */}
+                      {[0, 64, 128, 192, 256].map((y) => (
+                        <line
+                          key={y}
+                          x1="50"
+                          y1={y}
+                          x2="750"
+                          y2={y}
+                          stroke="rgba(148, 163, 184, 0.1)"
+                          strokeWidth="1"
                         />
                       ))}
-                    </div>
-                    
-                    {/* Bars */}
-                    <div className="relative h-full flex items-end gap-2 px-2">
-                      {analytics.dailyData.map((day, index) => {
+                      
+                      {/* Y-axis labels */}
+                      {(() => {
                         const maxHours = Math.max(...analytics.dailyData.map(d => d.hours)) || 10
                         const roundedMax = Math.ceil(maxHours / 5) * 5
-                        const totalHeight = (day.hours / roundedMax) * 100
-                        const approvedHeight = day.hours > 0 ? (day.approved / day.hours) * 100 : 0
-                        const pendingHeight = day.hours > 0 ? (day.pending / day.hours) * 100 : 0
-                        const rejectedHeight = day.hours > 0 ? (day.rejected / day.hours) * 100 : 0
+                        return [0, 0.25, 0.5, 0.75, 1].map((ratio, i) => (
+                          <text
+                            key={i}
+                            x="40"
+                            y={256 - (ratio * 256) + 4}
+                            textAnchor="end"
+                            className="fill-slate-400 text-xs"
+                          >
+                            {Math.round(roundedMax * ratio)}h
+                          </text>
+                        ))
+                      })()}
+                      
+                      {/* Lines and areas */}
+                      {(() => {
+                        const maxHours = Math.max(...analytics.dailyData.map(d => d.hours)) || 10
+                        const roundedMax = Math.ceil(maxHours / 5) * 5
+                        const xStep = 700 / (analytics.dailyData.length - 1 || 1)
+                        
+                        // Create path data for each status
+                        const approvedPath = analytics.dailyData.map((day, i) => {
+                          const x = 50 + (i * xStep)
+                          const y = 256 - ((day.approved / roundedMax) * 256)
+                          return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
+                        }).join(' ')
+                        
+                        const pendingPath = analytics.dailyData.map((day, i) => {
+                          const x = 50 + (i * xStep)
+                          const y = 256 - ((day.pending / roundedMax) * 256)
+                          return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
+                        }).join(' ')
+                        
+                        const rejectedPath = analytics.dailyData.map((day, i) => {
+                          const x = 50 + (i * xStep)
+                          const y = 256 - ((day.rejected / roundedMax) * 256)
+                          return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
+                        }).join(' ')
                         
                         return (
-                          <div key={index} className="flex-1 group relative">
-                            {/* Tooltip */}
-                            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50">
-                              <div className="bg-slate-900 text-white text-xs rounded-lg px-3 py-2 shadow-xl whitespace-nowrap border border-slate-700">
-                                <div className="font-semibold text-sm mb-1">{format(parseISO(day.date), 'dd/MM')}</div>
-                                <div className="space-y-1">
-                                  {day.approved > 0 && (
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-2 h-2 bg-emerald-500 rounded"></div>
-                                      <span>Aprovadas: {day.approved.toFixed(1)}h</span>
-                                    </div>
-                                  )}
-                                  {day.pending > 0 && (
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-2 h-2 bg-amber-500 rounded"></div>
-                                      <span>Pendentes: {day.pending.toFixed(1)}h</span>
-                                    </div>
-                                  )}
-                                  {day.rejected > 0 && (
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-2 h-2 bg-red-500 rounded"></div>
-                                      <span>Rejeitadas: {day.rejected.toFixed(1)}h</span>
-                                    </div>
-                                  )}
-                                  <div className="border-t border-slate-700 mt-2 pt-2">
-                                    <span className="font-semibold">Total: {day.hours.toFixed(1)}h</span>
-                                  </div>
-                                </div>
-                                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1 w-2 h-2 bg-slate-900 rotate-45"></div>
-                              </div>
-                            </div>
+                          <>
+                            {/* Area fills */}
+                            <path
+                              d={`${approvedPath} L ${50 + ((analytics.dailyData.length - 1) * xStep)} 256 L 50 256 Z`}
+                              fill="url(#approvedGradient)"
+                              opacity="0.5"
+                            />
+                            <path
+                              d={`${pendingPath} L ${50 + ((analytics.dailyData.length - 1) * xStep)} 256 L 50 256 Z`}
+                              fill="url(#pendingGradient)"
+                              opacity="0.5"
+                            />
+                            <path
+                              d={`${rejectedPath} L ${50 + ((analytics.dailyData.length - 1) * xStep)} 256 L 50 256 Z`}
+                              fill="url(#rejectedGradient)"
+                              opacity="0.5"
+                            />
                             
-                            {/* Stacked bar */}
-                            <div className="relative h-full flex items-end">
-                              <div 
-                                className="w-full relative rounded-t overflow-hidden transition-all duration-300 hover:opacity-90 cursor-pointer"
-                                style={{ height: `${totalHeight}%`, minHeight: day.hours > 0 ? '4px' : '0' }}
-                              >
-                                {/* Approved portion */}
-                                {day.approved > 0 && (
-                                  <div 
-                                    className="absolute bottom-0 w-full bg-emerald-500"
-                                    style={{ height: `${approvedHeight}%` }}
-                                  />
-                                )}
-                                
-                                {/* Pending portion */}
-                                {day.pending > 0 && (
-                                  <div 
-                                    className="absolute w-full bg-amber-500"
-                                    style={{ 
-                                      height: `${pendingHeight}%`,
-                                      bottom: `${approvedHeight}%`
-                                    }}
-                                  />
-                                )}
-                                
-                                {/* Rejected portion */}
-                                {day.rejected > 0 && (
-                                  <div 
-                                    className="absolute w-full bg-red-500"
-                                    style={{ 
-                                      height: `${rejectedHeight}%`,
-                                      bottom: `${approvedHeight + pendingHeight}%`
-                                    }}
-                                  />
-                                )}
-                                
-                                {/* Value label on top */}
-                                {day.hours > 0 && (
-                                  <div className="absolute -top-5 left-0 right-0 text-center">
-                                    <span className="text-xs font-medium text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                                      {day.hours.toFixed(1)}h
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
+                            {/* Lines */}
+                            <path
+                              d={approvedPath}
+                              fill="none"
+                              stroke="rgb(16, 185, 129)"
+                              strokeWidth="2"
+                              className="drop-shadow-lg"
+                            />
+                            <path
+                              d={pendingPath}
+                              fill="none"
+                              stroke="rgb(245, 158, 11)"
+                              strokeWidth="2"
+                              className="drop-shadow-lg"
+                            />
+                            <path
+                              d={rejectedPath}
+                              fill="none"
+                              stroke="rgb(239, 68, 68)"
+                              strokeWidth="2"
+                              className="drop-shadow-lg"
+                            />
+                            
+                            {/* Data points */}
+                            {analytics.dailyData.map((day, i) => {
+                              const x = 50 + (i * xStep)
+                              const yApproved = 256 - ((day.approved / roundedMax) * 256)
+                              const yPending = 256 - ((day.pending / roundedMax) * 256)
+                              const yRejected = 256 - ((day.rejected / roundedMax) * 256)
+                              
+                              return (
+                                <g key={i}>
+                                  {/* Approved points */}
+                                  <circle
+                                    cx={x}
+                                    cy={yApproved}
+                                    r="4"
+                                    fill="rgb(16, 185, 129)"
+                                    className="hover:r-6 transition-all cursor-pointer"
+                                  >
+                                    <title>{`${format(parseISO(day.date), 'dd/MM')}: ${day.approved.toFixed(1)}h aprovadas`}</title>
+                                  </circle>
+                                  
+                                  {/* Pending points */}
+                                  <circle
+                                    cx={x}
+                                    cy={yPending}
+                                    r="4"
+                                    fill="rgb(245, 158, 11)"
+                                    className="hover:r-6 transition-all cursor-pointer"
+                                  >
+                                    <title>{`${format(parseISO(day.date), 'dd/MM')}: ${day.pending.toFixed(1)}h pendentes`}</title>
+                                  </circle>
+                                  
+                                  {/* Rejected points */}
+                                  <circle
+                                    cx={x}
+                                    cy={yRejected}
+                                    r="4"
+                                    fill="rgb(239, 68, 68)"
+                                    className="hover:r-6 transition-all cursor-pointer"
+                                  >
+                                    <title>{`${format(parseISO(day.date), 'dd/MM')}: ${day.rejected.toFixed(1)}h rejeitadas`}</title>
+                                  </circle>
+                                  
+                                  {/* X-axis label */}
+                                  <text
+                                    x={x}
+                                    y="270"
+                                    textAnchor="middle"
+                                    className="fill-slate-400 text-xs"
+                                  >
+                                    {format(parseISO(day.date), 'dd/MM')}
+                                  </text>
+                                </g>
+                              )
+                            })}
+                          </>
                         )
-                      })}
-                    </div>
-                    
-                    {/* X-axis labels */}
-                    <div className="absolute -bottom-6 left-0 right-0 flex gap-2 px-2">
-                      {analytics.dailyData.map((day, index) => (
-                        <div key={index} className="flex-1 text-center">
-                          <span className="text-xs text-slate-400">
-                            {format(parseISO(day.date), 'dd/MM')}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+                      })()}
+                    </svg>
                   </div>
                   
                   {/* Legend */}
-                  <div className="flex items-center justify-center gap-6 mt-10 pt-4 border-t border-slate-700/30">
+                  <div className="flex items-center justify-center gap-6 mt-4 pt-4 border-t border-slate-700/30">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 bg-emerald-500 rounded"></div>
                       <span className="text-xs text-slate-400">Aprovadas</span>
@@ -1298,43 +1404,200 @@ export default function TimesheetsAnalyticsPage() {
                   </div>
                 </div>
 
-                {/* Evolução Mensal */}
+                {/* Evolução Mensal - Gráfico de Linhas */}
                 <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl shadow-xl p-6">
                   <h3 className="text-lg font-semibold text-white mb-4">
                     Evolução Mensal
                   </h3>
-                  <div className="space-y-3">
-                    {analytics.monthlyTrend.map((month, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 hover:bg-slate-700/30 rounded-lg transition-colors">
-                        <span className="font-medium text-slate-200">
-                          {month.month}
-                        </span>
-                        <div className="flex items-center gap-3">
-                          <div className="text-right">
-                            <span className="text-xl font-bold text-white block">
-                              {month.hours.toFixed(0)}h
-                            </span>
-                            {index > 0 && month.growth !== 0 && (
-                              <span className={`flex items-center justify-end gap-1 text-xs mt-1 ${
-                                month.growth > 0 ? 'text-emerald-400' : 'text-red-400'
-                              }`}>
-                                {month.growth > 0 ? (
-                                  <>
-                                    <TrendingUp className="h-3 w-3" />
-                                    +{Math.abs(month.growth).toFixed(0)}%
-                                  </>
-                                ) : (
-                                  <>
-                                    <TrendingDown className="h-3 w-3" />
-                                    -{Math.abs(month.growth).toFixed(0)}%
-                                  </>
-                                )}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="relative h-48">
+                    <svg className="w-full h-full" viewBox="0 0 400 192">
+                      <defs>
+                        <linearGradient id="monthlyGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="rgba(168, 85, 247, 0.5)" />
+                          <stop offset="100%" stopColor="rgba(168, 85, 247, 0)" />
+                        </linearGradient>
+                      </defs>
+                      
+                      {/* Grid lines */}
+                      {[0, 48, 96, 144, 192].map((y) => (
+                        <line
+                          key={y}
+                          x1="40"
+                          y1={y}
+                          x2="360"
+                          y2={y}
+                          stroke="rgba(148, 163, 184, 0.1)"
+                          strokeWidth="1"
+                        />
+                      ))}
+                      
+                      {/* Y-axis labels */}
+                      {(() => {
+                        const maxHours = Math.max(...analytics.monthlyTrend.map(m => m.hours)) || 100
+                        const roundedMax = Math.ceil(maxHours / 50) * 50
+                        return [0, 0.25, 0.5, 0.75, 1].map((ratio, i) => (
+                          <text
+                            key={i}
+                            x="35"
+                            y={192 - (ratio * 192) + 4}
+                            textAnchor="end"
+                            className="fill-slate-400 text-xs"
+                          >
+                            {Math.round(roundedMax * ratio)}
+                          </text>
+                        ))
+                      })()}
+                      
+                      {/* Line and area */}
+                      {(() => {
+                        const maxHours = Math.max(...analytics.monthlyTrend.map(m => m.hours)) || 100
+                        const roundedMax = Math.ceil(maxHours / 50) * 50
+                        const xStep = 320 / (analytics.monthlyTrend.length - 1 || 1)
+                        
+                        const linePath = analytics.monthlyTrend.map((month, i) => {
+                          const x = 40 + (i * xStep)
+                          const y = 192 - ((month.hours / roundedMax) * 192)
+                          return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
+                        }).join(' ')
+                        
+                        return (
+                          <>
+                            {/* Area fill */}
+                            <path
+                              d={`${linePath} L ${40 + ((analytics.monthlyTrend.length - 1) * xStep)} 192 L 40 192 Z`}
+                              fill="url(#monthlyGradient)"
+                            />
+                            
+                            {/* Line */}
+                            <path
+                              d={linePath}
+                              fill="none"
+                              stroke="rgb(168, 85, 247)"
+                              strokeWidth="3"
+                              className="drop-shadow-lg"
+                            />
+                            
+                            {/* Data points and labels */}
+                            {analytics.monthlyTrend.map((month, i) => {
+                              const x = 40 + (i * xStep)
+                              const y = 192 - ((month.hours / roundedMax) * 192)
+                              
+                              return (
+                                <g key={i} className="group/point">
+                                  {/* Data point */}
+                                  <circle
+                                    cx={x}
+                                    cy={y}
+                                    r="5"
+                                    fill="rgb(168, 85, 247)"
+                                    stroke="rgb(30, 41, 59)"
+                                    strokeWidth="2"
+                                    className="cursor-pointer"
+                                  />
+                                  
+                                  {/* Hover effect */}
+                                  <circle
+                                    cx={x}
+                                    cy={y}
+                                    r="8"
+                                    fill="rgba(168, 85, 247, 0.3)"
+                                    className="opacity-0 group-hover/point:opacity-100 transition-opacity"
+                                  />
+                                  
+                                  {/* Value label on hover */}
+                                  <g className="opacity-0 group-hover/point:opacity-100 transition-opacity">
+                                    <rect
+                                      x={x - 25}
+                                      y={y - 28}
+                                      width="50"
+                                      height="20"
+                                      rx="4"
+                                      fill="rgb(30, 41, 59)"
+                                      stroke="rgb(168, 85, 247)"
+                                      strokeWidth="1"
+                                    />
+                                    <text
+                                      x={x}
+                                      y={y - 14}
+                                      textAnchor="middle"
+                                      className="fill-white text-xs font-semibold"
+                                    >
+                                      {month.hours.toFixed(0)}h
+                                    </text>
+                                  </g>
+                                  
+                                  {/* Growth indicator */}
+                                  {i > 0 && month.growth !== 0 && (
+                                    <text
+                                      x={x}
+                                      y={y - 10}
+                                      textAnchor="middle"
+                                      className={`text-xs font-semibold ${
+                                        month.growth > 0 ? 'fill-emerald-400' : 'fill-red-400'
+                                      }`}
+                                    >
+                                      {month.growth > 0 ? '+' : ''}{month.growth.toFixed(0)}%
+                                    </text>
+                                  )}
+                                </g>
+                              )
+                            })}
+                          </>
+                        )
+                      })()}
+                      
+                      {/* X-axis labels */}
+                      {analytics.monthlyTrend.map((month, i) => {
+                        const xStep = 320 / (analytics.monthlyTrend.length - 1 || 1)
+                        const x = 40 + (i * xStep)
+                        return (
+                          <text
+                            key={i}
+                            x={x}
+                            y="210"
+                            textAnchor="middle"
+                            className="fill-slate-400 text-xs"
+                            transform={`rotate(-45 ${x} 210)`}
+                          >
+                            {month.month}
+                          </text>
+                        )
+                      })}
+                    </svg>
+                  </div>
+                  
+                  {/* Summary stats */}
+                  <div className="mt-4 pt-4 border-t border-slate-700/30 grid grid-cols-3 gap-4">
+                    <div className="text-center">
+                      <span className="text-xs text-slate-400">Total</span>
+                      <p className="text-lg font-bold text-white">
+                        {analytics.monthlyTrend.reduce((sum, m) => sum + m.hours, 0).toFixed(0)}h
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <span className="text-xs text-slate-400">Média</span>
+                      <p className="text-lg font-bold text-white">
+                        {(analytics.monthlyTrend.reduce((sum, m) => sum + m.hours, 0) / analytics.monthlyTrend.length).toFixed(0)}h
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <span className="text-xs text-slate-400">Tendência</span>
+                      <p className="text-lg font-bold">
+                        {analytics.monthlyTrend[analytics.monthlyTrend.length - 1]?.growth > 0 ? (
+                          <span className="text-emerald-400 flex items-center justify-center gap-1">
+                            <TrendingUp className="h-4 w-4" />
+                            {Math.abs(analytics.monthlyTrend[analytics.monthlyTrend.length - 1]?.growth || 0).toFixed(0)}%
+                          </span>
+                        ) : analytics.monthlyTrend[analytics.monthlyTrend.length - 1]?.growth < 0 ? (
+                          <span className="text-red-400 flex items-center justify-center gap-1">
+                            <TrendingDown className="h-4 w-4" />
+                            {Math.abs(analytics.monthlyTrend[analytics.monthlyTrend.length - 1]?.growth || 0).toFixed(0)}%
+                          </span>
+                        ) : (
+                          <span className="text-slate-400">Estável</span>
+                        )}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
