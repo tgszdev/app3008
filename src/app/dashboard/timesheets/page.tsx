@@ -399,40 +399,46 @@ export default function TimesheetsPage() {
         </div>
         
         <div className="flex gap-2 w-full sm:w-auto">
-          {/* Busca Rápida por Número de Chamado */}
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="#chamado"
-              value={quickSearchTicket}
-              onChange={(e) => {
-                const value = e.target.value.replace(/[^0-9]/g, '')
-                setQuickSearchTicket(value)
-                if (value) {
-                  const foundTicket = tickets.find(t => t.ticket_number.toString() === value)
-                  if (foundTicket) {
-                    setFilterTicket(foundTicket.id)
+          {/* Busca Rápida por Número de Chamado - Melhorada */}
+          <div className="relative group">
+            <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
+              <Ticket className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+              <input
+                type="text"
+                placeholder="#chamado"
+                value={quickSearchTicket}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9]/g, '')
+                  setQuickSearchTicket(value)
+                  if (value) {
+                    const foundTicket = tickets.find(t => t.ticket_number.toString() === value)
+                    if (foundTicket) {
+                      setFilterTicket(foundTicket.id)
+                    } else {
+                      setFilterTicket('all')
+                    }
                   } else {
                     setFilterTicket('all')
                   }
-                } else {
-                  setFilterTicket('all')
-                }
-              }}
-              className="w-20 sm:w-24 px-2 py-2 pl-7 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-sm focus:w-32 transition-all"
-            />
-            <Ticket className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            {quickSearchTicket && (
-              <button
-                onClick={() => {
-                  setQuickSearchTicket('')
-                  setFilterTicket('all')
                 }}
-                className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-0.5"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            )}
+                className="w-16 sm:w-20 bg-transparent border-none outline-none text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-sm focus:w-24 sm:focus:w-32 transition-all"
+              />
+              {quickSearchTicket && (
+                <button
+                  onClick={() => {
+                    setQuickSearchTicket('')
+                    setFilterTicket('all')
+                  }}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+            {/* Tooltip */}
+            <div className="absolute left-0 top-full mt-1 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap">
+              Busca rápida por número
+            </div>
           </div>
           
           <button
@@ -873,7 +879,7 @@ export default function TimesheetsPage() {
                               }}
                               className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border-b border-gray-200 dark:border-gray-700 last:border-0"
                             >
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-3 w-full">
                                 <div className="flex items-center gap-2">
                                   <Ticket className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                                   <span className="font-semibold text-gray-900 dark:text-white">
@@ -881,9 +887,16 @@ export default function TimesheetsPage() {
                                   </span>
                                 </div>
                                 <div className="h-4 w-px bg-gray-300 dark:bg-gray-600" />
-                                <span className="text-sm text-gray-600 dark:text-gray-400 truncate flex-1">
-                                  {formatTicketTitle(ticket.title, 45)}
-                                </span>
+                                <div className="flex-1 min-w-0 group relative">
+                                  <span className="text-sm text-gray-600 dark:text-gray-400 truncate block">
+                                    {formatTicketTitle(ticket.title, 45)}
+                                  </span>
+                                  {/* Tooltip com título completo */}
+                                  <div className="absolute left-0 bottom-full mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-sm rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap max-w-md">
+                                    <div className="text-xs font-medium">{ticket.title.toUpperCase()}</div>
+                                    <div className="absolute left-4 top-full w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-gray-900 dark:border-t-gray-700"></div>
+                                  </div>
+                                </div>
                               </div>
                             </button>
                           ))}

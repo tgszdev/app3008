@@ -1669,6 +1669,9 @@ export default function TimesheetsAnalyticsPage() {
                           Pendentes
                         </th>
                         <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          Rejeitadas
+                        </th>
+                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                           Chamados
                         </th>
                         <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -1697,8 +1700,8 @@ export default function TimesheetsAnalyticsPage() {
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
-                            <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                              {user.totalHours.toFixed(1)}h
+                            <span className="text-lg font-semibold text-gray-900 dark:text-white" title="Aprovadas + Pendentes (sem rejeitadas)">
+                              {(user.approvedHours + user.pendingHours).toFixed(1)}h
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
@@ -1709,6 +1712,11 @@ export default function TimesheetsAnalyticsPage() {
                           <td className="px-6 py-4 whitespace-nowrap text-center">
                             <span className="text-sm text-yellow-600 dark:text-yellow-400">
                               {user.pendingHours.toFixed(1)}h
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-center">
+                            <span className="text-sm text-red-600 dark:text-red-400">
+                              {user.rejectedHours.toFixed(1)}h
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
@@ -1740,17 +1748,24 @@ export default function TimesheetsAnalyticsPage() {
                 </h3>
                 <div className="space-y-3">
                   {analytics.userHoursData.slice(0, 10).map((user, index) => {
-                    const maxHours = Math.max(...analytics.userHoursData.map(u => u.totalHours))
-                    const percentage = (user.totalHours / maxHours) * 100
+                    const effectiveHours = user.approvedHours + user.pendingHours // Sem horas rejeitadas
+                    const maxHours = Math.max(...analytics.userHoursData.map(u => u.approvedHours + u.pendingHours))
+                    const percentage = (effectiveHours / maxHours) * 100
+                    const totalEffectiveHours = analytics.userHoursData.reduce((sum, u) => sum + u.approvedHours + u.pendingHours, 0)
                     return (
                       <div key={index}>
                         <div className="flex justify-between mb-1">
                           <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                             {user.name}
                           </span>
-                          <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                            {user.totalHours.toFixed(1)}h
-                          </span>
+                          <div className="flex items-center gap-3">
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              {user.rejectedHours > 0 && `(-${user.rejectedHours.toFixed(1)}h rejeitadas)`}
+                            </span>
+                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                              {effectiveHours.toFixed(1)}h
+                            </span>
+                          </div>
                         </div>
                         <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-6">
                           <div 
@@ -1758,7 +1773,7 @@ export default function TimesheetsAnalyticsPage() {
                             style={{ width: `${percentage}%` }}
                           >
                             <span className="text-xs text-white font-medium">
-                              {((user.totalHours / analytics.totalHours) * 100).toFixed(0)}%
+                              {((effectiveHours / totalEffectiveHours) * 100).toFixed(0)}%
                             </span>
                           </div>
                         </div>
