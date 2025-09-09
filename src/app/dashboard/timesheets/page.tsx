@@ -78,6 +78,15 @@ export default function TimesheetsPage() {
   const [showAddForm, setShowAddForm] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
   
+  // Helper function to format ticket title consistently
+  const formatTicketTitle = (title: string, maxLength: number = 50) => {
+    const upperTitle = title.toUpperCase()
+    if (upperTitle.length > maxLength) {
+      return upperTitle.substring(0, maxLength) + '...'
+    }
+    return upperTitle
+  }
+  
   // Form states
   const [selectedTicket, setSelectedTicket] = useState('')
   const [hoursWorked, setHoursWorked] = useState('')
@@ -748,10 +757,18 @@ export default function TimesheetsPage() {
                     onChange={(e) => {
                       setTicketSearch(e.target.value)
                       setShowTicketSuggestions(true)
+                      // Se limpar o campo, limpa também a seleção
+                      if (e.target.value === '') {
+                        setSelectedTicket('')
+                      }
                     }}
                     onFocus={() => setShowTicketSuggestions(true)}
-                    placeholder="Digite para buscar o chamado..."
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white pr-10"
+                    placeholder="Digite o número ou título do chamado..."
+                    className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white pr-10 ${
+                      selectedTicket 
+                        ? 'border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/20' 
+                        : 'border-gray-300 dark:border-gray-600'
+                    }`}
                     required={!selectedTicket}
                   />
                   {selectedTicket && (
@@ -771,9 +788,19 @@ export default function TimesheetsPage() {
                 
                 {/* Sugestões de chamados */}
                 {showTicketSuggestions && (
-                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto">
+                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-xl max-h-80 overflow-hidden">
+                    {/* Header da lista */}
+                    {tickets.length > 0 && (
+                      <div className="px-4 py-2 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">
+                          {ticketSearch ? 'Resultados da busca' : 'Seus chamados atribuídos'}
+                        </p>
+                      </div>
+                    )}
+                    
+                    <div className="max-h-64 overflow-y-auto">
                     {tickets.length === 0 ? (
-                      <div className="p-3 text-sm text-gray-500 dark:text-gray-400">
+                      <div className="p-4 text-sm text-gray-500 dark:text-gray-400 text-center">
                         Nenhum chamado atribuído a você
                       </div>
                     ) : (
@@ -793,25 +820,22 @@ export default function TimesheetsPage() {
                               type="button"
                               onClick={() => {
                                 setSelectedTicket(ticket.id)
-                                setTicketSearch(`#${ticket.ticket_number} - ${ticket.title.toUpperCase()}`)
+                                setTicketSearch(`#${ticket.ticket_number} - ${formatTicketTitle(ticket.title)}`)
                                 setShowTicketSuggestions(false)
                               }}
-                              className="w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border-b border-gray-100 dark:border-gray-700 last:border-0"
+                              className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border-b border-gray-200 dark:border-gray-700 last:border-0"
                             >
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <span className="font-medium text-gray-900 dark:text-white">
-                                    #{ticket.ticket_number}
-                                  </span>
-                                  <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
-                                    {ticket.title.toUpperCase()}
+                              <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2">
+                                  <Ticket className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                  <span className="font-semibold text-gray-900 dark:text-white">
+                                    #{String(ticket.ticket_number).padStart(3, '0')}
                                   </span>
                                 </div>
-                                {ticket.assigned_to_user && (
-                                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                                    {ticket.assigned_to_user.name}
-                                  </span>
-                                )}
+                                <div className="h-4 w-px bg-gray-300 dark:bg-gray-600" />
+                                <span className="text-sm text-gray-600 dark:text-gray-400 truncate flex-1">
+                                  {formatTicketTitle(ticket.title, 45)}
+                                </span>
                               </div>
                             </button>
                           ))}
@@ -822,12 +846,13 @@ export default function TimesheetsPage() {
                             ticket.title.toLowerCase().includes(searchLower)
                           )
                         }).length === 0 && (
-                          <div className="p-3 text-sm text-gray-500 dark:text-gray-400">
+                          <div className="p-4 text-sm text-gray-500 dark:text-gray-400 text-center">
                             Nenhum chamado encontrado com "{ticketSearch}"
                           </div>
                         )}
                       </>
                     )}
+                    </div>
                   </div>
                 )}
               </div>
