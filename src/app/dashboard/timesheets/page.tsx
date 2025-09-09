@@ -999,110 +999,88 @@ export default function TimesheetsPage() {
                   Tempo Trabalhado *
                 </label>
                 
-                {/* Campo único e elegante para entrada de horas */}
-                <div className="bg-gradient-to-br from-slate-900 to-slate-800 dark:from-slate-800 dark:to-slate-900 rounded-xl p-6 border border-blue-500/30 shadow-xl">
-                  <div className="text-center">
-                    {/* Ícone e Input */}
-                    <div className="flex items-center justify-center gap-3 mb-2">
-                      <Clock className="h-7 w-7 text-blue-400 animate-pulse" />
-                      <input
-                        type="text"
-                        value={hoursWorked}
-                        onChange={(e) => {
-                          let value = e.target.value
-                          
-                          // Permitir apenas números e dois pontos
-                          value = value.replace(/[^0-9:]/g, '')
-                          
-                          // Garantir formato H:MM ou HH:MM
-                          // Não fazer formatação automática - deixar o usuário digitar no formato desejado
-                          setHoursWorked(value)
-                        }}
-                        onKeyDown={(e) => {
-                          // Se digitou : automaticamente após números
-                          const value = e.currentTarget.value
-                          const key = e.key
-                          
-                          // Se está na posição 1 ou 2 e digitou um número, adicionar : automaticamente
-                          if (key >= '0' && key <= '9' && !value.includes(':')) {
-                            if (value.length === 1 && parseInt(value + key) > 23) {
-                              // Se vai passar de 23 horas, adicionar : após o primeiro dígito
-                              e.preventDefault()
-                              setHoursWorked(value + ':' + key)
-                            } else if (value.length === 2) {
-                              // Após 2 dígitos, adicionar : automaticamente
-                              e.preventDefault()
-                              setHoursWorked(value + ':' + key)
-                            }
+                {/* Campo compacto e elegante para entrada de horas */}
+                <div className="bg-slate-900 dark:bg-slate-950 rounded-lg p-4 border border-slate-700 dark:border-slate-600">
+                  <div className="flex items-center justify-center gap-3">
+                    <Clock className="h-5 w-5 text-blue-400" />
+                    <input
+                      type="text"
+                      value={hoursWorked}
+                      onChange={(e) => {
+                        let value = e.target.value
+                        
+                        // Permitir apenas números e dois pontos
+                        value = value.replace(/[^0-9:]/g, '')
+                        
+                        // Garantir formato H:MM ou HH:MM
+                        setHoursWorked(value)
+                      }}
+                      onKeyDown={(e) => {
+                        const value = e.currentTarget.value
+                        const key = e.key
+                        
+                        // Auto-adicionar : após digitar horas
+                        if (key >= '0' && key <= '9' && !value.includes(':')) {
+                          if (value.length === 1 && parseInt(value + key) > 23) {
+                            e.preventDefault()
+                            setHoursWorked(value + ':' + key)
+                          } else if (value.length === 2) {
+                            e.preventDefault()
+                            setHoursWorked(value + ':' + key)
                           }
-                        }}
-                        onBlur={(e) => {
-                          // Formatar ao sair do campo
-                          let value = e.target.value
-                          if (value && value.includes(':')) {
-                            const [h, m] = value.split(':')
-                            const hours = parseInt(h) || 0
-                            const minutes = parseInt(m) || 0
-                            // Validar limites
-                            const finalHours = Math.min(23, hours)
-                            const finalMinutes = Math.min(59, minutes)
-                            setHoursWorked(`${finalHours}:${finalMinutes.toString().padStart(2, '0')}`)
-                          } else if (value) {
-                            // Se tem apenas um número, adicionar :00
-                            const num = parseInt(value) || 0
-                            if (num <= 23) {
-                              setHoursWorked(`${num}:00`)
-                            } else {
-                              setHoursWorked('0:00')
-                            }
+                        }
+                      }}
+                      onBlur={(e) => {
+                        let value = e.target.value
+                        if (value && value.includes(':')) {
+                          const [h, m] = value.split(':')
+                          const hours = parseInt(h) || 0
+                          const minutes = parseInt(m) || 0
+                          const finalHours = Math.min(23, hours)
+                          const finalMinutes = Math.min(59, minutes)
+                          setHoursWorked(`${finalHours}:${finalMinutes.toString().padStart(2, '0')}`)
+                        } else if (value) {
+                          const num = parseInt(value) || 0
+                          if (num <= 23) {
+                            setHoursWorked(`${num}:00`)
                           } else {
                             setHoursWorked('0:00')
                           }
-                        }}
-                        placeholder="0:00"
-                        className="text-5xl font-bold bg-transparent border-0 text-white text-center focus:outline-none focus:ring-0 w-40 placeholder-gray-500 tabular-nums"
-                        pattern="[0-9]{1,2}:[0-9]{2}"
-                        inputMode="numeric"
-                        maxLength={5}
-                      />
-                    </div>
-                    
-                    {/* Descrição do tempo */}
-                    <p className="text-sm text-gray-400">
-                      {(() => {
-                        const [h, m] = (hoursWorked || '0:00').split(':').map(n => parseInt(n) || 0)
-                        if (h === 0 && m === 0) return 'Digite o tempo trabalhado'
-                        const parts = []
-                        if (h > 0) parts.push(`${h} ${h === 1 ? 'hora' : 'horas'}`)
-                        if (m > 0) parts.push(`${m} ${m === 1 ? 'minuto' : 'minutos'}`)
-                        return parts.join(' e ')
-                      })()}
-                    </p>
-                  </div>
-                  
-                  {/* Dicas de uso */}
-                  <div className="mt-4 pt-4 border-t border-gray-700">
-                    <p className="text-xs text-gray-500 text-center">
-                      Digite no formato: <span className="text-gray-400 font-mono">4:30</span> | <span className="text-gray-400 font-mono">8:45</span> | <span className="text-gray-400 font-mono">12:00</span>
-                    </p>
+                        } else {
+                          setHoursWorked('0:00')
+                        }
+                      }}
+                      placeholder="0:00"
+                      className="text-3xl font-semibold bg-transparent border-0 text-white text-center focus:outline-none focus:ring-0 w-32 placeholder-slate-500 tabular-nums"
+                      pattern="[0-9]{1,2}:[0-9]{2}"
+                      inputMode="numeric"
+                      maxLength={5}
+                    />
                   </div>
                 </div>
                 
-                {/* Botões de seleção rápida - opcional */}
-                <div className="mt-4">
+                {/* Botões de seleção rápida */}
+                <div className="mt-3">
                   <div className="flex flex-wrap gap-2">
-                    {['0:30', '1:00', '2:00', '4:00', '6:00', '8:00'].map(time => (
+                    {[
+                      { label: '0h30', value: '0:30' },
+                      { label: '1h', value: '1:00' },
+                      { label: '2h', value: '2:00' },
+                      { label: '4h', value: '4:00' },
+                      { label: '6h', value: '6:00' },
+                      { label: '8h', value: '8:00' }
+                    ].map(({ label, value }) => (
                       <button
-                        key={time}
+                        key={value}
                         type="button"
-                        onClick={() => setHoursWorked(time)}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
-                          hoursWorked === time
-                            ? 'bg-blue-600 text-white shadow-lg'
-                            : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600'
+                        onClick={() => setHoursWorked(value)}
+                        className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
+                          hoursWorked === value
+                            ? 'bg-blue-600 text-white border border-blue-500'
+                            : 'bg-slate-800 dark:bg-slate-900 text-slate-300 hover:bg-slate-700 dark:hover:bg-slate-800 border border-slate-600 dark:border-slate-700'
                         }`}
                       >
-                        {time.replace(':', 'h').replace('00', '')}
+                        {label}
                       </button>
                     ))}
                   </div>
