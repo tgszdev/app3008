@@ -94,6 +94,11 @@ export default function TimesheetsPage() {
   const [workDate, setWorkDate] = useState(format(new Date(), 'yyyy-MM-dd'))
   const [submitting, setSubmitting] = useState(false)
   
+  // New hour type states
+  const [hourType, setHourType] = useState<'normal' | 'extra'>('normal')
+  const [overtimeRequester, setOvertimeRequester] = useState('')
+  const [overtimeApprover, setOvertimeApprover] = useState('')
+  
   // Ticket search states
   const [ticketSearch, setTicketSearch] = useState('')
   const [showTicketSuggestions, setShowTicketSuggestions] = useState(false)
@@ -150,6 +155,9 @@ export default function TimesheetsPage() {
       setHoursWorked('')
       setDescription('')
       setWorkDate(format(new Date(), 'yyyy-MM-dd'))
+      setHourType('normal')
+      setOvertimeRequester('')
+      setOvertimeApprover('')
       setShowTicketSuggestions(false)
     }
   }, [showAddForm])
@@ -229,14 +237,44 @@ export default function TimesheetsPage() {
       return
     }
     
+    // Validar campos de hora extra
+    if (hourType === 'extra' && (!overtimeRequester || !overtimeApprover)) {
+      toast.error('Para hora extra, informe o solicitante e aprovador')
+      return
+    }
+    
+    // Converter formato de horas HH:MM para decimal
+    let hoursDecimal = 0
+    if (hoursWorked.includes(':')) {
+      const [hours, minutes] = hoursWorked.split(':').map(Number)
+      hoursDecimal = hours + (minutes / 60)
+    } else {
+      hoursDecimal = parseFloat(hoursWorked)
+    }
+    
+    // Validar horas
+    if (isNaN(hoursDecimal) || hoursDecimal <= 0 || hoursDecimal > 24) {
+      toast.error('Horas inválidas. Digite um valor entre 0:01 e 24:00')
+      return
+    }
+    
     try {
       setSubmitting(true)
       
+      // Preparar descrição com informações de hora extra se necessário
+      let finalDescription = description
+      if (hourType === 'extra') {
+        finalDescription = `[HORA EXTRA] ${description}\n\nSolicitante: ${overtimeRequester}\nAprovador: ${overtimeApprover}`
+      }
+      
       const response = await apiClient.post('/api/timesheets', {
         ticket_id: selectedTicket,
-        hours_worked: parseFloat(hoursWorked),
-        description,
-        work_date: workDate
+        hours_worked: hoursDecimal,
+        description: finalDescription,
+        work_date: workDate,
+        hour_type: hourType,
+        overtime_requester: hourType === 'extra' ? overtimeRequester : null,
+        overtime_approver: hourType === 'extra' ? overtimeApprover : null
       })
       
       if (response.status === 201) {
@@ -254,6 +292,9 @@ export default function TimesheetsPage() {
         setHoursWorked('')
         setDescription('')
         setWorkDate(format(new Date(), 'yyyy-MM-dd'))
+        setHourType('normal')
+        setOvertimeRequester('')
+        setOvertimeApprover('')
         setShowAddForm(false)
       }
     } catch (error: any) {
@@ -339,6 +380,18 @@ export default function TimesheetsPage() {
     setExpandedRows(newExpanded)
   }
 
+  // Helper para detectar hora extra
+  const isOvertime = (description: string) => {
+    return description?.includes('[HORA EXTRA]') || false
+  }
+  
+  // Helper para formatar horas decimais para HH:MM
+  const formatHoursToTime = (decimal: number) => {
+    const hours = Math.floor(decimal)
+    const minutes = Math.round((decimal - hours) * 60)
+    return `${hours}:${minutes.toString().padStart(2, '0')}`
+  }
+  
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'approved':
@@ -693,6 +746,12 @@ export default function TimesheetsPage() {
                                   {timesheet.user.name}
                                 </span>
                                 {getStatusBadge(timesheet.status)}
+                                {isOvertime(timesheet.description) && (
+                                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-800 dark:text-orange-100">
+                                    <Clock className="h-3 w-3" />
+                                    Extra
+                                  </span>
+                                )}
                               </div>
                               <div className="flex flex-wrap gap-3 text-xs text-slate-400">
                                 <span className="flex items-center gap-1 whitespace-nowrap">
@@ -701,7 +760,7 @@ export default function TimesheetsPage() {
                                 </span>
                                 <span className="flex items-center gap-1">
                                   <Clock className="h-3 w-3 flex-shrink-0" />
-                                  {timesheet.hours_worked}h
+                                  {formatHoursToTime(timesheet.hours_worked)}h
                                 </span>
                               </div>
                             </div>
@@ -933,22 +992,120 @@ export default function TimesheetsPage() {
               </div>
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Horas Trabalhadas *
-              </label>
-              <input
-                type="number"
-                min="0.5"
-                max="24"
-                step="0.5"
-                value={hoursWorked}
-                onChange={(e) => setHoursWorked(e.target.value)}
-                placeholder="Ex: 2.5"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                required
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Horas Trabalhadas *
+                </label>
+                <input
+                  type="text"
+                  value={hoursWorked}
+                  onChange={(e) => {
+                    let value = e.target.value.replace(/[^0-9]/g, '')
+                    
+                    // Formatar automaticamente como HH:MM
+                    if (value.length >= 3) {
+                      // Se tem 3 dígitos ou mais, formatar como H:MM ou HH:MM
+                      const hours = value.length === 3 ? value.substring(0, 1) : value.substring(0, 2)
+                      const minutes = value.length === 3 ? value.substring(1, 3) : value.substring(2, 4)
+                      value = `${hours}:${minutes}`
+                    } else if (value.length === 2) {
+                      // Se tem 2 dígitos, pode ser HH ou MM
+                      const num = parseInt(value)
+                      if (num <= 24) {
+                        value = `${value}:00` // Assumir horas completas
+                      } else {
+                        value = `0:${value}` // Assumir minutos
+                      }
+                    } else if (value.length === 1) {
+                      value = `${value}:00` // Um dígito = hora completa
+                    }
+                    
+                    setHoursWorked(value)
+                  }}
+                  onBlur={(e) => {
+                    // Validar e formatar ao sair do campo
+                    let value = e.target.value
+                    if (value && !value.includes(':')) {
+                      const num = parseInt(value)
+                      if (num <= 24) {
+                        setHoursWorked(`${num}:00`)
+                      } else {
+                        setHoursWorked(`0:${value.padStart(2, '0')}`)
+                      }
+                    }
+                  }}
+                  placeholder="Digite 330 para 3:30"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  required
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Digite apenas números: 330 = 3h30min, 845 = 8h45min
+                </p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Tipo de Hora *
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="hourType"
+                      value="normal"
+                      checked={hourType === 'normal'}
+                      onChange={(e) => setHourType(e.target.value as 'normal' | 'extra')}
+                      className="mr-2 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">Hora Normal</span>
+                  </label>
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="hourType"
+                      value="extra"
+                      checked={hourType === 'extra'}
+                      onChange={(e) => setHourType(e.target.value as 'normal' | 'extra')}
+                      className="mr-2 text-orange-600 focus:ring-orange-500"
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">Hora Extra</span>
+                  </label>
+                </div>
+              </div>
             </div>
+            
+            {/* Campos adicionais para Hora Extra */}
+            {hourType === 'extra' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Solicitante da Hora Extra *
+                  </label>
+                  <input
+                    type="text"
+                    value={overtimeRequester}
+                    onChange={(e) => setOvertimeRequester(e.target.value)}
+                    placeholder="Nome do solicitante"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    required={hourType === 'extra'}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Aprovador da Hora Extra *
+                  </label>
+                  <input
+                    type="text"
+                    value={overtimeApprover}
+                    onChange={(e) => setOvertimeApprover(e.target.value)}
+                    placeholder="Nome do aprovador"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    required={hourType === 'extra'}
+                  />
+                </div>
+              </div>
+            )}
             
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
