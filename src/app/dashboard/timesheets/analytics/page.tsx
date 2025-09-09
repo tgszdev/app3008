@@ -115,7 +115,7 @@ interface Analytics {
   topCategories: Array<{ category: string; hours: number }>
   
   // Dados temporais
-  dailyData: Array<{ date: string; hours: number; approved: number; pending: number }>
+  dailyData: Array<{ date: string; hours: number; approved: number; pending: number; rejected: number }>
   weeklyData: Array<{ week: string; hours: number; users: number }>
   monthlyTrend: Array<{ month: string; hours: number; growth: number }>
   
@@ -333,13 +333,14 @@ export default function TimesheetsAnalyticsPage() {
     }))
     
     // Dados diários
-    const dailyMap = new Map<string, { hours: number; approved: number; pending: number; users: Set<string> }>()
+    const dailyMap = new Map<string, { hours: number; approved: number; pending: number; rejected: number; users: Set<string> }>()
     data.forEach(t => {
       const date = format(parseISO(t.work_date), 'yyyy-MM-dd')
-      const current = dailyMap.get(date) || { hours: 0, approved: 0, pending: 0, users: new Set() }
+      const current = dailyMap.get(date) || { hours: 0, approved: 0, pending: 0, rejected: 0, users: new Set() }
       current.hours += parseFloat(t.hours_worked.toString())
       if (t.status === 'approved') current.approved += parseFloat(t.hours_worked.toString())
       if (t.status === 'pending') current.pending += parseFloat(t.hours_worked.toString())
+      if (t.status === 'rejected') current.rejected += parseFloat(t.hours_worked.toString())
       current.users.add(t.user_id)
       dailyMap.set(date, current)
     })
@@ -355,7 +356,8 @@ export default function TimesheetsAnalyticsPage() {
         date: dateStr,
         hours: data?.hours || 0,
         approved: data?.approved || 0,
-        pending: data?.pending || 0
+        pending: data?.pending || 0,
+        rejected: data?.rejected || 0
       }
     })
     
