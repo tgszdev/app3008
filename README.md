@@ -4,10 +4,13 @@
 Sistema completo de gerenciamento de tickets de suporte com autenticação, categorização, priorização e geração de PDFs.
 
 ## 🌐 URLs de Acesso
-- **Desenvolvimento**: https://3000-inf71qwtpa8mbn30ykzsp-6532622b.e2b.dev
+- **Produção**: https://app3008.vercel.app
+- **Desenvolvimento**: https://3000-i968ax1d7t7cf739vyajj-6532622b.e2b.dev
 - **Login**: /login
 - **Dashboard**: /dashboard (requer autenticação)
 - **Tickets**: /dashboard/tickets
+- **Apontamentos**: /dashboard/timesheets
+- **Analytics**: /dashboard/timesheets/analytics
 
 ## ✅ Funcionalidades Implementadas
 
@@ -60,6 +63,9 @@ Sistema completo de gerenciamento de tickets de suporte com autenticação, cate
 - ✅ **Notificações toast** para feedback
 - ✅ **Loading states** e skeleton loaders
 - ✅ **Breadcrumbs** de navegação
+- ✅ **Gráficos e visualizações** com design futurista
+- ✅ **Modal popups** para formulários
+- ✅ **Ícones Info** com popovers para tooltips
 
 ## 🔧 Stack Tecnológico
 - **Framework**: Next.js 15.5.2 com App Router
@@ -159,11 +165,21 @@ Para problemas ou dúvidas, abra um ticket no sistema ou entre em contato com a 
 
 ---
 
-**Última Atualização**: 05/09/2025
-**Versão**: 2.0.0
+**Última Atualização**: 09/09/2025
+**Versão**: 2.1.0
 **Status**: ✅ Em Produção
+**URL Produção**: https://app3008.vercel.app
 
-## 🎉 Novidades da Versão 2.0.0
+## 🎉 Novidades da Versão 2.1.0 (09/09/2025)
+
+### 📊 Redesenho Completo dos Gráficos de Analytics
+- ✅ **Gráfico de Horas Diárias** com barras empilhadas (aprovadas/pendentes/rejeitadas)
+- ✅ **Horas por Categoria** transformado em gráfico de barras horizontais com gradientes
+- ✅ **Tendência Semanal** com visualização de barras e indicadores de crescimento
+- ✅ **Evolução Mensal** com cards coloridos e indicadores de tendência
+- ✅ **Design futurista** com backgrounds escuros e gradientes coloridos
+- ✅ **Melhor UX** seguindo melhores práticas de visualização de dados
+
 ### Sistema de SLA (Service Level Agreement)
 - ✅ **Configuração completa de SLA** com interface administrativa
 - ✅ **Cálculo automático** de tempos e prazos
@@ -171,9 +187,12 @@ Para problemas ou dúvidas, abra um ticket no sistema ou entre em contato com a 
 - ✅ **Suporte a horário comercial** e dias úteis
 - ✅ **Sistema de alertas e violações**
 
-## 🔧 Correções Recentes (v1.5.6)
-- ✅ Corrigido erro React #306 (importação de módulos)
-- ✅ Corrigido erro React #130 (componente retornando undefined)
-- ✅ Implementado SimplePrintButton com impressão via iframe
-- ✅ Removidas importações dinâmicas problemáticas
-- ✅ Sistema de impressão robusto e confiável
+## 🔧 Correções Recentes (v2.0.1)
+- ✅ Tooltip dos gráficos substituído por ícones Info (evita corte de conteúdo)
+- ✅ Card duplicado "Média de Horas/Dia" removido
+- ✅ Filtros movidos para o topo das páginas de timesheets
+- ✅ Títulos de tickets sempre em MAIÚSCULAS
+- ✅ Sidebar reorganizado com ordem lógica
+- ✅ Formulário de timesheet em modal popup
+- ✅ Campo descrição obrigatório com mínimo 10 caracteres
+- ✅ Mapeamento de colunas do banco (activity_description → description)
