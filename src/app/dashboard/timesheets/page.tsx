@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
+import Link from 'next/link'
 import apiClient from '@/lib/api-client'
 import { format, startOfMonth, endOfMonth, parseISO } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -487,8 +488,12 @@ export default function TimesheetsPage() {
                 {/* Header Minimalista */}
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-3">
-                    <h3 className="text-lg font-semibold text-white">#{ticket.ticket_number}</h3>
-                    <span className="text-sm text-slate-400">{ticket.title.toUpperCase()}</span>
+                    <Link 
+                      href={`/dashboard/tickets/${ticket.id}`}
+                      className="text-lg font-semibold text-white hover:text-blue-400 transition-colors"
+                    >
+                      #{ticket.ticket_number}
+                    </Link>
                   </div>
                   <span className="text-sm text-slate-500">
                     {ticketTimesheets.length} {ticketTimesheets.length === 1 ? 'apontamento' : 'apontamentos'}
