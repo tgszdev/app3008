@@ -1142,7 +1142,6 @@ export default function TimesheetsAnalyticsPage() {
                     </div>
                   </div>
                 </div>
-              </div>
                 <div className="flex items-center justify-center gap-6 mt-6 pt-4 border-t border-gray-700/30">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-gradient-to-b from-green-400 to-green-600 shadow-sm"></div>
