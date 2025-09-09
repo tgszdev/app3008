@@ -100,7 +100,7 @@ interface Analytics {
   totalCollaborators: number // Quantidade de colaboradores que apontaram
   userHoursData: UserHoursData[] // Total de horas por colaborador
   
-  // Tickets e categorias
+  // Chamados e categorias
   uniqueTickets: number
   categoryDistribution: CategoryData[] // Horas por categoria
   priorityDistribution: PriorityData[] // Horas por prioridade
@@ -133,7 +133,7 @@ export default function TimesheetsAnalyticsPage() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null)
   const [loading, setLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'categories' | 'trends'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'trends'>('overview')
   
   // Filter states
   const [filterStartDate, setFilterStartDate] = useState(format(startOfMonth(new Date()), 'yyyy-MM-dd'))
@@ -299,11 +299,11 @@ export default function TimesheetsAnalyticsPage() {
       averageHours: data.hours / data.tickets.size
     })).sort((a, b) => (priorityOrder[a.priority as keyof typeof priorityOrder] || 99) - (priorityOrder[b.priority as keyof typeof priorityOrder] || 99))
     
-    // Tickets únicos
+    // Chamados únicos
     const uniqueTicketIds = new Set(data.map(t => t.ticket_id))
     const uniqueTickets = uniqueTicketIds.size
     
-    // Top tickets consumidores de tempo
+    // Top chamados consumidores de tempo
     const ticketHoursMap = new Map<string, { hours: number; title: string; number: number }>()
     data.forEach(t => {
       const ticketKey = t.ticket_id
@@ -446,7 +446,7 @@ export default function TimesheetsAnalyticsPage() {
       return
     }
     
-    const headers = ['Data', 'Usuário', 'Ticket', 'Categoria', 'Prioridade', 'Horas', 'Status', 'Descrição']
+    const headers = ['Data', 'Usuário', 'Chamado', 'Categoria', 'Prioridade', 'Horas', 'Status', 'Descrição']
     const rows = timesheets.map(t => [
       format(parseISO(t.work_date), 'dd/MM/yyyy'),
       t.user.name,
@@ -545,6 +545,48 @@ export default function TimesheetsAnalyticsPage() {
             <Download className="h-4 w-4" />
             Exportar CSV
           </button>
+        </div>
+      </div>
+
+      {/* Dicas para melhor atendimento */}
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0">
+            <div className="flex items-center justify-center w-8 h-8 bg-blue-100 dark:bg-blue-800 rounded-full">
+              <span className="text-blue-600 dark:text-blue-300 text-lg">💡</span>
+            </div>
+          </div>
+          <div className="flex-1">
+            <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
+              Dicas para um atendimento mais rápido:
+            </h3>
+            <ul className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
+              <li className="flex items-start gap-1">
+                <span className="text-blue-500">•</span>
+                <span>Seja específico no título do chamado</span>
+              </li>
+              <li className="flex items-start gap-1">
+                <span className="text-blue-500">•</span>
+                <span>Inclua mensagens de erro exatas, se houver</span>
+              </li>
+              <li className="flex items-start gap-1">
+                <span className="text-blue-500">•</span>
+                <span>Informe quando o problema começou</span>
+              </li>
+              <li className="flex items-start gap-1">
+                <span className="text-blue-500">•</span>
+                <span>Descreva o que você estava tentando fazer</span>
+              </li>
+              <li className="flex items-start gap-1">
+                <span className="text-blue-500">•</span>
+                <span>Selecione a categoria apropriada</span>
+              </li>
+              <li className="flex items-start gap-1">
+                <span className="text-blue-500">•</span>
+                <span>Defina a prioridade adequada</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 
@@ -651,16 +693,6 @@ export default function TimesheetsAnalyticsPage() {
             Colaboradores
           </button>
           <button
-            onClick={() => setActiveTab('categories')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'categories'
-                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-            }`}
-          >
-            Categorias & Prioridades
-          </button>
-          <button
             onClick={() => setActiveTab('trends')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'trends'
@@ -719,9 +751,9 @@ export default function TimesheetsAnalyticsPage() {
                       {analytics.uniqueTickets}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Tickets Trabalhados</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Chamados Trabalhados</p>
                   <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-                    Média: {analytics.averageHoursPerTicket.toFixed(1)}h por ticket
+                    Média: {analytics.averageHoursPerTicket.toFixed(1)}h por chamado
                   </p>
                 </div>
                 
@@ -792,10 +824,10 @@ export default function TimesheetsAnalyticsPage() {
                   </div>
                 </div>
 
-                {/* Top Tickets */}
+                {/* Top Chamados */}
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 lg:col-span-2">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Top 5 Tickets Consumidores de Tempo</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Top 5 Chamados Consumidores de Tempo</h3>
                     <Ticket className="h-5 w-5 text-gray-400" />
                   </div>
                   <div className="space-y-2">
@@ -822,6 +854,152 @@ export default function TimesheetsAnalyticsPage() {
                       </div>
                     ))}
                   </div>
+                </div>
+              </div>
+
+              {/* Horas por Categoria e Prioridade */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Horas por Categoria */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        Horas por Categoria
+                      </h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        💡 Dica: Identifique categorias que demandam mais atenção
+                      </p>
+                    </div>
+                    <FolderOpen className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <div className="space-y-3">
+                    {analytics.categoryDistribution.slice(0, 5).map((category, index) => (
+                      <div key={index}>
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {category.category}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500">
+                              {category.ticketCount} chamados
+                            </span>
+                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                              {category.hours.toFixed(1)}h
+                            </span>
+                          </div>
+                        </div>
+                        <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                          <div 
+                            className="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full"
+                            style={{ width: `${category.percentage}%` }}
+                          />
+                        </div>
+                        <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                          {category.percentage.toFixed(1)}% do total
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {analytics.categoryDistribution.length === 0 && (
+                    <div className="text-center py-4 text-gray-500 dark:text-gray-400">
+                      <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">Nenhuma categoria encontrada</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Horas por Prioridade */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        Horas por Prioridade
+                      </h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        ⚠️ Atenção: Priorize chamados críticos e de alta prioridade
+                      </p>
+                    </div>
+                    <AlertTriangle className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {analytics.priorityDistribution.map((priority, index) => {
+                      const getPriorityStyle = (p: string) => {
+                        switch(p.toLowerCase()) {
+                          case 'crítica': 
+                          case 'critical': 
+                            return 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                          case 'alta':
+                          case 'high':
+                            return 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800'
+                          case 'média':
+                          case 'medium':
+                            return 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
+                          case 'baixa':
+                          case 'low':
+                            return 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                          default:
+                            return 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800'
+                        }
+                      }
+                      
+                      const getPriorityTextColor = (p: string) => {
+                        switch(p.toLowerCase()) {
+                          case 'crítica':
+                          case 'critical':
+                            return 'text-red-700 dark:text-red-300'
+                          case 'alta':
+                          case 'high':
+                            return 'text-orange-700 dark:text-orange-300'
+                          case 'média':
+                          case 'medium':
+                            return 'text-yellow-700 dark:text-yellow-300'
+                          case 'baixa':
+                          case 'low':
+                            return 'text-green-700 dark:text-green-300'
+                          default:
+                            return 'text-gray-700 dark:text-gray-300'
+                        }
+                      }
+                      
+                      return (
+                        <div key={index} className={`rounded-lg p-3 border ${getPriorityStyle(priority.priority)}`}>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className={`text-sm font-semibold ${getPriorityTextColor(priority.priority)}`}>
+                              {priority.priority}
+                            </span>
+                            {priority.priority.toLowerCase() === 'crítica' || priority.priority.toLowerCase() === 'critical' ? <Zap className="h-4 w-4 text-red-500" /> : null}
+                            {priority.priority.toLowerCase() === 'alta' || priority.priority.toLowerCase() === 'high' ? <TrendingUp className="h-4 w-4 text-orange-500" /> : null}
+                            {priority.priority.toLowerCase() === 'média' || priority.priority.toLowerCase() === 'medium' ? <Activity className="h-4 w-4 text-yellow-500" /> : null}
+                            {priority.priority.toLowerCase() === 'baixa' || priority.priority.toLowerCase() === 'low' ? <TrendingDown className="h-4 w-4 text-green-500" /> : null}
+                          </div>
+                          <div className={`text-xl font-bold ${getPriorityTextColor(priority.priority)}`}>
+                            {priority.hours.toFixed(1)}h
+                          </div>
+                          <div className="text-xs text-gray-600 dark:text-gray-400">
+                            {priority.ticketCount} chamados
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                            Média: {priority.averageHours.toFixed(1)}h/chamado
+                          </div>
+                          <div className="mt-2 bg-gray-200 dark:bg-gray-700 rounded-full h-1">
+                            <div 
+                              className={`h-1 rounded-full ${priority.priority.toLowerCase() === 'crítica' || priority.priority.toLowerCase() === 'critical' ? 'bg-red-500' : priority.priority.toLowerCase() === 'alta' || priority.priority.toLowerCase() === 'high' ? 'bg-orange-500' : priority.priority.toLowerCase() === 'média' || priority.priority.toLowerCase() === 'medium' ? 'bg-yellow-500' : 'bg-green-500'}`}
+                              style={{ width: `${priority.percentage}%` }}
+                            />
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            {priority.percentage.toFixed(1)}% do total
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  {analytics.priorityDistribution.length === 0 && (
+                    <div className="text-center py-4 text-gray-500 dark:text-gray-400">
+                      <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">Nenhuma prioridade encontrada</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -856,10 +1034,10 @@ export default function TimesheetsAnalyticsPage() {
                           Pendentes
                         </th>
                         <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          Tickets
+                          Chamados
                         </th>
                         <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          Média/Ticket
+                          Média/Chamado
                         </th>
                         <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                           Última Atividade
@@ -957,8 +1135,8 @@ export default function TimesheetsAnalyticsPage() {
             </div>
           )}
 
-          {/* Tab: Categorias & Prioridades */}
-          {activeTab === 'categories' && (
+          {/* Categories tab removed - content moved to Overview */}
+          {false && (
             <div className="space-y-6">
               {/* Distribuição por Categoria */}
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
@@ -978,7 +1156,7 @@ export default function TimesheetsAnalyticsPage() {
                           </span>
                           <div className="flex items-center gap-2">
                             <span className="text-sm text-gray-500">
-                              {category.ticketCount} tickets
+                              {category.ticketCount} chamados
                             </span>
                             <span className="font-semibold text-gray-900 dark:text-white">
                               {category.hours.toFixed(1)}h
@@ -1078,10 +1256,10 @@ export default function TimesheetsAnalyticsPage() {
                         {priority.hours.toFixed(1)}h
                       </div>
                       <div className="text-sm opacity-80">
-                        {priority.ticketCount} tickets
+                        {priority.ticketCount} chamados
                       </div>
                       <div className="text-xs opacity-70 mt-1">
-                        Média: {priority.averageHours.toFixed(1)}h/ticket
+                        Média: {priority.averageHours.toFixed(1)}h/chamado
                       </div>
                       <div className="mt-2 bg-white/20 rounded-full h-1">
                         <div 
@@ -1258,9 +1436,9 @@ export default function TimesheetsAnalyticsPage() {
                       {analytics.averageHoursPerTicket.toFixed(1)}h
                     </span>
                   </div>
-                  <p className="text-sm opacity-90">Média de Horas/Ticket</p>
+                  <p className="text-sm opacity-90">Média de Horas/Chamado</p>
                   <p className="text-xs opacity-70 mt-1">
-                    Total de tickets: {analytics.uniqueTickets}
+                    Total de chamados: {analytics.uniqueTickets}
                   </p>
                 </div>
                 
