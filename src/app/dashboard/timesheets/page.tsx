@@ -89,7 +89,7 @@ export default function TimesheetsPage() {
   
   // Form states
   const [selectedTicket, setSelectedTicket] = useState('')
-  const [hoursWorked, setHoursWorked] = useState('')
+  const [hoursWorked, setHoursWorked] = useState('0:00')
   const [description, setDescription] = useState('')
   const [workDate, setWorkDate] = useState(format(new Date(), 'yyyy-MM-dd'))
   const [submitting, setSubmitting] = useState(false)
@@ -289,7 +289,7 @@ export default function TimesheetsPage() {
         // Limpar formulário
         setSelectedTicket('')
         setTicketSearch('')
-        setHoursWorked('')
+        setHoursWorked('0:00')
         setDescription('')
         setWorkDate(format(new Date(), 'yyyy-MM-dd'))
         setHourType('normal')
@@ -710,6 +710,7 @@ export default function TimesheetsPage() {
                   <button
                     onClick={() => {
                       setSelectedTicket(ticket.id)
+                      setTicketSearch(`#${ticket.ticket_number} - ${formatTicketTitle(ticket.title)}`)
                       setShowAddForm(true)
                     }}
                     className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
@@ -994,54 +995,220 @@ export default function TimesheetsPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Horas Trabalhadas *
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  Tempo Trabalhado *
                 </label>
-                <input
-                  type="text"
-                  value={hoursWorked}
-                  onChange={(e) => {
-                    let value = e.target.value.replace(/[^0-9]/g, '')
-                    
-                    // Formatar automaticamente como HH:MM
-                    if (value.length >= 3) {
-                      // Se tem 3 dígitos ou mais, formatar como H:MM ou HH:MM
-                      const hours = value.length === 3 ? value.substring(0, 1) : value.substring(0, 2)
-                      const minutes = value.length === 3 ? value.substring(1, 3) : value.substring(2, 4)
-                      value = `${hours}:${minutes}`
-                    } else if (value.length === 2) {
-                      // Se tem 2 dígitos, pode ser HH ou MM
-                      const num = parseInt(value)
-                      if (num <= 24) {
-                        value = `${value}:00` // Assumir horas completas
-                      } else {
-                        value = `0:${value}` // Assumir minutos
-                      }
-                    } else if (value.length === 1) {
-                      value = `${value}:00` // Um dígito = hora completa
-                    }
-                    
-                    setHoursWorked(value)
-                  }}
-                  onBlur={(e) => {
-                    // Validar e formatar ao sair do campo
-                    let value = e.target.value
-                    if (value && !value.includes(':')) {
-                      const num = parseInt(value)
-                      if (num <= 24) {
-                        setHoursWorked(`${num}:00`)
-                      } else {
-                        setHoursWorked(`0:${value.padStart(2, '0')}`)
-                      }
-                    }
-                  }}
-                  placeholder="Digite 330 para 3:30"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  required
-                />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Digite apenas números: 330 = 3h30min, 845 = 8h45min
-                </p>
+                
+                {/* Abordagem Visual com Slider e Botões Grandes */}
+                <div className="space-y-4">
+                  {/* Display Visual Grande do Tempo */}
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-6 border-2 border-blue-200 dark:border-blue-800">
+                    <div className="text-center">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <Clock className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                        <span className="text-5xl font-bold text-gray-900 dark:text-white tracking-wider">
+                          {hoursWorked || '0:00'}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {(() => {
+                          const [h, m] = (hoursWorked || '0:00').split(':').map(n => parseInt(n) || 0)
+                          if (h === 0 && m === 0) return 'Nenhum tempo selecionado'
+                          const parts = []
+                          if (h > 0) parts.push(`${h} ${h === 1 ? 'hora' : 'horas'}`)
+                          if (m > 0) parts.push(`${m} ${m === 1 ? 'minuto' : 'minutos'}`)
+                          return parts.join(' e ')
+                        })()}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Controles Visuais Intuitivos */}
+                  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 space-y-4">
+                    {/* Slider de Horas */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Horas</span>
+                        <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                          {hoursWorked.split(':')[0] || '0'}h
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const [h, m] = hoursWorked.split(':').map(n => parseInt(n) || 0)
+                            if (h > 0) setHoursWorked(`${h - 1}:${m.toString().padStart(2, '0')}`)
+                          }}
+                          className="p-2 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg border border-gray-300 dark:border-gray-600 transition-all hover:scale-110"
+                          disabled={parseInt(hoursWorked.split(':')[0] || '0') === 0}
+                        >
+                          <ChevronDown className="h-5 w-5" />
+                        </button>
+                        
+                        <input
+                          type="range"
+                          min="0"
+                          max="12"
+                          value={parseInt(hoursWorked.split(':')[0] || '0')}
+                          onChange={(e) => {
+                            const hours = parseInt(e.target.value)
+                            const minutes = hoursWorked.split(':')[1] || '00'
+                            setHoursWorked(`${hours}:${minutes}`)
+                          }}
+                          className="flex-1 h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer dark:bg-blue-700 slider"
+                          style={{
+                            background: `linear-gradient(to right, #3B82F6 0%, #3B82F6 ${(parseInt(hoursWorked.split(':')[0] || '0') / 12) * 100}%, #E5E7EB ${(parseInt(hoursWorked.split(':')[0] || '0') / 12) * 100}%, #E5E7EB 100%)`
+                          }}
+                        />
+                        
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const [h, m] = hoursWorked.split(':').map(n => parseInt(n) || 0)
+                            if (h < 12) setHoursWorked(`${h + 1}:${m.toString().padStart(2, '0')}`)
+                          }}
+                          className="p-2 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg border border-gray-300 dark:border-gray-600 transition-all hover:scale-110"
+                          disabled={parseInt(hoursWorked.split(':')[0] || '0') >= 12}
+                        >
+                          <ChevronUp className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Slider de Minutos */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Minutos</span>
+                        <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                          {hoursWorked.split(':')[1] || '00'}min
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const [h, m] = hoursWorked.split(':').map(n => parseInt(n) || 0)
+                            const newMinutes = m >= 15 ? m - 15 : 0
+                            setHoursWorked(`${h}:${newMinutes.toString().padStart(2, '0')}`)
+                          }}
+                          className="p-2 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg border border-gray-300 dark:border-gray-600 transition-all hover:scale-110"
+                          disabled={parseInt(hoursWorked.split(':')[1] || '0') === 0}
+                        >
+                          <ChevronDown className="h-5 w-5" />
+                        </button>
+                        
+                        <div className="flex-1 flex gap-1">
+                          {[0, 15, 30, 45].map(min => (
+                            <button
+                              key={min}
+                              type="button"
+                              onClick={() => {
+                                const hours = hoursWorked.split(':')[0] || '0'
+                                setHoursWorked(`${hours}:${min.toString().padStart(2, '0')}`)
+                              }}
+                              className={`flex-1 py-2 px-1 rounded-lg font-medium transition-all ${
+                                parseInt(hoursWorked.split(':')[1] || '0') === min
+                                  ? 'bg-blue-600 text-white scale-105 shadow-lg'
+                                  : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600'
+                              }`}
+                            >
+                              :{min.toString().padStart(2, '0')}
+                            </button>
+                          ))}
+                        </div>
+                        
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const [h, m] = hoursWorked.split(':').map(n => parseInt(n) || 0)
+                            const newMinutes = m < 45 ? m + 15 : 45
+                            setHoursWorked(`${h}:${newMinutes.toString().padStart(2, '0')}`)
+                          }}
+                          className="p-2 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg border border-gray-300 dark:border-gray-600 transition-all hover:scale-110"
+                          disabled={parseInt(hoursWorked.split(':')[1] || '0') >= 45}
+                        >
+                          <ChevronUp className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Atalhos Rápidos Melhorados */}
+                  <div>
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">
+                      Tempos Comuns
+                    </p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { label: '15min', value: '0:15', icon: '☕' },
+                        { label: '30min', value: '0:30', icon: '📧' },
+                        { label: '1 hora', value: '1:00', icon: '📞' },
+                        { label: '2 horas', value: '2:00', icon: '💻' },
+                        { label: '4 horas', value: '4:00', icon: '🎯' },
+                        { label: '6 horas', value: '6:00', icon: '📊' },
+                        { label: '8 horas', value: '8:00', icon: '📅' },
+                        { label: '1h30', value: '1:30', icon: '🔧' },
+                        { label: '2h30', value: '2:30', icon: '🚀' },
+                      ].map(({ label, value, icon }) => (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => setHoursWorked(value)}
+                          className={`relative px-3 py-3 text-sm font-medium rounded-lg transition-all transform hover:scale-105 ${
+                            hoursWorked === value
+                              ? 'bg-blue-600 text-white shadow-lg ring-2 ring-blue-400'
+                              : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 hover:shadow-md'
+                          }`}
+                        >
+                          <span className="text-lg mr-1">{icon}</span>
+                          {label}
+                          {hoursWorked === value && (
+                            <Check className="absolute top-1 right-1 h-3 w-3" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Campo de entrada alternativo (oculto por padrão) */}
+                  <details className="group">
+                    <summary className="cursor-pointer text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                      Preferir digitar manualmente? Clique aqui
+                    </summary>
+                    <div className="mt-3 p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                      <input
+                        type="text"
+                        value={hoursWorked}
+                        onChange={(e) => {
+                          const value = e.target.value
+                          // Aceitar formatos: "3:30", "330", "3.5", "3,5"
+                          if (value.match(/^\d{1,2}:\d{1,2}$/)) {
+                            setHoursWorked(value)
+                          } else if (value.match(/^\d{3,4}$/)) {
+                            // Formato 330 para 3:30
+                            const hours = Math.floor(parseInt(value) / 100)
+                            const minutes = parseInt(value) % 100
+                            if (minutes < 60) {
+                              setHoursWorked(`${hours}:${minutes.toString().padStart(2, '0')}`)
+                            }
+                          } else if (value.match(/^\d+[.,]\d+$/)) {
+                            // Formato decimal 3.5 ou 3,5 para 3:30
+                            const decimal = parseFloat(value.replace(',', '.'))
+                            const hours = Math.floor(decimal)
+                            const minutes = Math.round((decimal - hours) * 60)
+                            setHoursWorked(`${hours}:${minutes.toString().padStart(2, '0')}`)
+                          }
+                        }}
+                        placeholder="Ex: 3:30 ou 330 ou 3.5"
+                        className="w-full px-3 py-2 text-center font-mono text-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
+                        Formatos: <code>3:30</code>, <code>330</code>, <code>3.5</code>
+                      </p>
+                    </div>
+                  </details>
+                </div>
               </div>
               
               <div>
