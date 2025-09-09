@@ -124,6 +124,11 @@ interface Analytics {
   rejectionRate: number
   pendingRate: number
   productivityScore: number
+  
+  // Estatísticas adicionais
+  daysWorked: number
+  mostProductiveDay: string
+  mostProductiveHours: number
 }
 
 export default function TimesheetsAnalyticsPage() {
@@ -416,6 +421,17 @@ export default function TimesheetsAnalyticsPage() {
                              (averageHoursPerUser > 40 ? 100 : (averageHoursPerUser / 40) * 100) * 0.3 +
                              (uniqueTickets > 20 ? 100 : (uniqueTickets / 20) * 100) * 0.3
     
+    // Calcular dia mais produtivo
+    const daysWorked = dailyData.filter(d => d.hours > 0).length
+    const mostProductiveDayData = dailyData.reduce((max, day) => 
+      day.hours > max.hours ? day : max, 
+      { date: '', hours: 0, approved: 0, pending: 0, rejected: 0 }
+    )
+    const mostProductiveDay = mostProductiveDayData.date 
+      ? format(parseISO(mostProductiveDayData.date), 'dd/MM', { locale: ptBR })
+      : 'N/A'
+    const mostProductiveHours = mostProductiveDayData.hours
+    
     setAnalytics({
       totalHours,
       approvedHours,
@@ -438,7 +454,10 @@ export default function TimesheetsAnalyticsPage() {
       approvalRate,
       rejectionRate,
       pendingRate,
-      productivityScore
+      productivityScore,
+      daysWorked,
+      mostProductiveDay,
+      mostProductiveHours
     })
   }
 
