@@ -472,19 +472,38 @@ export default function TimesheetsAnalyticsPage() {
 
   const getPriorityColor = (priority: string) => {
     switch (priority.toLowerCase()) {
-      case 'crítica': return 'text-red-600 bg-red-100 dark:bg-red-900/30'
-      case 'alta': return 'text-orange-600 bg-orange-100 dark:bg-orange-900/30'
-      case 'média': return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30'
-      case 'baixa': return 'text-green-600 bg-green-100 dark:bg-green-900/30'
-      default: return 'text-gray-600 bg-gray-100 dark:bg-gray-900/30'
+      case 'crítica':
+      case 'critical': 
+        return 'text-red-600 bg-red-100 dark:bg-red-900/30'
+      case 'alta':
+      case 'high':
+        return 'text-orange-600 bg-orange-100 dark:bg-orange-900/30'
+      case 'média':
+      case 'medium':
+        return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30'
+      case 'baixa':
+      case 'low':
+        return 'text-green-600 bg-green-100 dark:bg-green-900/30'
+      default: 
+        return 'text-gray-600 bg-gray-100 dark:bg-gray-900/30'
+    }
+  }
+
+  const translatePriority = (priority: string): string => {
+    switch (priority.toLowerCase()) {
+      case 'critical': return 'Crítica'
+      case 'high': return 'Alta'
+      case 'medium': return 'Média'
+      case 'low': return 'Baixa'
+      default: return priority
     }
   }
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'approved': return <CheckCircle className="h-4 w-4 text-green-500" />
-      case 'pending': return <Clock className="h-4 w-4 text-yellow-500" />
-      case 'rejected': return <XCircle className="h-4 w-4 text-red-500" />
+      case 'approved': return <CheckCircle className="h-4 w-4 text-green-600" />
+      case 'pending': return <Clock className="h-4 w-4 text-yellow-600" />
+      case 'rejected': return <XCircle className="h-4 w-4 text-red-600" />
       default: return <AlertCircle className="h-4 w-4 text-gray-500" />
     }
   }
@@ -650,16 +669,6 @@ export default function TimesheetsAnalyticsPage() {
           >
             Colaboradores
           </button>
-          <button
-            onClick={() => setActiveTab('trends')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'trends'
-                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-            }`}
-          >
-            Tendências
-          </button>
         </nav>
       </div>
 
@@ -775,7 +784,7 @@ export default function TimesheetsAnalyticsPage() {
                       </div>
                       <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                         <div 
-                          className="bg-green-500 h-2 rounded-full"
+                          className="bg-green-600 h-2 rounded-full"
                           style={{ width: `${analytics.approvalRate}%` }}
                         />
                       </div>
@@ -787,7 +796,7 @@ export default function TimesheetsAnalyticsPage() {
                       </div>
                       <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                         <div 
-                          className="bg-yellow-500 h-2 rounded-full"
+                          className="bg-yellow-600 h-2 rounded-full"
                           style={{ width: `${analytics.pendingRate}%` }}
                         />
                       </div>
@@ -957,7 +966,7 @@ export default function TimesheetsAnalyticsPage() {
                         <div key={index} className={`rounded-lg p-3 border ${getPriorityStyle(priority.priority)}`}>
                           <div className="flex items-center justify-between mb-1">
                             <span className={`text-sm font-semibold ${getPriorityTextColor(priority.priority)}`}>
-                              {priority.priority}
+                              {translatePriority(priority.priority)}
                             </span>
                             {priority.priority.toLowerCase() === 'crítica' || priority.priority.toLowerCase() === 'critical' ? <Zap className="h-4 w-4 text-red-500" /> : null}
                             {priority.priority.toLowerCase() === 'alta' || priority.priority.toLowerCase() === 'high' ? <TrendingUp className="h-4 w-4 text-orange-500" /> : null}
@@ -992,6 +1001,206 @@ export default function TimesheetsAnalyticsPage() {
                       <p className="text-sm">Nenhuma prioridade encontrada</p>
                     </div>
                   )}
+                </div>
+              </div>
+
+              {/* Gráfico de Tendências - Horas Diárias */}
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Horas Diárias - Últimos 30 dias
+                  </h3>
+                  <Calendar className="h-5 w-5 text-gray-400" />
+                </div>
+                <div className="overflow-x-auto">
+                  <div className="min-w-[600px] h-64">
+                    <div className="flex items-end justify-between h-full gap-1">
+                      {analytics.dailyData.map((day, index) => {
+                        const maxHours = Math.max(...analytics.dailyData.map(d => d.hours)) || 1
+                        const heightPercentage = (day.hours / maxHours) * 100
+                        const approvedPercentage = day.hours > 0 ? (day.approved / day.hours) * 100 : 0
+                        const pendingPercentage = day.hours > 0 ? (day.pending / day.hours) * 100 : 0
+                        const rejectedPercentage = day.hours > 0 ? (day.rejected / day.hours) * 100 : 0
+                        
+                        return (
+                          <div key={index} className="flex-1 flex flex-col items-center">
+                            <div className="w-full flex flex-col justify-end h-48">
+                              <div 
+                                className="w-full bg-gray-300 dark:bg-gray-600 rounded-t relative group cursor-pointer"
+                                style={{ height: `${heightPercentage}%` }}
+                              >
+                                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                                  Total: {day.hours.toFixed(1)}h
+                                  <br />
+                                  <span className="text-green-400">Aprovadas: {day.approved.toFixed(1)}h</span>
+                                  <br />
+                                  <span className="text-yellow-400">Pendentes: {day.pending.toFixed(1)}h</span>
+                                  {day.rejected > 0 && (
+                                    <>
+                                      <br />
+                                      <span className="text-red-400">Rejeitadas: {day.rejected.toFixed(1)}h</span>
+                                    </>
+                                  )}
+                                </div>
+                                {/* Barra de aprovadas (verde) */}
+                                <div 
+                                  className="absolute bottom-0 w-full bg-green-600 rounded-t"
+                                  style={{ height: `${approvedPercentage}%` }}
+                                />
+                                {/* Barra de pendentes (amarelo) */}
+                                <div 
+                                  className="absolute w-full bg-yellow-600"
+                                  style={{ 
+                                    height: `${pendingPercentage}%`,
+                                    bottom: `${approvedPercentage}%`
+                                  }}
+                                />
+                                {/* Barra de rejeitadas (vermelho) */}
+                                {rejectedPercentage > 0 && (
+                                  <div 
+                                    className="absolute w-full bg-red-600"
+                                    style={{ 
+                                      height: `${rejectedPercentage}%`,
+                                      bottom: `${approvedPercentage + pendingPercentage}%`
+                                    }}
+                                  />
+                                )}
+                              </div>
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-2 rotate-45 origin-left">
+                              {format(parseISO(day.date), 'dd/MM')}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-center gap-4 mt-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-green-600 rounded"></div>
+                    <span className="text-xs text-gray-600 dark:text-gray-400">Aprovadas</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-yellow-600 rounded"></div>
+                    <span className="text-xs text-gray-600 dark:text-gray-400">Pendentes</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-red-600 rounded"></div>
+                    <span className="text-xs text-gray-600 dark:text-gray-400">Rejeitadas</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tendências Semanal e Mensal */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Tendência Semanal */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    Tendência Semanal
+                  </h3>
+                  <div className="space-y-3">
+                    {analytics.weeklyData.map((week, index) => (
+                      <div key={index}>
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            {week.week}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500">
+                              {week.users} colaboradores
+                            </span>
+                            <span className="font-semibold text-gray-900 dark:text-white">
+                              {week.hours.toFixed(1)}h
+                            </span>
+                          </div>
+                        </div>
+                        <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                          <div 
+                            className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full"
+                            style={{ 
+                              width: `${(week.hours / Math.max(...analytics.weeklyData.map(w => w.hours))) * 100}%` 
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Evolução Mensal */}
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    Evolução Mensal
+                  </h3>
+                  <div className="space-y-3">
+                    {analytics.monthlyTrend.map((month, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">
+                          {month.month}
+                        </span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg font-semibold text-gray-900 dark:text-white">
+                            {month.hours.toFixed(0)}h
+                          </span>
+                          {month.growth !== 0 && (
+                            <span className={`flex items-center gap-1 text-sm ${
+                              month.growth > 0 ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              {month.growth > 0 ? (
+                                <TrendingUp className="h-4 w-4" />
+                              ) : (
+                                <TrendingDown className="h-4 w-4" />
+                              )}
+                              {Math.abs(month.growth).toFixed(0)}%
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Métricas de Desempenho */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-6 text-white">
+                  <div className="flex items-center justify-between mb-2">
+                    <Timer className="h-8 w-8 opacity-80" />
+                    <span className="text-3xl font-bold">
+                      {analytics.averageHoursPerDay.toFixed(1)}h
+                    </span>
+                  </div>
+                  <p className="text-sm opacity-90">Média de Horas/Dia</p>
+                  <p className="text-xs opacity-70 mt-1">
+                    Dias trabalhados: {analytics.daysWorked}
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg p-6 text-white">
+                  <div className="flex items-center justify-between mb-2">
+                    <Target className="h-8 w-8 opacity-80" />
+                    <span className="text-3xl font-bold">
+                      {analytics.averageHoursPerTicket.toFixed(1)}h
+                    </span>
+                  </div>
+                  <p className="text-sm opacity-90">Média por Chamado</p>
+                  <p className="text-xs opacity-70 mt-1">
+                    Total: {analytics.uniqueTickets} chamados
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-6 text-white">
+                  <div className="flex items-center justify-between mb-2">
+                    <Award className="h-8 w-8 opacity-80" />
+                    <span className="text-3xl font-bold">
+                      {analytics.mostProductiveDay}
+                    </span>
+                  </div>
+                  <p className="text-sm opacity-90">Dia Mais Produtivo</p>
+                  <p className="text-xs opacity-70 mt-1">
+                    {analytics.mostProductiveHours.toFixed(1)}h registradas
+                  </p>
                 </div>
               </div>
             </div>
@@ -1269,186 +1478,7 @@ export default function TimesheetsAnalyticsPage() {
             </div>
           )}
 
-          {/* Tab: Tendências */}
-          {activeTab === 'trends' && (
-            <div className="space-y-6">
-              {/* Tendência Diária */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    Horas Diárias
-                  </h3>
-                  <Calendar className="h-5 w-5 text-gray-400" />
-                </div>
-                <div className="overflow-x-auto">
-                  <div className="min-w-[600px] h-64">
-                    <div className="flex items-end justify-between h-full gap-1">
-                      {analytics.dailyData.map((day, index) => {
-                        const maxHours = Math.max(...analytics.dailyData.map(d => d.hours)) || 1
-                        const heightPercentage = (day.hours / maxHours) * 100
-                        const approvedPercentage = day.hours > 0 ? (day.approved / day.hours) * 100 : 0
-                        const pendingPercentage = day.hours > 0 ? (day.pending / day.hours) * 100 : 0
-                        
-                        return (
-                          <div key={index} className="flex-1 flex flex-col items-center">
-                            <div className="w-full flex flex-col justify-end h-48">
-                              <div 
-                                className="w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-t relative group cursor-pointer"
-                                style={{ height: `${heightPercentage}%` }}
-                              >
-                                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                                  {day.hours.toFixed(1)}h
-                                </div>
-                                <div 
-                                  className="absolute bottom-0 w-full bg-green-500 rounded-t"
-                                  style={{ height: `${approvedPercentage}%` }}
-                                />
-                                <div 
-                                  className="absolute bottom-0 w-full bg-yellow-500 opacity-50"
-                                  style={{ 
-                                    height: `${pendingPercentage}%`,
-                                    bottom: `${approvedPercentage}%`
-                                  }}
-                                />
-                              </div>
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-2 rotate-45 origin-left">
-                              {format(parseISO(day.date), 'dd/MM')}
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-center gap-4 mt-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-green-500 rounded"></div>
-                    <span className="text-xs text-gray-600 dark:text-gray-400">Aprovadas</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-yellow-500 rounded"></div>
-                    <span className="text-xs text-gray-600 dark:text-gray-400">Pendentes</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-blue-500 rounded"></div>
-                    <span className="text-xs text-gray-600 dark:text-gray-400">Total</span>
-                  </div>
-                </div>
-              </div>
 
-              {/* Tendência Semanal */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    Tendência Semanal
-                  </h3>
-                  <div className="space-y-3">
-                    {analytics.weeklyData.map((week, index) => (
-                      <div key={index}>
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">
-                            {week.week}
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500">
-                              {week.users} colaboradores
-                            </span>
-                            <span className="font-semibold text-gray-900 dark:text-white">
-                              {week.hours.toFixed(1)}h
-                            </span>
-                          </div>
-                        </div>
-                        <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                          <div 
-                            className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full"
-                            style={{ 
-                              width: `${(week.hours / Math.max(...analytics.weeklyData.map(w => w.hours))) * 100}%` 
-                            }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Tendência Mensal */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    Evolução Mensal
-                  </h3>
-                  <div className="space-y-3">
-                    {analytics.monthlyTrend.map((month, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded">
-                        <span className="font-medium text-gray-700 dark:text-gray-300">
-                          {month.month}
-                        </span>
-                        <div className="flex items-center gap-3">
-                          <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                            {month.hours.toFixed(0)}h
-                          </span>
-                          {month.growth !== 0 && (
-                            <span className={`flex items-center gap-1 text-sm ${
-                              month.growth > 0 ? 'text-green-600' : 'text-red-600'
-                            }`}>
-                              {month.growth > 0 ? (
-                                <TrendingUp className="h-4 w-4" />
-                              ) : (
-                                <TrendingDown className="h-4 w-4" />
-                              )}
-                              {Math.abs(month.growth).toFixed(0)}%
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Métricas de Desempenho */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-6 text-white">
-                  <div className="flex items-center justify-between mb-2">
-                    <Timer className="h-8 w-8 opacity-80" />
-                    <span className="text-3xl font-bold">
-                      {analytics.averageHoursPerDay.toFixed(1)}h
-                    </span>
-                  </div>
-                  <p className="text-sm opacity-90">Média de Horas/Dia</p>
-                  <p className="text-xs opacity-70 mt-1">
-                    Dias trabalhados: {new Set(timesheets.map(t => t.work_date)).size}
-                  </p>
-                </div>
-                
-                <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg p-6 text-white">
-                  <div className="flex items-center justify-between mb-2">
-                    <Target className="h-8 w-8 opacity-80" />
-                    <span className="text-3xl font-bold">
-                      {analytics.averageHoursPerTicket.toFixed(1)}h
-                    </span>
-                  </div>
-                  <p className="text-sm opacity-90">Média de Horas/Chamado</p>
-                  <p className="text-xs opacity-70 mt-1">
-                    Total de chamados: {analytics.uniqueTickets}
-                  </p>
-                </div>
-                
-                <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-6 text-white">
-                  <div className="flex items-center justify-between mb-2">
-                    <Award className="h-8 w-8 opacity-80" />
-                    <span className="text-3xl font-bold">
-                      {analytics.approvalRate.toFixed(0)}%
-                    </span>
-                  </div>
-                  <p className="text-sm opacity-90">Taxa de Aprovação</p>
-                  <p className="text-xs opacity-70 mt-1">
-                    {analytics.approvedHours.toFixed(0)}h de {analytics.totalHours.toFixed(0)}h
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
         </>
       )}
     </div>
