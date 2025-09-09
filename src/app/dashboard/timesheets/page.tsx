@@ -1014,33 +1014,27 @@ export default function TimesheetsPage() {
                           // Permitir apenas números e dois pontos
                           value = value.replace(/[^0-9:]/g, '')
                           
-                          // Se não tem : e tem 3 ou 4 dígitos, formatar automaticamente
-                          if (!value.includes(':') && value.length >= 3) {
-                            const len = value.length
-                            if (len === 3) {
-                              // 330 -> 3:30
-                              value = `${value[0]}:${value.slice(1)}`
-                            } else if (len === 4) {
-                              // 1030 -> 10:30
-                              value = `${value.slice(0, 2)}:${value.slice(2)}`
-                            }
-                          }
-                          
-                          // Validar formato HH:MM
-                          if (value.includes(':')) {
-                            const parts = value.split(':')
-                            if (parts.length === 2) {
-                              let [h, m] = parts
-                              // Limitar horas a 23 e minutos a 59
-                              h = h.slice(0, 2)
-                              m = m.slice(0, 2)
-                              if (h && parseInt(h) > 23) h = '23'
-                              if (m && parseInt(m) > 59) m = '59'
-                              value = h + (m !== undefined ? ':' + m : ':')
-                            }
-                          }
-                          
+                          // Garantir formato H:MM ou HH:MM
+                          // Não fazer formatação automática - deixar o usuário digitar no formato desejado
                           setHoursWorked(value)
+                        }}
+                        onKeyDown={(e) => {
+                          // Se digitou : automaticamente após números
+                          const value = e.currentTarget.value
+                          const key = e.key
+                          
+                          // Se está na posição 1 ou 2 e digitou um número, adicionar : automaticamente
+                          if (key >= '0' && key <= '9' && !value.includes(':')) {
+                            if (value.length === 1 && parseInt(value + key) > 23) {
+                              // Se vai passar de 23 horas, adicionar : após o primeiro dígito
+                              e.preventDefault()
+                              setHoursWorked(value + ':' + key)
+                            } else if (value.length === 2) {
+                              // Após 2 dígitos, adicionar : automaticamente
+                              e.preventDefault()
+                              setHoursWorked(value + ':' + key)
+                            }
+                          }
                         }}
                         onBlur={(e) => {
                           // Formatar ao sair do campo
@@ -1049,25 +1043,27 @@ export default function TimesheetsPage() {
                             const [h, m] = value.split(':')
                             const hours = parseInt(h) || 0
                             const minutes = parseInt(m) || 0
-                            setHoursWorked(`${hours}:${minutes.toString().padStart(2, '0')}`)
+                            // Validar limites
+                            const finalHours = Math.min(23, hours)
+                            const finalMinutes = Math.min(59, minutes)
+                            setHoursWorked(`${finalHours}:${finalMinutes.toString().padStart(2, '0')}`)
                           } else if (value) {
-                            // Se digitou apenas números sem :, assumir horas
+                            // Se tem apenas um número, adicionar :00
                             const num = parseInt(value) || 0
                             if (num <= 23) {
                               setHoursWorked(`${num}:00`)
                             } else {
-                              // Se for maior que 23, tratar como minutos
-                              const hours = Math.floor(num / 60)
-                              const minutes = num % 60
-                              setHoursWorked(`${hours}:${minutes.toString().padStart(2, '0')}`)
+                              setHoursWorked('0:00')
                             }
                           } else {
                             setHoursWorked('0:00')
                           }
                         }}
                         placeholder="0:00"
-                        className="text-5xl font-bold bg-transparent border-0 text-white text-center focus:outline-none focus:ring-0 w-40 placeholder-gray-500"
-                        style={{ letterSpacing: '0.1em' }}
+                        className="text-5xl font-bold bg-transparent border-0 text-white text-center focus:outline-none focus:ring-0 w-40 placeholder-gray-500 tabular-nums"
+                        pattern="[0-9]{1,2}:[0-9]{2}"
+                        inputMode="numeric"
+                        maxLength={5}
                       />
                     </div>
                     
@@ -1087,7 +1083,7 @@ export default function TimesheetsPage() {
                   {/* Dicas de uso */}
                   <div className="mt-4 pt-4 border-t border-gray-700">
                     <p className="text-xs text-gray-500 text-center">
-                      Digite direto: <span className="text-gray-400">330</span> = 3:30 | <span className="text-gray-400">845</span> = 8:45 | <span className="text-gray-400">130</span> = 1:30
+                      Digite no formato: <span className="text-gray-400 font-mono">4:30</span> | <span className="text-gray-400 font-mono">8:45</span> | <span className="text-gray-400 font-mono">12:00</span>
                     </p>
                   </div>
                 </div>
