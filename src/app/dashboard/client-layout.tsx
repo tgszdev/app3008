@@ -50,16 +50,16 @@ const navigation: NavigationItem[] = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Chamados', href: '/dashboard/tickets', icon: Ticket },
   { name: 'Apontamentos', href: '/dashboard/timesheets', icon: Clock },
-  { name: 'Base de Conhecimento', href: '/dashboard/knowledge-base', icon: BookOpen },
-  { name: 'Estatísticas', href: '/dashboard/analytics', icon: BarChart3 },
   { name: 'Comentários', href: '/dashboard/comments', icon: MessageSquare },
+  { name: 'Base de Conhecimento', href: '/dashboard/knowledge-base', icon: BookOpen },
   { name: 'Relatórios', href: '/dashboard/reports', icon: FileText },
+  { name: 'Estatísticas', href: '/dashboard/analytics', icon: BarChart3 },
 ]
 
 const adminNavigation: NavigationItem[] = [
-  { name: 'Usuários', href: '/dashboard/users', icon: Users },
   { name: 'Aprovação de Horas', href: '/dashboard/timesheets/admin', icon: CheckCircle },
   { name: 'Analytics de Horas', href: '/dashboard/timesheets/analytics', icon: PieChart },
+  { name: 'Usuários', href: '/dashboard/users', icon: Users },
   { name: 'Permissões', href: '/dashboard/timesheets/permissions', icon: Lock },
   { name: 'SLA', href: '/dashboard/sla', icon: Gauge },
   { name: 'Configurações', href: '/dashboard/settings', icon: Settings },

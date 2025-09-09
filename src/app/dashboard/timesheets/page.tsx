@@ -349,6 +349,71 @@ export default function TimesheetsPage() {
         </div>
       </div>
 
+      {/* Filtros */}
+      {showFilters && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Status
+              </label>
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              >
+                <option value="all">Todos</option>
+                <option value="pending">Pendente</option>
+                <option value="approved">Aprovado</option>
+                <option value="rejected">Rejeitado</option>
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Chamado
+              </label>
+              <select
+                value={filterTicket}
+                onChange={(e) => setFilterTicket(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              >
+                <option value="all">Todos</option>
+                {tickets.map(ticket => (
+                  <option key={ticket.id} value={ticket.id}>
+                    #{ticket.ticket_number} - {ticket.title.toUpperCase()}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Data Início
+              </label>
+              <input
+                type="date"
+                value={filterStartDate}
+                onChange={(e) => setFilterStartDate(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Data Fim
+              </label>
+              <input
+                type="date"
+                value={filterEndDate}
+                onChange={(e) => setFilterEndDate(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Cards de Tickets com Apontamentos */}
       {tickets.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -421,7 +486,7 @@ export default function TimesheetsPage() {
                 
                 {/* Título do Ticket */}
                 <p className="text-sm text-slate-300 mb-4 line-clamp-2">
-                  {ticket.title}
+                  {ticket.title.toUpperCase()}
                 </p>
                 
                 {/* Barra de Progresso */}
@@ -581,71 +646,6 @@ export default function TimesheetsPage() {
         </div>
       )}
 
-      {/* Filtros */}
-      {showFilters && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Status
-              </label>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              >
-                <option value="all">Todos</option>
-                <option value="pending">Pendente</option>
-                <option value="approved">Aprovado</option>
-                <option value="rejected">Rejeitado</option>
-              </select>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Ticket
-              </label>
-              <select
-                value={filterTicket}
-                onChange={(e) => setFilterTicket(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              >
-                <option value="all">Todos</option>
-                {tickets.map(ticket => (
-                  <option key={ticket.id} value={ticket.id}>
-                    #{ticket.ticket_number} - {ticket.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Data Início
-              </label>
-              <input
-                type="date"
-                value={filterStartDate}
-                onChange={(e) => setFilterStartDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Data Fim
-              </label>
-              <input
-                type="date"
-                value={filterEndDate}
-                onChange={(e) => setFilterEndDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Formulário de Adicionar */}
       {showAddForm && permissions.can_submit && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
@@ -668,7 +668,7 @@ export default function TimesheetsPage() {
                   <option value="">Selecione um ticket</option>
                   {tickets.map(ticket => (
                     <option key={ticket.id} value={ticket.id}>
-                      #{ticket.ticket_number} - {ticket.title}
+                      #{ticket.ticket_number} - {ticket.title.toUpperCase()}
                     </option>
                   ))}
                 </select>
@@ -789,7 +789,7 @@ export default function TimesheetsPage() {
                             #{timesheet.ticket.ticket_number}
                           </span>
                           <span className="text-gray-600 dark:text-gray-400">
-                            {timesheet.ticket.title}
+                            {timesheet.ticket.title.toUpperCase()}
                           </span>
                         </div>
                         

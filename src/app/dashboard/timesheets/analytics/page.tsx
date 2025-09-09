@@ -471,7 +471,7 @@ export default function TimesheetsAnalyticsPage() {
     const rows = timesheets.map(t => [
       format(parseISO(t.work_date), 'dd/MM/yyyy'),
       t.user.name,
-      `#${t.ticket.ticket_number} - ${t.ticket.title}`,
+      `#${t.ticket.ticket_number} - ${t.ticket.title.toUpperCase()}`,
       t.ticket.category || 'Sem Categoria',
       t.ticket.priority || 'Média',
       t.hours_worked.toString(),
@@ -851,7 +851,7 @@ export default function TimesheetsAnalyticsPage() {
                           <div className="flex items-center gap-2">
                             <span className="font-medium text-gray-900 dark:text-white">{ticket.ticket}</span>
                             <span className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
-                              {ticket.title}
+                              {ticket.title.toUpperCase()}
                             </span>
                           </div>
                           <div className="mt-1 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
@@ -1057,28 +1057,28 @@ export default function TimesheetsAnalyticsPage() {
                           <div key={index} className="flex-1 flex flex-col items-center group">
                             <div className="w-full flex flex-col justify-end h-64 relative">
                               {/* Valor total no topo ao hover */}
-                              <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                <div className="bg-black/90 backdrop-blur-sm text-white text-xs rounded-lg px-3 py-2 shadow-lg">
+                              <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 pointer-events-none">
+                                <div className="bg-black/95 backdrop-blur-sm text-white text-xs rounded-lg px-3 py-2 shadow-xl whitespace-nowrap">
                                   <div className="font-semibold text-sm mb-1">{day.hours.toFixed(1)}h</div>
-                                  <div className="space-y-0.5">
+                                  {day.approved > 0 && (
                                     <div className="flex items-center gap-1">
                                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                                       <span className="text-green-400">{day.approved.toFixed(1)}h</span>
                                     </div>
-                                    {day.pending > 0 && (
-                                      <div className="flex items-center gap-1">
-                                        <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                                        <span className="text-yellow-400">{day.pending.toFixed(1)}h</span>
-                                      </div>
-                                    )}
-                                    {day.rejected > 0 && (
-                                      <div className="flex items-center gap-1">
-                                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                                        <span className="text-red-400">{day.rejected.toFixed(1)}h</span>
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1 w-2 h-2 bg-black/90 rotate-45"></div>
+                                  )}
+                                  {day.pending > 0 && (
+                                    <div className="flex items-center gap-1">
+                                      <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                                      <span className="text-yellow-400">{day.pending.toFixed(1)}h</span>
+                                    </div>
+                                  )}
+                                  {day.rejected > 0 && (
+                                    <div className="flex items-center gap-1">
+                                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                                      <span className="text-red-400">{day.rejected.toFixed(1)}h</span>
+                                    </div>
+                                  )}
+                                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1 w-2 h-2 bg-black/95 rotate-45"></div>
                                 </div>
                               </div>
                               
@@ -1225,48 +1225,6 @@ export default function TimesheetsAnalyticsPage() {
                       </div>
                     ))}
                   </div>
-                </div>
-              </div>
-
-              {/* Métricas de Desempenho */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-6 text-white">
-                  <div className="flex items-center justify-between mb-2">
-                    <Timer className="h-8 w-8 opacity-80" />
-                    <span className="text-3xl font-bold">
-                      {analytics.averageHoursPerDay.toFixed(1)}h
-                    </span>
-                  </div>
-                  <p className="text-sm opacity-90">Média de Horas/Dia</p>
-                  <p className="text-xs opacity-70 mt-1">
-                    Dias trabalhados: {analytics.daysWorked}
-                  </p>
-                </div>
-
-                <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg p-6 text-white">
-                  <div className="flex items-center justify-between mb-2">
-                    <Target className="h-8 w-8 opacity-80" />
-                    <span className="text-3xl font-bold">
-                      {analytics.averageHoursPerTicket.toFixed(1)}h
-                    </span>
-                  </div>
-                  <p className="text-sm opacity-90">Média por Chamado</p>
-                  <p className="text-xs opacity-70 mt-1">
-                    Total: {analytics.uniqueTickets} chamados
-                  </p>
-                </div>
-
-                <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-6 text-white">
-                  <div className="flex items-center justify-between mb-2">
-                    <Award className="h-8 w-8 opacity-80" />
-                    <span className="text-3xl font-bold">
-                      {analytics.mostProductiveDay}
-                    </span>
-                  </div>
-                  <p className="text-sm opacity-90">Dia Mais Produtivo</p>
-                  <p className="text-xs opacity-70 mt-1">
-                    {analytics.mostProductiveHours.toFixed(1)}h registradas
-                  </p>
                 </div>
               </div>
             </div>

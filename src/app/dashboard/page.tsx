@@ -930,7 +930,7 @@ export default function DashboardPage() {
                     <StatusBadge status={ticket.status} />
                   </div>
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
-                    {ticket.title}
+                    {ticket.title.toUpperCase()}
                   </h3>
                   <div className="flex justify-between items-center">
                     <PriorityBadge priority={ticket.priority} />

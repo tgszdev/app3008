@@ -473,7 +473,7 @@ export default function TicketsPage() {
                       href={`/dashboard/tickets/${ticket.id}`}
                       className="text-base font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 line-clamp-2"
                     >
-                      {ticket.title}
+                      {ticket.title.toUpperCase()}
                     </Link>
                   </div>
                 </div>
@@ -593,7 +593,7 @@ export default function TicketsPage() {
                             href={`/dashboard/tickets/${ticket.id}`}
                             className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
                           >
-                            {ticket.title}
+                            {ticket.title.toUpperCase()}
                           </Link>
                           <div className="flex items-center mt-1 text-xs text-gray-500 dark:text-gray-400">
                             <User className="h-3 w-3 mr-1" />
