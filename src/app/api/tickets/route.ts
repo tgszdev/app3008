@@ -453,6 +453,53 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
+    // Verificar se existem apontamentos vinculados (exceto rejeitados)
+    const { data: timesheets, error: timesheetsError } = await supabaseAdmin
+      .from('timesheets')
+      .select('id, status')
+      .eq('ticket_id', id)
+      .in('status', ['pending', 'approved'])
+
+    if (timesheetsError) {
+      console.error('Erro ao verificar apontamentos:', timesheetsError)
+      return NextResponse.json(
+        { error: 'Erro ao verificar apontamentos do ticket' },
+        { status: 500 }
+      )
+    }
+
+    // Se houver apontamentos aprovados ou pendentes, impedir exclusão
+    if (timesheets && timesheets.length > 0) {
+      const approvedCount = timesheets.filter(t => t.status === 'approved').length
+      const pendingCount = timesheets.filter(t => t.status === 'pending').length
+      
+      let message = 'Não é possível excluir este chamado pois existem '
+      const parts = []
+      
+      if (approvedCount > 0) {
+        parts.push(`${approvedCount} apontamento${approvedCount > 1 ? 's' : ''} aprovado${approvedCount > 1 ? 's' : ''}`)
+      }
+      
+      if (pendingCount > 0) {
+        parts.push(`${pendingCount} apontamento${pendingCount > 1 ? 's' : ''} pendente${pendingCount > 1 ? 's' : ''}`)
+      }
+      
+      message += parts.join(' e ') + ' vinculado' + (timesheets.length > 1 ? 's' : '') + ' a ele.'
+      
+      return NextResponse.json(
+        { 
+          error: message,
+          details: {
+            approved: approvedCount,
+            pending: pendingCount,
+            total: timesheets.length
+          }
+        },
+        { status: 400 }
+      )
+    }
+
+    // Se não houver apontamentos impeditivos, prosseguir com a exclusão
     const { error } = await supabaseAdmin
       .from('tickets')
       .delete()

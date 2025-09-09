@@ -28,6 +28,7 @@ import {
   AlertTriangle,
   CheckCircle,
   XCircle,
+  Info,
   Timer,
   Zap,
   Briefcase,
@@ -700,7 +701,7 @@ export default function TimesheetsAnalyticsPage() {
             <div className="space-y-6">
               {/* KPI Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-help group relative">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
                   <div className="flex items-center justify-between mb-2">
                     <Clock className="h-8 w-8 text-blue-500" />
                     <span className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -708,10 +709,16 @@ export default function TimesheetsAnalyticsPage() {
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Total de Horas</p>
-                  {/* Tooltip */}
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                    Soma de todas as horas registradas no período
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                  {/* Info Icon with Popover */}
+                  <div className="absolute top-2 right-2">
+                    <div className="group/tooltip relative">
+                      <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help" />
+                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
+                        <p className="font-semibold mb-1">Total de Horas</p>
+                        <p>Soma de todas as horas apontadas no período selecionado</p>
+                        <div className="absolute top-0 right-2 transform -translate-y-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                      </div>
+                    </div>
                   </div>
                   <div className="mt-2 flex items-center gap-2">
                     <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -724,7 +731,7 @@ export default function TimesheetsAnalyticsPage() {
                   </div>
                 </div>
                 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-help group relative">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
                   <div className="flex items-center justify-between mb-2">
                     <Users className="h-8 w-8 text-purple-500" />
                     <span className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -732,17 +739,23 @@ export default function TimesheetsAnalyticsPage() {
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Colaboradores com Apontamentos</p>
-                  {/* Tooltip */}
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                    Quantidade de colaboradores que fizeram apontamentos
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                  {/* Info Icon with Popover */}
+                  <div className="absolute top-2 right-2">
+                    <div className="group/tooltip relative">
+                      <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help" />
+                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
+                        <p className="font-semibold mb-1">Colaboradores Ativos</p>
+                        <p>Número de colaboradores que registraram horas no período</p>
+                        <div className="absolute top-0 right-2 transform -translate-y-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                      </div>
+                    </div>
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
                     Média: {analytics.averageHoursPerUser.toFixed(1)}h por pessoa
                   </p>
                 </div>
                 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-help group relative">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
                   <div className="flex items-center justify-between mb-2">
                     <Ticket className="h-8 w-8 text-green-500" />
                     <span className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -750,17 +763,23 @@ export default function TimesheetsAnalyticsPage() {
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Chamados Trabalhados</p>
-                  {/* Tooltip */}
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                    Total de chamados únicos com apontamentos
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                  {/* Info Icon with Popover */}
+                  <div className="absolute top-2 right-2">
+                    <div className="group/tooltip relative">
+                      <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help" />
+                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
+                        <p className="font-semibold mb-1">Chamados Trabalhados</p>
+                        <p>Quantidade de chamados únicos que receberam apontamentos de horas</p>
+                        <div className="absolute top-0 right-2 transform -translate-y-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                      </div>
+                    </div>
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
                     Média: {analytics.averageHoursPerTicket.toFixed(1)}h por chamado
                   </p>
                 </div>
                 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-help group relative">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
                   <div className="flex items-center justify-between mb-2">
                     <BarChart3 className="h-8 w-8 text-yellow-500" />
                     <span className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -768,10 +787,16 @@ export default function TimesheetsAnalyticsPage() {
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Média de Horas/Dia</p>
-                  {/* Tooltip */}
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                    Média de horas trabalhadas por dia útil
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                  {/* Info Icon with Popover */}
+                  <div className="absolute top-2 right-2">
+                    <div className="group/tooltip relative">
+                      <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help" />
+                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
+                        <p className="font-semibold mb-1">Média Diária</p>
+                        <p>Média de horas trabalhadas por dia útil no período</p>
+                        <div className="absolute top-0 right-2 transform -translate-y-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                      </div>
+                    </div>
                   </div>
                   <div className="mt-2">
                     <span className="text-xs text-gray-500">
@@ -1057,8 +1082,8 @@ export default function TimesheetsAnalyticsPage() {
                           <div key={index} className="flex-1 flex flex-col items-center group">
                             <div className="w-full flex flex-col justify-end h-64 relative">
                               {/* Valor total no topo ao hover */}
-                              <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 pointer-events-none">
-                                <div className="bg-black/95 backdrop-blur-sm text-white text-xs rounded-lg px-3 py-2 shadow-xl whitespace-nowrap">
+                              <div className="absolute left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none" style={{ bottom: `calc(${heightPercentage}% + 10px)`, zIndex: 50 }}>
+                                <div className="bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-2xl whitespace-nowrap border border-gray-700">
                                   <div className="font-semibold text-sm mb-1">{day.hours.toFixed(1)}h</div>
                                   {day.approved > 0 && (
                                     <div className="flex items-center gap-1">

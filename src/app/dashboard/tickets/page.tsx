@@ -167,7 +167,13 @@ export default function TicketsPage() {
       fetchTickets(false)
     } catch (error: any) {
       console.error('Erro ao excluir ticket:', error)
-      toast.error('Erro ao excluir chamado')
+      
+      // Verificar se há uma mensagem específica sobre apontamentos
+      if (error.response?.data?.error) {
+        toast.error(error.response.data.error)
+      } else {
+        toast.error('Erro ao excluir chamado')
+      }
     }
   }
 
