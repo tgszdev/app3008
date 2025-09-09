@@ -873,7 +873,7 @@ export default function TimesheetsAnalyticsPage() {
                     <FolderOpen className="h-5 w-5 text-gray-400" />
                   </div>
                   <div className="space-y-3">
-                    {analytics.categoryDistribution.slice(0, 5).map((category, index) => (
+                    {analytics?.categoryDistribution.slice(0, 5).map((category, index) => (
                       <div key={index}>
                         <div className="flex justify-between items-center mb-1">
                           <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -900,7 +900,7 @@ export default function TimesheetsAnalyticsPage() {
                       </div>
                     ))}
                   </div>
-                  {analytics.categoryDistribution.length === 0 && (
+                  {analytics?.categoryDistribution.length === 0 && (
                     <div className="text-center py-4 text-gray-500 dark:text-gray-400">
                       <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
                       <p className="text-sm">Nenhuma categoria encontrada</p>
@@ -922,7 +922,7 @@ export default function TimesheetsAnalyticsPage() {
                     <AlertTriangle className="h-5 w-5 text-gray-400" />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    {analytics.priorityDistribution.map((priority, index) => {
+                    {analytics?.priorityDistribution.map((priority, index) => {
                       const getPriorityStyle = (p: string) => {
                         switch(p.toLowerCase()) {
                           case 'crítica': 
@@ -994,7 +994,7 @@ export default function TimesheetsAnalyticsPage() {
                       )
                     })}
                   </div>
-                  {analytics.priorityDistribution.length === 0 && (
+                  {analytics?.priorityDistribution.length === 0 && (
                     <div className="text-center py-4 text-gray-500 dark:text-gray-400">
                       <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
                       <p className="text-sm">Nenhuma prioridade encontrada</p>
@@ -1148,7 +1148,7 @@ export default function TimesheetsAnalyticsPage() {
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="space-y-3">
-                    {analytics.categoryDistribution.map((category, index) => (
+                    {analytics?.categoryDistribution.map((category, index) => (
                       <div key={index} className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
                         <div className="flex justify-between items-center mb-2">
                           <span className="font-medium text-gray-900 dark:text-white">
@@ -1241,7 +1241,7 @@ export default function TimesheetsAnalyticsPage() {
                   <AlertTriangle className="h-5 w-5 text-gray-400" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {analytics.priorityDistribution.map((priority, index) => (
+                  {analytics?.priorityDistribution.map((priority, index) => (
                     <div key={index} className={`rounded-lg p-4 ${getPriorityColor(priority.priority)}`}>
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-semibold text-lg">
