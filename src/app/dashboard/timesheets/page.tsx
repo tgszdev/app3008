@@ -339,23 +339,23 @@ export default function TimesheetsPage() {
           </p>
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex gap-2 w-full sm:w-auto">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm sm:text-base"
           >
             <Filter className="h-4 w-4" />
-            Filtros
+            <span className="hidden sm:inline">Filtros</span>
             {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
           
           {permissions.can_submit && (
             <button
               onClick={() => setShowAddForm(!showAddForm)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
             >
               <Plus className="h-4 w-4" />
-              Adicionar Apontamento
+              <span>Adicionar</span>
             </button>
           )}
         </div>
@@ -428,7 +428,7 @@ export default function TimesheetsPage() {
 
       {/* Cards de Tickets com Apontamentos */}
       {tickets.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {/* Agrupar apontamentos por ticket */}
           {(() => {
             const ticketsWithTimesheets = tickets.filter(ticket => {
@@ -482,7 +482,7 @@ export default function TimesheetsPage() {
           }
           
           return ticketsWithTimesheets.map(({ ticket, timesheets: ticketTimesheets, totalHours, approvedHours, pendingHours, rejectedHours, percentComplete, approvedCount, pendingCount, rejectedCount }) => (
-            <div key={ticket.id} className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden hover:border-slate-600 transition-colors">
+            <div key={ticket.id} className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden hover:border-slate-600 transition-colors w-full">
               {/* Card Compacto */}
               <div className="p-4">
                 {/* Header Minimalista */}
@@ -569,57 +569,60 @@ export default function TimesheetsPage() {
                     <h4 className="text-xs uppercase tracking-wider text-slate-400 mb-3">HISTÓRICO DE APONTAMENTOS</h4>
                     <div className="space-y-2 max-h-64 overflow-y-auto">
                       {ticketTimesheets.map((timesheet) => (
-                        <div key={timesheet.id} className="bg-slate-900/50 rounded-lg p-3 border border-slate-700">
-                          <div className="flex justify-between items-start mb-2">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="text-sm font-medium text-white">
+                        <div key={timesheet.id} className="bg-slate-900/50 rounded-lg p-4 border border-slate-700">
+                          <div className="flex flex-col sm:flex-row sm:justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-wrap items-center gap-2 mb-2">
+                                <span className="text-sm font-medium text-white truncate">
                                   {timesheet.user.name}
                                 </span>
                                 {getStatusBadge(timesheet.status)}
                               </div>
-                              <div className="flex items-center gap-3 text-xs text-slate-400">
-                                <span className="flex items-center gap-1">
-                                  <Calendar className="h-3 w-3" />
-                                  {format(parseISO(timesheet.work_date), "EEEE, dd 'de' MMMM", { locale: ptBR })}
+                              <div className="flex flex-wrap gap-3 text-xs text-slate-400">
+                                <span className="flex items-center gap-1 whitespace-nowrap">
+                                  <Calendar className="h-3 w-3 flex-shrink-0" />
+                                  {format(parseISO(timesheet.work_date), "dd/MM/yyyy", { locale: ptBR })}
                                 </span>
                                 <span className="flex items-center gap-1">
-                                  <Clock className="h-3 w-3" />
+                                  <Clock className="h-3 w-3 flex-shrink-0" />
                                   {timesheet.hours_worked}h
                                 </span>
                               </div>
                             </div>
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-start gap-1">
                               {timesheet.status === 'pending' && permissions.can_approve && (
                                 <>
                                   <button
                                     onClick={() => handleApprove(timesheet.id)}
-                                    className="p-1 text-green-400 hover:bg-green-400/20 rounded transition-colors"
+                                    className="p-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors group"
                                     title="Aprovar"
+                                    aria-label="Aprovar apontamento"
                                   >
-                                    <Check className="h-4 w-4" />
+                                    <CheckCircle className="h-5 w-5" />
                                   </button>
                                   <button
                                     onClick={() => handleReject(timesheet.id)}
-                                    className="p-1 text-red-400 hover:bg-red-400/20 rounded transition-colors"
+                                    className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors group"
                                     title="Rejeitar"
+                                    aria-label="Rejeitar apontamento"
                                   >
-                                    <X className="h-4 w-4" />
+                                    <XCircle className="h-5 w-5" />
                                   </button>
                                 </>
                               )}
                               {timesheet.status === 'pending' && timesheet.user_id === session?.user?.id && (
                                 <button
                                   onClick={() => handleDelete(timesheet.id)}
-                                  className="p-1 text-slate-400 hover:bg-slate-600 rounded transition-colors"
+                                  className="p-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg transition-colors group"
                                   title="Excluir"
+                                  aria-label="Excluir apontamento"
                                 >
-                                  <X className="h-3 w-3" />
+                                  <X className="h-5 w-5" />
                                 </button>
                               )}
                             </div>
                           </div>
-                          <p className="text-sm text-slate-300 mt-2">
+                          <p className="text-sm text-slate-300 mt-3 break-words">
                             {timesheet.description}
                           </p>
                           {timesheet.status === 'rejected' && timesheet.rejection_reason && (
