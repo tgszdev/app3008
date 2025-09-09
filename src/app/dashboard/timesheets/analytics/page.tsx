@@ -731,7 +731,7 @@ export default function TimesheetsAnalyticsPage() {
                       {analytics.totalCollaborators}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Colaboradores Ativos</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Colaboradores com Apontamentos</p>
                   {/* Tooltip */}
                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
                     Quantidade de colaboradores que fizeram apontamentos
@@ -762,25 +762,21 @@ export default function TimesheetsAnalyticsPage() {
                 
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-help group relative">
                   <div className="flex items-center justify-between mb-2">
-                    <Zap className="h-8 w-8 text-yellow-500" />
+                    <BarChart className="h-8 w-8 text-yellow-500" />
                     <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {analytics.productivityScore.toFixed(0)}%
+                      {analytics.averageHoursPerDay.toFixed(1)}h
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Score de Produtividade</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Média de Horas/Dia</p>
                   {/* Tooltip */}
                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                    Taxa de aprovação multiplicada pela eficiência
+                    Média de horas trabalhadas por dia útil
                     <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
                   </div>
                   <div className="mt-2">
-                    {analytics.productivityScore >= 80 ? (
-                      <span className="text-xs text-green-600">Excelente</span>
-                    ) : analytics.productivityScore >= 60 ? (
-                      <span className="text-xs text-yellow-600">Bom</span>
-                    ) : (
-                      <span className="text-xs text-red-600">Precisa Melhorar</span>
-                    )}
+                    <span className="text-xs text-gray-500">
+                      {analytics.daysWorked} dias trabalhados
+                    </span>
                   </div>
                 </div>
               </div>
@@ -1026,16 +1022,30 @@ export default function TimesheetsAnalyticsPage() {
               </div>
 
               {/* Gráfico de Tendências - Horas Diárias */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    Horas Diárias - Últimos 30 dias
-                  </h3>
-                  <Calendar className="h-5 w-5 text-gray-400" />
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-900 rounded-xl shadow-xl border border-gray-700 p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">
+                      Horas Diárias
+                    </h3>
+                    <p className="text-sm text-gray-400 mt-1">
+                      {filterStartDate && filterEndDate 
+                        ? `${format(parseISO(filterStartDate), 'dd/MM', { locale: ptBR })} a ${format(parseISO(filterEndDate), 'dd/MM', { locale: ptBR })}`
+                        : `${format(startOfMonth(new Date()), 'dd/MM', { locale: ptBR })} a ${format(endOfMonth(new Date()), 'dd/MM', { locale: ptBR })}`
+                      }
+                    </p>
+                  </div>
+                  <Calendar className="h-5 w-5 text-gray-500" />
                 </div>
                 <div className="overflow-x-auto">
-                  <div className="min-w-[600px] h-64">
-                    <div className="flex items-end justify-between h-full gap-1">
+                  <div className="min-w-[600px] h-72 relative">
+                    {/* Grid de fundo */}
+                    <div className="absolute inset-0 grid grid-rows-4 gap-0">
+                      {[100, 75, 50, 25].map((value) => (
+                        <div key={value} className="border-t border-gray-700/30" />
+                      ))}
+                    </div>
+                    <div className="flex items-end justify-between h-full gap-2 relative z-10">
                       {analytics.dailyData.map((day, index) => {
                         const maxHours = Math.max(...analytics.dailyData.map(d => d.hours)) || 1
                         const heightPercentage = (day.hours / maxHours) * 100
@@ -1044,51 +1054,86 @@ export default function TimesheetsAnalyticsPage() {
                         const rejectedPercentage = day.hours > 0 ? (day.rejected / day.hours) * 100 : 0
                         
                         return (
-                          <div key={index} className="flex-1 flex flex-col items-center">
-                            <div className="w-full flex flex-col justify-end h-48">
-                              <div 
-                                className="w-full bg-gray-300 dark:bg-gray-600 rounded-t relative group cursor-pointer"
-                                style={{ height: `${heightPercentage}%` }}
-                              >
-                                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                                  Total: {day.hours.toFixed(1)}h
-                                  <br />
-                                  <span className="text-green-400">Aprovadas: {day.approved.toFixed(1)}h</span>
-                                  <br />
-                                  <span className="text-yellow-400">Pendentes: {day.pending.toFixed(1)}h</span>
-                                  {day.rejected > 0 && (
-                                    <>
-                                      <br />
-                                      <span className="text-red-400">Rejeitadas: {day.rejected.toFixed(1)}h</span>
-                                    </>
-                                  )}
+                          <div key={index} className="flex-1 flex flex-col items-center group">
+                            <div className="w-full flex flex-col justify-end h-64 relative">
+                              {/* Valor total no topo ao hover */}
+                              <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                <div className="bg-black/90 backdrop-blur-sm text-white text-xs rounded-lg px-3 py-2 shadow-lg">
+                                  <div className="font-semibold text-sm mb-1">{day.hours.toFixed(1)}h</div>
+                                  <div className="space-y-0.5">
+                                    <div className="flex items-center gap-1">
+                                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                      <span className="text-green-400">{day.approved.toFixed(1)}h</span>
+                                    </div>
+                                    {day.pending > 0 && (
+                                      <div className="flex items-center gap-1">
+                                        <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                                        <span className="text-yellow-400">{day.pending.toFixed(1)}h</span>
+                                      </div>
+                                    )}
+                                    {day.rejected > 0 && (
+                                      <div className="flex items-center gap-1">
+                                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                                        <span className="text-red-400">{day.rejected.toFixed(1)}h</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1 w-2 h-2 bg-black/90 rotate-45"></div>
                                 </div>
-                                {/* Barra de aprovadas (verde) */}
+                              </div>
+                              
+                              {/* Barra com gradiente e animação */}
+                              <div 
+                                className="w-full rounded-t-lg overflow-hidden relative transition-all duration-500 hover:scale-105 cursor-pointer"
+                                style={{ 
+                                  height: `${heightPercentage}%`,
+                                  background: 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%)'
+                                }}
+                              >
+                                {/* Fundo com opacidade */}
+                                <div className="absolute inset-0 bg-gray-600/20 backdrop-blur-sm"></div>
+                                
+                                {/* Barra de aprovadas (verde) com gradiente */}
                                 <div 
-                                  className="absolute bottom-0 w-full bg-green-600 rounded-t"
-                                  style={{ height: `${approvedPercentage}%` }}
-                                />
-                                {/* Barra de pendentes (amarelo) */}
-                                <div 
-                                  className="absolute w-full bg-yellow-600"
+                                  className="absolute bottom-0 w-full transition-all duration-300"
                                   style={{ 
-                                    height: `${pendingPercentage}%`,
-                                    bottom: `${approvedPercentage}%`
+                                    height: `${approvedPercentage}%`,
+                                    background: 'linear-gradient(180deg, #10b981 0%, #059669 100%)',
+                                    boxShadow: '0 -2px 10px rgba(16, 185, 129, 0.3)'
                                   }}
                                 />
-                                {/* Barra de rejeitadas (vermelho) */}
-                                {rejectedPercentage > 0 && (
+                                
+                                {/* Barra de pendentes (amarelo) com gradiente */}
+                                {pendingPercentage > 0 && (
                                   <div 
-                                    className="absolute w-full bg-red-600"
+                                    className="absolute w-full transition-all duration-300"
                                     style={{ 
-                                      height: `${rejectedPercentage}%`,
-                                      bottom: `${approvedPercentage + pendingPercentage}%`
+                                      height: `${pendingPercentage}%`,
+                                      bottom: `${approvedPercentage}%`,
+                                      background: 'linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%)',
+                                      boxShadow: '0 -2px 10px rgba(251, 191, 36, 0.3)'
                                     }}
                                   />
                                 )}
+                                
+                                {/* Barra de rejeitadas (vermelho) com gradiente */}
+                                {rejectedPercentage > 0 && (
+                                  <div 
+                                    className="absolute w-full transition-all duration-300"
+                                    style={{ 
+                                      height: `${rejectedPercentage}%`,
+                                      bottom: `${approvedPercentage + pendingPercentage}%`,
+                                      background: 'linear-gradient(180deg, #ef4444 0%, #dc2626 100%)',
+                                      boxShadow: '0 -2px 10px rgba(239, 68, 68, 0.3)'
+                                    }}
+                                  />
+                                )}
+                                
+                                {/* Linha de topo animada */}
+                                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-white to-transparent opacity-50"></div>
                               </div>
                             </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-2 rotate-45 origin-left">
+                            <div className="text-xs text-gray-400 mt-3 font-medium">
                               {format(parseISO(day.date), 'dd/MM')}
                             </div>
                           </div>
@@ -1097,18 +1142,19 @@ export default function TimesheetsAnalyticsPage() {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-center gap-4 mt-4">
+              </div>
+                <div className="flex items-center justify-center gap-6 mt-6 pt-4 border-t border-gray-700/30">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-green-600 rounded"></div>
-                    <span className="text-xs text-gray-600 dark:text-gray-400">Aprovadas</span>
+                    <div className="w-3 h-3 rounded-full bg-gradient-to-b from-green-400 to-green-600 shadow-sm"></div>
+                    <span className="text-xs text-gray-400 font-medium">Aprovadas</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-yellow-600 rounded"></div>
-                    <span className="text-xs text-gray-600 dark:text-gray-400">Pendentes</span>
+                    <div className="w-3 h-3 rounded-full bg-gradient-to-b from-yellow-400 to-yellow-600 shadow-sm"></div>
+                    <span className="text-xs text-gray-400 font-medium">Pendentes</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-red-600 rounded"></div>
-                    <span className="text-xs text-gray-600 dark:text-gray-400">Rejeitadas</span>
+                    <div className="w-3 h-3 rounded-full bg-gradient-to-b from-red-400 to-red-600 shadow-sm"></div>
+                    <span className="text-xs text-gray-400 font-medium">Rejeitadas</span>
                   </div>
                 </div>
               </div>

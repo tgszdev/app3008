@@ -28,6 +28,11 @@ import {
   Shield,
   TrendingUp,
   UserCheck,
+  ClipboardList,
+  CheckCircle,
+  PieChart,
+  Lock,
+  Gauge,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
@@ -35,34 +40,16 @@ import NotificationBell from '@/components/notifications/NotificationBell'
 import { Tooltip } from '@/components/ui/tooltip'
 import { LucideIcon } from 'lucide-react'
 
-interface NavigationSubItem {
-  name: string
-  href: string
-  icon: LucideIcon
-  adminOnly?: boolean
-}
-
 interface NavigationItem {
   name: string
   href: string
   icon: LucideIcon
-  subItems?: NavigationSubItem[]
 }
 
 const navigation: NavigationItem[] = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Chamados', href: '/dashboard/tickets', icon: Ticket },
-  { 
-    name: 'Apontamentos', 
-    href: '/dashboard/timesheets', 
-    icon: Clock,
-    subItems: [
-      { name: 'Meus Apontamentos', href: '/dashboard/timesheets', icon: Clock },
-      { name: 'Aprovações', href: '/dashboard/timesheets/admin', icon: Shield, adminOnly: true },
-      { name: 'Analytics', href: '/dashboard/timesheets/analytics', icon: TrendingUp, adminOnly: true },
-      { name: 'Permissões', href: '/dashboard/timesheets/permissions', icon: UserCheck, adminOnly: true },
-    ]
-  },
+  { name: 'Apontamentos', href: '/dashboard/timesheets', icon: Clock },
   { name: 'Base de Conhecimento', href: '/dashboard/knowledge-base', icon: BookOpen },
   { name: 'Estatísticas', href: '/dashboard/analytics', icon: BarChart3 },
   { name: 'Comentários', href: '/dashboard/comments', icon: MessageSquare },
@@ -71,7 +58,10 @@ const navigation: NavigationItem[] = [
 
 const adminNavigation: NavigationItem[] = [
   { name: 'Usuários', href: '/dashboard/users', icon: Users },
-  { name: 'SLA', href: '/dashboard/sla', icon: Clock },
+  { name: 'Aprovação de Horas', href: '/dashboard/timesheets/admin', icon: CheckCircle },
+  { name: 'Analytics de Horas', href: '/dashboard/timesheets/analytics', icon: PieChart },
+  { name: 'Permissões', href: '/dashboard/timesheets/permissions', icon: Lock },
+  { name: 'SLA', href: '/dashboard/sla', icon: Gauge },
   { name: 'Configurações', href: '/dashboard/settings', icon: Settings },
 ]
 
@@ -88,17 +78,7 @@ export default function DashboardLayout({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set())
 
-  const toggleExpanded = (itemName: string) => {
-    const newExpanded = new Set(expandedItems)
-    if (newExpanded.has(itemName)) {
-      newExpanded.delete(itemName)
-    } else {
-      newExpanded.add(itemName)
-    }
-    setExpandedItems(newExpanded)
-  }
   
   // Load sidebar collapsed state from localStorage
   useEffect(() => {
@@ -166,72 +146,23 @@ export default function DashboardLayout({
           <nav className="flex-1 space-y-1 px-3 py-4">
             {allNavigation.map((item) => {
               const Icon = item.icon
-              const hasSubItems = item.subItems && item.subItems.length > 0
-              const isExpanded = expandedItems.has(item.name)
-              const isActive = pathname === item.href || (hasSubItems && item.subItems?.some((sub) => pathname === sub.href))
+              const isActive = pathname === item.href
               
               return (
-                <div key={item.name}>
-                  {hasSubItems ? (
-                    <>
-                      <button
-                        onClick={() => toggleExpanded(item.name)}
-                        className={cn(
-                          "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors",
-                          isActive
-                            ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
-                            : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                        )}
-                      >
-                        <div className="flex items-center">
-                          <Icon className="mr-3 h-5 w-5" />
-                          {item.name}
-                        </div>
-                        {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                      </button>
-                      {isExpanded && (
-                        <div className="ml-4 mt-1 space-y-1">
-                          {item.subItems
-                            ?.filter((subItem) => !subItem.adminOnly || isAdmin)
-                            .map((subItem) => {
-                              const SubIcon = subItem.icon
-                              const isSubActive = pathname === subItem.href
-                              return (
-                                <Link
-                                  key={subItem.name}
-                                  href={subItem.href}
-                                  className={cn(
-                                    "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors",
-                                    isSubActive
-                                      ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
-                                      : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
-                                  )}
-                                  onClick={() => setSidebarOpen(false)}
-                                >
-                                  <SubIcon className="mr-3 h-4 w-4" />
-                                  {subItem.name}
-                                </Link>
-                              )
-                            })}
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <Link
-                      href={item.href}
-                      className={cn(
-                        "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors",
-                        isActive
-                          ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
-                          : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                      )}
-                      onClick={() => setSidebarOpen(false)}
-                    >
-                      <Icon className="mr-3 h-5 w-5" />
-                      {item.name}
-                    </Link>
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors",
+                    isActive
+                      ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                   )}
-                </div>
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <Icon className="mr-3 h-5 w-5" />
+                  {item.name}
+                </Link>
               )
             })}
           </nav>
@@ -283,34 +214,11 @@ export default function DashboardLayout({
           <nav className="flex-1 space-y-1 px-3 py-4">
             {allNavigation.map((item) => {
               const Icon = item.icon
-              const hasSubItems = item.subItems && item.subItems.length > 0
-              const isExpanded = expandedItems.has(item.name)
-              const isActive = pathname === item.href || (hasSubItems && item.subItems?.some((sub) => pathname === sub.href))
+              const isActive = pathname === item.href
               
               if (sidebarCollapsed) {
-                // Collapsed sidebar - show tooltip for main item
-                if (hasSubItems) {
-                  // For items with subitems, clicking expands the sidebar
-                  return (
-                    <Tooltip key={item.name} content={item.name} side="right">
-                      <button
-                        onClick={() => {
-                          setSidebarCollapsed(false)
-                          toggleExpanded(item.name)
-                        }}
-                        className={cn(
-                          "w-full flex items-center justify-center px-2.5 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
-                          isActive
-                            ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
-                            : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                        )}
-                      >
-                        <Icon className="h-5 w-5 flex-shrink-0" />
-                      </button>
-                    </Tooltip>
-                  )
-                } else {
-                  const linkElement = (
+                return (
+                  <Tooltip key={item.name} content={item.name} side="right">
                     <Link
                       href={item.href}
                       className={cn(
@@ -322,75 +230,23 @@ export default function DashboardLayout({
                     >
                       <Icon className="h-5 w-5 flex-shrink-0" />
                     </Link>
-                  )
-                  return (
-                    <Tooltip key={item.name} content={item.name} side="right">
-                      {linkElement}
-                    </Tooltip>
-                  )
-                }
+                  </Tooltip>
+                )
               } else {
-                // Expanded sidebar - show full menu with subitems
                 return (
-                  <div key={item.name}>
-                    {hasSubItems ? (
-                      <>
-                        <button
-                          onClick={() => toggleExpanded(item.name)}
-                          className={cn(
-                            "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors",
-                            isActive
-                              ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
-                              : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                          )}
-                        >
-                          <div className="flex items-center">
-                            <Icon className="mr-3 h-5 w-5" />
-                            <span className="truncate">{item.name}</span>
-                          </div>
-                          {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                        </button>
-                        {isExpanded && (
-                          <div className="ml-4 mt-1 space-y-1">
-                            {item.subItems
-                              ?.filter((subItem) => !subItem.adminOnly || isAdmin)
-                              .map((subItem) => {
-                                const SubIcon = subItem.icon
-                                const isSubActive = pathname === subItem.href
-                                return (
-                                  <Link
-                                    key={subItem.name}
-                                    href={subItem.href}
-                                    className={cn(
-                                      "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors",
-                                      isSubActive
-                                        ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
-                                        : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
-                                    )}
-                                  >
-                                    <SubIcon className="mr-3 h-4 w-4" />
-                                    <span className="truncate">{subItem.name}</span>
-                                  </Link>
-                                )
-                              })}
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <Link
-                        href={item.href}
-                        className={cn(
-                          "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors",
-                          isActive
-                            ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
-                            : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                        )}
-                      >
-                        <Icon className="mr-3 h-5 w-5" />
-                        <span className="truncate">{item.name}</span>
-                      </Link>
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={cn(
+                      "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors",
+                      isActive
+                        ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                        : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                     )}
-                  </div>
+                  >
+                    <Icon className="mr-3 h-5 w-5" />
+                    <span className="truncate">{item.name}</span>
+                  </Link>
                 )
               }
             })}
