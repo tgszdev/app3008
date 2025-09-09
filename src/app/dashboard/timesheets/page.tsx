@@ -399,10 +399,10 @@ export default function TimesheetsPage() {
         </div>
         
         <div className="flex gap-2 w-full sm:w-auto">
-          {/* Busca Rápida por Número de Chamado - Melhorada */}
+          {/* Busca Rápida por Número de Chamado - Design Aprimorado */}
           <div className="relative group">
-            <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
-              <Ticket className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+            <div className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-400 dark:hover:border-blue-500 focus-within:border-blue-500 dark:focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 dark:focus-within:ring-blue-900/30 transition-all duration-200">
+              <Ticket className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
               <input
                 type="text"
                 placeholder="#chamado"
@@ -421,7 +421,7 @@ export default function TimesheetsPage() {
                     setFilterTicket('all')
                   }
                 }}
-                className="w-16 sm:w-20 bg-transparent border-none outline-none text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-sm focus:w-24 sm:focus:w-32 transition-all"
+                className="w-16 sm:w-20 bg-transparent border-none outline-none text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-sm focus:w-24 sm:focus:w-32 transition-all duration-200"
               />
               {quickSearchTicket && (
                 <button
@@ -429,15 +429,19 @@ export default function TimesheetsPage() {
                     setQuickSearchTicket('')
                     setFilterTicket('all')
                   }}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  className="ml-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  title="Limpar busca"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
               )}
             </div>
-            {/* Tooltip */}
-            <div className="absolute left-0 top-full mt-1 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap">
-              Busca rápida por número
+            {/* Tooltip indicativo */}
+            <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-10">
+              <div className="bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-md py-1 px-2 whitespace-nowrap">
+                Buscar por número
+              </div>
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-900 dark:border-b-gray-700"></div>
             </div>
           </div>
           
@@ -877,25 +881,18 @@ export default function TimesheetsPage() {
                                 setTicketSearch(`#${ticket.ticket_number} - ${formatTicketTitle(ticket.title)}`)
                                 setShowTicketSuggestions(false)
                               }}
-                              className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border-b border-gray-200 dark:border-gray-700 last:border-0"
+                              className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border-b border-gray-200 dark:border-gray-700 last:border-0 group relative"
+                              title={ticket.title.toUpperCase()}
                             >
-                              <div className="flex items-center gap-3 w-full">
-                                <div className="flex items-center gap-2">
-                                  <Ticket className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                                  <span className="font-semibold text-gray-900 dark:text-white">
-                                    #{String(ticket.ticket_number).padStart(3, '0')}
-                                  </span>
-                                </div>
-                                <div className="h-4 w-px bg-gray-300 dark:bg-gray-600" />
-                                <div className="flex-1 min-w-0 group relative">
-                                  <span className="text-sm text-gray-600 dark:text-gray-400 truncate block">
-                                    {formatTicketTitle(ticket.title, 45)}
-                                  </span>
-                                  {/* Tooltip com título completo */}
-                                  <div className="absolute left-0 bottom-full mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-sm rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap max-w-md">
-                                    <div className="text-xs font-medium">{ticket.title.toUpperCase()}</div>
-                                    <div className="absolute left-4 top-full w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-gray-900 dark:border-t-gray-700"></div>
-                                  </div>
+                              <div className="flex items-center gap-2 w-full">
+                                <Ticket className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                                <span className="font-semibold text-gray-900 dark:text-white whitespace-nowrap">
+                                  #{String(ticket.ticket_number).padStart(3, '0')}
+                                </span>
+                                {/* Tooltip flutuante com título completo */}
+                                <div className="absolute left-16 -top-8 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-[100] whitespace-nowrap max-w-xs">
+                                  {ticket.title.toUpperCase()}
+                                  <div className="absolute left-4 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
                                 </div>
                               </div>
                             </button>
