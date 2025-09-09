@@ -703,32 +703,7 @@ export default function TicketDetailsPage() {
             )}
           </div>
 
-          {/* Apontamentos de Horas */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold flex items-center gap-2">
-                <Clock size={20} />
-                Apontamentos de Horas
-              </h2>
-              <a
-                href={`/dashboard/timesheets?ticket_id=${ticketId}`}
-                className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-              >
-                Ver todos →
-              </a>
-            </div>
-            
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              <Clock className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>Visualize e gerencie apontamentos na página dedicada</p>
-              <a
-                href="/dashboard/timesheets"
-                className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Ir para Apontamentos
-              </a>
-            </div>
-          </div>
+
         </div>
 
         {/* Sidebar - Order 1 on mobile, Order 2 on desktop */}
