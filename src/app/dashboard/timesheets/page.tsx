@@ -33,6 +33,12 @@ interface Ticket {
   id: string
   ticket_number: number
   title: string
+  assigned_to?: string | null
+  assigned_to_user?: {
+    id: string
+    name: string
+    email: string
+  } | null
 }
 
 interface User {
@@ -79,6 +85,10 @@ export default function TimesheetsPage() {
   const [workDate, setWorkDate] = useState(format(new Date(), 'yyyy-MM-dd'))
   const [submitting, setSubmitting] = useState(false)
   
+  // Ticket search states
+  const [ticketSearch, setTicketSearch] = useState('')
+  const [showTicketSuggestions, setShowTicketSuggestions] = useState(false)
+  
   // Filter states
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [filterTicket, setFilterTicket] = useState<string>('all')
@@ -92,15 +102,46 @@ export default function TimesheetsPage() {
     fetchData()
   }, [filterStatus, filterTicket, filterStartDate, filterEndDate])
 
-  // Fechar modal com ESC
+  // Fechar modal com ESC e limpar formulário
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && showAddForm) {
-        setShowAddForm(false)
+      if (e.key === 'Escape') {
+        if (showAddForm) {
+          setShowAddForm(false)
+        }
+        if (showTicketSuggestions) {
+          setShowTicketSuggestions(false)
+        }
       }
     }
+    
+    // Fechar sugestões ao clicar fora
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      if (!target.closest('.ticket-search-container')) {
+        setShowTicketSuggestions(false)
+      }
+    }
+    
     window.addEventListener('keydown', handleEsc)
-    return () => window.removeEventListener('keydown', handleEsc)
+    window.addEventListener('click', handleClickOutside)
+    
+    return () => {
+      window.removeEventListener('keydown', handleEsc)
+      window.removeEventListener('click', handleClickOutside)
+    }
+  }, [showAddForm, showTicketSuggestions])
+  
+  // Limpar formulário quando o modal fechar
+  useEffect(() => {
+    if (!showAddForm) {
+      setSelectedTicket('')
+      setTicketSearch('')
+      setHoursWorked('')
+      setDescription('')
+      setWorkDate(format(new Date(), 'yyyy-MM-dd'))
+      setShowTicketSuggestions(false)
+    }
   }, [showAddForm])
 
   const fetchData = async () => {
@@ -122,10 +163,17 @@ export default function TimesheetsPage() {
         })
       }
       
-      // Buscar tickets disponíveis
+      // Buscar tickets disponíveis - filtrar apenas os atribuídos ao usuário logado
       try {
         const ticketsResponse = await apiClient.get('/api/tickets')
-        setTickets(ticketsResponse.data || [])
+        const allTickets = ticketsResponse.data || []
+        
+        // Filtrar apenas tickets onde o usuário logado é o responsável
+        const userTickets = allTickets.filter((ticket: Ticket) => 
+          ticket.assigned_to === session?.user?.id
+        )
+        
+        setTickets(userTickets)
       } catch (ticketError) {
         console.error('Erro ao buscar tickets:', ticketError)
         setTickets([])
@@ -192,6 +240,7 @@ export default function TimesheetsPage() {
         
         // Limpar formulário
         setSelectedTicket('')
+        setTicketSearch('')
         setHoursWorked('')
         setDescription('')
         setWorkDate(format(new Date(), 'yyyy-MM-dd'))
@@ -648,15 +697,15 @@ export default function TimesheetsPage() {
         </div>
       )}
       
-      {/* Mensagem quando não há tickets */}
+      {/* Mensagem quando não há chamados */}
       {tickets.length === 0 && (
         <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
           <Ticket className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-500 dark:text-gray-400">
-            Nenhum ticket disponível para apontamento
+            Nenhum chamado atribuído a você
           </p>
           <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
-            Crie tickets primeiro para poder adicionar apontamentos de horas
+            Você só pode adicionar apontamentos em chamados onde é o responsável
           </p>
         </div>
       )}
@@ -688,23 +737,99 @@ export default function TimesheetsPage() {
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+              <div className="relative ticket-search-container">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Ticket *
+                  Chamado *
                 </label>
-                <select
-                  value={selectedTicket}
-                  onChange={(e) => setSelectedTicket(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  required
-                >
-                  <option value="">Selecione um ticket</option>
-                  {tickets.map(ticket => (
-                    <option key={ticket.id} value={ticket.id}>
-                      #{ticket.ticket_number} - {ticket.title.toUpperCase()}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={ticketSearch}
+                    onChange={(e) => {
+                      setTicketSearch(e.target.value)
+                      setShowTicketSuggestions(true)
+                    }}
+                    onFocus={() => setShowTicketSuggestions(true)}
+                    placeholder="Digite para buscar o chamado..."
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white pr-10"
+                    required={!selectedTicket}
+                  />
+                  {selectedTicket && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedTicket('')
+                        setTicketSearch('')
+                        setShowTicketSuggestions(false)
+                      }}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+                
+                {/* Sugestões de chamados */}
+                {showTicketSuggestions && (
+                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto">
+                    {tickets.length === 0 ? (
+                      <div className="p-3 text-sm text-gray-500 dark:text-gray-400">
+                        Nenhum chamado atribuído a você
+                      </div>
+                    ) : (
+                      <>
+                        {tickets
+                          .filter(ticket => {
+                            const searchLower = ticketSearch.toLowerCase()
+                            return (
+                              ticket.ticket_number.toString().includes(searchLower) ||
+                              ticket.title.toLowerCase().includes(searchLower)
+                            )
+                          })
+                          .slice(0, 10) // Limitar a 10 sugestões
+                          .map(ticket => (
+                            <button
+                              key={ticket.id}
+                              type="button"
+                              onClick={() => {
+                                setSelectedTicket(ticket.id)
+                                setTicketSearch(`#${ticket.ticket_number} - ${ticket.title.toUpperCase()}`)
+                                setShowTicketSuggestions(false)
+                              }}
+                              className="w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border-b border-gray-100 dark:border-gray-700 last:border-0"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <span className="font-medium text-gray-900 dark:text-white">
+                                    #{ticket.ticket_number}
+                                  </span>
+                                  <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                                    {ticket.title.toUpperCase()}
+                                  </span>
+                                </div>
+                                {ticket.assigned_to_user && (
+                                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                                    {ticket.assigned_to_user.name}
+                                  </span>
+                                )}
+                              </div>
+                            </button>
+                          ))}
+                        {tickets.filter(ticket => {
+                          const searchLower = ticketSearch.toLowerCase()
+                          return (
+                            ticket.ticket_number.toString().includes(searchLower) ||
+                            ticket.title.toLowerCase().includes(searchLower)
+                          )
+                        }).length === 0 && (
+                          <div className="p-3 text-sm text-gray-500 dark:text-gray-400">
+                            Nenhum chamado encontrado com "{ticketSearch}"
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
               
               <div>

@@ -41,6 +41,7 @@ Sistema completo de gerenciamento de tickets de suporte com autenticação, cate
 - ✅ **Atribuição** para usuários específicos
 - ✅ **Comentários** com suporte a internos (apenas staff)
 - ✅ **Resolução** com notas detalhadas
+- ✅ **Filtro de responsabilidade** nos apontamentos (apenas chamados atribuídos ao usuário)
 
 ### Anexos e Imagens
 - ✅ **Upload de arquivos** via Supabase Storage
@@ -116,6 +117,9 @@ npm run db:seed     # Popular com dados de teste
 2. **Storage**: Buckets renomeados para uppercase (TICKET-ATTACHMENTS)
 3. **PDF**: Substituído hook useReactToPrint por componente ReactToPrint
 4. **Modal de Imagem**: Implementado visualizador com zoom e download
+5. **Seleção de Chamados**: Implementado campo de busca com filtro e sugestões
+6. **Filtro de Responsabilidade**: Apenas chamados atribuídos ao usuário aparecem
+7. **Terminologia**: Alterado "Ticket" para "Chamado" no modal de apontamento
 5. **Debug Tools**: Removidas páginas de teste da produção
 
 ## 📝 Credenciais de Teste
