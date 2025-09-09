@@ -214,7 +214,17 @@ export default function TimesheetsAnalyticsPage() {
     const totalCollaborators = uniqueUserIds.size
     
     // Total de horas por colaborador
-    const userMap = new Map<string, UserHoursData>()
+    interface UserHoursTemp {
+      name: string
+      totalHours: number
+      approvedHours: number
+      pendingHours: number
+      rejectedHours: number
+      ticketsSet: Set<string>
+      lastActivity: string
+    }
+    
+    const userMap = new Map<string, UserHoursTemp>()
     data.forEach(t => {
       const userName = t.user.name
       const current = userMap.get(userName) || {
@@ -223,8 +233,7 @@ export default function TimesheetsAnalyticsPage() {
         approvedHours: 0,
         pendingHours: 0,
         rejectedHours: 0,
-        ticketCount: new Set<string>(),
-        averageHoursPerTicket: 0,
+        ticketsSet: new Set<string>(),
         lastActivity: t.work_date
       }
       
@@ -233,9 +242,7 @@ export default function TimesheetsAnalyticsPage() {
       if (t.status === 'pending') current.pendingHours += parseFloat(t.hours_worked.toString())
       if (t.status === 'rejected') current.rejectedHours += parseFloat(t.hours_worked.toString())
       
-      if (typeof current.ticketCount === 'object') {
-        (current.ticketCount as Set<string>).add(t.ticket_id)
-      }
+      current.ticketsSet.add(t.ticket_id)
       
       if (t.work_date > current.lastActivity) {
         current.lastActivity = t.work_date
@@ -244,10 +251,15 @@ export default function TimesheetsAnalyticsPage() {
       userMap.set(userName, current)
     })
     
-    const userHoursData = Array.from(userMap.values()).map(user => ({
-      ...user,
-      ticketCount: typeof user.ticketCount === 'object' ? (user.ticketCount as Set<string>).size : 0,
-      averageHoursPerTicket: user.totalHours / (typeof user.ticketCount === 'object' ? (user.ticketCount as Set<string>).size : 1)
+    const userHoursData: UserHoursData[] = Array.from(userMap.values()).map(user => ({
+      name: user.name,
+      totalHours: user.totalHours,
+      approvedHours: user.approvedHours,
+      pendingHours: user.pendingHours,
+      rejectedHours: user.rejectedHours,
+      ticketCount: user.ticketsSet.size,
+      averageHoursPerTicket: user.totalHours / (user.ticketsSet.size || 1),
+      lastActivity: user.lastActivity
     })).sort((a, b) => b.totalHours - a.totalHours)
     
     // Distribuição por categoria
