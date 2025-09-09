@@ -1188,39 +1188,57 @@ export default function TimesheetsAnalyticsPage() {
                       </defs>
                       
                       {/* Grid lines */}
-                      {[0, 64, 128, 192, 256].map((y) => (
-                        <line
-                          key={y}
-                          x1="50"
-                          y1={y}
-                          x2="750"
-                          y2={y}
-                          stroke="rgba(148, 163, 184, 0.1)"
-                          strokeWidth="1"
-                        />
-                      ))}
+                      {(() => {
+                        const numLines = 6 // Número de linhas de grid (incluindo topo e base)
+                        const lines = []
+                        for (let i = 0; i < numLines; i++) {
+                          const y = (256 / (numLines - 1)) * i
+                          lines.push(
+                            <line
+                              key={i}
+                              x1="50"
+                              y1={y}
+                              x2="750"
+                              y2={y}
+                              stroke="rgba(148, 163, 184, 0.1)"
+                              strokeWidth="1"
+                              strokeDasharray={i === 0 || i === numLines - 1 ? "0" : "2,2"}
+                            />
+                          )
+                        }
+                        return lines
+                      })()}
                       
                       {/* Y-axis labels */}
                       {(() => {
                         const maxHours = Math.max(...analytics.dailyData.map(d => d.hours)) || 10
-                        const roundedMax = Math.ceil(maxHours / 5) * 5
-                        return [0, 0.25, 0.5, 0.75, 1].map((ratio, i) => (
-                          <text
-                            key={i}
-                            x="40"
-                            y={256 - (ratio * 256) + 4}
-                            textAnchor="end"
-                            className="fill-slate-400 text-xs"
-                          >
-                            {Math.round(roundedMax * ratio)}h
-                          </text>
-                        ))
+                        const stepSize = maxHours <= 10 ? 2 : maxHours <= 20 ? 5 : maxHours <= 50 ? 10 : 20
+                        const roundedMax = Math.ceil(maxHours / stepSize) * stepSize
+                        const numSteps = 5
+                        const labels = []
+                        
+                        for (let i = 0; i <= numSteps; i++) {
+                          const value = (roundedMax / numSteps) * i
+                          labels.push(
+                            <text
+                              key={i}
+                              x="40"
+                              y={256 - ((i / numSteps) * 256) + 4}
+                              textAnchor="end"
+                              className="fill-slate-400 text-xs"
+                            >
+                              {value.toFixed(0)}h
+                            </text>
+                          )
+                        }
+                        return labels
                       })()}
                       
                       {/* Lines and areas */}
                       {(() => {
                         const maxHours = Math.max(...analytics.dailyData.map(d => d.hours)) || 10
-                        const roundedMax = Math.ceil(maxHours / 5) * 5
+                        const stepSize = maxHours <= 10 ? 2 : maxHours <= 20 ? 5 : maxHours <= 50 ? 10 : 20
+                        const roundedMax = Math.ceil(maxHours / stepSize) * stepSize
                         const xStep = 700 / (analytics.dailyData.length - 1 || 1)
                         
                         // Create path data for each status
@@ -1419,39 +1437,57 @@ export default function TimesheetsAnalyticsPage() {
                       </defs>
                       
                       {/* Grid lines */}
-                      {[0, 48, 96, 144, 192].map((y) => (
-                        <line
-                          key={y}
-                          x1="40"
-                          y1={y}
-                          x2="360"
-                          y2={y}
-                          stroke="rgba(148, 163, 184, 0.1)"
-                          strokeWidth="1"
-                        />
-                      ))}
+                      {(() => {
+                        const numLines = 5 // Número de linhas de grid
+                        const lines = []
+                        for (let i = 0; i < numLines; i++) {
+                          const y = (192 / (numLines - 1)) * i
+                          lines.push(
+                            <line
+                              key={i}
+                              x1="40"
+                              y1={y}
+                              x2="360"
+                              y2={y}
+                              stroke="rgba(148, 163, 184, 0.1)"
+                              strokeWidth="1"
+                              strokeDasharray={i === 0 || i === numLines - 1 ? "0" : "2,2"}
+                            />
+                          )
+                        }
+                        return lines
+                      })()}
                       
                       {/* Y-axis labels */}
                       {(() => {
                         const maxHours = Math.max(...analytics.monthlyTrend.map(m => m.hours)) || 100
-                        const roundedMax = Math.ceil(maxHours / 50) * 50
-                        return [0, 0.25, 0.5, 0.75, 1].map((ratio, i) => (
-                          <text
-                            key={i}
-                            x="35"
-                            y={192 - (ratio * 192) + 4}
-                            textAnchor="end"
-                            className="fill-slate-400 text-xs"
-                          >
-                            {Math.round(roundedMax * ratio)}
-                          </text>
-                        ))
+                        const stepSize = maxHours <= 10 ? 2 : maxHours <= 25 ? 5 : maxHours <= 50 ? 10 : maxHours <= 100 ? 25 : 50
+                        const roundedMax = Math.ceil(maxHours / stepSize) * stepSize
+                        const numSteps = 4
+                        const labels = []
+                        
+                        for (let i = 0; i <= numSteps; i++) {
+                          const value = (roundedMax / numSteps) * i
+                          labels.push(
+                            <text
+                              key={i}
+                              x="35"
+                              y={192 - ((i / numSteps) * 192) + 4}
+                              textAnchor="end"
+                              className="fill-slate-400 text-xs"
+                            >
+                              {value.toFixed(0)}h
+                            </text>
+                          )
+                        }
+                        return labels
                       })()}
                       
                       {/* Line and area */}
                       {(() => {
                         const maxHours = Math.max(...analytics.monthlyTrend.map(m => m.hours)) || 100
-                        const roundedMax = Math.ceil(maxHours / 50) * 50
+                        const stepSize = maxHours <= 10 ? 2 : maxHours <= 25 ? 5 : maxHours <= 50 ? 10 : maxHours <= 100 ? 25 : 50
+                        const roundedMax = Math.ceil(maxHours / stepSize) * stepSize
                         const xStep = 320 / (analytics.monthlyTrend.length - 1 || 1)
                         
                         const linePath = analytics.monthlyTrend.map((month, i) => {
