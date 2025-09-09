@@ -548,48 +548,6 @@ export default function TimesheetsAnalyticsPage() {
         </div>
       </div>
 
-      {/* Dicas para melhor atendimento */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-        <div className="flex items-start gap-3">
-          <div className="flex-shrink-0">
-            <div className="flex items-center justify-center w-8 h-8 bg-blue-100 dark:bg-blue-800 rounded-full">
-              <span className="text-blue-600 dark:text-blue-300 text-lg">💡</span>
-            </div>
-          </div>
-          <div className="flex-1">
-            <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
-              Dicas para um atendimento mais rápido:
-            </h3>
-            <ul className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
-              <li className="flex items-start gap-1">
-                <span className="text-blue-500">•</span>
-                <span>Seja específico no título do chamado</span>
-              </li>
-              <li className="flex items-start gap-1">
-                <span className="text-blue-500">•</span>
-                <span>Inclua mensagens de erro exatas, se houver</span>
-              </li>
-              <li className="flex items-start gap-1">
-                <span className="text-blue-500">•</span>
-                <span>Informe quando o problema começou</span>
-              </li>
-              <li className="flex items-start gap-1">
-                <span className="text-blue-500">•</span>
-                <span>Descreva o que você estava tentando fazer</span>
-              </li>
-              <li className="flex items-start gap-1">
-                <span className="text-blue-500">•</span>
-                <span>Selecione a categoria apropriada</span>
-              </li>
-              <li className="flex items-start gap-1">
-                <span className="text-blue-500">•</span>
-                <span>Defina a prioridade adequada</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
       {/* Filtros */}
       {showFilters && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
@@ -712,7 +670,7 @@ export default function TimesheetsAnalyticsPage() {
             <div className="space-y-6">
               {/* KPI Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-help group relative">
                   <div className="flex items-center justify-between mb-2">
                     <Clock className="h-8 w-8 text-blue-500" />
                     <span className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -720,6 +678,11 @@ export default function TimesheetsAnalyticsPage() {
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Total de Horas</p>
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                    Soma de todas as horas registradas no período
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                  </div>
                   <div className="mt-2 flex items-center gap-2">
                     <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                       <div 
@@ -731,7 +694,7 @@ export default function TimesheetsAnalyticsPage() {
                   </div>
                 </div>
                 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-help group relative">
                   <div className="flex items-center justify-between mb-2">
                     <Users className="h-8 w-8 text-purple-500" />
                     <span className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -739,12 +702,17 @@ export default function TimesheetsAnalyticsPage() {
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Colaboradores Ativos</p>
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                    Quantidade de colaboradores que fizeram apontamentos
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                  </div>
                   <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
                     Média: {analytics.averageHoursPerUser.toFixed(1)}h por pessoa
                   </p>
                 </div>
                 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-help group relative">
                   <div className="flex items-center justify-between mb-2">
                     <Ticket className="h-8 w-8 text-green-500" />
                     <span className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -752,12 +720,17 @@ export default function TimesheetsAnalyticsPage() {
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Chamados Trabalhados</p>
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                    Total de chamados únicos com apontamentos
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                  </div>
                   <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
                     Média: {analytics.averageHoursPerTicket.toFixed(1)}h por chamado
                   </p>
                 </div>
                 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-help group relative">
                   <div className="flex items-center justify-between mb-2">
                     <Zap className="h-8 w-8 text-yellow-500" />
                     <span className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -765,6 +738,11 @@ export default function TimesheetsAnalyticsPage() {
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Score de Produtividade</p>
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                    Taxa de aprovação multiplicada pela eficiência
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                  </div>
                   <div className="mt-2">
                     {analytics.productivityScore >= 80 ? (
                       <span className="text-xs text-green-600">Excelente</span>
@@ -779,10 +757,15 @@ export default function TimesheetsAnalyticsPage() {
 
               {/* Status Distribution */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-help group relative">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Distribuição por Status</h3>
                     <Activity className="h-5 w-5 text-gray-400" />
+                  </div>
+                  {/* Tooltip */}
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                    Percentual de horas por situação de aprovação
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
                   </div>
                   <div className="space-y-3">
                     <div>
@@ -825,10 +808,15 @@ export default function TimesheetsAnalyticsPage() {
                 </div>
 
                 {/* Top Chamados */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 lg:col-span-2">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 lg:col-span-2 cursor-help group relative">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Top 5 Chamados Consumidores de Tempo</h3>
                     <Ticket className="h-5 w-5 text-gray-400" />
+                  </div>
+                  {/* Tooltip */}
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                    Chamados que mais consumiram horas no período
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
                   </div>
                   <div className="space-y-2">
                     {analytics.topTickets.slice(0, 5).map((ticket, index) => (
@@ -860,17 +848,19 @@ export default function TimesheetsAnalyticsPage() {
               {/* Horas por Categoria e Prioridade */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Horas por Categoria */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-help group relative">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                         Horas por Categoria
                       </h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        💡 Dica: Identifique categorias que demandam mais atenção
-                      </p>
                     </div>
                     <FolderOpen className="h-5 w-5 text-gray-400" />
+                  </div>
+                  {/* Tooltip */}
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                    Distribuição de horas por tipo de categoria
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
                   </div>
                   <div className="space-y-3">
                     {analytics?.categoryDistribution.slice(0, 5).map((category, index) => (
@@ -909,17 +899,19 @@ export default function TimesheetsAnalyticsPage() {
                 </div>
 
                 {/* Horas por Prioridade */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-help group relative">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                         Horas por Prioridade
                       </h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        ⚠️ Atenção: Priorize chamados críticos e de alta prioridade
-                      </p>
                     </div>
                     <AlertTriangle className="h-5 w-5 text-gray-400" />
+                  </div>
+                  {/* Tooltip */}
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                    Distribuição de horas por nível de prioridade
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 w-2 h-2 bg-gray-900 rotate-45"></div>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     {analytics?.priorityDistribution.map((priority, index) => {
