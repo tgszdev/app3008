@@ -55,7 +55,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json(data || [])
+    // Mapear activity_description para description para compatibilidade
+    const mappedData = (data || []).map(item => ({
+      ...item,
+      description: item.activity_description || item.description || ''
+    }))
+
+    return NextResponse.json(mappedData)
   } catch (error) {
     console.error('Unexpected error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -113,14 +119,14 @@ export async function POST(request: NextRequest) {
       }, { status: 403 })
     }
 
-    // Inserir apontamento
+    // Inserir apontamento - usando activity_description como nome da coluna
     const { data, error } = await supabaseAdmin
       .from('timesheets')
       .insert({
         ticket_id,
         user_id: session.user.id,
         hours_worked: parseFloat(hours_worked),
-        description,
+        activity_description: description, // Usando o nome correto da coluna
         work_date: work_date || new Date().toISOString().split('T')[0],
         status: 'pending'
       })
@@ -136,7 +142,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json(data, { status: 201 })
+    // Mapear activity_description para description para compatibilidade
+    const mappedData = {
+      ...data,
+      description: data.activity_description || data.description || ''
+    }
+
+    return NextResponse.json(mappedData, { status: 201 })
   } catch (error) {
     console.error('Unexpected error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

@@ -128,7 +128,12 @@ export default function TimesheetsPage() {
         if (filterEndDate) params.append('end_date', filterEndDate)
         
         const timesheetsResponse = await apiClient.get(`/api/timesheets?${params.toString()}`)
-        setTimesheets(timesheetsResponse.data || [])
+        // Mapear activity_description para description se necessário
+        const mappedTimesheets = (timesheetsResponse.data || []).map((t: any) => ({
+          ...t,
+          description: t.description || t.activity_description || ''
+        }))
+        setTimesheets(mappedTimesheets)
       } catch (timesheetError) {
         console.error('Erro ao buscar apontamentos:', timesheetError)
         setTimesheets([])
@@ -166,7 +171,12 @@ export default function TimesheetsPage() {
       
       if (response.status === 201) {
         toast.success('Apontamento adicionado com sucesso!')
-        setTimesheets([response.data, ...timesheets])
+        // Mapear activity_description para description se necessário
+        const newTimesheet = {
+          ...response.data,
+          description: response.data.description || response.data.activity_description || ''
+        }
+        setTimesheets([newTimesheet, ...timesheets])
         
         // Limpar formulário
         setSelectedTicket('')
@@ -192,8 +202,13 @@ export default function TimesheetsPage() {
       
       if (response.status === 200) {
         toast.success('Apontamento aprovado!')
+        // Mapear activity_description para description
+        const updatedTimesheet = {
+          ...response.data,
+          description: response.data.description || response.data.activity_description || ''
+        }
         setTimesheets(timesheets.map(t => 
-          t.id === id ? response.data : t
+          t.id === id ? updatedTimesheet : t
         ))
       }
     } catch (error: any) {
@@ -215,8 +230,13 @@ export default function TimesheetsPage() {
       
       if (response.status === 200) {
         toast.success('Apontamento rejeitado')
+        // Mapear activity_description para description
+        const updatedTimesheet = {
+          ...response.data,
+          description: response.data.description || response.data.activity_description || ''
+        }
         setTimesheets(timesheets.map(t => 
-          t.id === id ? response.data : t
+          t.id === id ? updatedTimesheet : t
         ))
       }
     } catch (error: any) {
