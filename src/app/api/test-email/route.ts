@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendNotificationEmail } from '@/lib/email-config'
 import { auth } from '@/lib/auth'
+import { requireUserEmail } from '@/lib/session-utils'
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,11 +11,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    console.log('Testando envio de email para:', session.user.email)
+    // Obter email de forma segura
+    const userEmail = requireUserEmail(session)
+    console.log('Testando envio de email para:', userEmail)
 
     // Enviar email de teste
     const result = await sendNotificationEmail({
-      to: session.user.email,
+      to: userEmail,
       title: '✅ Teste de Email - Sistema de Suporte',
       message: `Olá ${session.user.name}! Este é um email de teste do Sistema de Suporte Técnico. Se você está recebendo este email, significa que a configuração do Gmail está funcionando corretamente!`,
       actionUrl: '/dashboard',
