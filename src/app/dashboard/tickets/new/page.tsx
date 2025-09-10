@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { usePermissions } from '@/hooks/usePermissions'
 import {
   ArrowLeft,
   Send,
@@ -46,6 +47,7 @@ interface Category {
 export default function NewTicketPage() {
   const router = useRouter()
   const { data: session } = useSession()
+  const { hasPermission, loading: permissionsLoading } = usePermissions()
   const [loading, setLoading] = useState(false)
   const [analysts, setAnalysts] = useState<UserData[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -71,20 +73,36 @@ export default function NewTicketPage() {
     fetchCategories()
   }, [])
 
+  // Debug permissions
+  useEffect(() => {
+    if (!permissionsLoading) {
+      console.log('=== DEBUG PERMISSIONS ===')
+      console.log('User can assign tickets:', hasPermission('tickets_assign'))
+      console.log('User can edit all tickets:', hasPermission('tickets_edit_all'))
+    }
+  }, [permissionsLoading, hasPermission])
+
   const fetchAnalysts = async () => {
     try {
       // Buscar usuários que têm permissão para atribuir tickets
       const response = await axios.get('/api/users/with-permission?permission=tickets_assign')
+      console.log('=== DEBUG FETCH ANALYSTS ===')
+      console.log('Response status:', response.status)
+      console.log('Users with tickets_assign permission:', response.data)
+      console.log('Number of users found:', response.data.length)
       setAnalysts(response.data)
-      console.log('Usuários com permissão tickets_assign:', response.data)
     } catch (error) {
-      console.error('Erro ao buscar analistas:', error)
+      console.error('=== ERROR FETCHING ANALYSTS ===')
+      console.error('Error details:', error)
       // Fallback: buscar todos os usuários se o novo endpoint falhar
       try {
         const fallbackResponse = await axios.get('/api/users')
+        console.log('=== FALLBACK USERS ===')
+        console.log('All users:', fallbackResponse.data)
         const analystUsers = fallbackResponse.data.filter((user: UserData) => 
           user.role === 'analyst' || user.role === 'admin'
         )
+        console.log('Filtered analyst users:', analystUsers)
         setAnalysts(analystUsers)
       } catch (fallbackError) {
         console.error('Erro no fallback:', fallbackError)
@@ -387,30 +405,36 @@ export default function NewTicketPage() {
               )}
             </div>
 
-            {/* Assigned To - Only visible for admin and analyst */}
-            {(session?.user?.role === 'admin' || session?.user?.role === 'analyst') && (
+            {/* Assigned To - Only visible for users with tickets_assign permission */}
+            {hasPermission('tickets_assign') && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <User className="inline h-4 w-4 mr-1" />
                   Atribuir para (opcional)
                 </label>
-                <select
-                  value={formData.assigned_to}
-                  onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">Selecione um analista...</option>
-                  {analysts.map((analyst) => (
-                    <option key={analyst.id} value={analyst.id}>
-                      {analyst.name} ({analyst.role === 'admin' ? 'Admin' : 'Analista'})
-                    </option>
-                  ))}
-                </select>
+                {analysts.length === 0 ? (
+                  <div className="w-full px-4 py-2 border border-yellow-300 dark:border-yellow-600 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 text-sm">
+                    Carregando lista de responsáveis...
+                  </div>
+                ) : (
+                  <select
+                    value={formData.assigned_to}
+                    onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Selecione um responsável...</option>
+                    {analysts.map((analyst) => (
+                      <option key={analyst.id} value={analyst.id}>
+                        {analyst.name} ({analyst.email})
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
             )}
 
-            {/* Due Date - Only visible for admin and analyst */}
-            {(session?.user?.role === 'admin' || session?.user?.role === 'analyst') && (
+            {/* Due Date - Only visible for users with tickets_assign permission */}
+            {hasPermission('tickets_assign') && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Calendar className="inline h-4 w-4 mr-1" />
@@ -427,8 +451,8 @@ export default function NewTicketPage() {
             )}
           </div>
           
-          {/* Internal Ticket Checkbox - Only visible for admin and analyst */}
-          {(session?.user?.role === 'admin' || session?.user?.role === 'analyst') && (
+          {/* Internal Ticket Checkbox - Only visible for users with tickets_edit_all permission (admins and analysts) */}
+          {hasPermission('tickets_edit_all') && (
             <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
               <label className="flex items-start space-x-3 cursor-pointer">
                 <input
