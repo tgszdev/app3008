@@ -441,17 +441,17 @@ export default function TimesheetsPage() {
       <TimesheetNavigation />
       
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             Apontamentos de Horas
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
             Gerencie seus apontamentos de horas trabalhadas
           </p>
         </div>
         
-        <div className="flex gap-2 w-full sm:w-auto">
+        <div className="flex gap-2 w-auto">
           {/* Busca Rápida por Número de Chamado - Design Aprimorado */}
           <div className="relative group">
             <div className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-400 dark:hover:border-blue-500 focus-within:border-blue-500 dark:focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 dark:focus-within:ring-blue-900/30 transition-all duration-200">
@@ -664,7 +664,7 @@ export default function TimesheetsPage() {
                       #{ticket.ticket_number}
                     </Link>
                   </div>
-                  <span className="text-sm text-slate-500">
+                  <span className="text-xs sm:text-sm text-slate-500 whitespace-nowrap">
                     {ticketTimesheets.length} {ticketTimesheets.length === 1 ? 'apontamento' : 'apontamentos'}
                   </span>
                 </div>
@@ -679,28 +679,31 @@ export default function TimesheetsPage() {
                       />
                     </div>
                   </div>
-                  <span className="text-xs text-slate-400 min-w-fit">
+                  <span className="text-xs text-slate-400 whitespace-nowrap flex-shrink-0">
                     {percentComplete}% aprovado
                   </span>
                 </div>
                 
                 {/* Estatísticas Inline */}
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-4 text-sm">
-                    <span className="text-green-400">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm flex-wrap">
+                    <span className="text-green-400 whitespace-nowrap">
                       <span className="font-semibold">{approvedCount}</span>
-                      <span className="text-xs text-slate-500 ml-1">aprovadas</span>
+                      <span className="text-xs text-slate-500 ml-0.5 hidden sm:inline">aprovadas</span>
+                      <span className="text-xs text-slate-500 ml-0.5 sm:hidden">aprov.</span>
                     </span>
-                    <span className="text-yellow-400">
+                    <span className="text-yellow-400 whitespace-nowrap">
                       <span className="font-semibold">{pendingCount}</span>
-                      <span className="text-xs text-slate-500 ml-1">pendentes</span>
+                      <span className="text-xs text-slate-500 ml-0.5 hidden sm:inline">pendentes</span>
+                      <span className="text-xs text-slate-500 ml-0.5 sm:hidden">pend.</span>
                     </span>
-                    <span className="text-red-400">
+                    <span className="text-red-400 whitespace-nowrap">
                       <span className="font-semibold">{rejectedCount}</span>
-                      <span className="text-xs text-slate-500 ml-1">rejeitadas</span>
+                      <span className="text-xs text-slate-500 ml-0.5 hidden sm:inline">rejeitadas</span>
+                      <span className="text-xs text-slate-500 ml-0.5 sm:hidden">rejeit.</span>
                     </span>
                   </div>
-                  <div className="text-sm text-slate-400">
+                  <div className="text-xs sm:text-sm text-slate-400 whitespace-nowrap">
                     {totalHours.toFixed(1)}h total
                   </div>
                 </div>

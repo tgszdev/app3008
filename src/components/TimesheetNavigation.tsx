@@ -55,14 +55,14 @@ export default function TimesheetNavigation() {
           <Link
             key={link.href}
             href={link.href}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg transition-colors ${
               isActive
                 ? 'bg-blue-600 text-white'
                 : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
             }`}
           >
-            <Icon className="h-4 w-4" />
-            <span className="text-sm font-medium">{link.label}</span>
+            <Icon className="h-4 w-4 flex-shrink-0" />
+            <span className="text-xs sm:text-sm font-medium whitespace-nowrap">{link.label}</span>
           </Link>
         )
       })}

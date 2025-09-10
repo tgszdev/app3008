@@ -559,12 +559,12 @@ export default function TimesheetsAnalyticsPage() {
       <TimesheetNavigation />
       
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             Analytics de Apontamentos
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
             Análise completa de horas apontadas e produtividade
           </p>
         </div>
@@ -572,19 +572,19 @@ export default function TimesheetsAnalyticsPage() {
         <div className="flex gap-2">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             <Filter className="h-4 w-4" />
-            Filtros
+            <span className="hidden sm:inline">Filtros</span>
             {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
           
           <button
             onClick={exportToCSV}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Download className="h-4 w-4" />
-            Exportar CSV
+            <span className="text-xs sm:text-sm">Exportar CSV</span>
           </button>
         </div>
       </div>
@@ -708,7 +708,7 @@ export default function TimesheetsAnalyticsPage() {
                       {analytics.totalHours.toFixed(1)}h
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Total de Horas</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Total de Horas</p>
                   {/* Info Icon with Popover */}
                   <div className="absolute top-2 right-2">
                     <div className="group/tooltip relative">
@@ -727,7 +727,7 @@ export default function TimesheetsAnalyticsPage() {
                         style={{ width: `${analytics.approvalRate}%` }}
                       />
                     </div>
-                    <span className="text-xs text-gray-500">{analytics.approvalRate.toFixed(0)}% aprovadas</span>
+                    <span className="text-xs text-gray-500 whitespace-nowrap">{analytics.approvalRate.toFixed(0)}% aprovadas</span>
                   </div>
                 </div>
                 
@@ -738,7 +738,7 @@ export default function TimesheetsAnalyticsPage() {
                       {analytics.totalCollaborators}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Colaboradores com Apontamentos</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-tight">Colaboradores com Apontamentos</p>
                   {/* Info Icon with Popover */}
                   <div className="absolute top-2 right-2">
                     <div className="group/tooltip relative">
@@ -750,7 +750,7 @@ export default function TimesheetsAnalyticsPage() {
                       </div>
                     </div>
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-2 truncate">
                     Média: {analytics.averageHoursPerUser.toFixed(1)}h por pessoa
                   </p>
                 </div>
@@ -762,7 +762,7 @@ export default function TimesheetsAnalyticsPage() {
                       {analytics.uniqueTickets}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Chamados Trabalhados</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Chamados Trabalhados</p>
                   {/* Info Icon with Popover */}
                   <div className="absolute top-2 right-2">
                     <div className="group/tooltip relative">
@@ -774,7 +774,7 @@ export default function TimesheetsAnalyticsPage() {
                       </div>
                     </div>
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-2 truncate">
                     Média: {analytics.averageHoursPerTicket.toFixed(1)}h por chamado
                   </p>
                 </div>
@@ -786,7 +786,7 @@ export default function TimesheetsAnalyticsPage() {
                       {analytics.averageHoursPerDay.toFixed(1)}h
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Média de Horas/Dia</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Média de Horas/Dia</p>
                   {/* Info Icon with Popover */}
                   <div className="absolute top-2 right-2">
                     <div className="group/tooltip relative">
