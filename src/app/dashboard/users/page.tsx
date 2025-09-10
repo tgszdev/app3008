@@ -8,26 +8,33 @@ import axios from 'axios'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
-const RoleBadge = ({ role }: { role: string }) => {
-  const config: Record<string, { color: string; icon: any; label: string }> = {
+const RoleBadge = ({ role, roles }: { role: string; roles?: Role[] }) => {
+  // Obter o display_name da role
+  const label = getRoleLabel(role, roles)
+  
+  // Configuração de ícones e cores para roles conhecidas
+  const config: Record<string, { color: string; icon: any }> = {
     admin: { 
       color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
-      icon: Shield,
-      label: 'Administrador'
+      icon: Shield
     },
     analyst: { 
       color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-      icon: UserCheck,
-      label: 'Analista'
+      icon: UserCheck
     },
     user: { 
       color: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
-      icon: UserIcon,
-      label: 'Usuário'
+      icon: UserIcon
     },
   }
   
-  const { color, icon: Icon, label } = config[role] || config.user
+  // Para roles customizadas, usar configuração padrão
+  const defaultConfig = {
+    color: getRoleBadgeColor(role),
+    icon: UserIcon
+  }
+  
+  const { color, icon: Icon } = config[role] || defaultConfig
   
   return (
     <span className={cn("inline-flex items-center px-2 py-1 text-xs font-medium rounded-full", color)}>
@@ -73,6 +80,14 @@ interface UserFormData {
   password?: string
 }
 
+interface Role {
+  id: string
+  name: string
+  display_name: string
+  permissions: any
+  is_system: boolean
+}
+
 const getRoleBadgeColor = (role: string) => {
   switch (role) {
     case 'admin':
@@ -82,11 +97,28 @@ const getRoleBadgeColor = (role: string) => {
     case 'user':
       return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300'
     default:
-      return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300'
+      // Para roles customizadas, usar cores alternativas
+      const colors = [
+        'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
+        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+        'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300',
+        'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300'
+      ]
+      // Usar hash do nome da role para escolher uma cor consistente
+      const hash = role.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+      return colors[hash % colors.length]
   }
 }
 
-const getRoleLabel = (role: string) => {
+const getRoleLabel = (role: string, roles?: Role[]) => {
+  // Se temos a lista de roles, buscar o display_name
+  if (roles) {
+    const foundRole = roles.find(r => r.name === role)
+    if (foundRole) return foundRole.display_name
+  }
+  
+  // Fallback para roles conhecidas
   switch (role) {
     case 'admin':
       return 'Administrador'
@@ -95,7 +127,8 @@ const getRoleLabel = (role: string) => {
     case 'user':
       return 'Usuário'
     default:
-      return role
+      // Capitalizar a primeira letra para roles customizadas
+      return role.charAt(0).toUpperCase() + role.slice(1)
   }
 }
 
@@ -103,6 +136,7 @@ export default function UsersPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [users, setUsers] = useState<User[]>([])
+  const [roles, setRoles] = useState<Role[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
@@ -141,6 +175,25 @@ export default function UsersPage() {
       router.push('/dashboard')
     }
   }, [status, isCurrentUserAdmin, router])
+
+  // Buscar roles do banco
+  const fetchRoles = async () => {
+    try {
+      const response = await axios.get('/api/roles')
+      if (Array.isArray(response.data)) {
+        setRoles(response.data)
+        console.log(`Carregados ${response.data.length} perfis disponíveis`)
+      }
+    } catch (error: any) {
+      console.error('Erro ao buscar perfis:', error)
+      // Se falhar, usar roles padrão como fallback
+      setRoles([
+        { id: '1', name: 'admin', display_name: 'Administrador', permissions: {}, is_system: true },
+        { id: '2', name: 'analyst', display_name: 'Analista', permissions: {}, is_system: true },
+        { id: '3', name: 'user', display_name: 'Usuário', permissions: {}, is_system: true }
+      ])
+    }
+  }
 
   // Buscar usuários do banco
   const fetchUsers = async () => {
@@ -188,6 +241,7 @@ export default function UsersPage() {
   }
 
   useEffect(() => {
+    fetchRoles()
     fetchUsers()
   }, [])
 
@@ -418,9 +472,11 @@ export default function UsersPage() {
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="all">Todos os Perfis</option>
-            <option value="admin">Administrador</option>
-            <option value="analyst">Analista</option>
-            <option value="user">Usuário</option>
+            {roles.map(role => (
+              <option key={role.id} value={role.name}>
+                {role.display_name}
+              </option>
+            ))}
           </select>
 
           <select
@@ -455,7 +511,7 @@ export default function UsersPage() {
             
             <div className="flex items-center justify-between text-sm">
               <span className={`px-2 py-1 rounded-full text-xs ${getRoleBadgeColor(user.role)}`}>
-                {getRoleLabel(user.role)}
+                {getRoleLabel(user.role, roles)}
               </span>
               
               {session?.user?.role === 'admin' && (
@@ -521,7 +577,7 @@ export default function UsersPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <RoleBadge role={user.role} />
+                    <RoleBadge role={user.role} roles={roles} />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     {user.department || '-'}
@@ -782,9 +838,20 @@ export default function UsersPage() {
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value="user">Usuário</option>
-                  <option value="analyst">Analista</option>
-                  <option value="admin">Administrador</option>
+                  {roles.length > 0 ? (
+                    roles.map(role => (
+                      <option key={role.id} value={role.name}>
+                        {role.display_name}
+                      </option>
+                    ))
+                  ) : (
+                    // Fallback caso as roles não tenham sido carregadas
+                    <>
+                      <option value="user">Usuário</option>
+                      <option value="analyst">Analista</option>
+                      <option value="admin">Administrador</option>
+                    </>
+                  )}
                 </select>
               </div>
 
