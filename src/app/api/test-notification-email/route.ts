@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 import { sendNotificationEmail } from '@/lib/email-config'
+import { requireUserEmail } from '@/lib/session-utils'
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,8 +14,11 @@ export async function POST(request: NextRequest) {
 
     const { type } = await request.json()
     
+    // Obter email de forma segura
+    const userEmail = requireUserEmail(session)
+    
     console.log('=== TESTE DE NOTIFICAÇÃO POR EMAIL ===')
-    console.log('Usuário:', session.user.email)
+    console.log('Usuário:', userEmail)
     console.log('Tipo:', type || 'ticket_status_changed')
 
     // 1. Verificar preferências do usuário
@@ -62,7 +66,7 @@ export async function POST(request: NextRequest) {
     console.log('Tentando enviar email diretamente...')
     
     const emailResult = await sendNotificationEmail({
-      to: session.user.email,
+      to: userEmail,
       title: `🔔 Teste de Notificação - ${type || 'Status Alterado'}`,
       message: `Este é um teste de notificação por email. Se você está recebendo este email, o sistema de notificações está funcionando corretamente para o tipo: ${type || 'ticket_status_changed'}`,
       actionUrl: '/dashboard/tickets',
@@ -105,7 +109,7 @@ export async function POST(request: NextRequest) {
         : '❌ Falha ao enviar email de teste',
       details: {
         emailResult,
-        recipient: session.user.email,
+        recipient: userEmail,
         configSource: hasDbConfig ? 'database' : hasEnvConfig ? 'environment' : 'none',
         hasPreferences: !!preferences,
         notificationCreated: !notifError
