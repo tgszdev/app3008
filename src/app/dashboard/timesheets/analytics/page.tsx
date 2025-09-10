@@ -172,7 +172,7 @@ export default function TimesheetsAnalyticsPage() {
       const ticketsData = ticketsResponse.data || []
       setTickets(ticketsData)
       
-      // Buscar apontamentos com filtros
+      // Buscar apontamentos com filtros para os dados gerais
       const params = new URLSearchParams()
       if (filterStatus !== 'all') params.append('status', filterStatus)
       if (filterStartDate) params.append('start_date', filterStartDate)
@@ -181,6 +181,10 @@ export default function TimesheetsAnalyticsPage() {
       
       const response = await apiClient.get(`/api/timesheets?${params.toString()}`)
       const data = response.data || []
+      
+      // Buscar TODOS os apontamentos sem filtros para o gráfico de Evolução Mensal
+      const allTimesheetsResponse = await apiClient.get('/api/timesheets')
+      const allTimesheetsData = allTimesheetsResponse.data || []
       
       // Enriquecer dados com informações dos tickets
       const enrichedData = data.map((timesheet: TimeSheetData) => {
@@ -196,8 +200,22 @@ export default function TimesheetsAnalyticsPage() {
         }
       })
       
+      // Enriquecer todos os dados para o gráfico mensal
+      const allEnrichedData = allTimesheetsData.map((timesheet: TimeSheetData) => {
+        const ticketInfo = ticketsData.find((t: TicketDetails) => t.id === timesheet.ticket_id)
+        return {
+          ...timesheet,
+          ticket: {
+            ...timesheet.ticket,
+            priority: ticketInfo?.priority || 'Média',
+            category: ticketInfo?.category || 'Geral',
+            status: ticketInfo?.status || 'open'
+          }
+        }
+      })
+      
       setTimesheets(enrichedData)
-      calculateAnalytics(enrichedData, ticketsData)
+      calculateAnalytics(enrichedData, ticketsData, allEnrichedData)
     } catch (error) {
       console.error('Error fetching data:', error)
       toast.error('Erro ao carregar dados')
@@ -206,7 +224,9 @@ export default function TimesheetsAnalyticsPage() {
     }
   }
 
-  const calculateAnalytics = (data: TimeSheetData[], ticketsData: TicketDetails[]) => {
+  const calculateAnalytics = (data: TimeSheetData[], ticketsData: TicketDetails[], allData?: TimeSheetData[]) => {
+    // Use allData para o gráfico de Evolução Mensal se disponível, senão use data filtrada
+    const monthlyData = allData || data
     // Totais de horas
     const totalHours = data.reduce((sum, t) => sum + parseFloat(t.hours_worked.toString()), 0)
     const approvedHours = data
@@ -391,9 +411,9 @@ export default function TimesheetsAnalyticsPage() {
       }))
       .slice(-8) // Últimas 8 semanas
     
-    // Tendência mensal - Incluir dados de todos os anos
+    // Tendência mensal - Usar TODOS os dados sem filtros
     const monthlyMap = new Map<string, number>()
-    data.forEach(t => {
+    monthlyData.forEach(t => {
       const month = format(parseISO(t.work_date), 'yyyy-MM')
       const current = monthlyMap.get(month) || 0
       monthlyMap.set(month, current + parseFloat(t.hours_worked.toString()))
@@ -1450,7 +1470,7 @@ export default function TimesheetsAnalyticsPage() {
                       Evolução Mensal
                     </h3>
                     <div className="flex gap-2">
-                      {[currentYear, currentYear - 1, currentYear - 2].map(year => (
+                      {[currentYear - 2, currentYear - 1, currentYear].map(year => (
                         <button
                           key={year}
                           onClick={() => setSelectedYear(year)}
