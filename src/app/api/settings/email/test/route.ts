@@ -62,10 +62,18 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
+    // Verificar se temos um email válido
+    if (!session.user.email) {
+      return NextResponse.json({
+        success: false,
+        error: 'Email do usuário não encontrado na sessão'
+      }, { status: 400 })
+    }
+
     // Enviar email de teste
     const mailOptions = {
       from: `${config.fromName || 'Sistema de Suporte'} <${config.from || config.user}>`,
-      to: session.user.email,
+      to: session.user.email as string,
       subject: '✅ Teste de Configuração de Email - Sistema de Suporte',
       html: `
         <!DOCTYPE html>
