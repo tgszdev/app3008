@@ -1549,44 +1549,83 @@ export default function TimesheetsAnalyticsPage() {
                           month.year === selectedYear
                         )
                         
-                        // If no data for selected year, create empty months
-                        const yearData = filteredMonthlyData.length > 0 ? filteredMonthlyData : 
+                        // Get current date
+                        const currentDate = new Date()
+                        const currentYear = currentDate.getFullYear()
+                        const currentMonth = currentDate.getMonth()
+                        
+                        // If no data for selected year, create empty months (but only up to current month if it's current year)
+                        let yearData = filteredMonthlyData.length > 0 ? filteredMonthlyData : 
                           Array.from({ length: 12 }, (_, i) => ({
                             month: format(new Date(selectedYear, i, 1), 'MMM/yy', { locale: ptBR }),
+                            year: selectedYear,
                             hours: 0,
                             growth: 0
                           }))
+                        
+                        // Filter out future months if viewing current year
+                        if (selectedYear === currentYear) {
+                          yearData = yearData.filter((_, index) => index <= currentMonth)
+                        } else if (selectedYear > currentYear) {
+                          // If selected year is in the future, show no data
+                          yearData = []
+                        }
                         
                         const maxHours = Math.max(...yearData.map(m => m.hours), 10) || 100
                         const stepSize = maxHours <= 10 ? 2 : maxHours <= 25 ? 5 : maxHours <= 50 ? 10 : maxHours <= 100 ? 25 : 50
                         const roundedMax = Math.ceil(maxHours / stepSize) * stepSize
                         const xStep = 320 / (yearData.length - 1 || 1)
                         
-                        const linePath = yearData.map((month, i) => {
-                          const x = 40 + (i * xStep)
+                        // Only create path for months with data or past months
+                        const dataWithValues = yearData.filter((month, index) => {
+                          // For current year, include only up to current month
+                          if (selectedYear === currentYear) {
+                            return index <= currentMonth && (month.hours > 0 || index <= currentMonth)
+                          }
+                          // For past years, include all months with data
+                          return month.hours > 0 || selectedYear < currentYear
+                        })
+                        
+                        const linePath = dataWithValues.length > 0 ? dataWithValues.map((month, i) => {
+                          const monthIndex = yearData.indexOf(month)
+                          const x = 40 + (monthIndex * xStep)
                           const y = 180 - ((month.hours / roundedMax) * 160)
                           return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
-                        }).join(' ')
+                        }).join(' ') : ''
                         
                         return (
                           <>
                             {/* Area fill */}
-                            <path
-                              d={`${linePath} L ${40 + ((yearData.length - 1) * xStep)} 180 L 40 180 Z`}
-                              fill="url(#monthlyGradient)"
-                            />
+                            {linePath && (
+                              <path
+                                d={`${linePath} L ${40 + ((dataWithValues.length - 1) * xStep)} 180 L 40 180 Z`}
+                                fill="url(#monthlyGradient)"
+                              />
+                            )}
                             
                             {/* Line */}
-                            <path
-                              d={linePath}
-                              fill="none"
-                              stroke="rgb(168, 85, 247)"
-                              strokeWidth="3"
-                              className="drop-shadow-lg"
-                            />
+                            {linePath && (
+                              <path
+                                d={linePath}
+                                fill="none"
+                                stroke="rgb(168, 85, 247)"
+                                strokeWidth="3"
+                                className="drop-shadow-lg"
+                              />
+                            )}
                             
                             {/* Data points and labels */}
                             {yearData.map((month, i) => {
+                              // Don't render future months
+                              if (selectedYear === currentYear && i > currentMonth) {
+                                return null
+                              }
+                              
+                              // Don't render points for months with no data (except for current/past months of current year)
+                              if (month.hours === 0 && !(selectedYear === currentYear && i <= currentMonth)) {
+                                return null
+                              }
+                              
                               const x = 40 + (i * xStep)
                               const y = 180 - ((month.hours / roundedMax) * 160)
                               
@@ -1661,12 +1700,24 @@ export default function TimesheetsAnalyticsPage() {
                           month.year === selectedYear
                         )
                         
-                        const yearData = filteredMonthlyData.length > 0 ? filteredMonthlyData : 
+                        const currentDate = new Date()
+                        const currentYear = currentDate.getFullYear()
+                        const currentMonth = currentDate.getMonth()
+                        
+                        let yearData = filteredMonthlyData.length > 0 ? filteredMonthlyData : 
                           Array.from({ length: 12 }, (_, i) => ({
                             month: format(new Date(selectedYear, i, 1), 'MMM/yy', { locale: ptBR }),
+                            year: selectedYear,
                             hours: 0,
                             growth: 0
                           }))
+                        
+                        // Filter out future months if viewing current year
+                        if (selectedYear === currentYear) {
+                          yearData = yearData.filter((_, index) => index <= currentMonth)
+                        } else if (selectedYear > currentYear) {
+                          yearData = []
+                        }
                         
                         return yearData.map((month, i) => {
                           const xStep = 320 / (yearData.length - 1 || 1)
