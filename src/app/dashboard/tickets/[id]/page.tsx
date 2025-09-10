@@ -12,6 +12,7 @@ import { useSession } from 'next-auth/react'
 import { getAttachmentUrl, isImageFile } from '@/lib/storage-utils'
 import { SimplePrintButton as PrintButton } from '@/components/SimplePrintButton'
 import ImageModal from '@/components/ImageModal'
+import { usePermissions } from '@/hooks/usePermissions'
 
 interface User {
   id: string
@@ -106,6 +107,20 @@ export default function TicketDetailsPage() {
   const [reactivateReason, setReactivateReason] = useState('')
   const [selectedImage, setSelectedImage] = useState<{url: string, name: string, size?: number, type?: string} | null>(null)
   
+  // Hook de permissões
+  const { hasPermission, loading: permissionsLoading } = usePermissions()
+  
+  // Verificar permissões específicas
+  const canAssignTickets = hasPermission('tickets_assign')
+  const canEditAllTickets = hasPermission('tickets_edit_all')
+  const canEditOwnTickets = hasPermission('tickets_edit_own')
+  const canCloseTickets = hasPermission('tickets_close')
+  const canDeleteTickets = hasPermission('tickets_delete')
+  
+  // Determinar se pode editar este ticket
+  const isOwner = ticket?.created_by === session?.user?.id
+  const canEditThisTicket = canEditAllTickets || (canEditOwnTickets && isOwner)
+  
   useEffect(() => {
     if (ticketId) {
       fetchTicket()
@@ -138,10 +153,22 @@ export default function TicketDetailsPage() {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('/api/users')
-      setUsers(response.data.filter((u: User) => u.role === 'analyst' || u.role === 'admin'))
+      // Buscar usuários que têm permissão para atribuir tickets
+      const response = await axios.get('/api/users/with-permission?permission=tickets_assign')
+      setUsers(response.data)
+      console.log('Usuários com permissão tickets_assign:', response.data)
     } catch (error) {
       console.error('Erro ao buscar usuários:', error)
+      // Fallback: buscar todos os usuários se o novo endpoint falhar
+      try {
+        const fallbackResponse = await axios.get('/api/users')
+        const assignableUsers = fallbackResponse.data.filter((u: User) => 
+          u.role === 'analyst' || u.role === 'admin'
+        )
+        setUsers(assignableUsers)
+      } catch (fallbackError) {
+        console.error('Erro no fallback:', fallbackError)
+      }
     }
   }
 
@@ -158,9 +185,9 @@ export default function TicketDetailsPage() {
     const file = event.target.files?.[0]
     if (!file || !ticket) return
 
-    // Block non-admin users from uploading to cancelled tickets
-    if (ticket.status === 'cancelled' && session?.user && 'role' in session.user && session.user.role !== 'admin') {
-      toast.error('Apenas administradores podem anexar arquivos em tickets cancelados')
+    // Block users without permission from uploading to cancelled tickets
+    if (ticket.status === 'cancelled' && !canDeleteTickets) {
+      toast.error('Você não tem permissão para anexar arquivos em tickets cancelados')
       event.target.value = ''
       return
     }
@@ -467,9 +494,9 @@ export default function TicketDetailsPage() {
           </div>
           
           <div className="flex gap-2">
-            {/* Status - Apenas admin e analyst podem alterar */}
+            {/* Status - Baseado em permissões */}
             <div className="relative">
-              {editingStatus && (session?.user?.role === 'admin' || session?.user?.role === 'analyst') ? (
+              {editingStatus && canEditThisTicket ? (
                 <div className="flex gap-2">
                   <select
                     value={newStatus}
@@ -480,8 +507,8 @@ export default function TicketDetailsPage() {
                     <option value="in_progress">Em Progresso</option>
                     <option value="resolved">Resolvido</option>
                     <option value="closed">Fechado</option>
-                    {/* Only show cancelled option for admin */}
-                    {session?.user?.role === 'admin' && (
+                    {/* Cancelado apenas para quem tem permissão de deletar */}
+                    {canDeleteTickets && (
                       <option value="cancelled">Cancelado</option>
                     )}
                   </select>
@@ -501,22 +528,24 @@ export default function TicketDetailsPage() {
               ) : (
                 <button
                   onClick={() => {
-                    // Apenas admin e analyst podem alterar status (mas se cancelado, apenas admin)
-                    if (ticket.status === 'cancelled' && session?.user?.role !== 'admin') {
-                      toast.error('Apenas administradores podem alterar o status de tickets cancelados')
+                    // Verificar permissões para alterar status
+                    if (ticket.status === 'cancelled' && !canDeleteTickets) {
+                      toast.error('Você não tem permissão para alterar o status de tickets cancelados')
                       return
                     }
-                    if (session?.user?.role === 'admin' || session?.user?.role === 'analyst') {
+                    if (canEditThisTicket) {
                       setEditingStatus(true)
+                    } else {
+                      toast.error('Você não tem permissão para alterar o status deste ticket')
                     }
                   }}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white ${statusConfig[ticket.status].color} ${
-                    (session?.user?.role === 'admin' || session?.user?.role === 'analyst') && 
-                    (ticket.status !== 'cancelled' || session?.user?.role === 'admin') 
+                    canEditThisTicket && 
+                    (ticket.status !== 'cancelled' || canDeleteTickets) 
                       ? 'hover:opacity-90 cursor-pointer' 
                       : 'cursor-default'
                   }`}
-                  disabled={session?.user?.role === 'user'}
+                  disabled={!canEditThisTicket}
                 >
                   <StatusIcon size={16} />
                   {statusConfig[ticket.status].label}
@@ -653,8 +682,8 @@ export default function TicketDetailsPage() {
               )}
             </div>
 
-            {/* Add Comment Form - Disabled for cancelled tickets unless admin */}
-            {ticket.status === 'cancelled' && session?.user?.role !== 'admin' ? (
+            {/* Add Comment Form - Disabled for cancelled tickets unless has delete permission */}
+            {ticket.status === 'cancelled' && !canDeleteTickets ? (
               <div className="border-t pt-4">
                 <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg text-center">
                   <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -670,11 +699,11 @@ export default function TicketDetailsPage() {
                   placeholder="Adicionar comentário..."
                   className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 resize-none"
                   rows={3}
-                  disabled={ticket.status === 'cancelled' && session?.user?.role !== 'admin'}
+                  disabled={ticket.status === 'cancelled' && !canDeleteTickets}
                 />
                 <div className="flex justify-between items-center mt-2">
-                  {/* Checkbox para comentário interno - apenas para admin e analyst */}
-                  {(session?.user?.role === 'admin' || session?.user?.role === 'analyst') && (
+                  {/* Checkbox para comentário interno - baseado em permissões */}
+                  {(canEditAllTickets || canAssignTickets) && (
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
@@ -688,10 +717,10 @@ export default function TicketDetailsPage() {
                       </span>
                     </label>
                   )}
-                  <div className={!session?.user?.role || session?.user?.role === 'user' ? 'w-full flex justify-end' : ''}>
+                  <div className={!(canEditAllTickets || canAssignTickets) ? 'w-full flex justify-end' : ''}>
                     <button
                       type="submit"
-                      disabled={submittingComment || !comment.trim() || (ticket.status === 'cancelled' && session?.user?.role !== 'admin')}
+                      disabled={submittingComment || !comment.trim() || (ticket.status === 'cancelled' && !canDeleteTickets)}
                       className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Send size={16} />
@@ -720,10 +749,10 @@ export default function TicketDetailsPage() {
                 <p className="text-sm text-gray-500">{ticket.created_by_user?.email}</p>
               </div>
 
-              {/* Responsável - Apenas admin e analyst podem alterar */}
+              {/* Responsável - Baseado em permissões */}
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Responsável</p>
-                {editingAssignee && (session?.user?.role === 'admin' || session?.user?.role === 'analyst') ? (
+                {editingAssignee && canAssignTickets ? (
                   <div className="space-y-2">
                     <select
                       value={newAssignee}
@@ -755,18 +784,20 @@ export default function TicketDetailsPage() {
                 ) : (
                   <div 
                     onClick={() => {
-                      // Apenas admin e analyst podem alterar responsável (mas se cancelado, apenas admin)
-                      if (ticket.status === 'cancelled' && session?.user?.role !== 'admin') {
-                        toast.error('Apenas administradores podem alterar o responsável de tickets cancelados')
+                      // Verificar permissões para atribuir ticket
+                      if (ticket.status === 'cancelled' && !canDeleteTickets) {
+                        toast.error('Você não tem permissão para alterar o responsável de tickets cancelados')
                         return
                       }
-                      if (session?.user?.role === 'admin' || session?.user?.role === 'analyst') {
+                      if (canAssignTickets) {
                         setEditingAssignee(true)
+                      } else {
+                        toast.error('Você não tem permissão para atribuir tickets')
                       }
                     }}
                     className={`${
-                      (session?.user?.role === 'admin' || session?.user?.role === 'analyst') && 
-                      (ticket.status !== 'cancelled' || session?.user?.role === 'admin')
+                      canAssignTickets && 
+                      (ticket.status !== 'cancelled' || canDeleteTickets)
                         ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700' 
                         : 'cursor-default'
                     } p-2 -m-2 rounded`}
@@ -836,9 +867,9 @@ export default function TicketDetailsPage() {
             <h2 className="text-xl font-bold mb-4">Ações</h2>
             
             <div className="space-y-2">
-              {/* Botões de Ação - Apenas admin e analyst (mas se cancelado, apenas admin) */}
-              {((session?.user?.role === 'admin' || session?.user?.role === 'analyst') && 
-                (ticket.status !== 'cancelled' || session?.user?.role === 'admin')) && (
+              {/* Botões de Ação - Baseado em permissões */}
+              {((canEditThisTicket || canAssignTickets) && 
+                (ticket.status !== 'cancelled' || canDeleteTickets)) && (
                 <>
                   <button
                     onClick={() => setEditingStatus(true)}
@@ -856,8 +887,8 @@ export default function TicketDetailsPage() {
                 </>
               )}
               
-              {/* File Upload - Disabled for cancelled tickets unless admin */}
-              {ticket.status === 'cancelled' && session?.user?.role !== 'admin' ? (
+              {/* File Upload - Disabled for cancelled tickets unless has delete permission */}
+              {ticket.status === 'cancelled' && !canDeleteTickets ? (
                 <div className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
                   <Paperclip size={16} />
                   <span className="text-gray-600 dark:text-gray-400">Anexos bloqueados</span>
@@ -867,7 +898,7 @@ export default function TicketDetailsPage() {
                   <input
                     type="file"
                     onChange={handleFileUpload}
-                    disabled={uploadingFile || (ticket.status === 'cancelled' && session?.user?.role !== 'admin')}
+                    disabled={uploadingFile || (ticket.status === 'cancelled' && !canDeleteTickets)}
                     className="hidden"
                     accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.txt,.zip,.rar"
                   />
@@ -878,8 +909,8 @@ export default function TicketDetailsPage() {
                 </label>
               )}
               
-              {/* Botão de Excluir - Apenas admin */}
-              {session?.user?.role === 'admin' && (
+              {/* Botão de Excluir - Baseado em permissão */}
+              {canDeleteTickets && (
                 <button
                   onClick={handleDelete}
                   className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-2"
