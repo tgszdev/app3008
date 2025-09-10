@@ -87,7 +87,8 @@ export const authConfig: NextAuthConfig = {
             id: user.id,
             email: user.email,
             name: user.name,
-            role: user.role,
+            role: user.role_name || user.role, // Usar role_name se disponível
+            role_name: user.role_name, // Incluir role_name também
             department: user.department,
             avatar_url: user.avatar_url,
           }
@@ -103,6 +104,7 @@ export const authConfig: NextAuthConfig = {
       if (user) {
         token.id = user.id
         token.role = user.role
+        token.role_name = (user as any).role_name // Adicionar role_name
         token.department = user.department
         token.avatar_url = user.avatar_url
       }
@@ -112,6 +114,7 @@ export const authConfig: NextAuthConfig = {
       if (session?.user) {
         session.user.id = token.id as string
         session.user.role = token.role as string
+        session.user.role_name = token.role_name as string // Adicionar role_name
         session.user.department = token.department as string
         session.user.avatar_url = token.avatar_url as string
       }

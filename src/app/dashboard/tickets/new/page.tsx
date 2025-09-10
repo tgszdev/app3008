@@ -73,13 +73,22 @@ export default function NewTicketPage() {
 
   const fetchAnalysts = async () => {
     try {
-      const response = await axios.get('/api/users')
-      const analystUsers = response.data.filter((user: UserData) => 
-        user.role === 'analyst' || user.role === 'admin'
-      )
-      setAnalysts(analystUsers)
+      // Buscar usuários que têm permissão para atribuir tickets
+      const response = await axios.get('/api/users/with-permission?permission=tickets_assign')
+      setAnalysts(response.data)
+      console.log('Usuários com permissão tickets_assign:', response.data)
     } catch (error) {
       console.error('Erro ao buscar analistas:', error)
+      // Fallback: buscar todos os usuários se o novo endpoint falhar
+      try {
+        const fallbackResponse = await axios.get('/api/users')
+        const analystUsers = fallbackResponse.data.filter((user: UserData) => 
+          user.role === 'analyst' || user.role === 'admin'
+        )
+        setAnalysts(analystUsers)
+      } catch (fallbackError) {
+        console.error('Erro no fallback:', fallbackError)
+      }
     }
   }
 
