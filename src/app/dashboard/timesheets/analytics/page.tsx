@@ -118,7 +118,7 @@ interface Analytics {
   // Dados temporais
   dailyData: Array<{ date: string; hours: number; approved: number; pending: number; rejected: number }>
   weeklyData: Array<{ week: string; hours: number; users: number }>
-  monthlyTrend: Array<{ month: string; hours: number; growth: number }>
+  monthlyTrend: Array<{ month: string; year: number; hours: number; growth: number }>
   
   // Eficiência
   approvalRate: number
@@ -147,6 +147,10 @@ export default function TimesheetsAnalyticsPage() {
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [filterUser, setFilterUser] = useState<string>('all')
   const [filterCategory, setFilterCategory] = useState<string>('all')
+  
+  // Year filter for monthly evolution chart
+  const currentYear = new Date().getFullYear()
+  const [selectedYear, setSelectedYear] = useState<number>(currentYear)
 
   useEffect(() => {
     fetchData()
@@ -387,7 +391,7 @@ export default function TimesheetsAnalyticsPage() {
       }))
       .slice(-8) // Últimas 8 semanas
     
-    // Tendência mensal
+    // Tendência mensal - Incluir dados de todos os anos
     const monthlyMap = new Map<string, number>()
     data.forEach(t => {
       const month = format(parseISO(t.work_date), 'yyyy-MM')
@@ -395,12 +399,25 @@ export default function TimesheetsAnalyticsPage() {
       monthlyMap.set(month, current + parseFloat(t.hours_worked.toString()))
     })
     
+    // Adicionar todos os meses dos últimos 3 anos (mesmo sem dados)
+    const currentYear = new Date().getFullYear()
+    for (let year = currentYear - 2; year <= currentYear; year++) {
+      for (let month = 0; month < 12; month++) {
+        const monthKey = format(new Date(year, month, 1), 'yyyy-MM')
+        if (!monthlyMap.has(monthKey)) {
+          monthlyMap.set(monthKey, 0)
+        }
+      }
+    }
+    
     const monthlyEntries = Array.from(monthlyMap.entries()).sort()
     const monthlyTrend = monthlyEntries.map(([month, hours], index) => {
       const previousHours = index > 0 ? monthlyEntries[index - 1][1] : hours
       const growth = previousHours > 0 ? ((hours - previousHours) / previousHours) * 100 : 0
+      const monthDate = parseISO(`${month}-01`)
       return {
-        month: format(parseISO(`${month}-01`), 'MMM/yy', { locale: ptBR }),
+        month: format(monthDate, 'MMM/yy', { locale: ptBR }),
+        year: monthDate.getFullYear(),
         hours,
         growth
       }
@@ -1428,9 +1445,26 @@ export default function TimesheetsAnalyticsPage() {
 
                 {/* Evolução Mensal - Gráfico de Linhas */}
                 <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl shadow-xl p-6">
-                  <h3 className="text-lg font-semibold text-white mb-4">
-                    Evolução Mensal
-                  </h3>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-white">
+                      Evolução Mensal
+                    </h3>
+                    <div className="flex gap-2">
+                      {[currentYear, currentYear - 1, currentYear - 2].map(year => (
+                        <button
+                          key={year}
+                          onClick={() => setSelectedYear(year)}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                            selectedYear === year
+                              ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
+                              : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+                          }`}
+                        >
+                          {year}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                   <div className="relative h-56">
                     <svg className="w-full h-full" viewBox="0 0 400 240" style={{ overflow: 'visible' }}>
                       <defs>
@@ -1490,12 +1524,25 @@ export default function TimesheetsAnalyticsPage() {
                       
                       {/* Line and area */}
                       {(() => {
-                        const maxHours = Math.max(...analytics.monthlyTrend.map(m => m.hours)) || 100
+                        // Filter data by selected year
+                        const filteredMonthlyData = analytics.monthlyTrend.filter(month => 
+                          month.year === selectedYear
+                        )
+                        
+                        // If no data for selected year, create empty months
+                        const yearData = filteredMonthlyData.length > 0 ? filteredMonthlyData : 
+                          Array.from({ length: 12 }, (_, i) => ({
+                            month: format(new Date(selectedYear, i, 1), 'MMM/yy', { locale: ptBR }),
+                            hours: 0,
+                            growth: 0
+                          }))
+                        
+                        const maxHours = Math.max(...yearData.map(m => m.hours), 10) || 100
                         const stepSize = maxHours <= 10 ? 2 : maxHours <= 25 ? 5 : maxHours <= 50 ? 10 : maxHours <= 100 ? 25 : 50
                         const roundedMax = Math.ceil(maxHours / stepSize) * stepSize
-                        const xStep = 320 / (analytics.monthlyTrend.length - 1 || 1)
+                        const xStep = 320 / (yearData.length - 1 || 1)
                         
-                        const linePath = analytics.monthlyTrend.map((month, i) => {
+                        const linePath = yearData.map((month, i) => {
                           const x = 40 + (i * xStep)
                           const y = 180 - ((month.hours / roundedMax) * 160)
                           return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
@@ -1505,7 +1552,7 @@ export default function TimesheetsAnalyticsPage() {
                           <>
                             {/* Area fill */}
                             <path
-                              d={`${linePath} L ${40 + ((analytics.monthlyTrend.length - 1) * xStep)} 180 L 40 180 Z`}
+                              d={`${linePath} L ${40 + ((yearData.length - 1) * xStep)} 180 L 40 180 Z`}
                               fill="url(#monthlyGradient)"
                             />
                             
@@ -1519,7 +1566,7 @@ export default function TimesheetsAnalyticsPage() {
                             />
                             
                             {/* Data points and labels */}
-                            {analytics.monthlyTrend.map((month, i) => {
+                            {yearData.map((month, i) => {
                               const x = 40 + (i * xStep)
                               const y = 180 - ((month.hours / roundedMax) * 160)
                               
@@ -1588,10 +1635,23 @@ export default function TimesheetsAnalyticsPage() {
                       })()}
                       
                       {/* X-axis labels */}
-                      {analytics.monthlyTrend.map((month, i) => {
-                        const xStep = 320 / (analytics.monthlyTrend.length - 1 || 1)
-                        const x = 40 + (i * xStep)
-                        return (
+                      {(() => {
+                        // Use same filtered data as above
+                        const filteredMonthlyData = analytics.monthlyTrend.filter(month => 
+                          month.year === selectedYear
+                        )
+                        
+                        const yearData = filteredMonthlyData.length > 0 ? filteredMonthlyData : 
+                          Array.from({ length: 12 }, (_, i) => ({
+                            month: format(new Date(selectedYear, i, 1), 'MMM/yy', { locale: ptBR }),
+                            hours: 0,
+                            growth: 0
+                          }))
+                        
+                        return yearData.map((month, i) => {
+                          const xStep = 320 / (yearData.length - 1 || 1)
+                          const x = 40 + (i * xStep)
+                          return (
                           <text
                             key={i}
                             x={x}
@@ -1602,41 +1662,59 @@ export default function TimesheetsAnalyticsPage() {
                           >
                             {month.month}
                           </text>
-                        )
-                      })}
+                          )
+                        })
+                      })()}
                     </svg>
                   </div>
                   
                   {/* Summary stats */}
                   <div className="mt-4 pt-4 border-t border-slate-700/30 grid grid-cols-3 gap-4">
                     <div className="text-center">
-                      <span className="text-xs text-slate-400">Total</span>
+                      <span className="text-xs text-slate-400">Total {selectedYear}</span>
                       <p className="text-lg font-bold text-white">
-                        {analytics.monthlyTrend.reduce((sum, m) => sum + m.hours, 0).toFixed(0)}h
+                        {(() => {
+                          const yearTotal = analytics.monthlyTrend
+                            .filter(month => month.year === selectedYear)
+                            .reduce((sum, m) => sum + m.hours, 0)
+                          return yearTotal.toFixed(0)
+                        })()}h
                       </p>
                     </div>
                     <div className="text-center">
-                      <span className="text-xs text-slate-400">Média</span>
+                      <span className="text-xs text-slate-400">Média Mensal</span>
                       <p className="text-lg font-bold text-white">
-                        {(analytics.monthlyTrend.reduce((sum, m) => sum + m.hours, 0) / analytics.monthlyTrend.length).toFixed(0)}h
+                        {(() => {
+                          const filteredData = analytics.monthlyTrend.filter(month => 
+                            month.year === selectedYear && month.hours > 0
+                          )
+                          const total = filteredData.reduce((sum, m) => sum + m.hours, 0)
+                          return filteredData.length > 0 ? (total / filteredData.length).toFixed(0) : '0'
+                        })()}h
                       </p>
                     </div>
                     <div className="text-center">
                       <span className="text-xs text-slate-400">Tendência</span>
                       <p className="text-lg font-bold">
-                        {analytics.monthlyTrend[analytics.monthlyTrend.length - 1]?.growth > 0 ? (
-                          <span className="text-emerald-400 flex items-center justify-center gap-1">
-                            <TrendingUp className="h-4 w-4" />
-                            {Math.abs(analytics.monthlyTrend[analytics.monthlyTrend.length - 1]?.growth || 0).toFixed(0)}%
-                          </span>
-                        ) : analytics.monthlyTrend[analytics.monthlyTrend.length - 1]?.growth < 0 ? (
-                          <span className="text-red-400 flex items-center justify-center gap-1">
-                            <TrendingDown className="h-4 w-4" />
-                            {Math.abs(analytics.monthlyTrend[analytics.monthlyTrend.length - 1]?.growth || 0).toFixed(0)}%
-                          </span>
-                        ) : (
-                          <span className="text-slate-400">Estável</span>
-                        )}
+                        {(() => {
+                          const filteredData = analytics.monthlyTrend.filter(month => 
+                            month.year === selectedYear && month.hours > 0
+                          )
+                          const lastMonth = filteredData[filteredData.length - 1]
+                          return lastMonth?.growth > 0 ? (
+                            <span className="text-emerald-400 flex items-center justify-center gap-1">
+                              <TrendingUp className="h-4 w-4" />
+                              {Math.abs(lastMonth?.growth || 0).toFixed(0)}%
+                            </span>
+                          ) : lastMonth?.growth < 0 ? (
+                            <span className="text-red-400 flex items-center justify-center gap-1">
+                              <TrendingDown className="h-4 w-4" />
+                              {Math.abs(lastMonth?.growth || 0).toFixed(0)}%
+                            </span>
+                          ) : (
+                            <span className="text-slate-400">Estável</span>
+                          )
+                        })()}
                       </p>
                     </div>
                   </div>
