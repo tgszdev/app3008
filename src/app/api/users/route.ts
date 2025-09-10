@@ -39,8 +39,11 @@ export async function GET(request: NextRequest) {
       }, { status: 500 })
     }
 
-    // Remover password_hash dos resultados
-    const sanitizedUsers = users?.map(({ password_hash, ...user }) => user) || []
+    // Remover password_hash dos resultados e usar role_name quando disponível
+    const sanitizedUsers = users?.map(({ password_hash, ...user }) => ({
+      ...user,
+      role: user.role_name || user.role // Usar role_name se disponível, senão usar role
+    })) || []
 
     return NextResponse.json(sanitizedUsers)
   } catch (error: any) {
@@ -84,6 +87,11 @@ export async function POST(request: NextRequest) {
     // Hash da senha
     const password_hash = await bcrypt.hash(password, 10)
 
+    // Mapear roles customizadas para uma role padrão válida no ENUM
+    // e armazenar a role real em um campo separado (role_name)
+    const systemRoles = ['admin', 'analyst', 'user']
+    const enumRole = systemRoles.includes(role) ? role : 'user'
+    
     // Criar usuário
     const { data: newUser, error } = await supabaseAdmin
       .from('users')
@@ -91,7 +99,8 @@ export async function POST(request: NextRequest) {
         name,
         email,
         password_hash,
-        role: role || 'user',
+        role: enumRole, // Usar role válida para o ENUM
+        role_name: role, // Armazenar a role real (customizada ou não)
         department,
         phone,
         is_active: true,
@@ -106,8 +115,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    // Remover password_hash do resultado
+    // Remover password_hash do resultado e ajustar role
     const { password_hash: _, ...sanitizedUser } = newUser
+    
+    // Retornar role_name como role se disponível
+    if (sanitizedUser.role_name) {
+      sanitizedUser.role = sanitizedUser.role_name
+    }
 
     return NextResponse.json(sanitizedUser, { status: 201 })
   } catch (error: any) {
@@ -135,6 +149,17 @@ export async function PATCH(request: NextRequest) {
     delete updateData.id
     delete updateData.created_at
 
+    // Se houver uma role sendo atualizada, processar adequadamente
+    if (updateData.role) {
+      const systemRoles = ['admin', 'analyst', 'user']
+      // Armazenar a role real em role_name
+      updateData.role_name = updateData.role
+      // Mapear para uma role válida do ENUM se for customizada
+      if (!systemRoles.includes(updateData.role)) {
+        updateData.role = 'user'
+      }
+    }
+
     // Adicionar updated_at
     updateData.updated_at = new Date().toISOString()
 
@@ -150,8 +175,13 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    // Remover password_hash do resultado
+    // Remover password_hash do resultado e ajustar role
     const { password_hash, ...sanitizedUser } = updatedUser
+    
+    // Retornar role_name como role se disponível
+    if (sanitizedUser.role_name) {
+      sanitizedUser.role = sanitizedUser.role_name
+    }
 
     return NextResponse.json(sanitizedUser)
   } catch (error: any) {
