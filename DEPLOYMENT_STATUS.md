@@ -121,4 +121,4 @@ Sistema 100% funcional com:
 
 ## ⚠️ Importante
 
-**Executar o SQL no Supabase é obrigatório** para ativar o sistema completo. Sem a coluna `role_name`, roles customizadas serão mapeadas para "user" mas funcionarão.
+**Executar o SQL no Supabase é obrigatório** para ativar o sistema completo. Sem a coluna `role_name`, roles customizadas serão mapeadas para "user" mas funcionarão.# Deploy forçado: 2025-09-10 21:44:33
