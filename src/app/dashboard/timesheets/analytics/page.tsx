@@ -1170,8 +1170,8 @@ export default function TimesheetsAnalyticsPage() {
                 </div>
                 <div className="relative">
                   {/* Line Chart */}
-                  <div className="relative h-64">
-                    <svg className="w-full h-full" viewBox="0 0 800 256">
+                  <div className="relative h-80">
+                    <svg className="w-full h-full" viewBox="0 0 800 350" style={{ overflow: 'visible' }}>
                       <defs>
                         <linearGradient id="approvedGradient" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor="rgba(16, 185, 129, 0.3)" />
@@ -1192,11 +1192,11 @@ export default function TimesheetsAnalyticsPage() {
                         const numLines = 6 // Número de linhas de grid (incluindo topo e base)
                         const lines = []
                         for (let i = 0; i < numLines; i++) {
-                          const y = (256 / (numLines - 1)) * i
+                          const y = 20 + (220 / (numLines - 1)) * i
                           lines.push(
                             <line
                               key={i}
-                              x1="50"
+                              x1="60"
                               y1={y}
                               x2="750"
                               y2={y}
@@ -1219,13 +1219,14 @@ export default function TimesheetsAnalyticsPage() {
                         
                         for (let i = 0; i <= numSteps; i++) {
                           const value = (roundedMax / numSteps) * i
+                          const y = 240 - ((i / numSteps) * 220) + 4
                           labels.push(
                             <text
                               key={i}
-                              x="40"
-                              y={256 - ((i / numSteps) * 256) + 4}
+                              x="50"
+                              y={y}
                               textAnchor="end"
-                              className="fill-slate-400 text-xs"
+                              className="fill-slate-400 text-xs font-medium"
                             >
                               {value.toFixed(0)}h
                             </text>
@@ -1243,20 +1244,20 @@ export default function TimesheetsAnalyticsPage() {
                         
                         // Create path data for each status
                         const approvedPath = analytics.dailyData.map((day, i) => {
-                          const x = 50 + (i * xStep)
-                          const y = 256 - ((day.approved / roundedMax) * 256)
+                          const x = 60 + (i * xStep)
+                          const y = 240 - ((day.approved / roundedMax) * 220)
                           return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
                         }).join(' ')
                         
                         const pendingPath = analytics.dailyData.map((day, i) => {
-                          const x = 50 + (i * xStep)
-                          const y = 256 - ((day.pending / roundedMax) * 256)
+                          const x = 60 + (i * xStep)
+                          const y = 240 - ((day.pending / roundedMax) * 220)
                           return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
                         }).join(' ')
                         
                         const rejectedPath = analytics.dailyData.map((day, i) => {
-                          const x = 50 + (i * xStep)
-                          const y = 256 - ((day.rejected / roundedMax) * 256)
+                          const x = 60 + (i * xStep)
+                          const y = 240 - ((day.rejected / roundedMax) * 220)
                           return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
                         }).join(' ')
                         
@@ -1264,17 +1265,17 @@ export default function TimesheetsAnalyticsPage() {
                           <>
                             {/* Area fills */}
                             <path
-                              d={`${approvedPath} L ${50 + ((analytics.dailyData.length - 1) * xStep)} 256 L 50 256 Z`}
+                              d={`${approvedPath} L ${60 + ((analytics.dailyData.length - 1) * xStep)} 240 L 60 240 Z`}
                               fill="url(#approvedGradient)"
                               opacity="0.5"
                             />
                             <path
-                              d={`${pendingPath} L ${50 + ((analytics.dailyData.length - 1) * xStep)} 256 L 50 256 Z`}
+                              d={`${pendingPath} L ${60 + ((analytics.dailyData.length - 1) * xStep)} 240 L 60 240 Z`}
                               fill="url(#pendingGradient)"
                               opacity="0.5"
                             />
                             <path
-                              d={`${rejectedPath} L ${50 + ((analytics.dailyData.length - 1) * xStep)} 256 L 50 256 Z`}
+                              d={`${rejectedPath} L ${60 + ((analytics.dailyData.length - 1) * xStep)} 240 L 60 240 Z`}
                               fill="url(#rejectedGradient)"
                               opacity="0.5"
                             />
@@ -1304,10 +1305,10 @@ export default function TimesheetsAnalyticsPage() {
                             
                             {/* Data points */}
                             {analytics.dailyData.map((day, i) => {
-                              const x = 50 + (i * xStep)
-                              const yApproved = 256 - ((day.approved / roundedMax) * 256)
-                              const yPending = 256 - ((day.pending / roundedMax) * 256)
-                              const yRejected = 256 - ((day.rejected / roundedMax) * 256)
+                              const x = 60 + (i * xStep)
+                              const yApproved = 240 - ((day.approved / roundedMax) * 220)
+                              const yPending = 240 - ((day.pending / roundedMax) * 220)
+                              const yRejected = 240 - ((day.rejected / roundedMax) * 220)
                               
                               return (
                                 <g key={i}>
@@ -1345,14 +1346,17 @@ export default function TimesheetsAnalyticsPage() {
                                   </circle>
                                   
                                   {/* X-axis label */}
-                                  <text
-                                    x={x}
-                                    y="270"
-                                    textAnchor="middle"
-                                    className="fill-slate-400 text-xs"
-                                  >
-                                    {format(parseISO(day.date), 'dd/MM')}
-                                  </text>
+                                  {i % Math.ceil(analytics.dailyData.length / 15) === 0 && (
+                                    <text
+                                      x={x}
+                                      y="265"
+                                      textAnchor="end"
+                                      className="fill-slate-400 text-xs"
+                                      transform={`rotate(-45 ${x} 265)`}
+                                    >
+                                      {format(parseISO(day.date), 'dd/MM')}
+                                    </text>
+                                  )}
                                 </g>
                               )
                             })}
@@ -1427,8 +1431,8 @@ export default function TimesheetsAnalyticsPage() {
                   <h3 className="text-lg font-semibold text-white mb-4">
                     Evolução Mensal
                   </h3>
-                  <div className="relative h-48">
-                    <svg className="w-full h-full" viewBox="0 0 400 192">
+                  <div className="relative h-56">
+                    <svg className="w-full h-full" viewBox="0 0 400 240" style={{ overflow: 'visible' }}>
                       <defs>
                         <linearGradient id="monthlyGradient" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor="rgba(168, 85, 247, 0.5)" />
@@ -1441,7 +1445,7 @@ export default function TimesheetsAnalyticsPage() {
                         const numLines = 5 // Número de linhas de grid
                         const lines = []
                         for (let i = 0; i < numLines; i++) {
-                          const y = (192 / (numLines - 1)) * i
+                          const y = 20 + (160 / (numLines - 1)) * i
                           lines.push(
                             <line
                               key={i}
@@ -1468,11 +1472,12 @@ export default function TimesheetsAnalyticsPage() {
                         
                         for (let i = 0; i <= numSteps; i++) {
                           const value = (roundedMax / numSteps) * i
+                          const y = 180 - ((i / numSteps) * 160) + 4
                           labels.push(
                             <text
                               key={i}
                               x="35"
-                              y={192 - ((i / numSteps) * 192) + 4}
+                              y={y}
                               textAnchor="end"
                               className="fill-slate-400 text-xs"
                             >
@@ -1492,7 +1497,7 @@ export default function TimesheetsAnalyticsPage() {
                         
                         const linePath = analytics.monthlyTrend.map((month, i) => {
                           const x = 40 + (i * xStep)
-                          const y = 192 - ((month.hours / roundedMax) * 192)
+                          const y = 180 - ((month.hours / roundedMax) * 160)
                           return `${i === 0 ? 'M' : 'L'} ${x} ${y}`
                         }).join(' ')
                         
@@ -1500,7 +1505,7 @@ export default function TimesheetsAnalyticsPage() {
                           <>
                             {/* Area fill */}
                             <path
-                              d={`${linePath} L ${40 + ((analytics.monthlyTrend.length - 1) * xStep)} 192 L 40 192 Z`}
+                              d={`${linePath} L ${40 + ((analytics.monthlyTrend.length - 1) * xStep)} 180 L 40 180 Z`}
                               fill="url(#monthlyGradient)"
                             />
                             
@@ -1516,7 +1521,7 @@ export default function TimesheetsAnalyticsPage() {
                             {/* Data points and labels */}
                             {analytics.monthlyTrend.map((month, i) => {
                               const x = 40 + (i * xStep)
-                              const y = 192 - ((month.hours / roundedMax) * 192)
+                              const y = 180 - ((month.hours / roundedMax) * 160)
                               
                               return (
                                 <g key={i} className="group/point">
@@ -1590,10 +1595,10 @@ export default function TimesheetsAnalyticsPage() {
                           <text
                             key={i}
                             x={x}
-                            y="210"
-                            textAnchor="middle"
+                            y="200"
+                            textAnchor="end"
                             className="fill-slate-400 text-xs"
-                            transform={`rotate(-45 ${x} 210)`}
+                            transform={`rotate(-45 ${x} 200)`}
                           >
                             {month.month}
                           </text>
