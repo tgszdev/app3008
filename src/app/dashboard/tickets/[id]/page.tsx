@@ -118,7 +118,7 @@ export default function TicketDetailsPage() {
   const canDeleteTickets = hasPermission('tickets_delete')
   
   // Determinar se pode editar este ticket
-  const isOwner = ticket?.created_by === session?.user?.id
+  const isOwner = ticket?.created_by_user?.id === session?.user?.id
   const canEditThisTicket = canEditAllTickets || (canEditOwnTickets && isOwner)
   
   useEffect(() => {
