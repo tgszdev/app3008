@@ -114,7 +114,9 @@ export const authConfig: NextAuthConfig = {
       if (session?.user) {
         session.user.id = token.id as string
         session.user.role = token.role as string
-        session.user.role_name = token.role_name as string // Adicionar role_name
+        if (token.role_name) {
+          session.user.role_name = token.role_name as string // Adicionar role_name
+        }
         session.user.department = token.department as string
         session.user.avatar_url = token.avatar_url as string
       }
