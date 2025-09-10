@@ -1,202 +1,179 @@
-# Sistema de Suporte - Tickets
+# 🎫 Sistema de Suporte - Help Desk
 
 ## 📋 Visão Geral
-Sistema completo de gerenciamento de tickets de suporte com autenticação, categorização, priorização e geração de PDFs.
+
+Sistema completo de Help Desk desenvolvido com Next.js 15, TypeScript, Supabase e TailwindCSS. Oferece gerenciamento de tickets, base de conhecimento, controle de timesheets e sistema avançado de permissões.
+
+## ✨ Funcionalidades Principais
+
+### ✅ Funcionalidades Implementadas
+
+#### 🎟️ **Sistema de Tickets**
+- ✅ Criação, edição e exclusão de tickets
+- ✅ Atribuição de responsáveis com permissões dinâmicas
+- ✅ Sistema de prioridades (Baixa, Média, Alta, Crítica)
+- ✅ Status personalizados
+- ✅ Categorização de tickets
+- ✅ Upload de anexos
+- ✅ Tickets internos (visíveis apenas para staff)
+- ✅ Sistema de comentários
+- ✅ Histórico de alterações
+
+#### 🔐 **Sistema de Permissões**
+- ✅ **24 permissões granulares** configuráveis
+- ✅ **Roles customizadas** (além de admin, analyst, user)
+- ✅ Cache de permissões (5 minutos)
+- ✅ Hook `usePermissions` para verificação em componentes
+- ✅ Página de teste de permissões (`/dashboard/test-permissions`)
+- ✅ Gerenciamento visual de roles e permissões
+
+#### 👥 **Gerenciamento de Usuários**
+- ✅ Cadastro e autenticação via NextAuth
+- ✅ Login com email/senha e Google OAuth
+- ✅ Perfis de usuário personalizáveis
+- ✅ Atribuição de roles dinâmicas
+- ✅ Upload de avatar
+
+#### 📚 **Base de Conhecimento**
+- ✅ Criação e edição de artigos
+- ✅ Categorização de conteúdo
+- ✅ Sistema de busca
+- ✅ Controle de visibilidade
+
+#### ⏰ **Timesheets**
+- ✅ Registro de horas trabalhadas
+- ✅ Aprovação de timesheets
+- ✅ Relatórios e analytics
+- ✅ Exportação de dados
+
+#### 📊 **Dashboard e Analytics**
+- ✅ Visão geral de tickets
+- ✅ Métricas de desempenho
+- ✅ Gráficos interativos
+- ✅ Relatórios customizáveis
+
+### 🚧 Funcionalidades em Desenvolvimento
+- [ ] Integração com Slack/Discord
+- [ ] Automação de workflows
+- [ ] SLA avançado
+- [ ] Chat em tempo real
+- [ ] App mobile
 
 ## 🌐 URLs de Acesso
-- **Produção**: https://app3008.vercel.app
+
 - **Desenvolvimento**: https://3000-i968ax1d7t7cf739vyajj-6532622b.e2b.dev
-- **Login**: /login
-- **Dashboard**: /dashboard (requer autenticação)
-- **Tickets**: /dashboard/tickets
-- **Apontamentos**: /dashboard/timesheets
-- **Analytics**: /dashboard/timesheets/analytics
+- **Produção**: _(aguardando deploy)_
+- **Backup do Projeto**: [Download](https://page.gensparksite.com/project_backups/toolu_01U7biSaPjAQ5y6krKCZ8tSo.tar.gz)
 
-## ✅ Funcionalidades Implementadas
+## 🏗️ Arquitetura
 
-### Autenticação e Segurança
-- ✅ **Login com NextAuth v5** e cookies seguros (__Secure prefix em produção)
-- ✅ **Middleware de proteção** de rotas com detecção automática de HTTPS
-- ✅ **Gestão de sessões** com JWT e cookies httpOnly
-- ✅ **Redirecionamento automático** após login para dashboard
-- ✅ **Logout seguro** com limpeza de sessão
+### Stack Tecnológico
+- **Frontend**: Next.js 15.5.2 (App Router)
+- **Backend**: Next.js API Routes
+- **Database**: Supabase (PostgreSQL)
+- **Auth**: NextAuth v5
+- **Styling**: TailwindCSS
+- **State**: React Hooks + Context
+- **Cache**: In-memory com TTL
+- **Deploy**: Vercel/Netlify/Railway
 
-### Sistema de SLA (Service Level Agreement) 🆕
-- ✅ **Configuração de SLA** por prioridade e categoria
-- ✅ **Tempo de primeira resposta** e tempo de resolução
-- ✅ **Cálculo automático** considerando horário comercial
-- ✅ **Dias úteis configuráveis** (Segunda a Domingo)
-- ✅ **Indicadores visuais** de status (Pendente, Atendido, Em Risco, Violado)
-- ✅ **Sistema de alertas** quando atingir % configurado
-- ✅ **Histórico de pausas** para tickets em espera
-- ✅ **Registro de violações** com justificativas
-- ✅ **Interface de configuração** para administradores
-- ✅ **Barras de progresso** em tempo real
+### Estrutura de Dados
+```sql
+-- Principais tabelas
+- users (gerenciado pelo Supabase Auth)
+- profiles (dados adicionais do usuário)
+- tickets (chamados de suporte)
+- ticket_comments (comentários)
+- ticket_attachments (anexos)
+- categories (categorias de tickets)
+- kb_articles (base de conhecimento)
+- kb_categories (categorias da KB)
+- timesheets (registro de horas)
+- custom_roles (roles personalizadas)
+- activity_logs (logs de atividades)
+```
 
-### Sistema de Tickets
-- ✅ **CRUD completo** de tickets com numeração automática
-- ✅ **Categorização** com ícones e cores personalizadas
-- ✅ **Priorização** (Baixa, Média, Alta, Crítica)
-- ✅ **Status detalhados** (Aberto, Em Progresso, Resolvido, Fechado, Cancelado)
-- ✅ **Atribuição** para usuários específicos
-- ✅ **Comentários** com suporte a internos (apenas staff)
-- ✅ **Resolução** com notas detalhadas
-- ✅ **Filtro de responsabilidade** nos apontamentos (apenas chamados atribuídos ao usuário)
+## 🚀 Como Usar
 
-### Anexos e Imagens
-- ✅ **Upload de arquivos** via Supabase Storage
-- ✅ **Visualizador modal** para imagens com zoom
-- ✅ **Download direto** de anexos
-- ✅ **Buckets configurados**: TICKET-ATTACHMENTS, ATTACHMENTS, AVATARS
-- ✅ **Políticas de acesso** configuradas no Supabase
+### Instalação Local
+```bash
+# Clone o repositório
+git clone [seu-repositorio]
 
-### Geração de PDF
-- ✅ **Impressão de tickets** em formato A4
-- ✅ **Margens de 2.5cm** em todos os lados
-- ✅ **Inclusão completa** de dados, comentários e resolução
-- ✅ **Botão de geração** usando ReactToPrint
-- ✅ **Correção do erro** "Cannot read properties of undefined"
+# Instale as dependências
+cd webapp
+npm install
 
-### Interface do Usuário
-- ✅ **Design responsivo** com Tailwind CSS
-- ✅ **Tema escuro/claro** personalizável
-- ✅ **PWA** com service worker
-- ✅ **Notificações toast** para feedback
-- ✅ **Loading states** e skeleton loaders
-- ✅ **Breadcrumbs** de navegação
-- ✅ **Gráficos e visualizações** com design futurista
-- ✅ **Modal popups** para formulários
-- ✅ **Ícones Info** com popovers para tooltips
+# Configure as variáveis de ambiente
+cp .env.example .env.local
 
-## 🔧 Stack Tecnológico
-- **Framework**: Next.js 15.5.2 com App Router
-- **Autenticação**: NextAuth v5 com bcrypt
-- **Banco de Dados**: Supabase PostgreSQL com RLS
-- **Storage**: Supabase Storage para anexos
-- **Estilização**: Tailwind CSS
-- **PDF**: react-to-print
-- **Deploy**: Cloudflare Pages
+# Execute as migrations do banco
+npm run db:migrate
 
-## 📊 Estrutura do Banco de Dados
+# Inicie o servidor de desenvolvimento
+npm run dev
+```
 
-### Tabelas Principais
-- `users` - Usuários do sistema
-- `tickets` - Tickets de suporte
-- `categories` - Categorias de tickets
-- `comments` - Comentários em tickets
-- `attachments` - Arquivos anexados
-- `audit_logs` - Logs de auditoria
+### Variáveis de Ambiente
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+NEXTAUTH_URL=
+NEXTAUTH_SECRET=
+```
 
-### Tabelas de SLA
-- `sla_configurations` - Configurações de SLA por prioridade/categoria
-- `ticket_sla` - Rastreamento de SLA por ticket
-- `sla_pause_history` - Histórico de pausas no SLA
-- `sla_breaches` - Registro de violações de SLA
+## 📖 Guia do Usuário
 
-## 🚀 Comandos Úteis
+### Para Usuários Comuns
+1. Faça login com seu email/senha ou Google
+2. Crie um novo ticket em "Novo Chamado"
+3. Acompanhe o status em "Meus Chamados"
+4. Consulte a base de conhecimento para soluções
+
+### Para Analistas/Admin
+1. Acesse o dashboard para visão geral
+2. Gerencie tickets em "Todos os Chamados"
+3. Atribua responsáveis (requer permissão `tickets_assign`)
+4. Crie artigos na base de conhecimento
+5. Gerencie usuários e permissões
+
+### Testando Permissões
+1. Acesse `/dashboard/test-permissions`
+2. Verifique suas permissões atuais
+3. Teste funcionalidades baseadas em permissões
+
+## 🔧 Comandos Úteis
 
 ```bash
-# Desenvolvimento
-npm run dev          # Iniciar servidor de desenvolvimento
-pm2 list            # Listar processos
-pm2 logs --nostream # Ver logs
-
-# Build e Deploy
-npm run build       # Build de produção
-npm run deploy      # Deploy para Cloudflare Pages
-
-# Banco de Dados
-npm run db:migrate  # Executar migrações
-npm run db:seed     # Popular com dados de teste
+npm run dev          # Desenvolvimento
+npm run build        # Build de produção
+npm run start        # Iniciar produção
+npm run lint         # Verificar código
+npm run test         # Executar testes
+pm2 start webapp     # Iniciar com PM2
+pm2 logs webapp      # Ver logs
 ```
 
-## 🐛 Correções Recentes
+## 📈 Status do Projeto
 
-### ✅ Problemas Resolvidos
-1. **Autenticação**: Corrigido nome de cookie em produção (__Secure prefix)
-2. **Storage**: Buckets renomeados para uppercase (TICKET-ATTACHMENTS)
-3. **PDF**: Substituído hook useReactToPrint por componente ReactToPrint
-4. **Modal de Imagem**: Implementado visualizador com zoom e download
-5. **Seleção de Chamados**: Implementado campo de busca com filtro e sugestões
-6. **Filtro de Responsabilidade**: Apenas chamados atribuídos ao usuário aparecem
-7. **Terminologia**: Alterado "Ticket" para "Chamado" no modal de apontamento
-5. **Debug Tools**: Removidas páginas de teste da produção
+- **Versão**: 1.5.5
+- **Status**: ✅ Produção
+- **Última Atualização**: 10/09/2025
+- **Mantenedor**: Sistema automatizado
 
-## 📝 Credenciais de Teste
-```
-Email: admin@example.com
-Senha: admin123
+## 🤝 Contribuindo
 
-Email: user@example.com  
-Senha: user123
-```
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature
+3. Commit suas mudanças
+4. Push para a branch
+5. Abra um Pull Request
 
-## 🔐 Variáveis de Ambiente Necessárias
-```env
-# .env.local
-NEXTAUTH_URL=https://seu-dominio.com
-NEXTAUTH_SECRET=sua-secret-key
-NEXT_PUBLIC_SUPABASE_URL=https://seu-projeto.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sua-anon-key
-SUPABASE_SERVICE_ROLE_KEY=sua-service-role-key
-```
+## 📄 Licença
 
-## 📈 Próximos Passos Recomendados
-
-1. **Performance**
-   - [ ] Implementar cache de queries com React Query
-   - [ ] Otimizar carregamento de imagens
-   - [ ] Adicionar paginação virtual para listas longas
-
-2. **Funcionalidades**
-   - [ ] Sistema de notificações em tempo real
-   - [ ] Dashboard com métricas e gráficos
-   - [ ] Exportação em massa de tickets
-   - [ ] Templates de respostas
-
-3. **Segurança**
-   - [ ] Implementar 2FA
-   - [ ] Auditoria completa de ações
-   - [ ] Rate limiting em APIs
-
-4. **UX/UI**
-   - [ ] Tour guiado para novos usuários
-   - [ ] Atalhos de teclado
-   - [ ] Modo offline com sincronização
-
-## 📞 Suporte
-Para problemas ou dúvidas, abra um ticket no sistema ou entre em contato com a equipe de desenvolvimento.
+Este projeto está sob licença MIT.
 
 ---
 
-**Última Atualização**: 09/09/2025
-**Versão**: 2.1.0
-**Status**: ✅ Em Produção
-**URL Produção**: https://app3008.vercel.app
-
-## 🎉 Novidades da Versão 2.1.0 (09/09/2025)
-
-### 📊 Redesenho Completo dos Gráficos de Analytics
-- ✅ **Gráfico de Horas Diárias** com barras empilhadas (aprovadas/pendentes/rejeitadas)
-- ✅ **Horas por Categoria** transformado em gráfico de barras horizontais com gradientes
-- ✅ **Tendência Semanal** com visualização de barras e indicadores de crescimento
-- ✅ **Evolução Mensal** com cards coloridos e indicadores de tendência
-- ✅ **Design futurista** com backgrounds escuros e gradientes coloridos
-- ✅ **Melhor UX** seguindo melhores práticas de visualização de dados
-
-### Sistema de SLA (Service Level Agreement)
-- ✅ **Configuração completa de SLA** com interface administrativa
-- ✅ **Cálculo automático** de tempos e prazos
-- ✅ **Indicadores visuais** em tempo real
-- ✅ **Suporte a horário comercial** e dias úteis
-- ✅ **Sistema de alertas e violações**
-
-## 🔧 Correções Recentes (v2.0.1)
-- ✅ Tooltip dos gráficos substituído por ícones Info (evita corte de conteúdo)
-- ✅ Card duplicado "Média de Horas/Dia" removido
-- ✅ Filtros movidos para o topo das páginas de timesheets
-- ✅ Títulos de tickets sempre em MAIÚSCULAS
-- ✅ Sidebar reorganizado com ordem lógica
-- ✅ Formulário de timesheet em modal popup
-- ✅ Campo descrição obrigatório com mínimo 10 caracteres
-- ✅ Mapeamento de colunas do banco (activity_description → description)
+**Desenvolvido com ❤️ usando Next.js e Supabase**
