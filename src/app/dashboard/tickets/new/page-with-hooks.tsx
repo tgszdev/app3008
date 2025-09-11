@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { usePermissions } from '@/hooks/usePermissions'
 import {
   ArrowLeft,
   Send,
@@ -14,6 +15,7 @@ import {
   FileText,
   Loader2,
   Lock,
+  Eye,
   Paperclip,
   Upload,
   File,
@@ -45,64 +47,66 @@ interface Category {
 export default function NewTicketPage() {
   const router = useRouter()
   const { data: session } = useSession()
+  const { hasPermission, loading: permissionsLoading } = usePermissions()
   const [loading, setLoading] = useState(false)
   const [analysts, setAnalysts] = useState<UserData[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loadingCategories, setLoadingCategories] = useState(true)
-  const [permissionsError, setPermissionsError] = useState(false)
   
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     priority: 'medium',
-    category_id: '',
+    category_id: '', // Mudando de category para category_id
     assigned_to: '',
     due_date: '',
-    is_internal: false,
+    is_internal: false, // Novo campo para tickets internos
   })
   
   // Estados para upload de arquivos
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [uploadingFiles, setUploadingFiles] = useState(false)
 
-  // Check permissions safely
-  const [canAssignTickets, setCanAssignTickets] = useState(false)
-  const [canEditAllTickets, setCanEditAllTickets] = useState(false)
-
   // Buscar lista de analistas e categorias
   useEffect(() => {
     fetchAnalysts()
     fetchCategories()
-    checkPermissions()
-  }, [session])
+  }, [])
 
-  const checkPermissions = () => {
-    try {
-      // Safe permission check based on role
-      const userRole = session?.user?.role || 'user'
-      const rolePermissions = {
-        admin: true,
-        analyst: true,
-        user: false
-      }
-      
-      setCanAssignTickets(rolePermissions[userRole as keyof typeof rolePermissions] || false)
-      setCanEditAllTickets(userRole === 'admin')
-    } catch (error) {
-      console.error('Error checking permissions:', error)
-      setPermissionsError(true)
+  // Debug permissions
+  useEffect(() => {
+    if (!permissionsLoading) {
+      console.log('=== DEBUG PERMISSIONS ===')
+      console.log('User can assign tickets:', hasPermission('tickets_assign'))
+      console.log('User can edit all tickets:', hasPermission('tickets_edit_all'))
     }
-  }
+  }, [permissionsLoading, hasPermission])
 
   const fetchAnalysts = async () => {
     try {
-      const response = await axios.get('/api/users')
-      const analystUsers = response.data.filter((user: UserData) => 
-        user.role === 'analyst' || user.role === 'admin'
-      )
-      setAnalysts(analystUsers)
+      // Buscar usuários que têm permissão para atribuir tickets
+      const response = await axios.get('/api/users/with-permission?permission=tickets_assign')
+      console.log('=== DEBUG FETCH ANALYSTS ===')
+      console.log('Response status:', response.status)
+      console.log('Users with tickets_assign permission:', response.data)
+      console.log('Number of users found:', response.data.length)
+      setAnalysts(response.data)
     } catch (error) {
-      console.error('Erro ao buscar analistas:', error)
+      console.error('=== ERROR FETCHING ANALYSTS ===')
+      console.error('Error details:', error)
+      // Fallback: buscar todos os usuários se o novo endpoint falhar
+      try {
+        const fallbackResponse = await axios.get('/api/users')
+        console.log('=== FALLBACK USERS ===')
+        console.log('All users:', fallbackResponse.data)
+        const analystUsers = fallbackResponse.data.filter((user: UserData) => 
+          user.role === 'analyst' || user.role === 'admin'
+        )
+        console.log('Filtered analyst users:', analystUsers)
+        setAnalysts(analystUsers)
+      } catch (fallbackError) {
+        console.error('Erro no fallback:', fallbackError)
+      }
     }
   }
 
@@ -112,6 +116,7 @@ export default function NewTicketPage() {
       const response = await axios.get('/api/categories?active_only=true')
       setCategories(response.data)
       
+      // Selecionar a primeira categoria ativa como padrão
       if (response.data.length > 0 && !formData.category_id) {
         setFormData(prev => ({ ...prev, category_id: response.data[0].id }))
       }
@@ -123,10 +128,12 @@ export default function NewTicketPage() {
     }
   }
 
+  // Função para lidar com seleção de arquivos
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files) return
 
+    // Validar tamanho máximo (10MB por arquivo)
     const maxSize = 10 * 1024 * 1024
     const validFiles: File[] = []
     
@@ -138,6 +145,7 @@ export default function NewTicketPage() {
       }
     })
 
+    // Limitar a 5 arquivos no total
     const totalFiles = selectedFiles.length + validFiles.length
     if (totalFiles > 5) {
       toast.error('Máximo de 5 arquivos permitidos')
@@ -147,10 +155,12 @@ export default function NewTicketPage() {
     setSelectedFiles([...selectedFiles, ...validFiles])
   }
 
+  // Função para remover arquivo selecionado
   const handleRemoveFile = (index: number) => {
     setSelectedFiles(selectedFiles.filter((_, i) => i !== index))
   }
 
+  // Função para formatar tamanho de arquivo
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes'
     const k = 1024
@@ -180,19 +190,26 @@ export default function NewTicketPage() {
     setLoading(true)
 
     try {
+      // Encontrar a categoria selecionada para enviar o slug também (compatibilidade)
       const selectedCategory = categories.find(c => c.id === formData.category_id)
       
       const ticketData = {
         ...formData,
-        category: selectedCategory?.slug || 'general',
+        category: selectedCategory?.slug || 'general', // Manter compatibilidade
         created_by: session.user.id,
         assigned_to: formData.assigned_to || null,
         due_date: formData.due_date || null,
       }
 
+      // Criar o ticket primeiro
       const response = await axios.post('/api/tickets', ticketData)
       const ticketId = response.data.id
       
+      console.log('=== DEBUG CRIAÇÃO DE TICKET ===')
+      console.log('Resposta da API:', response.data)
+      console.log('ID do ticket criado:', ticketId)
+      
+      // Se há arquivos selecionados, fazer upload deles
       if (selectedFiles.length > 0) {
         setUploadingFiles(true)
         toast(`Enviando ${selectedFiles.length} arquivo(s)...`, {
@@ -200,6 +217,7 @@ export default function NewTicketPage() {
         })
         
         try {
+          // Upload de cada arquivo
           const uploadPromises = selectedFiles.map(async (file) => {
             const formData = new FormData()
             formData.append('file', file)
@@ -215,6 +233,7 @@ export default function NewTicketPage() {
           
           const results = await Promise.allSettled(uploadPromises)
           
+          // Verificar resultados
           const successCount = results.filter(r => r.status === 'fulfilled').length
           const failCount = results.filter(r => r.status === 'rejected').length
           
@@ -241,6 +260,7 @@ export default function NewTicketPage() {
     }
   }
 
+  // Função para obter o ícone da categoria selecionada
   const getSelectedCategoryIcon = () => {
     const category = categories.find(c => c.id === formData.category_id)
     if (category) {
@@ -255,21 +275,6 @@ export default function NewTicketPage() {
       )
     }
     return <Tag className="inline h-4 w-4" />
-  }
-
-  if (permissionsError) {
-    return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
-          <h2 className="text-lg font-semibold text-yellow-900 dark:text-yellow-100 mb-2">
-            Aviso de Permissões
-          </h2>
-          <p className="text-sm text-yellow-800 dark:text-yellow-200">
-            O sistema de permissões está sendo carregado. Por favor, aguarde ou recarregue a página.
-          </p>
-        </div>
-      </div>
-    )
   }
 
   return (
@@ -375,37 +380,61 @@ export default function NewTicketPage() {
                   <option value="">Selecione uma categoria...</option>
                   {categories.map((category) => (
                     <option key={category.id} value={category.id}>
-                      {category.name}
+                      {category.name} {category.description && `- ${category.description.substring(0, 50)}...`}
                     </option>
                   ))}
                 </select>
               )}
+              {formData.category_id && (
+                <div className="mt-2 flex items-center gap-2">
+                  {(() => {
+                    const selectedCategory = categories.find(c => c.id === formData.category_id)
+                    return selectedCategory ? (
+                      <>
+                        <div
+                          className="w-4 h-4 rounded"
+                          style={{ backgroundColor: selectedCategory.color }}
+                        />
+                        <span className="text-xs text-gray-600 dark:text-gray-400">
+                          {selectedCategory.description}
+                        </span>
+                      </>
+                    ) : null
+                  })()}
+                </div>
+              )}
             </div>
 
-            {/* Assigned To - Only visible for users with permission */}
-            {canAssignTickets && (
+            {/* Assigned To - Only visible for users with tickets_assign permission */}
+            {hasPermission('tickets_assign') && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <User className="inline h-4 w-4 mr-1" />
                   Atribuir para (opcional)
                 </label>
-                <select
-                  value={formData.assigned_to}
-                  onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">Selecione um responsável...</option>
-                  {analysts.map((analyst) => (
-                    <option key={analyst.id} value={analyst.id}>
-                      {analyst.name} ({analyst.email})
-                    </option>
-                  ))}
-                </select>
+                {analysts.length === 0 ? (
+                  <div className="w-full px-4 py-2 border border-yellow-300 dark:border-yellow-600 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 text-sm">
+                    Carregando lista de responsáveis...
+                  </div>
+                ) : (
+                  <select
+                    value={formData.assigned_to}
+                    onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Selecione um responsável...</option>
+                    {analysts.map((analyst) => (
+                      <option key={analyst.id} value={analyst.id}>
+                        {analyst.name} ({analyst.email})
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
             )}
 
-            {/* Due Date - Only visible for users with permission */}
-            {canAssignTickets && (
+            {/* Due Date - Only visible for users with tickets_assign permission */}
+            {hasPermission('tickets_assign') && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Calendar className="inline h-4 w-4 mr-1" />
@@ -422,8 +451,8 @@ export default function NewTicketPage() {
             )}
           </div>
           
-          {/* Internal Ticket Checkbox */}
-          {canEditAllTickets && (
+          {/* Internal Ticket Checkbox - Only visible for users with tickets_edit_all permission (admins and analysts) */}
+          {hasPermission('tickets_edit_all') && (
             <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
               <label className="flex items-start space-x-3 cursor-pointer">
                 <input
@@ -440,7 +469,8 @@ export default function NewTicketPage() {
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Marque esta opção para tornar o ticket visível apenas para administradores e analistas.
+                    Marque esta opção para tornar o ticket visível apenas para administradores e analistas. 
+                    Usuários comuns não poderão ver este ticket.
                   </p>
                 </div>
               </label>
