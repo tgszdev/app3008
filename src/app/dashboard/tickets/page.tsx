@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { usePermissions } from '@/hooks/usePermissions'
 import {
   Plus,
   Search,
@@ -126,6 +127,7 @@ const categoryLabels: Record<string, string> = {
 export default function TicketsPage() {
   const router = useRouter()
   const { data: session } = useSession()
+  const { hasPermission } = usePermissions()
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -513,7 +515,7 @@ export default function TicketsPage() {
                     <Eye className="h-4 w-4 inline mr-1" />
                     Ver Detalhes
                   </Link>
-                  {session?.user?.role === 'admin' && (
+                  {(hasPermission('tickets_delete') || (session?.user as any)?.role === 'admin') && (
                     <button
                       onClick={() => handleDeleteTicket(ticket.id)}
                       className="p-1.5 text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors"
@@ -688,7 +690,7 @@ export default function TicketsPage() {
                             <Edit className="h-4 w-4" />
                           </button>
                           {/* Apenas admin pode excluir tickets */}
-                          {session?.user?.role === 'admin' && (
+                          {(hasPermission('tickets_delete') || (session?.user as any)?.role === 'admin') && (
                             <button
                               onClick={() => handleDeleteTicket(ticket.id)}
                               className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors"

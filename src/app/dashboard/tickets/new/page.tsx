@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { usePermissions } from '@/hooks/usePermissions'
 import {
   ArrowLeft,
   Send,
@@ -65,34 +66,19 @@ export default function NewTicketPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [uploadingFiles, setUploadingFiles] = useState(false)
 
-  // Check permissions safely
-  const [canAssignTickets, setCanAssignTickets] = useState(false)
-  const [canEditAllTickets, setCanEditAllTickets] = useState(false)
+  // Use the permissions hook
+  const { hasPermission } = usePermissions()
+  
+  // Check permissions
+  const canAssignTickets = hasPermission('tickets_assign')
+  const canEditAllTickets = hasPermission('tickets_edit_all')
+  const canCreateTickets = hasPermission('tickets_create')
 
   // Buscar lista de analistas e categorias
   useEffect(() => {
     fetchAnalysts()
     fetchCategories()
-    checkPermissions()
   }, [session])
-
-  const checkPermissions = () => {
-    try {
-      // Safe permission check based on role
-      const userRole = session?.user?.role || 'user'
-      const rolePermissions = {
-        admin: true,
-        analyst: true,
-        user: false
-      }
-      
-      setCanAssignTickets(rolePermissions[userRole as keyof typeof rolePermissions] || false)
-      setCanEditAllTickets(userRole === 'admin')
-    } catch (error) {
-      console.error('Error checking permissions:', error)
-      setPermissionsError(true)
-    }
-  }
 
   const fetchAnalysts = async () => {
     try {

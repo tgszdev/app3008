@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { usePermissions } from '@/hooks/usePermissions'
 import {
   Clock,
   Shield,
@@ -14,6 +15,9 @@ import {
 export default function TimesheetNavigation() {
   const pathname = usePathname()
   const { data: session } = useSession()
+  const { hasPermission, loading } = usePermissions()
+  
+  // Fallback para admin para manter compatibilidade enquanto migra
   const isAdmin = (session?.user as any)?.role === 'admin'
 
   const links = [
@@ -21,27 +25,38 @@ export default function TimesheetNavigation() {
       href: '/dashboard/timesheets',
       label: 'Meus Apontamentos',
       icon: Clock,
-      show: true
+      show: hasPermission('timesheets_view_own') || true // Sempre mostrar para todos os usuários
     },
     {
       href: '/dashboard/timesheets/admin',
       label: 'Aprovações',
       icon: Shield,
-      show: isAdmin
+      show: hasPermission('timesheets_approve') || isAdmin
     },
     {
       href: '/dashboard/timesheets/analytics',
       label: 'Analytics',
       icon: BarChart3,
-      show: isAdmin
+      show: hasPermission('timesheets_analytics') || isAdmin
     },
     {
       href: '/dashboard/timesheets/permissions',
       label: 'Permissões',
       icon: Users,
-      show: isAdmin
+      show: hasPermission('system_users') || isAdmin // Permissões de sistema para gerenciar usuários
     }
   ]
+
+  // Não renderizar navegação até as permissões carregarem
+  if (loading) {
+    return (
+      <div className="flex gap-2 flex-wrap mb-6">
+        <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-lg"></div>
+        <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-lg"></div>
+        <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-lg"></div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex gap-2 flex-wrap mb-6">

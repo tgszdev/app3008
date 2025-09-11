@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { usePermissions } from '@/hooks/usePermissions'
 import {
   ArrowLeft,
   BookOpen,
@@ -88,6 +89,13 @@ export default function ArticlePage() {
   const [copied, setCopied] = useState(false)
 
   const slug = params?.slug as string
+  const { hasPermission } = usePermissions()
+  
+  // Verificar permissões do artigo
+  const canView = hasPermission('kb_view')
+  const canEdit = hasPermission('kb_edit')
+  
+  // Fallback para compatibilidade
   const isAdmin = (session?.user as any)?.role === 'admin'
   const isAnalyst = (session?.user as any)?.role === 'analyst'
   const canEdit = isAdmin || isAnalyst

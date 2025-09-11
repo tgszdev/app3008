@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { usePermissions } from '@/hooks/usePermissions'
 import {
   BookOpen,
   Search,
@@ -119,9 +120,18 @@ export default function KnowledgeBasePage() {
   const [refreshing, setRefreshing] = useState(false)
   const [setupNeeded, setSetupNeeded] = useState(false)
 
+  const { hasPermission } = usePermissions()
+  
+  // Usar permissões específicas ao invés de roles
+  const canView = hasPermission('kb_view')
+  const canCreate = hasPermission('kb_create')
+  const canEdit = hasPermission('kb_edit')
+  const canDelete = hasPermission('kb_delete')
+  const canManageCategories = hasPermission('kb_manage_categories')
+  
+  // Fallback para compatibilidade
   const isAdmin = (session?.user as any)?.role === 'admin'
   const isAnalyst = (session?.user as any)?.role === 'analyst'
-  const canEdit = isAdmin || isAnalyst
 
   // Buscar dados da base de conhecimento
   const fetchKnowledgeBase = async (showLoader = true) => {
@@ -217,7 +227,7 @@ export default function KnowledgeBasePage() {
           </div>
           
           <div className="flex flex-wrap items-center gap-2">
-            {isAdmin && (
+            {(canManageCategories || isAdmin) && (
               <button
                 onClick={() => router.push('/dashboard/knowledge-base/categories')}
                 className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-white/20 backdrop-blur border border-white/30 rounded-lg text-sm md:text-base text-white hover:bg-white/30 transition-colors"
@@ -228,7 +238,7 @@ export default function KnowledgeBasePage() {
               </button>
             )}
             
-            {canEdit && (
+            {(canCreate || canEdit || isAdmin) && (
               <button
                 onClick={createNewArticle}
                 className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-white/20 backdrop-blur border border-white/30 rounded-lg text-sm md:text-base text-white hover:bg-white/30 transition-colors"

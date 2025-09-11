@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { usePermissions } from '@/hooks/usePermissions'
 import {
   ArrowLeft,
   Save,
@@ -53,6 +54,12 @@ export default function NewArticlePage() {
     meta_description: ''
   })
 
+  const { hasPermission } = usePermissions()
+  
+  // Verificar permissão para criar artigos
+  const canCreate = hasPermission('kb_create')
+  
+  // Fallback para compatibilidade
   const isAdmin = (session?.user as any)?.role === 'admin'
   const isAnalyst = (session?.user as any)?.role === 'analyst'
   const canCreate = isAdmin || isAnalyst

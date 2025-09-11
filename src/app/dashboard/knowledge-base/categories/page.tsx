@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { usePermissions } from '@/hooks/usePermissions'
 import {
   ArrowLeft,
   Plus,
@@ -240,6 +241,12 @@ export default function CategoriesPage() {
   const [color, setColor] = useState('#6366F1')
   const [displayOrder, setDisplayOrder] = useState(999)
 
+  const { hasPermission } = usePermissions()
+  
+  // Verificar permissão específica para gerenciar categorias
+  const canManageCategories = hasPermission('kb_manage_categories')
+  
+  // Fallback para compatibilidade
   const isAdmin = (session?.user as any)?.role === 'admin'
 
   useEffect(() => {

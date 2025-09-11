@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter, useParams } from 'next/navigation'
+import { usePermissions } from '@/hooks/usePermissions'
 import {
   ArrowLeft,
   Save,
@@ -85,6 +86,12 @@ export default function EditArticlePage() {
   const [metaDescription, setMetaDescription] = useState('')
   const [showPreview, setShowPreview] = useState(false)
 
+  const { hasPermission } = usePermissions()
+  
+  // Verificar permissão para editar artigos
+  const canEdit = hasPermission('kb_edit')
+  
+  // Fallback para compatibilidade
   const isAdmin = (session?.user as any)?.role === 'admin'
   const isAnalyst = (session?.user as any)?.role === 'analyst'
   const canEdit = isAdmin || isAnalyst
