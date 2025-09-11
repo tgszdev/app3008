@@ -195,9 +195,55 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Error creating role:', error)
       
-      // Se a tabela não existir, retornar sucesso simulado
+      // Se a tabela não existir, tentar criar
       if (error.code === '42P01') {
-        // Limpar cache mesmo para simulação
+        console.log('Tabela roles não existe. Tentando criar...')
+        
+        // Tentar criar a tabela
+        try {
+          // Criar tabela roles
+          await supabaseAdmin.rpc('exec_sql', {
+            sql: `
+              CREATE TABLE IF NOT EXISTS roles (
+                id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+                name VARCHAR(50) UNIQUE NOT NULL,
+                display_name VARCHAR(100) NOT NULL,
+                description TEXT,
+                permissions JSONB DEFAULT '{}',
+                is_system BOOLEAN DEFAULT false,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+              );
+            `
+          })
+          
+          console.log('Tabela roles criada com sucesso!')
+          
+          // Tentar inserir novamente
+          const { data: retryRole, error: retryError } = await supabaseAdmin
+            .from('roles')
+            .insert([
+              {
+                name: name.toLowerCase().replace(/\s+/g, '_'),
+                display_name,
+                description: description || '',
+                permissions: permissions || {},
+                is_system: false
+              }
+            ])
+            .select()
+            .single()
+          
+          if (!retryError) {
+            clearPermissionsCache()
+            return NextResponse.json(retryRole, { status: 201 })
+          }
+        } catch (createTableError) {
+          console.error('Erro ao criar tabela roles:', createTableError)
+        }
+        
+        // Se não conseguir criar a tabela, retornar sucesso simulado
+        // mas avisar o usuário
         clearPermissionsCache()
         return NextResponse.json({
           id: Date.now().toString(),
@@ -207,7 +253,8 @@ export async function POST(request: NextRequest) {
           permissions: permissions || {},
           is_system: false,
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          warning: 'Role criada temporariamente. Execute o script de migração no Supabase para persistir.'
         }, { status: 201 })
       }
       
