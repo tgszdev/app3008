@@ -3,7 +3,15 @@
  * Gerencia as permissões de usuários baseado em suas roles
  */
 
-import { supabaseAdmin } from './supabase'
+// Importar o cliente Supabase diretamente com as credenciais corretas
+import { createClient } from '@supabase/supabase-js'
+
+// Configuração hardcoded temporariamente para garantir funcionamento
+const supabaseUrl = 'https://eyfvvximmeqmwdfqzqov.supabase.co'
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5ZnZ2eGltbWVxbXdkZnF6cW92Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1ODUxODYsImV4cCI6MjA3MjE2MTE4Nn0.ht9a6MmtkfE5hVRmwpfyMcW24a4R7n-9hoW6eYd3K2w'
+
+// Criar cliente com a anon key (que tem acesso de leitura às roles)
+const supabaseClient = createClient(supabaseUrl, supabaseAnonKey)
 
 export interface Permission {
   tickets_view: boolean
@@ -142,7 +150,7 @@ export async function getRolePermissions(roleName: string): Promise<Permission |
     console.log(`[getRolePermissions] Buscando role: ${roleName}`)
     
     // Buscar role customizada no banco
-    const { data: role, error } = await supabaseAdmin
+    const { data: role, error } = await supabaseClient
       .from('roles')
       .select('permissions')
       .eq('name', roleName)
@@ -196,7 +204,7 @@ export async function userHasPermission(
 export async function getUsersWithPermission(permission: keyof Permission): Promise<any[]> {
   try {
     // Buscar todos os usuários
-    const { data: users, error: usersError } = await supabaseAdmin
+    const { data: users, error: usersError } = await supabaseClient
       .from('users')
       .select('id, name, email, role, role_name')
       .eq('is_active', true)
@@ -207,7 +215,7 @@ export async function getUsersWithPermission(permission: keyof Permission): Prom
     }
 
     // Buscar todas as roles customizadas
-    const { data: customRoles, error: rolesError } = await supabaseAdmin
+    const { data: customRoles, error: rolesError } = await supabaseClient
       .from('roles')
       .select('name, permissions')
 
