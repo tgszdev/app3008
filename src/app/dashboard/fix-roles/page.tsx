@@ -31,6 +31,26 @@ export default function FixRolesPage() {
     }
   }
 
+  const createN1Role = async () => {
+    setLoading(true)
+    try {
+      const response = await axios.post('/api/admin/create-n1-role')
+      setResult(response.data)
+      
+      if (response.data.success) {
+        toast.success('Role N1 criada com sucesso!')
+      } else {
+        toast.error('Role N1 já existe ou erro ao criar')
+      }
+    } catch (error: any) {
+      console.error('Erro:', error)
+      toast.error('Erro ao criar role N1')
+      setResult({ error: error.message })
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const clearCache = async () => {
     setLoading(true)
     try {
@@ -93,7 +113,7 @@ export default function FixRolesPage() {
           </div>
 
           {/* Botões de ação */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <button
               onClick={createDeveloperRole}
               disabled={loading}
@@ -105,6 +125,19 @@ export default function FixRolesPage() {
                 <UserPlus className="h-5 w-5" />
               )}
               Criar Role Desenvolvedor
+            </button>
+
+            <button
+              onClick={createN1Role}
+              disabled={loading}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {loading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <UserPlus className="h-5 w-5" />
+              )}
+              Criar Role N1
             </button>
 
             <button

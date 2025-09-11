@@ -139,6 +139,8 @@ export async function getRolePermissions(roleName: string): Promise<Permission |
   }
 
   try {
+    console.log(`[getRolePermissions] Buscando role: ${roleName}`)
+    
     // Buscar role customizada no banco
     const { data: role, error } = await supabaseAdmin
       .from('roles')
@@ -146,18 +148,33 @@ export async function getRolePermissions(roleName: string): Promise<Permission |
       .eq('name', roleName)
       .single()
 
-    if (error || !role) {
-      console.error('Erro ao buscar role:', error)
+    if (error) {
+      console.error(`[getRolePermissions] Erro ao buscar role ${roleName}:`, error)
+      
+      // Se o erro for "0 rows", a role não existe no banco
+      if (error.code === 'PGRST116') {
+        console.warn(`[getRolePermissions] Role "${roleName}" não existe no banco de dados!`)
+        console.warn(`[getRolePermissions] Execute no Supabase SQL Editor:`)
+        console.warn(`INSERT INTO roles (name, display_name, permissions, is_system) VALUES ('${roleName}', '${roleName.toUpperCase()}', '{}', false);`)
+      }
+      
+      return null
+    }
+    
+    if (!role) {
+      console.error(`[getRolePermissions] Role ${roleName} retornou vazio`)
       return null
     }
 
+    console.log(`[getRolePermissions] Role ${roleName} encontrada, permissões:`, role.permissions)
+    
     // Atualizar cache
     rolesCache.set(roleName, role.permissions)
     cacheTimestamp = now
 
     return role.permissions
   } catch (error) {
-    console.error('Erro ao buscar permissões da role:', error)
+    console.error('[getRolePermissions] Erro geral ao buscar permissões:', error)
     return null
   }
 }
