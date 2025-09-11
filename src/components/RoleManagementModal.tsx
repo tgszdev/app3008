@@ -489,15 +489,34 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                     </div>
                   ) : (
                     <div className="mt-6 space-y-4">
-                      {/* Botão para criar novo perfil */}
+                      {/* Botões de ação */}
                       {!isCreating && (
-                        <button
-                          onClick={() => setIsCreating(true)}
-                          className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                        >
-                          <Plus className="h-5 w-5" />
-                          Criar Novo Perfil
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setIsCreating(true)}
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                          >
+                            <Plus className="h-5 w-5" />
+                            Criar Novo Perfil
+                          </button>
+                          <button
+                            onClick={async () => {
+                              try {
+                                const response = await apiClient.post('/api/admin/clear-cache')
+                                if (response.status === 200) {
+                                  toast.success('Cache de permissões limpo! Faça logout e login novamente para aplicar as mudanças.')
+                                }
+                              } catch (error) {
+                                toast.error('Erro ao limpar cache')
+                              }
+                            }}
+                            className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                            title="Limpar cache de permissões"
+                          >
+                            <Database className="h-5 w-5" />
+                            Limpar Cache
+                          </button>
+                        </div>
                       )}
 
                       {/* Formulário de criação */}

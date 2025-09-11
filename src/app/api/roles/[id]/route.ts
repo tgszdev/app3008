@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
+import { clearPermissionsCache } from '@/lib/permissions'
 
 type RouteParams = {
   params: Promise<{ id: string }>
@@ -59,6 +60,9 @@ export async function PUT(
       
       return NextResponse.json({ error: 'Failed to update role' }, { status: 500 })
     }
+
+    // Limpar cache de permissões após atualizar role
+    clearPermissionsCache()
 
     return NextResponse.json(updatedRole)
   } catch (error) {

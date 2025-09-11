@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
+import { clearPermissionsCache } from '@/lib/permissions'
 
 export async function GET(request: NextRequest) {
   try {
@@ -196,6 +197,8 @@ export async function POST(request: NextRequest) {
       
       // Se a tabela não existir, retornar sucesso simulado
       if (error.code === '42P01') {
+        // Limpar cache mesmo para simulação
+        clearPermissionsCache()
         return NextResponse.json({
           id: Date.now().toString(),
           name: name.toLowerCase().replace(/\s+/g, '_'),
@@ -210,6 +213,9 @@ export async function POST(request: NextRequest) {
       
       return NextResponse.json({ error: 'Failed to create role' }, { status: 500 })
     }
+
+    // Limpar cache de permissões após criar nova role
+    clearPermissionsCache()
 
     return NextResponse.json(newRole, { status: 201 })
   } catch (error) {

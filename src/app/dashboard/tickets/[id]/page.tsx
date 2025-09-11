@@ -108,7 +108,7 @@ export default function TicketDetailsPage() {
   const [selectedImage, setSelectedImage] = useState<{url: string, name: string, size?: number, type?: string} | null>(null)
   
   // Hook de permissões
-  const { hasPermission, loading: permissionsLoading } = usePermissions()
+  const { hasPermission, loading: permissionsLoading, permissions } = usePermissions()
   
   // Verificar permissões específicas
   const canAssignTickets = hasPermission('tickets_assign')
@@ -116,6 +116,18 @@ export default function TicketDetailsPage() {
   const canEditOwnTickets = hasPermission('tickets_edit_own')
   const canCloseTickets = hasPermission('tickets_close')
   const canDeleteTickets = hasPermission('tickets_delete')
+  
+  // Debug: Log permissions para verificar se estão sendo carregadas corretamente
+  useEffect(() => {
+    if (!permissionsLoading && permissions) {
+      console.log('=== DEBUG PERMISSÕES ===');
+      console.log('Usuário:', session?.user?.email);
+      console.log('Role:', (session?.user as any)?.role_name || (session?.user as any)?.role);
+      console.log('Permissões carregadas:', permissions);
+      console.log('tickets_delete:', permissions.tickets_delete);
+      console.log('canDeleteTickets:', canDeleteTickets);
+    }
+  }, [permissions, permissionsLoading, canDeleteTickets, session])
   
   // Determinar se pode editar este ticket
   const isOwner = ticket?.created_by_user?.id === session?.user?.id
