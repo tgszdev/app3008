@@ -22,10 +22,13 @@ Sistema completo de Help Desk desenvolvido com Next.js 15, TypeScript, Supabase 
 #### 🔐 **Sistema de Permissões**
 - ✅ **24 permissões granulares** configuráveis
 - ✅ **Roles customizadas** (além de admin, analyst, user)
-- ✅ Cache de permissões (5 minutos)
+- ✅ Cache de permissões (5 minutos) com limpeza automática
 - ✅ Hook `usePermissions` para verificação em componentes
 - ✅ Página de teste de permissões (`/dashboard/test-permissions`)
 - ✅ Gerenciamento visual de roles e permissões
+- ✅ **Botão "Limpar Cache"** no gerenciamento de roles
+- ✅ **Debug logging** para rastreamento de permissões
+- ✅ **Correção aplicada**: Botão excluir agora aparece corretamente para roles customizadas
 
 #### 👥 **Gerenciamento de Usuários**
 - ✅ Cadastro e autenticação via NextAuth
@@ -89,7 +92,7 @@ Sistema completo de Help Desk desenvolvido com Next.js 15, TypeScript, Supabase 
 - kb_articles (base de conhecimento)
 - kb_categories (categorias da KB)
 - timesheets (registro de horas)
-- custom_roles (roles personalizadas)
+- roles (perfis customizados com permissões)
 - activity_logs (logs de atividades)
 ```
 
@@ -98,7 +101,7 @@ Sistema completo de Help Desk desenvolvido com Next.js 15, TypeScript, Supabase 
 ### Instalação Local
 ```bash
 # Clone o repositório
-git clone [seu-repositorio]
+git clone https://github.com/tgszdev/app3008.git
 
 # Instale as dependências
 cd webapp
@@ -157,10 +160,30 @@ pm2 logs webapp      # Ver logs
 
 ## 📈 Status do Projeto
 
-- **Versão**: 1.5.5
+- **Versão**: 1.5.6
 - **Status**: ✅ Produção
-- **Última Atualização**: 10/09/2025
-- **Mantenedor**: Sistema automatizado
+- **Última Atualização**: 11/09/2025
+- **GitHub**: https://github.com/tgszdev/app3008
+- **URL de Desenvolvimento**: https://3000-i968ax1d7t7cf739vyajj-6532622b.e2b.dev
+- **Backup**: https://page.gensparksite.com/project_backups/toolu_01WULLFFS16LGgcFQgK6DcxA.tar.gz
+
+## 🔧 Resolução de Problemas
+
+### Permissões não funcionam após criar/editar roles
+1. Acesse **Configurações > Gerenciar Perfis**
+2. Clique em **"Limpar Cache"**
+3. Faça **logout** e **login** novamente
+4. As novas permissões serão aplicadas
+
+### Botão de ação não aparece mesmo com permissão
+1. Abra o **Console do Navegador** (F12)
+2. Verifique os logs de debug de permissões
+3. Confirme que a permissão está `true`
+4. Se persistir, limpe o cache do navegador
+
+### Como verificar minhas permissões
+- Acesse `/dashboard/test-permissions` para ver todas as suas permissões atuais
+- O sistema mostra quais permissões você tem e quais não tem
 
 ## 🤝 Contribuindo
 
