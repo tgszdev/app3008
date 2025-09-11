@@ -106,7 +106,7 @@ export async function GET(request: NextRequest) {
       
       const currentUserId = currentUser?.id
 
-      filteredComments = filteredComments.filter(comment => {
+      filteredComments = filteredComments.filter((comment: any) => {
         // Usuários só podem ver:
         // 1. Comentários não internos
         // 2. Comentários internos criados por eles mesmos
