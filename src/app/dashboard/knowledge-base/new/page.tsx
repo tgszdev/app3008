@@ -57,12 +57,12 @@ export default function NewArticlePage() {
   const { hasPermission } = usePermissions()
   
   // Verificar permissão para criar artigos
-  const canCreate = hasPermission('kb_create')
+  const canCreatePermission = hasPermission('kb_create')
   
   // Fallback para compatibilidade
   const isAdmin = (session?.user as any)?.role === 'admin'
   const isAnalyst = (session?.user as any)?.role === 'analyst'
-  const canCreate = isAdmin || isAnalyst
+  const canCreate = canCreatePermission || isAdmin || isAnalyst
 
   // Verificar permissão
   useEffect(() => {

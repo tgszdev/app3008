@@ -89,12 +89,12 @@ export default function EditArticlePage() {
   const { hasPermission } = usePermissions()
   
   // Verificar permissão para editar artigos
-  const canEdit = hasPermission('kb_edit')
+  const canEditPermission = hasPermission('kb_edit')
   
   // Fallback para compatibilidade
   const isAdmin = (session?.user as any)?.role === 'admin'
   const isAnalyst = (session?.user as any)?.role === 'analyst'
-  const canEdit = isAdmin || isAnalyst
+  const canEdit = canEditPermission || isAdmin || isAnalyst
 
   // Buscar artigo e categorias
   useEffect(() => {
