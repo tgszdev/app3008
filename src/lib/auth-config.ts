@@ -339,8 +339,9 @@ export const authConfig: NextAuthConfig = {
       // IMPORTANTE: Preservar o sessionToken em todas as requisições
       // Não apenas no update
       if (token.sessionToken) {
-        // Verificar periodicamente se a sessão ainda é válida
-        if (trigger === 'update' || Math.random() < 0.1) { // 10% das vezes verifica
+        // Verificar apenas em updates controlados, não aleatoriamente
+        // Removida verificação aleatória que causava logouts inesperados
+        if (trigger === 'update') { // Apenas em updates, sem Math.random()
           try {
             const { data: session } = await supabaseAdmin
               .from('sessions')
@@ -350,11 +351,18 @@ export const authConfig: NextAuthConfig = {
               .single()
             
             if (!session) {
-              console.log('Sessão invalidada no banco, forçando logout')
+              console.log('[AUTH] Sessão não encontrada no banco:', {
+                sessionToken: token.sessionToken,
+                userId: token.id,
+                trigger
+              })
               return null // Isso força o logout
+            } else {
+              console.log('[AUTH] Sessão válida encontrada no update')
             }
           } catch (error) {
             console.error('Erro ao verificar sessão:', error)
+            // Em caso de erro, não forçar logout - pode ser problema de rede
           }
         }
       }
