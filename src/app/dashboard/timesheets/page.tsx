@@ -386,12 +386,7 @@ export default function TimesheetsPage() {
     return description?.includes('[HORA EXTRA]') || false
   }
   
-  // Helper para formatar horas decimais para HH:MM
-  const formatHoursToTime = (decimal: number) => {
-    const hours = Math.floor(decimal)
-    const minutes = Math.round((decimal - hours) * 60)
-    return `${hours}:${minutes.toString().padStart(2, '0')}`
-  }
+
   
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -765,7 +760,7 @@ export default function TimesheetsPage() {
                                 </span>
                                 <span className="flex items-center gap-1">
                                   <Clock className="h-3 w-3 flex-shrink-0" />
-                                  {formatHoursToTime(timesheet.hours_worked)}h
+                                  {formatHoursToHHMM(timesheet.hours_worked)}
                                 </span>
                               </div>
                             </div>
