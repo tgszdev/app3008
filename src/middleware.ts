@@ -43,7 +43,22 @@ export async function middleware(request: NextRequest) {
   }
 
   // Verificação de sessão única no banco de dados
-  if (isAuth && token && (token as any).sessionToken) {
+  // TEMPORARIAMENTE: Adicionar logs detalhados para debug
+  if (isAuth && token) {
+    const sessionToken = (token as any).sessionToken
+    console.log('Debug - Token info:', {
+      hasToken: !!token,
+      hasSessionToken: !!sessionToken,
+      tokenKeys: Object.keys(token || {}),
+      path: request.nextUrl.pathname
+    })
+    
+    // Se não tem sessionToken no JWT, permitir acesso (sessão sem tracking)
+    if (!sessionToken) {
+      console.log('Token JWT não contém sessionToken - permitindo acesso sem verificação de sessão única')
+      return NextResponse.next()
+    }
+    
     try {
       // Importar Supabase apenas quando necessário
       const { createClient } = await import('@supabase/supabase-js')
@@ -52,25 +67,31 @@ export async function middleware(request: NextRequest) {
         process.env.SUPABASE_SERVICE_ROLE_KEY!
       )
       
+      console.log('Verificando sessão no banco:', sessionToken)
+      
       const { data: session, error } = await supabase
         .from('sessions')
         .select('*')
-        .eq('sessionToken', (token as any).sessionToken)
+        .eq('sessionToken', sessionToken)
         .gt('expires', new Date().toISOString())
         .single()
       
+      console.log('Resultado da verificação:', {
+        hasSession: !!session,
+        error: error?.message,
+        sessionId: session?.id
+      })
+      
       if (error || !session) {
         // Sessão foi invalidada (login em outro dispositivo)
-        console.log('Sessão invalidada no banco - forçando logout')
+        console.log('Sessão inválida - detalhes:', {
+          error: error?.message,
+          sessionToken: sessionToken,
+          reason: !session ? 'Sessão não encontrada' : 'Erro na query'
+        })
         
-        // Limpar cookies de autenticação
-        const response = NextResponse.redirect(new URL('/login', request.url))
-        response.cookies.delete('authjs.session-token')
-        response.cookies.delete('__Secure-authjs.session-token')
-        response.cookies.delete('__Host-authjs.csrf-token')
-        response.cookies.delete('__Secure-authjs.callback-url')
-        
-        return response
+        // Por enquanto, NÃO forçar logout - apenas logar
+        // return NextResponse.redirect(new URL('/login', request.url))
       }
     } catch (error) {
       console.error('Erro ao verificar sessão no banco:', error)
