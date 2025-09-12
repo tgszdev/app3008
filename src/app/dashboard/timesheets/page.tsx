@@ -8,6 +8,7 @@ import { format, startOfMonth, endOfMonth, parseISO } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import toast from 'react-hot-toast'
 import TimesheetNavigation from '@/components/TimesheetNavigation'
+import { formatHoursToHHMM } from '@/lib/format-hours'
 import {
   Clock,
   Calendar,
@@ -704,7 +705,7 @@ export default function TimesheetsPage() {
                     </span>
                   </div>
                   <div className="text-xs sm:text-sm text-slate-400 whitespace-nowrap">
-                    {totalHours.toFixed(1)}h total
+                    {formatHoursToHHMM(totalHours)} total
                   </div>
                 </div>
                 
@@ -816,7 +817,7 @@ export default function TimesheetsPage() {
                     </div>
                     <div className="mt-3 pt-3 border-t border-slate-700 flex justify-between text-sm">
                       <span className="text-slate-400">Total de apontamentos: {ticketTimesheets.length}</span>
-                      <span className="text-slate-300 font-semibold">Total: {totalHours.toFixed(1)}h</span>
+                      <span className="text-slate-300 font-semibold">Total: {formatHoursToHHMM(totalHours)}</span>
                     </div>
                   </div>
                 </div>
@@ -1220,7 +1221,7 @@ export default function TimesheetsPage() {
                           </span>
                           <span className="flex items-center gap-1">
                             <Clock className="h-3 w-3" />
-                            {timesheet.hours_worked}h
+                            {formatHoursToHHMM(timesheet.hours_worked)}
                           </span>
                           <span className="flex items-center gap-1">
                             <User className="h-3 w-3" />

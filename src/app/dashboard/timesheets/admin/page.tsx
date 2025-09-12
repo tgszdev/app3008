@@ -7,6 +7,7 @@ import { format, parseISO } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import toast from 'react-hot-toast'
 import TimesheetNavigation from '@/components/TimesheetNavigation'
+import { formatHoursToHHMM } from '@/lib/format-hours'
 import {
   Clock,
   Calendar,
@@ -358,7 +359,7 @@ export default function TimesheetsAdminPage() {
                 Total de Horas
               </p>
               <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-                {stats.totalHours.toFixed(1)}h
+                {formatHoursToHHMM(stats.totalHours)}
               </p>
             </div>
             <Clock className="h-8 w-8 text-blue-500" />
@@ -420,7 +421,7 @@ export default function TimesheetsAdminPage() {
                           </span>
                           <span className="flex items-center gap-1">
                             <Clock className="h-3 w-3" />
-                            {timesheet.hours_worked}h
+                            {formatHoursToHHMM(timesheet.hours_worked)}
                           </span>
                         </div>
                       </div>

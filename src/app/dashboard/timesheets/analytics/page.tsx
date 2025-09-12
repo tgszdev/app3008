@@ -7,6 +7,7 @@ import { format, startOfMonth, endOfMonth, parseISO, eachDayOfInterval, startOfW
 import { ptBR } from 'date-fns/locale'
 import toast from 'react-hot-toast'
 import TimesheetNavigation from '@/components/TimesheetNavigation'
+import { formatHoursToHHMM } from '@/lib/format-hours'
 import {
   Clock,
   Calendar,
@@ -742,7 +743,7 @@ export default function TimesheetsAnalyticsPage() {
                   <div className="flex items-center justify-between mb-2">
                     <Clock className="h-8 w-8 text-blue-500" />
                     <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {analytics.totalHours.toFixed(1)}h
+                      {formatHoursToHHMM(analytics.totalHours)}
                     </span>
                   </div>
                   <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Total de Horas</p>
@@ -788,7 +789,7 @@ export default function TimesheetsAnalyticsPage() {
                     </div>
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-500 mt-2 truncate">
-                    Média: {analytics.averageHoursPerUser.toFixed(1)}h por pessoa
+                    Média: {formatHoursToHHMM(analytics.averageHoursPerUser)} por pessoa
                   </p>
                 </div>
                 
@@ -812,7 +813,7 @@ export default function TimesheetsAnalyticsPage() {
                     </div>
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-500 mt-2 truncate">
-                    Média: {analytics.averageHoursPerTicket.toFixed(1)}h por chamado
+                    Média: {formatHoursToHHMM(analytics.averageHoursPerTicket)} por chamado
                   </p>
                 </div>
                 
@@ -820,7 +821,7 @@ export default function TimesheetsAnalyticsPage() {
                   <div className="flex items-center justify-between mb-2">
                     <BarChart3 className="h-8 w-8 text-yellow-500" />
                     <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {analytics.averageHoursPerDay.toFixed(1)}h
+                      {formatHoursToHHMM(analytics.averageHoursPerDay)}
                     </span>
                   </div>
                   <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Média de Horas/Dia</p>
@@ -865,7 +866,7 @@ export default function TimesheetsAnalyticsPage() {
                     <div>
                       <div className="flex justify-between mb-1">
                         <span className="text-sm text-gray-600 dark:text-gray-400">Aprovadas</span>
-                        <span className="text-sm font-medium text-green-600">{analytics.approvedHours.toFixed(1)}h</span>
+                        <span className="text-sm font-medium text-green-600">{formatHoursToHHMM(analytics.approvedHours)}</span>
                       </div>
                       <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                         <div 
@@ -877,7 +878,7 @@ export default function TimesheetsAnalyticsPage() {
                     <div>
                       <div className="flex justify-between mb-1">
                         <span className="text-sm text-gray-600 dark:text-gray-400">Pendentes</span>
-                        <span className="text-sm font-medium text-yellow-600">{analytics.pendingHours.toFixed(1)}h</span>
+                        <span className="text-sm font-medium text-yellow-600">{formatHoursToHHMM(analytics.pendingHours)}</span>
                       </div>
                       <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                         <div 
@@ -889,7 +890,7 @@ export default function TimesheetsAnalyticsPage() {
                     <div>
                       <div className="flex justify-between mb-1">
                         <span className="text-sm text-gray-600 dark:text-gray-400">Rejeitadas</span>
-                        <span className="text-sm font-medium text-red-600">{analytics.rejectedHours.toFixed(1)}h</span>
+                        <span className="text-sm font-medium text-red-600">{formatHoursToHHMM(analytics.rejectedHours)}</span>
                       </div>
                       <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                         <div 
@@ -936,7 +937,7 @@ export default function TimesheetsAnalyticsPage() {
                           </div>
                         </div>
                         <div className="ml-4 text-right">
-                          <span className="font-semibold text-gray-900 dark:text-white">{ticket.hours.toFixed(1)}h</span>
+                          <span className="font-semibold text-gray-900 dark:text-white">{formatHoursToHHMM(ticket.hours)}</span>
                           <span className="block text-xs text-gray-500">{ticket.percentage.toFixed(1)}%</span>
                         </div>
                       </div>
@@ -1031,7 +1032,7 @@ export default function TimesheetsAnalyticsPage() {
                                   dominantBaseline="middle"
                                   className="fill-white text-xs font-semibold opacity-0 group-hover/segment:opacity-100 transition-opacity"
                                 >
-                                  {category.hours.toFixed(0)}h
+                                  {formatHoursToHHMM(category.hours)}
                                 </text>
                               </g>
                             )
@@ -1067,7 +1068,7 @@ export default function TimesheetsAnalyticsPage() {
                               {category.ticketCount} chamado{category.ticketCount !== 1 ? 's' : ''}
                             </span>
                             <span className="text-white font-semibold">
-                              {category.hours.toFixed(0)}h
+                              {formatHoursToHHMM(category.hours)}
                             </span>
                             <span className="text-slate-400 text-xs">
                               {category.percentage.toFixed(0)}%
@@ -1152,13 +1153,13 @@ export default function TimesheetsAnalyticsPage() {
                             {priority.priority.toLowerCase() === 'baixa' || priority.priority.toLowerCase() === 'low' ? <TrendingDown className="h-4 w-4 text-green-500" /> : null}
                           </div>
                           <div className={`text-xl font-bold ${getPriorityTextColor(priority.priority)}`}>
-                            {priority.hours.toFixed(1)}h
+                            {formatHoursToHHMM(priority.hours)}
                           </div>
                           <div className="text-xs text-gray-600 dark:text-gray-400">
                             {priority.ticketCount} chamados
                           </div>
                           <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                            Média: {priority.averageHours.toFixed(1)}h/chamado
+                            Média: {formatHoursToHHMM(priority.averageHours)}/chamado
                           </div>
                           <div className="mt-2 bg-gray-200 dark:bg-gray-700 rounded-full h-1">
                             <div 
@@ -1265,7 +1266,7 @@ export default function TimesheetsAnalyticsPage() {
                               textAnchor="end"
                               className="fill-slate-400 text-xs font-medium"
                             >
-                              {value.toFixed(0)}h
+                              {formatHoursToHHMM(value)}
                             </text>
                           )
                         }
@@ -1357,7 +1358,7 @@ export default function TimesheetsAnalyticsPage() {
                                     fill="rgb(16, 185, 129)"
                                     className="hover:r-6 transition-all cursor-pointer"
                                   >
-                                    <title>{`${format(parseISO(day.date), 'dd/MM')}: ${day.approved.toFixed(1)}h aprovadas`}</title>
+                                    <title>{`${format(parseISO(day.date), 'dd/MM')}: ${formatHoursToHHMM(day.approved)} aprovadas`}</title>
                                   </circle>
                                   
                                   {/* Pending points */}
@@ -1368,7 +1369,7 @@ export default function TimesheetsAnalyticsPage() {
                                     fill="rgb(245, 158, 11)"
                                     className="hover:r-6 transition-all cursor-pointer"
                                   >
-                                    <title>{`${format(parseISO(day.date), 'dd/MM')}: ${day.pending.toFixed(1)}h pendentes`}</title>
+                                    <title>{`${format(parseISO(day.date), 'dd/MM')}: ${formatHoursToHHMM(day.pending)} pendentes`}</title>
                                   </circle>
                                   
                                   {/* Rejected points */}
@@ -1379,7 +1380,7 @@ export default function TimesheetsAnalyticsPage() {
                                     fill="rgb(239, 68, 68)"
                                     className="hover:r-6 transition-all cursor-pointer"
                                   >
-                                    <title>{`${format(parseISO(day.date), 'dd/MM')}: ${day.rejected.toFixed(1)}h rejeitadas`}</title>
+                                    <title>{`${format(parseISO(day.date), 'dd/MM')}: ${formatHoursToHHMM(day.rejected)} rejeitadas`}</title>
                                   </circle>
                                   
                                   {/* X-axis label */}
@@ -1443,7 +1444,7 @@ export default function TimesheetsAnalyticsPage() {
                                 {week.users} colaboradores
                               </span>
                               <span className="font-bold text-white">
-                                {week.hours.toFixed(1)}h
+                                {formatHoursToHHMM(week.hours)}
                               </span>
                             </div>
                           </div>
@@ -1535,7 +1536,7 @@ export default function TimesheetsAnalyticsPage() {
                               textAnchor="end"
                               className="fill-slate-400 text-xs"
                             >
-                              {value.toFixed(0)}h
+                              {formatHoursToHHMM(value)}
                             </text>
                           )
                         }
@@ -1669,7 +1670,7 @@ export default function TimesheetsAnalyticsPage() {
                                       textAnchor="middle"
                                       className="fill-white text-xs font-semibold"
                                     >
-                                      {month.hours.toFixed(0)}h
+                                      {formatHoursToHHMM(month.hours)}
                                     </text>
                                   </g>
                                   
@@ -1855,7 +1856,7 @@ export default function TimesheetsAnalyticsPage() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
                             <span className="text-lg font-semibold text-gray-900 dark:text-white" title="Aprovadas + Pendentes (sem rejeitadas)">
-                              {(user.approvedHours + user.pendingHours).toFixed(1)}h
+                              {formatHoursToHHMM(user.approvedHours + user.pendingHours)}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
