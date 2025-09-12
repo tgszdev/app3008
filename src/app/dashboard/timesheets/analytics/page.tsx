@@ -630,19 +630,9 @@ export default function TimesheetsAnalyticsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-              Analytics de Apontamentos
-            </h1>
-            {/* Badge indicando o modo de visualização */}
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-              canViewFullAnalytics 
-                ? 'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100'
-                : 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100'
-            }`}>
-              {canViewFullAnalytics ? 'Visão Completa' : 'Visão Pessoal'}
-            </span>
-          </div>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+            Analytics de Apontamentos
+          </h1>
           <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
             {canViewFullAnalytics
               ? 'Análise completa de horas apontadas e produtividade de todos os colaboradores'
