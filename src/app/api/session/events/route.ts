@@ -107,16 +107,16 @@ export async function GET(request: NextRequest) {
       // Contador para heartbeat
       let heartbeatCount = 0
       
-      // Verificar a cada 2 segundos (mais rápido que o polling atual de 10s)
+      // Verificar a cada 1 segundo (detecção mais rápida)
       const interval = setInterval(async () => {
         const isValid = await checkSession()
         
         if (!isValid) {
           clearInterval(interval)
         } else {
-          // Enviar heartbeat a cada 10 verificações (20 segundos)
+          // Enviar heartbeat a cada 20 verificações (20 segundos)
           heartbeatCount++
-          if (heartbeatCount >= 10) {
+          if (heartbeatCount >= 20) {
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ 
                 type: 'heartbeat',
@@ -126,7 +126,7 @@ export async function GET(request: NextRequest) {
             heartbeatCount = 0
           }
         }
-      }, 2000) // Verificação a cada 2 segundos
+      }, 1000) // Verificação a cada 1 segundo (mais agressivo)
       
       // Cleanup quando cliente desconectar
       request.signal.addEventListener('abort', () => {

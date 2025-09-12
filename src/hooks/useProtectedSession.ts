@@ -90,10 +90,10 @@ export function useProtectedSession(options: UseProtectedSessionOptions = {}) {
             onSessionInvalidated(data.reason)
           }
 
-          // Aguardar um pouco antes do logout para mostrar a notificação
+          // Logout quase imediato, apenas 500ms para garantir que a notificação apareça
           setTimeout(() => {
             signOut({ callbackUrl: redirectTo })
-          }, 2000)
+          }, 500)
         }
 
         return false
@@ -169,7 +169,7 @@ export function useProtectedSession(options: UseProtectedSessionOptions = {}) {
               setTimeout(() => {
                 eventSource.close()
                 signOut({ callbackUrl: redirectTo })
-              }, 2000)
+              }, 500)
             }
           } else if (data.type === 'session_expired') {
             console.log('[useProtectedSession] Sessão expirada via SSE')
@@ -194,7 +194,7 @@ export function useProtectedSession(options: UseProtectedSessionOptions = {}) {
               setTimeout(() => {
                 eventSource.close()
                 signOut({ callbackUrl: redirectTo })
-              }, 2000)
+              }, 500)
             }
           }
         } catch (error) {
