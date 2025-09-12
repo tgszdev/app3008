@@ -146,8 +146,8 @@ const systemRolesPermissions = {
     timesheets_create: true,
     timesheets_edit_own: true,
     timesheets_approve: true,
-    timesheets_analytics: true,
-    timesheets_analytics_full: false // Analista não tem acesso completo por padrão
+    timesheets_analytics: true, // Analista pode ver analytics (apenas próprio)
+    timesheets_analytics_full: false // Analista vê apenas seus próprios dados
   },
   user: {
     ...defaultPermissions,
@@ -158,7 +158,7 @@ const systemRolesPermissions = {
     timesheets_view_own: true,
     timesheets_create: true,
     timesheets_edit_own: true,
-    timesheets_analytics: true, // Usuário pode ver analytics próprio
+    timesheets_analytics: false, // Usuário NÃO tem acesso ao analytics
     timesheets_analytics_full: false // Usuário não tem acesso completo
   }
 }
@@ -224,11 +224,43 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
         ]
         setRoles(defaultRoles)
       } else {
-        setRoles(response.data)
+        // Garantir que todos os perfis tenham a nova permissão
+        const rolesWithNewPermission = response.data.map((role: Role) => {
+          const updatedPermissions = { ...role.permissions }
+          
+          // Adicionar timesheets_analytics_full se não existir
+          if (updatedPermissions.timesheets_analytics_full === undefined) {
+            // Definir valor padrão baseado no tipo de perfil
+            if (role.name === 'admin') {
+              updatedPermissions.timesheets_analytics_full = true
+            } else {
+              updatedPermissions.timesheets_analytics_full = false
+            }
+          }
+          
+          // Ajustar permissões do user
+          if (role.name === 'user') {
+            updatedPermissions.timesheets_analytics = false
+            updatedPermissions.timesheets_analytics_full = false
+          }
+          
+          // Ajustar permissões do analyst
+          if (role.name === 'analyst') {
+            updatedPermissions.timesheets_analytics = true
+            updatedPermissions.timesheets_analytics_full = false
+          }
+          
+          return {
+            ...role,
+            permissions: updatedPermissions
+          }
+        })
+        
+        setRoles(rolesWithNewPermission)
       }
     } catch (error: any) {
       console.error('Error fetching roles:', error)
-      // Se a API não existir, usar roles padrão
+      // Se a API não existir, usar roles padrão com permissões corretas
       const defaultRoles: Role[] = [
         {
           id: '1',
@@ -672,7 +704,33 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                                 ) : (
                                   <>
                                     <button
-                                      onClick={() => setEditingRole(role)}
+                                      onClick={() => {
+                                        // Garantir que o perfil tem todas as permissões definidas
+                                        const updatedPermissions = { ...role.permissions }
+                                        
+                                        // Adicionar timesheets_analytics_full se não existir
+                                        if (updatedPermissions.timesheets_analytics_full === undefined) {
+                                          if (role.name === 'admin') {
+                                            updatedPermissions.timesheets_analytics_full = true
+                                          } else {
+                                            updatedPermissions.timesheets_analytics_full = false
+                                          }
+                                        }
+                                        
+                                        // Garantir configurações corretas por perfil
+                                        if (role.name === 'user') {
+                                          updatedPermissions.timesheets_analytics = false
+                                          updatedPermissions.timesheets_analytics_full = false
+                                        } else if (role.name === 'analyst') {
+                                          updatedPermissions.timesheets_analytics = true
+                                          updatedPermissions.timesheets_analytics_full = false
+                                        }
+                                        
+                                        setEditingRole({
+                                          ...role,
+                                          permissions: updatedPermissions
+                                        })
+                                      }}
                                       className="p-2 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
                                     >
                                       <Edit2 className="h-5 w-5" />
@@ -716,13 +774,33 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                                 ))}
                               </div>
                             ) : (
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4">
-                                {Object.entries(role.permissions).filter(([_, value]) => value).map(([perm]) => (
-                                  <div key={perm} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                    {getPermissionIcon(perm)}
-                                    <span>{getPermissionLabel(perm)}</span>
+                              <div className="space-y-3 mt-4">
+                                {/* Mostrar estado do Analytics de forma destacada */}
+                                {(role.permissions.timesheets_analytics || role.permissions.timesheets_analytics_full) && (
+                                  <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                                    <h6 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">Analytics de Apontamentos</h6>
+                                    <div className="flex flex-wrap gap-2">
+                                      {role.permissions.timesheets_analytics && (
+                                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200 rounded text-xs">
+                                          <BarChart3 className="h-3 w-3" />
+                                          {role.permissions.timesheets_analytics_full ? 'Ver Analytics Completo' : 'Ver Analytics Próprio'}
+                                        </span>
+                                      )}
+                                    </div>
                                   </div>
-                                ))}
+                                )}
+                                
+                                {/* Grid de outras permissões */}
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                  {Object.entries(role.permissions)
+                                    .filter(([perm, value]) => value && !perm.includes('analytics'))
+                                    .map(([perm]) => (
+                                      <div key={perm} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                        {getPermissionIcon(perm)}
+                                        <span>{getPermissionLabel(perm)}</span>
+                                      </div>
+                                    ))}
+                                </div>
                               </div>
                             )}
                           </div>
