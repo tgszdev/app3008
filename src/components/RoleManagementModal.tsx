@@ -18,7 +18,8 @@ import {
   Clock,
   BarChart3,
   Settings,
-  Database
+  Database,
+  Info
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import apiClient from '@/lib/api-client'
