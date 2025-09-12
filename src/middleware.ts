@@ -1,32 +1,49 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
-import { createClient } from '@supabase/supabase-js'
-
-// Criar cliente Supabase para o middleware
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 export async function middleware(request: NextRequest) {
-  // Passar o secret explicitamente para o getToken
-  const token = await getToken({ 
-    req: request,
-    secret: process.env.NEXTAUTH_SECRET
-  })
-  const isAuth = !!token
   const isAuthPage = request.nextUrl.pathname.startsWith('/login')
   
-  // Debug para entender o problema de autenticação
-  console.log('Middleware Debug:', {
-    path: request.nextUrl.pathname,
-    hasToken: !!token,
-    tokenData: token ? 'Token exists' : 'No token',
-    isAuthPage,
-    cookies: request.cookies.getAll().map(c => c.name),
-    secret: process.env.NEXTAUTH_SECRET ? 'Secret exists' : 'No secret'
-  })
+  // Tentar obter o token com diferentes métodos
+  let token = null
+  let authMethod = 'none'
+  
+  try {
+    // Método 1: Tentar com NEXTAUTH_SECRET
+    token = await getToken({ 
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET
+    })
+    if (token) authMethod = 'NEXTAUTH_SECRET'
+  } catch (e) {
+    console.log('Erro ao decodificar com NEXTAUTH_SECRET:', e)
+  }
+  
+  // Se não funcionou, tentar com AUTH_SECRET (NextAuth v5)
+  if (!token && process.env.AUTH_SECRET) {
+    try {
+      token = await getToken({ 
+        req: request,
+        secret: process.env.AUTH_SECRET
+      })
+      if (token) authMethod = 'AUTH_SECRET'
+    } catch (e) {
+      console.log('Erro ao decodificar com AUTH_SECRET:', e)
+    }
+  }
+  
+  const isAuth = !!token
+  
+  // Log simplificado apenas para debug
+  if (request.nextUrl.pathname.startsWith('/dashboard')) {
+    console.log('Auth Status:', {
+      path: request.nextUrl.pathname,
+      authenticated: isAuth,
+      authMethod,
+      hasCookie: !!request.cookies.get('__Secure-authjs.session-token')
+    })
+  }
 
   // TEMPORARIAMENTE DESABILITADO: Verificação de sessão no banco
   // Motivo: Causando loop de redirecionamento devido a delay na sincronização
@@ -69,17 +86,17 @@ export async function middleware(request: NextRequest) {
   }
 
   if (!isAuth) {
-    // TEMPORÁRIO: Verificar se o cookie de sessão existe mesmo sem token decodificado
+    // Verificar se o cookie de sessão existe (fallback de segurança)
     const sessionCookie = request.cookies.get('__Secure-authjs.session-token') || 
-                         request.cookies.get('authjs.session-token') ||
-                         request.cookies.get('next-auth.session-token') ||
-                         request.cookies.get('__Secure-next-auth.session-token')
+                         request.cookies.get('authjs.session-token')
     
     if (sessionCookie) {
-      console.log('Cookie de sessão encontrado mas token não decodificado - permitindo acesso temporariamente')
+      // Cookie existe mas não conseguimos decodificar - permitir acesso mas logar aviso
+      console.warn('⚠️ Cookie de sessão presente mas JWT não pode ser verificado. Verifique NEXTAUTH_SECRET no Vercel.')
       return NextResponse.next()
     }
     
+    // Sem cookie e sem token - redirecionar para login
     let from = request.nextUrl.pathname
     if (request.nextUrl.search) {
       from += request.nextUrl.search
@@ -89,6 +106,9 @@ export async function middleware(request: NextRequest) {
       new URL(`/login?from=${encodeURIComponent(from)}`, request.url)
     )
   }
+  
+  // Token válido - permitir acesso
+  return NextResponse.next()
 }
 
 export const config = {
