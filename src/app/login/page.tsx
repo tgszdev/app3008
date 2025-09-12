@@ -43,6 +43,7 @@ export default function LoginPage() {
         email,
         password,
         redirect: false,
+        callbackUrl: '/dashboard'
       })
       
       console.log('Resultado do login:', result)
