@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
+import { SessionMonitor } from '@/components/session-monitor'
 import {
   Home,
   Ticket,
@@ -125,6 +126,8 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Monitor de Sessão - Verifica a cada 5 segundos */}
+      <SessionMonitor checkInterval={5000} enabled={true} />
       {/* Mobile sidebar */}
       <div className={cn(
         "fixed inset-0 z-50 lg:hidden",
