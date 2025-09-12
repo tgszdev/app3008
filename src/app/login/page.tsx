@@ -55,10 +55,13 @@ export default function LoginPage() {
         console.log('Login bem-sucedido!')
         toast.success('Login realizado com sucesso!')
         
-        // Aguardar um pouco e redirecionar
+        // Usar a URL retornada pelo NextAuth ou fallback para dashboard
+        const redirectUrl = result.url || '/dashboard'
+        console.log('Redirecionando para:', redirectUrl)
+        
+        // Aguardar um pouco e fazer redirecionamento completo
         setTimeout(() => {
-          router.push('/dashboard')
-          router.refresh()
+          window.location.href = redirectUrl
         }, 500)
       }
     } catch (error) {
