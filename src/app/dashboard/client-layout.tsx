@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
-import { SessionMonitor } from '@/components/SessionMonitor'
+import { useProtectedSession } from '@/hooks/useProtectedSession'
 import {
   Home,
   Ticket,
@@ -79,6 +79,15 @@ export default function DashboardLayout({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  
+  // Proteção de sessão com notificações
+  useProtectedSession({
+    showNotifications: true,
+    enableSSE: true,
+    enablePolling: true,
+    pollingInterval: 10000, // Fallback polling a cada 10s
+    redirectTo: '/login?reason=session_invalidated'
+  })
 
   
   // Load sidebar collapsed state from localStorage
@@ -126,8 +135,6 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Monitor de Sessão - Verifica a cada 5 segundos */}
-      <SessionMonitor checkInterval={5000} enabled={true} />
       {/* Mobile sidebar */}
       <div className={cn(
         "fixed inset-0 z-50 lg:hidden",

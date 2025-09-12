@@ -101,3 +101,38 @@ details summary::before {
 details[open] summary::before {
   transform: rotate(90deg);
 }
+
+/* Toast responsivo para mobile */
+@media (max-width: 640px) {
+  /* Ajustes para toasts em dispositivos móveis */
+  .toast-notification {
+    margin: 4px !important;
+    max-width: calc(100vw - 16px) !important;
+    font-size: 13px !important;
+  }
+  
+  /* Posicionamento do container de toasts */
+  [data-sonner-toaster] {
+    top: env(safe-area-inset-top, 0px) !important;
+  }
+  
+  /* Ajuste para react-hot-toast */
+  div[data-hot-toast-wrapper] {
+    padding-top: env(safe-area-inset-top, 0px) !important;
+  }
+}
+
+/* Garantir que toasts apareçam acima de tudo em mobile */
+@media (max-width: 768px) {
+  div[role="status"] {
+    z-index: 99999 !important;
+    position: fixed !important;
+  }
+  
+  /* Ajuste para notificações de sessão */
+  .toast-notification[data-toast-id*="session"] {
+    background: #dc2626 !important; /* Vermelho mais visível */
+    font-weight: 500 !important;
+    padding: 16px 20px !important;
+  }
+}

@@ -62,23 +62,25 @@ export default function RootLayout({
           <AuthProvider>
             {children}
             <Toaster
-              position="bottom-left"
+              position="top-center"
               reverseOrder={false}
               gutter={8}
               toastOptions={{
-                duration: 4000,
+                duration: 5000,
+                className: 'toast-notification',
                 style: {
                   background: '#323232',
                   color: '#ffffff',
-                  padding: '14px 24px',
-                  borderRadius: '4px',
+                  padding: '14px 20px',
+                  borderRadius: '8px',
                   fontSize: '14px',
                   fontWeight: '400',
-                  marginBottom: '20px',
-                  marginLeft: '20px',
-                  minWidth: '288px',
-                  maxWidth: '568px',
-                  boxShadow: '0 3px 5px rgba(0,0,0,0.2)',
+                  margin: '8px',
+                  width: 'auto',
+                  minWidth: '250px',
+                  maxWidth: 'min(90vw, 500px)',
+                  boxShadow: '0 4px 6px rgba(0,0,0,0.25)',
+                  zIndex: 99999,
                 },
                 success: {
                   iconTheme: {

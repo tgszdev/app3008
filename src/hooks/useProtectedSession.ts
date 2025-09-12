@@ -90,8 +90,10 @@ export function useProtectedSession(options: UseProtectedSessionOptions = {}) {
             onSessionInvalidated(data.reason)
           }
 
-          // Logout imediato sem delay
-          signOut({ callbackUrl: redirectTo })
+          // Pequeno delay apenas para garantir que o toast seja renderizado
+          setTimeout(() => {
+            signOut({ callbackUrl: redirectTo })
+          }, 200)
         }
 
         return false
@@ -164,9 +166,11 @@ export function useProtectedSession(options: UseProtectedSessionOptions = {}) {
                 onSessionInvalidated(data.reason)
               }
 
-              // Logout imediato sem delay
-              eventSource.close()
-              signOut({ callbackUrl: redirectTo })
+              // Pequeno delay apenas para garantir que o toast seja renderizado
+              setTimeout(() => {
+                eventSource.close()
+                signOut({ callbackUrl: redirectTo })
+              }, 200)
             }
           } else if (data.type === 'session_expired') {
             console.log('[useProtectedSession] Sessão expirada via SSE')
@@ -188,9 +192,11 @@ export function useProtectedSession(options: UseProtectedSessionOptions = {}) {
                 onSessionInvalidated('session_expired')
               }
 
-              // Logout imediato sem delay
-              eventSource.close()
-              signOut({ callbackUrl: redirectTo })
+              // Pequeno delay apenas para garantir que o toast seja renderizado
+              setTimeout(() => {
+                eventSource.close()
+                signOut({ callbackUrl: redirectTo })
+              }, 200)
             }
           }
         } catch (error) {
