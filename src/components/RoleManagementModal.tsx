@@ -935,21 +935,6 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                               </div>
                             ) : (
                               <div className="space-y-3 mt-4">
-                                {/* Mostrar estado do Analytics de forma destacada */}
-                                {(role.permissions.timesheets_analytics || role.permissions.timesheets_analytics_full) && (
-                                  <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-                                    <h6 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">Analytics de Apontamentos</h6>
-                                    <div className="flex flex-wrap gap-2">
-                                      {role.permissions.timesheets_analytics && (
-                                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200 rounded text-xs">
-                                          <BarChart3 className="h-3 w-3" />
-                                          {role.permissions.timesheets_analytics_full ? 'Ver Analytics Completo' : 'Ver Analytics Próprio'}
-                                        </span>
-                                      )}
-                                    </div>
-                                  </div>
-                                )}
-                                
                                 {/* Grid de permissões agrupadas por categoria */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                   {Object.entries(groupPermissions(role.permissions)).map(([group, perms]) => {
