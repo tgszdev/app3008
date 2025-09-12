@@ -2,6 +2,148 @@ import type { NextAuthConfig } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { supabaseAdmin } from '@/lib/supabase'
 
+// Função para obter permissões padrão baseadas no role
+function getDefaultPermissions(role: string) {
+  const defaultPermissions: Record<string, any> = {
+    admin: {
+      tickets_view: true,
+      tickets_create: true,
+      tickets_edit_own: true,
+      tickets_edit_all: true,
+      tickets_delete: true,
+      tickets_assign: true,
+      tickets_close: true,
+      kb_view: true,
+      kb_create: true,
+      kb_edit: true,
+      kb_delete: true,
+      kb_manage_categories: true,
+      timesheets_view_own: true,
+      timesheets_view_all: true,
+      timesheets_create: true,
+      timesheets_edit_own: true,
+      timesheets_edit_all: true,
+      timesheets_approve: true,
+      timesheets_analytics: true,
+      timesheets_analytics_full: true,
+      system_settings: true,
+      system_users: true,
+      system_roles: true,
+      system_backup: true,
+      system_logs: true
+    },
+    developer: {
+      tickets_view: true,
+      tickets_create: true,
+      tickets_edit_own: true,
+      tickets_edit_all: true,
+      tickets_delete: false,
+      tickets_assign: true,
+      tickets_close: true,
+      kb_view: true,
+      kb_create: true,
+      kb_edit: true,
+      kb_delete: false,
+      kb_manage_categories: false,
+      timesheets_view_own: true,
+      timesheets_view_all: true,
+      timesheets_create: true,
+      timesheets_edit_own: true,
+      timesheets_edit_all: false,
+      timesheets_approve: false,
+      timesheets_analytics: true,
+      timesheets_analytics_full: false,
+      system_settings: false,
+      system_users: false,
+      system_roles: false,
+      system_backup: false,
+      system_logs: false
+    },
+    dev: { // Alias para developer
+      tickets_view: true,
+      tickets_create: true,
+      tickets_edit_own: true,
+      tickets_edit_all: true,
+      tickets_delete: false,
+      tickets_assign: true,
+      tickets_close: true,
+      kb_view: true,
+      kb_create: true,
+      kb_edit: true,
+      kb_delete: false,
+      kb_manage_categories: false,
+      timesheets_view_own: true,
+      timesheets_view_all: true,
+      timesheets_create: true,
+      timesheets_edit_own: true,
+      timesheets_edit_all: false,
+      timesheets_approve: false,
+      timesheets_analytics: true,
+      timesheets_analytics_full: false,
+      system_settings: false,
+      system_users: false,
+      system_roles: false,
+      system_backup: false,
+      system_logs: false
+    },
+    analyst: {
+      tickets_view: true,
+      tickets_create: true,
+      tickets_edit_own: true,
+      tickets_edit_all: true,
+      tickets_assign: true,
+      tickets_close: true,
+      kb_view: true,
+      kb_create: true,
+      kb_edit: true,
+      kb_delete: false,
+      kb_manage_categories: false,
+      timesheets_view_own: true,
+      timesheets_view_all: true,
+      timesheets_create: true,
+      timesheets_edit_own: true,
+      timesheets_edit_all: false,
+      timesheets_approve: true,
+      timesheets_analytics: true,
+      timesheets_analytics_full: false,
+      system_settings: false,
+      system_users: false,
+      system_roles: false,
+      system_backup: false,
+      system_logs: false
+    },
+    user: {
+      tickets_view: true,
+      tickets_create: true,
+      tickets_edit_own: true,
+      tickets_edit_all: false,
+      tickets_delete: false,
+      tickets_assign: false,
+      tickets_close: false,
+      kb_view: true,
+      kb_create: false,
+      kb_edit: false,
+      kb_delete: false,
+      kb_manage_categories: false,
+      timesheets_view_own: true,
+      timesheets_view_all: false,
+      timesheets_create: true,
+      timesheets_edit_own: true,
+      timesheets_edit_all: false,
+      timesheets_approve: false,
+      timesheets_analytics: false,
+      timesheets_analytics_full: false,
+      system_settings: false,
+      system_users: false,
+      system_roles: false,
+      system_backup: false,
+      system_logs: false
+    }
+  }
+  
+  return defaultPermissions[role] || defaultPermissions['user']
+}
+
 async function verifyPassword(password: string, hashedPassword: string) {
   // Verificação de hash para compatibilidade
   const ADMIN_PASSWORD_HASH = '$2a$10$qVPQejPGUNnzBOX1Gut4buUVLXauhbR6QY.sDk9SHV7Rg1sepaive'
@@ -131,6 +273,26 @@ export const authConfig: NextAuthConfig = {
             .update({ last_login: new Date().toISOString() })
             .eq('id', user.id)
 
+          // Buscar permissões do perfil do usuário
+          let userPermissions = {}
+          if (user.role_name) {
+            // Buscar permissões do perfil no banco
+            const { data: roleData } = await supabaseAdmin
+              .from('roles')
+              .select('permissions')
+              .eq('name', user.role_name)
+              .single()
+            
+            if (roleData?.permissions) {
+              userPermissions = roleData.permissions
+            }
+          }
+
+          // Se não encontrou no banco, usar permissões padrão baseadas no role
+          if (Object.keys(userPermissions).length === 0) {
+            userPermissions = getDefaultPermissions(user.role_name || user.role)
+          }
+
           console.log('Login successful for:', credentials.email)
 
           return {
@@ -141,6 +303,7 @@ export const authConfig: NextAuthConfig = {
             role_name: user.role_name,
             department: user.department,
             avatar_url: user.avatar_url,
+            permissions: userPermissions,
           }
         } catch (error) {
           console.error('Auth error:', error)
@@ -158,6 +321,7 @@ export const authConfig: NextAuthConfig = {
         token.role_name = (user as any).role_name
         token.department = user.department
         token.avatar_url = user.avatar_url
+        token.permissions = (user as any).permissions || {}
         
         // Gerar token de sessão único
         const sessionToken = `${user.id}_${Date.now()}_${Math.random().toString(36).substring(7)}`
@@ -206,6 +370,7 @@ export const authConfig: NextAuthConfig = {
         }
         session.user.department = token.department as string
         session.user.avatar_url = token.avatar_url as string
+        session.user.permissions = token.permissions as any || {}
         
         // Verificar se a sessão ainda é válida no banco
         if (token.sessionToken) {

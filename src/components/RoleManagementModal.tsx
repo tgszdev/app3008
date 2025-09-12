@@ -950,16 +950,32 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                                   </div>
                                 )}
                                 
-                                {/* Grid de outras permissões */}
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                                  {Object.entries(role.permissions)
-                                    .filter(([perm, value]) => value && !perm.includes('analytics'))
-                                    .map(([perm]) => (
-                                      <div key={perm} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                        {getPermissionIcon(perm)}
-                                        <span>{getPermissionLabel(perm)}</span>
+                                {/* Grid de permissões agrupadas por categoria */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                  {Object.entries(groupPermissions(role.permissions)).map(([group, perms]) => {
+                                    const activePerms = perms.filter(p => role.permissions[p as keyof Role['permissions']])
+                                    if (activePerms.length === 0) return null
+                                    
+                                    return (
+                                      <div key={group} className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3">
+                                        <h6 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1">
+                                          {group === 'Tickets' && <FileText className="h-3 w-3" />}
+                                          {group === 'Base de Conhecimento' && <Eye className="h-3 w-3" />}
+                                          {group === 'Apontamentos' && <Clock className="h-3 w-3" />}
+                                          {group === 'Sistema' && <Settings className="h-3 w-3" />}
+                                          {group}
+                                        </h6>
+                                        <div className="space-y-1">
+                                          {activePerms.map(perm => (
+                                            <div key={perm} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                                              <Check className="h-3 w-3 text-green-500" />
+                                              <span>{getPermissionLabel(perm)}</span>
+                                            </div>
+                                          ))}
+                                        </div>
                                       </div>
-                                    ))}
+                                    )
+                                  })}
                                 </div>
                               </div>
                             )}
