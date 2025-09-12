@@ -10,27 +10,23 @@ export async function middleware(request: NextRequest) {
   let authMethod = 'none'
   
   try {
-    // Método 1: Tentar com NEXTAUTH_SECRET
-    token = await getToken({ 
-      req: request,
-      secret: process.env.NEXTAUTH_SECRET
-    })
-    if (token) authMethod = 'NEXTAUTH_SECRET'
-  } catch (e) {
-    console.log('Erro ao decodificar com NEXTAUTH_SECRET:', e)
-  }
-  
-  // Se não funcionou, tentar com AUTH_SECRET (NextAuth v5)
-  if (!token && process.env.AUTH_SECRET) {
-    try {
+    // NextAuth v5 usa AUTH_SECRET como padrão
+    // Tentar primeiro com AUTH_SECRET, depois NEXTAUTH_SECRET
+    const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
+    
+    if (secret) {
       token = await getToken({ 
         req: request,
-        secret: process.env.AUTH_SECRET
+        secret: secret
       })
-      if (token) authMethod = 'AUTH_SECRET'
-    } catch (e) {
-      console.log('Erro ao decodificar com AUTH_SECRET:', e)
+      if (token) {
+        authMethod = process.env.AUTH_SECRET ? 'AUTH_SECRET' : 'NEXTAUTH_SECRET'
+      }
+    } else {
+      console.log('Nenhum secret configurado (AUTH_SECRET ou NEXTAUTH_SECRET)')
     }
+  } catch (e) {
+    console.log('Erro ao decodificar token:', (e as Error).message)
   }
   
   const isAuth = !!token

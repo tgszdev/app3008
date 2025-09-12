@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authConfig } from '@/lib/auth-config'
+import { auth } from '@/lib/auth'
 import { cookies } from 'next/headers'
 
 export async function GET() {
   try {
-    const session = await getServerSession(authConfig)
+    const session = await auth()
     const cookieStore = cookies()
     
     // Verificar cookies de sessão
@@ -20,10 +19,21 @@ export async function GET() {
       NODE_ENV: process.env.NODE_ENV
     }
     
-    // Se NEXTAUTH_SECRET existe, verificar se não é o placeholder
+    // Verificar qual secret está configurado e seu status
     let secretStatus = 'not_set'
-    if (process.env.NEXTAUTH_SECRET) {
-      if (process.env.NEXTAUTH_SECRET.includes('your-nextauth-secret-key-here')) {
+    let secretType = 'none'
+    
+    // NextAuth v5 usa AUTH_SECRET por padrão
+    if (process.env.AUTH_SECRET) {
+      secretType = 'AUTH_SECRET'
+      if (process.env.AUTH_SECRET.includes('your-')) {
+        secretStatus = 'placeholder_value'
+      } else {
+        secretStatus = 'custom_value'
+      }
+    } else if (process.env.NEXTAUTH_SECRET) {
+      secretType = 'NEXTAUTH_SECRET'
+      if (process.env.NEXTAUTH_SECRET.includes('your-')) {
         secretStatus = 'placeholder_value'
       } else {
         secretStatus = 'custom_value'
@@ -42,11 +52,12 @@ export async function GET() {
       },
       environment: envCheck,
       secretStatus,
+      secretType,
       recommendation: secretStatus === 'placeholder_value' 
-        ? '⚠️ NEXTAUTH_SECRET está com valor placeholder. Configure um valor real no Vercel!'
+        ? `⚠️ ${secretType} está com valor placeholder. Configure um valor real no Vercel!`
         : secretStatus === 'not_set'
-        ? '❌ NEXTAUTH_SECRET não está configurado. Adicione no Vercel!'
-        : '✅ NEXTAUTH_SECRET configurado'
+        ? '❌ Nenhum secret configurado. Adicione AUTH_SECRET (recomendado) ou NEXTAUTH_SECRET no Vercel!'
+        : `✅ ${secretType} configurado corretamente`
     })
   } catch (error) {
     return NextResponse.json({ 

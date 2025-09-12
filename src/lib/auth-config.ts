@@ -221,6 +221,6 @@ export const authConfig: NextAuthConfig = {
     maxAge: 24 * 60 * 60, // 24 horas
     updateAge: 60 * 60, // Atualiza a cada 1 hora
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
   trustHost: true,
 }
