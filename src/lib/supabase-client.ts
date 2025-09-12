@@ -17,5 +17,6 @@ export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
   },
 })
 
-// Exportar também como default
+// Exportar também como default e com alias
 export default supabaseClient
+export const supabase = supabaseClient

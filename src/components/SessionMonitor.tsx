@@ -2,7 +2,7 @@
 
 import { useSession, signOut } from 'next-auth/react'
 import { useEffect, useRef, useCallback } from 'react'
-import { supabase } from '@/lib/supabase-client'
+import { supabaseClient } from '@/lib/supabase-client'
 
 export function SessionMonitor() {
   const { data: session, status } = useSession()
@@ -14,7 +14,7 @@ export function SessionMonitor() {
     
     try {
       // Buscar a sessão atual do usuário no banco
-      const { data: currentSession } = await supabase
+      const { data: currentSession } = await supabaseClient
         .from('sessions')
         .select('sessionToken, expires')
         .eq('userId', session.user.id)
