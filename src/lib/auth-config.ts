@@ -1,6 +1,5 @@
 import type { NextAuthConfig } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { SupabaseAdapter } from '@auth/supabase-adapter'
 import { supabaseAdmin } from '@/lib/supabase'
 
 async function verifyPassword(password: string, hashedPassword: string) {
@@ -33,12 +32,57 @@ async function verifyPassword(password: string, hashedPassword: string) {
   return false
 }
 
+// Função para invalidar sessões antigas
+async function invalidateOldSessions(userId: string, newSessionToken: string) {
+  try {
+    // Marcar todas as sessões antigas como expiradas
+    await supabaseAdmin
+      .from('sessions')
+      .update({ expires: new Date(Date.now() - 1000).toISOString() })
+      .eq('userId', userId)
+      .neq('sessionToken', newSessionToken)
+    
+    console.log(`Sessões antigas invalidadas para usuário: ${userId}`)
+  } catch (error) {
+    console.error('Erro ao invalidar sessões antigas:', error)
+  }
+}
+
+// Função para registrar nova sessão
+async function registerSession(userId: string, sessionToken: string) {
+  try {
+    // Primeiro, invalidar sessões antigas (backup do trigger)
+    await supabaseAdmin
+      .from('sessions')
+      .update({ expires: new Date(Date.now() - 1000).toISOString() })
+      .eq('userId', userId)
+      .gt('expires', new Date().toISOString())
+    
+    // Criar nova sessão
+    const { data, error } = await supabaseAdmin
+      .from('sessions')
+      .upsert({
+        id: sessionToken, // Usar o token como ID
+        sessionToken: sessionToken,
+        userId: userId,
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 horas
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'sessionToken'
+      })
+    
+    if (error) {
+      console.error('Erro ao registrar sessão:', error)
+    } else {
+      console.log('Nova sessão registrada com sucesso')
+    }
+  } catch (error) {
+    console.error('Erro ao registrar sessão:', error)
+  }
+}
+
 export const authConfig: NextAuthConfig = {
-  // Adapter para usar sessões no banco de dados
-  adapter: SupabaseAdapter({
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  }),
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -89,9 +133,8 @@ export const authConfig: NextAuthConfig = {
 
           console.log('Login successful for:', credentials.email)
 
-          // IMPORTANTE: Retornar o ID como string para compatibilidade com o adapter
           return {
-            id: user.id.toString(), // Converter para string
+            id: user.id,
             email: user.email,
             name: user.name,
             role: user.role_name || user.role,
@@ -107,33 +150,66 @@ export const authConfig: NextAuthConfig = {
     })
   ],
   callbacks: {
-    // IMPORTANTE: Com database sessions, os callbacks funcionam diferente
-    async session({ session, user }) {
-      // Com database sessions, recebemos o user completo do banco
-      if (session?.user && user) {
-        // Buscar dados adicionais do usuário no banco se necessário
-        const { data: userData } = await supabaseAdmin
-          .from('users')
-          .select('id, role_name, department, avatar_url')
-          .eq('id', user.id)
+    async jwt({ token, user, trigger }) {
+      if (user) {
+        token.id = user.id
+        token.role = user.role
+        token.role_name = (user as any).role_name
+        token.department = user.department
+        token.avatar_url = user.avatar_url
+        
+        // Gerar token de sessão único
+        const sessionToken = `${user.id}_${Date.now()}_${Math.random().toString(36).substring(7)}`
+        token.sessionToken = sessionToken
+        
+        // Registrar sessão no banco (com invalidação de antigas)
+        await registerSession(user.id as string, sessionToken)
+      }
+      
+      // Verificar se a sessão ainda é válida
+      if (token.sessionToken && trigger === 'update') {
+        const { data: session } = await supabaseAdmin
+          .from('sessions')
+          .select('*')
+          .eq('sessionToken', token.sessionToken as string)
+          .gt('expires', new Date().toISOString())
           .single()
         
-        if (userData) {
-          session.user.id = userData.id
-          session.user.role = userData.role_name
-          session.user.role_name = userData.role_name
-          session.user.department = userData.department
-          session.user.avatar_url = userData.avatar_url
+        if (!session) {
+          // Sessão foi invalidada (login em outro dispositivo)
+          return null // Isso força o logout
+        }
+      }
+      
+      return token
+    },
+    async session({ session, token }) {
+      if (session?.user) {
+        session.user.id = token.id as string
+        session.user.role = token.role as string
+        if (token.role_name) {
+          session.user.role_name = token.role_name as string
+        }
+        session.user.department = token.department as string
+        session.user.avatar_url = token.avatar_url as string
+        
+        // Verificar se a sessão ainda é válida no banco
+        if (token.sessionToken) {
+          const { data: dbSession } = await supabaseAdmin
+            .from('sessions')
+            .select('*')
+            .eq('sessionToken', token.sessionToken as string)
+            .gt('expires', new Date().toISOString())
+            .single()
+          
+          if (!dbSession) {
+            // Sessão foi invalidada
+            session.user = undefined as any
+            return { expires: new Date(0).toISOString() } as any
+          }
         }
       }
       return session
-    },
-    async signIn({ user, account, profile }) {
-      // Permitir login apenas para providers credentials
-      if (account?.provider === 'credentials') {
-        return true
-      }
-      return false
     }
   },
   pages: {
@@ -141,11 +217,10 @@ export const authConfig: NextAuthConfig = {
     error: '/login',
   },
   session: {
-    strategy: 'database', // MUDANÇA CRÍTICA: Usar database ao invés de JWT
+    strategy: 'jwt', // VOLTAR PARA JWT (obrigatório para CredentialsProvider)
     maxAge: 24 * 60 * 60, // 24 horas
-    updateAge: 60 * 60, // Atualiza a sessão a cada 1 hora de atividade
+    updateAge: 60 * 60, // Atualiza a cada 1 hora
   },
   secret: process.env.NEXTAUTH_SECRET,
-  trustHost: true, // Importante para funcionar no Vercel
-  debug: process.env.NODE_ENV === 'development', // Adicionar debug em dev
+  trustHost: true,
 }

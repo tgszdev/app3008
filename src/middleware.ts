@@ -1,36 +1,72 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { auth } from '@/lib/auth'
+import { getToken } from 'next-auth/jwt'
+import { createClient } from '@supabase/supabase-js'
 
-export default auth((req) => {
-  const isLoggedIn = !!req.auth
-  const isAuthPage = req.nextUrl.pathname.startsWith('/login')
-  const isDashboard = req.nextUrl.pathname.startsWith('/dashboard')
-  const isApiAuth = req.nextUrl.pathname.startsWith('/api/auth')
-  const isPublicApi = req.nextUrl.pathname.startsWith('/api/public')
+// Criar cliente Supabase para o middleware
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
-  // Se está tentando acessar o dashboard sem estar logado
-  if (isDashboard && !isLoggedIn) {
-    const loginUrl = new URL('/login', req.url)
-    loginUrl.searchParams.set('callbackUrl', req.nextUrl.pathname)
-    return NextResponse.redirect(loginUrl)
+export async function middleware(request: NextRequest) {
+  const token = await getToken({ req: request })
+  const isAuth = !!token
+  const isAuthPage = request.nextUrl.pathname.startsWith('/login')
+
+  // Se estiver autenticado, verificar se a sessão ainda é válida no banco
+  if (isAuth && token.sessionToken) {
+    try {
+      const { data: session } = await supabase
+        .from('sessions')
+        .select('*')
+        .eq('sessionToken', token.sessionToken as string)
+        .gt('expires', new Date().toISOString())
+        .single()
+      
+      if (!session) {
+        // Sessão foi invalidada (login em outro dispositivo)
+        console.log('Sessão invalidada - redirecionando para login')
+        
+        // Limpar cookies de autenticação
+        const response = NextResponse.redirect(new URL('/login', request.url))
+        response.cookies.delete('next-auth.session-token')
+        response.cookies.delete('next-auth.csrf-token')
+        response.cookies.delete('__Secure-next-auth.session-token')
+        response.cookies.delete('__Secure-next-auth.csrf-token')
+        
+        return response
+      }
+    } catch (error) {
+      console.error('Erro ao verificar sessão:', error)
+    }
   }
 
-  // Se está logado e tenta acessar a página de login
-  if (isAuthPage && isLoggedIn) {
-    return NextResponse.redirect(new URL('/dashboard', req.url))
+  if (isAuthPage) {
+    if (isAuth) {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+    return null
   }
 
-  // Permitir acesso a APIs públicas e de autenticação
-  if (isApiAuth || isPublicApi) {
-    return NextResponse.next()
-  }
+  if (!isAuth) {
+    let from = request.nextUrl.pathname
+    if (request.nextUrl.search) {
+      from += request.nextUrl.search
+    }
 
-  return NextResponse.next()
-})
+    return NextResponse.redirect(
+      new URL(`/login?from=${encodeURIComponent(from)}`, request.url)
+    )
+  }
+}
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|images/).*)',
+    '/dashboard/:path*',
+    '/admin/:path*',
+    '/login',
+    '/api/admin/:path*',
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 }
