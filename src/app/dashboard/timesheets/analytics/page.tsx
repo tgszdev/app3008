@@ -148,6 +148,7 @@ export default function TimesheetsAnalyticsPage() {
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [filterUser, setFilterUser] = useState<string>('all')
   const [filterCategory, setFilterCategory] = useState<string>('all')
+  const [allUsers, setAllUsers] = useState<Array<{id: string, name: string}>>([]) // Para armazenar usuários únicos
   
   // Year filter for monthly evolution chart
   const currentYear = new Date().getFullYear()
@@ -173,12 +174,20 @@ export default function TimesheetsAnalyticsPage() {
       const ticketsData = ticketsResponse.data || []
       setTickets(ticketsData)
       
-      // Buscar apontamentos com filtros para os dados gerais
+      // Buscar apontamentos com filtros básicos (data e status)
       const params = new URLSearchParams()
       if (filterStatus !== 'all') params.append('status', filterStatus)
       if (filterStartDate) params.append('start_date', filterStartDate)
       if (filterEndDate) params.append('end_date', filterEndDate)
-      if (filterUser !== 'all') params.append('user_id', filterUser)
+      
+      // Se há filtro de usuário, enviar o ID correto
+      if (filterUser !== 'all') {
+        // Verificar se filterUser é um ID válido ou buscar o ID pelo nome
+        const userData = allUsers.find(u => u.id === filterUser || u.name === filterUser)
+        if (userData) {
+          params.append('user_id', userData.id)
+        }
+      }
       
       const response = await apiClient.get(`/api/timesheets?${params.toString()}`)
       const data = response.data || []
@@ -187,8 +196,17 @@ export default function TimesheetsAnalyticsPage() {
       const allTimesheetsResponse = await apiClient.get('/api/timesheets')
       const allTimesheetsData = allTimesheetsResponse.data || []
       
+      // Coletar usuários únicos para o filtro
+      const uniqueUsers = new Map<string, {id: string, name: string}>()
+      allTimesheetsData.forEach((t: TimeSheetData) => {
+        if (!uniqueUsers.has(t.user_id)) {
+          uniqueUsers.set(t.user_id, { id: t.user_id, name: t.user.name })
+        }
+      })
+      setAllUsers(Array.from(uniqueUsers.values()))
+      
       // Enriquecer dados com informações dos tickets
-      const enrichedData = data.map((timesheet: TimeSheetData) => {
+      let enrichedData = data.map((timesheet: TimeSheetData) => {
         const ticketInfo = ticketsData.find((t: TicketDetails) => t.id === timesheet.ticket_id)
         return {
           ...timesheet,
@@ -200,6 +218,16 @@ export default function TimesheetsAnalyticsPage() {
           }
         }
       })
+      
+      // Aplicar filtro de categoria no frontend após enriquecimento
+      if (filterCategory !== 'all') {
+        enrichedData = enrichedData.filter(t => t.ticket.category === filterCategory)
+      }
+      
+      // Aplicar filtro de usuário no frontend se necessário (backup)
+      if (filterUser !== 'all' && !params.has('user_id')) {
+        enrichedData = enrichedData.filter(t => t.user.name === filterUser || t.user_id === filterUser)
+      }
       
       // Enriquecer todos os dados para o gráfico mensal
       const allEnrichedData = allTimesheetsData.map((timesheet: TimeSheetData) => {
@@ -610,10 +638,16 @@ export default function TimesheetsAnalyticsPage() {
         <div className="flex gap-2">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="relative flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             <Filter className="h-4 w-4" />
             <span className="hidden sm:inline">Filtros</span>
+            {/* Indicador de filtros ativos */}
+            {(filterStatus !== 'all' || filterUser !== 'all' || filterCategory !== 'all' || 
+              filterStartDate !== format(startOfMonth(new Date()), 'yyyy-MM-dd') || 
+              filterEndDate !== format(endOfMonth(new Date()), 'yyyy-MM-dd')) && (
+              <span className="absolute -top-1 -right-1 h-2 w-2 bg-blue-500 rounded-full"></span>
+            )}
             {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
           
@@ -665,9 +699,9 @@ export default function TimesheetsAnalyticsPage() {
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="all">Todos</option>
-                <option value="approved">Aprovado</option>
-                <option value="pending">Pendente</option>
-                <option value="rejected">Rejeitado</option>
+                <option value="approved">Aprovados</option>
+                <option value="pending">Pendentes</option>
+                <option value="rejected">Rejeitados</option>
               </select>
             </div>
             
@@ -681,8 +715,8 @@ export default function TimesheetsAnalyticsPage() {
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="all">Todos</option>
-                {analytics?.userHoursData.map(user => (
-                  <option key={user.name} value={user.name}>{user.name}</option>
+                {allUsers.map(user => (
+                  <option key={user.id} value={user.id}>{user.name}</option>
                 ))}
               </select>
             </div>
@@ -697,11 +731,31 @@ export default function TimesheetsAnalyticsPage() {
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="all">Todas</option>
-                {analytics?.categoryDistribution.map(cat => (
-                  <option key={cat.category} value={cat.category}>{cat.category}</option>
-                ))}
+                {/* Usar categorias únicas dos tickets */}
+                {Array.from(new Set(tickets.map(t => t.category || 'Geral')))
+                  .sort()
+                  .map(category => (
+                    <option key={category} value={category}>{category}</option>
+                  ))
+                }
               </select>
             </div>
+          </div>
+          
+          {/* Botão Limpar Filtros */}
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={() => {
+                setFilterStartDate(format(startOfMonth(new Date()), 'yyyy-MM-dd'))
+                setFilterEndDate(format(endOfMonth(new Date()), 'yyyy-MM-dd'))
+                setFilterStatus('all')
+                setFilterUser('all')
+                setFilterCategory('all')
+              }}
+              className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+              Limpar Filtros
+            </button>
           </div>
         </div>
       )}
