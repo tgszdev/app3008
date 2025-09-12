@@ -31,48 +31,52 @@ export async function middleware(request: NextRequest) {
   
   const isAuth = !!token
   
-  // Log simplificado apenas para debug
-  if (request.nextUrl.pathname.startsWith('/dashboard')) {
-    console.log('Auth Status:', {
-      path: request.nextUrl.pathname,
-      authenticated: isAuth,
-      authMethod,
-      hasCookie: !!request.cookies.get('__Secure-authjs.session-token')
-    })
+  // Log apenas para debug de sessão única (remover em produção)
+  if (process.env.NODE_ENV === 'development' || process.env.DEBUG_AUTH === 'true') {
+    if (request.nextUrl.pathname.startsWith('/dashboard') && isAuth) {
+      console.log('Session check:', {
+        path: request.nextUrl.pathname,
+        hasSessionToken: !!(token as any)?.sessionToken,
+        userId: (token as any)?.id
+      })
+    }
   }
 
-  // TEMPORARIAMENTE DESABILITADO: Verificação de sessão no banco
-  // Motivo: Causando loop de redirecionamento devido a delay na sincronização
-  // O trigger do PostgreSQL continua funcionando para invalidar sessões antigas
-  // TODO: Investigar e corrigir sincronização entre JWT e banco de dados
-  /*
-  if (isAuth && token.sessionToken) {
+  // Verificação de sessão única no banco de dados
+  if (isAuth && token && (token as any).sessionToken) {
     try {
-      const { data: session } = await supabase
+      // Importar Supabase apenas quando necessário
+      const { createClient } = await import('@supabase/supabase-js')
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      )
+      
+      const { data: session, error } = await supabase
         .from('sessions')
         .select('*')
-        .eq('sessionToken', token.sessionToken as string)
+        .eq('sessionToken', (token as any).sessionToken)
         .gt('expires', new Date().toISOString())
         .single()
       
-      if (!session) {
+      if (error || !session) {
         // Sessão foi invalidada (login em outro dispositivo)
-        console.log('Sessão invalidada - redirecionando para login')
+        console.log('Sessão invalidada no banco - forçando logout')
         
         // Limpar cookies de autenticação
         const response = NextResponse.redirect(new URL('/login', request.url))
-        response.cookies.delete('next-auth.session-token')
-        response.cookies.delete('next-auth.csrf-token')
-        response.cookies.delete('__Secure-next-auth.session-token')
-        response.cookies.delete('__Secure-next-auth.csrf-token')
+        response.cookies.delete('authjs.session-token')
+        response.cookies.delete('__Secure-authjs.session-token')
+        response.cookies.delete('__Host-authjs.csrf-token')
+        response.cookies.delete('__Secure-authjs.callback-url')
         
         return response
       }
     } catch (error) {
-      console.error('Erro ao verificar sessão:', error)
+      console.error('Erro ao verificar sessão no banco:', error)
+      // Em caso de erro, permitir acesso mas logar o problema
     }
   }
-  */
 
   if (isAuthPage) {
     if (isAuth) {
@@ -82,17 +86,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (!isAuth) {
-    // Verificar se o cookie de sessão existe (fallback de segurança)
-    const sessionCookie = request.cookies.get('__Secure-authjs.session-token') || 
-                         request.cookies.get('authjs.session-token')
-    
-    if (sessionCookie) {
-      // Cookie existe mas não conseguimos decodificar - permitir acesso mas logar aviso
-      console.warn('⚠️ Cookie de sessão presente mas JWT não pode ser verificado. Verifique NEXTAUTH_SECRET no Vercel.')
-      return NextResponse.next()
-    }
-    
-    // Sem cookie e sem token - redirecionar para login
+    // Sem token válido - redirecionar para login
     let from = request.nextUrl.pathname
     if (request.nextUrl.search) {
       from += request.nextUrl.search
