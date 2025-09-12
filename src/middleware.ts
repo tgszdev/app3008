@@ -14,7 +14,11 @@ export async function middleware(request: NextRequest) {
   const isAuth = !!token
   const isAuthPage = request.nextUrl.pathname.startsWith('/login')
 
-  // Se estiver autenticado, verificar se a sessão ainda é válida no banco
+  // TEMPORARIAMENTE DESABILITADO: Verificação de sessão no banco
+  // Motivo: Causando loop de redirecionamento devido a delay na sincronização
+  // O trigger do PostgreSQL continua funcionando para invalidar sessões antigas
+  // TODO: Investigar e corrigir sincronização entre JWT e banco de dados
+  /*
   if (isAuth && token.sessionToken) {
     try {
       const { data: session } = await supabase
@@ -41,6 +45,7 @@ export async function middleware(request: NextRequest) {
       console.error('Erro ao verificar sessão:', error)
     }
   }
+  */
 
   if (isAuthPage) {
     if (isAuth) {
