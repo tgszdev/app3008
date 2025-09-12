@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
+import { usePermissions } from '@/hooks/usePermissions'
 import apiClient from '@/lib/api-client'
 import { format, startOfMonth, endOfMonth, parseISO, eachDayOfInterval, startOfWeek, endOfWeek, subMonths } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -135,6 +136,7 @@ interface Analytics {
 
 export default function TimesheetsAnalyticsPage() {
   const { data: session } = useSession()
+  const { userId, isAdmin, canViewAnalytics, canViewFullAnalytics } = usePermissions()
   const [timesheets, setTimesheets] = useState<TimeSheetData[]>([])
   const [tickets, setTickets] = useState<TicketDetails[]>([])
   const [analytics, setAnalytics] = useState<Analytics | null>(null)
@@ -162,10 +164,9 @@ export default function TimesheetsAnalyticsPage() {
     try {
       setLoading(true)
       
-      // Verificar se é admin
-      const userRole = (session?.user as any)?.role
-      if (userRole !== 'admin') {
-        toast.error('Acesso negado. Apenas administradores podem acessar esta página.')
+      // Verificar se tem permissão para ver analytics
+      if (!canViewAnalytics) {
+        toast.error('Acesso negado. Você não tem permissão para acessar analytics.')
         return
       }
       
@@ -180,9 +181,11 @@ export default function TimesheetsAnalyticsPage() {
       if (filterStartDate) params.append('start_date', filterStartDate)
       if (filterEndDate) params.append('end_date', filterEndDate)
       
-      // Se há filtro de usuário, enviar o ID correto
-      if (filterUser !== 'all') {
-        // Verificar se filterUser é um ID válido ou buscar o ID pelo nome
+      // Se não tem permissão completa, filtrar apenas seus próprios dados
+      if (!canViewFullAnalytics) {
+        params.append('user_id', userId)
+      } else if (filterUser !== 'all') {
+        // Se tem permissão completa e há filtro de usuário, aplicar o filtro
         const userData = allUsers.find(u => u.id === filterUser || u.name === filterUser)
         if (userData) {
           params.append('user_id', userData.id)
@@ -627,11 +630,23 @@ export default function TimesheetsAnalyticsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-            Analytics de Apontamentos
-          </h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+              Analytics de Apontamentos
+            </h1>
+            {/* Badge indicando o modo de visualização */}
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+              canViewFullAnalytics 
+                ? 'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100'
+                : 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100'
+            }`}>
+              {canViewFullAnalytics ? 'Visão Completa' : 'Visão Pessoal'}
+            </span>
+          </div>
           <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
-            Análise completa de horas apontadas e produtividade
+            {canViewFullAnalytics
+              ? 'Análise completa de horas apontadas e produtividade de todos os colaboradores'
+              : 'Análise de suas horas apontadas e produtividade pessoal'}
           </p>
         </div>
         
@@ -705,21 +720,24 @@ export default function TimesheetsAnalyticsPage() {
               </select>
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Colaborador
-              </label>
-              <select
-                value={filterUser}
-                onChange={(e) => setFilterUser(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              >
-                <option value="all">Todos</option>
-                {allUsers.map(user => (
-                  <option key={user.id} value={user.id}>{user.name}</option>
-                ))}
-              </select>
-            </div>
+            {/* Filtro de Colaborador - só aparece se tem permissão completa */}
+            {canViewFullAnalytics && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Colaborador
+                </label>
+                <select
+                  value={filterUser}
+                  onChange={(e) => setFilterUser(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <option value="all">Todos</option>
+                  {allUsers.map(user => (
+                    <option key={user.id} value={user.id}>{user.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
             
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

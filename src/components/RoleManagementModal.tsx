@@ -53,6 +53,7 @@ interface Role {
     timesheets_edit_all: boolean
     timesheets_approve: boolean
     timesheets_analytics: boolean
+    timesheets_analytics_full: boolean // Ver Analytics de todos os colaboradores
     
     // System
     system_settings: boolean
@@ -91,6 +92,7 @@ const defaultPermissions = {
   timesheets_edit_all: false,
   timesheets_approve: false,
   timesheets_analytics: false,
+  timesheets_analytics_full: false,
   system_settings: false,
   system_users: false,
   system_roles: false,
@@ -121,6 +123,7 @@ const systemRolesPermissions = {
     timesheets_edit_all: true,
     timesheets_approve: true,
     timesheets_analytics: true,
+    timesheets_analytics_full: true, // Admin tem acesso completo por padrão
     system_settings: true,
     system_users: true,
     system_roles: true,
@@ -142,7 +145,9 @@ const systemRolesPermissions = {
     timesheets_view_all: true,
     timesheets_create: true,
     timesheets_edit_own: true,
-    timesheets_approve: true
+    timesheets_approve: true,
+    timesheets_analytics: true,
+    timesheets_analytics_full: false // Analista não tem acesso completo por padrão
   },
   user: {
     ...defaultPermissions,
@@ -152,7 +157,9 @@ const systemRolesPermissions = {
     kb_view: true,
     timesheets_view_own: true,
     timesheets_create: true,
-    timesheets_edit_own: true
+    timesheets_edit_own: true,
+    timesheets_analytics: true, // Usuário pode ver analytics próprio
+    timesheets_analytics_full: false // Usuário não tem acesso completo
   }
 }
 
@@ -419,6 +426,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
       timesheets_edit_all: 'Editar Todos os Apontamentos',
       timesheets_approve: 'Aprovar Apontamentos',
       timesheets_analytics: 'Ver Analytics',
+      timesheets_analytics_full: 'Ver Analytics Completo',
       
       // System
       system_settings: 'Configurações do Sistema',

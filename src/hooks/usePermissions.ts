@@ -1,86 +1,69 @@
-/**
- * Hook para gerenciar permissões do usuário
- */
-
-import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
-import { getRolePermissions, Permission } from '@/lib/permissions'
+
+export interface UserPermissions {
+  // Tickets
+  tickets_view: boolean
+  tickets_create: boolean
+  tickets_edit_own: boolean
+  tickets_edit_all: boolean
+  tickets_delete: boolean
+  tickets_assign: boolean
+  tickets_close: boolean
+  
+  // Knowledge Base
+  kb_view: boolean
+  kb_create: boolean
+  kb_edit: boolean
+  kb_delete: boolean
+  kb_manage_categories: boolean
+  
+  // Timesheets
+  timesheets_view_own: boolean
+  timesheets_view_all: boolean
+  timesheets_create: boolean
+  timesheets_edit_own: boolean
+  timesheets_edit_all: boolean
+  timesheets_approve: boolean
+  timesheets_analytics: boolean
+  timesheets_analytics_full: boolean
+  
+  // System
+  system_settings: boolean
+  system_users: boolean
+  system_roles: boolean
+  system_backup: boolean
+  system_logs: boolean
+}
 
 export function usePermissions() {
-  const { data: session, update } = useSession()
-  const [permissions, setPermissions] = useState<Permission | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [forceReload, setForceReload] = useState(0)
-
-  useEffect(() => {
-    async function loadPermissions() {
-      if (!session?.user) {
-        setPermissions(null)
-        setLoading(false)
-        return
-      }
-
-      try {
-        // Obter role do usuário (usar role_name se disponível, senão role)
-        const userRole = (session.user as any).role_name || (session.user as any).role || 'user'
-        
-        console.log('=== usePermissions DEBUG ===')
-        console.log('Carregando permissões para role:', userRole)
-        console.log('Session user:', session.user)
-        
-        const rolePermissions = await getRolePermissions(userRole)
-        
-        console.log('Permissões carregadas:', rolePermissions)
-        
-        setPermissions(rolePermissions)
-      } catch (error) {
-        console.error('Erro ao carregar permissões:', error)
-        setPermissions(null)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadPermissions()
-  }, [session, forceReload])
-
-  /**
-   * Verifica se o usuário tem uma permissão específica
-   */
-  const hasPermission = (permission: keyof Permission): boolean => {
-    if (!permissions) return false
-    return permissions[permission] || false
+  const { data: session, status } = useSession()
+  
+  const loading = status === 'loading'
+  const userRole = (session?.user as any)?.role || 'user'
+  const userPermissions = (session?.user as any)?.permissions || {}
+  const userId = (session?.user as any)?.id
+  
+  // Admin tem todas as permissões
+  const isAdmin = userRole === 'admin'
+  
+  // Função auxiliar para verificar permissão
+  const hasPermission = (permission: keyof UserPermissions): boolean => {
+    if (isAdmin) return true
+    return userPermissions[permission] === true
   }
-
-  /**
-   * Verifica se o usuário tem pelo menos uma das permissões
-   */
-  const hasAnyPermission = (permissionList: (keyof Permission)[]): boolean => {
-    if (!permissions) return false
-    return permissionList.some(perm => permissions[perm])
-  }
-
-  /**
-   * Verifica se o usuário tem todas as permissões
-   */
-  const hasAllPermissions = (permissionList: (keyof Permission)[]): boolean => {
-    if (!permissions) return false
-    return permissionList.every(perm => permissions[perm])
-  }
-
-  /**
-   * Força o recarregamento das permissões
-   */
-  const reloadPermissions = () => {
-    setForceReload(prev => prev + 1)
-  }
-
+  
+  // Permissões específicas de analytics
+  const canViewAnalytics = hasPermission('timesheets_analytics')
+  const canViewFullAnalytics = hasPermission('timesheets_analytics_full')
+  
   return {
-    permissions,
     loading,
+    userId,
+    userRole,
+    isAdmin,
+    permissions: userPermissions as UserPermissions,
     hasPermission,
-    hasAnyPermission,
-    hasAllPermissions,
-    reloadPermissions
+    canViewAnalytics,
+    canViewFullAnalytics,
   }
 }
