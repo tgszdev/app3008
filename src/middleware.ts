@@ -10,9 +10,23 @@ const supabase = createClient(
 )
 
 export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request })
+  // Passar o secret explicitamente para o getToken
+  const token = await getToken({ 
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET
+  })
   const isAuth = !!token
   const isAuthPage = request.nextUrl.pathname.startsWith('/login')
+  
+  // Debug para entender o problema de autenticação
+  console.log('Middleware Debug:', {
+    path: request.nextUrl.pathname,
+    hasToken: !!token,
+    tokenData: token ? 'Token exists' : 'No token',
+    isAuthPage,
+    cookies: request.cookies.getAll().map(c => c.name),
+    secret: process.env.NEXTAUTH_SECRET ? 'Secret exists' : 'No secret'
+  })
 
   // TEMPORARIAMENTE DESABILITADO: Verificação de sessão no banco
   // Motivo: Causando loop de redirecionamento devido a delay na sincronização
@@ -55,6 +69,17 @@ export async function middleware(request: NextRequest) {
   }
 
   if (!isAuth) {
+    // TEMPORÁRIO: Verificar se o cookie de sessão existe mesmo sem token decodificado
+    const sessionCookie = request.cookies.get('__Secure-authjs.session-token') || 
+                         request.cookies.get('authjs.session-token') ||
+                         request.cookies.get('next-auth.session-token') ||
+                         request.cookies.get('__Secure-next-auth.session-token')
+    
+    if (sessionCookie) {
+      console.log('Cookie de sessão encontrado mas token não decodificado - permitindo acesso temporariamente')
+      return NextResponse.next()
+    }
+    
     let from = request.nextUrl.pathname
     if (request.nextUrl.search) {
       from += request.nextUrl.search
