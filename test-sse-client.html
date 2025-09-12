@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste SSE - Session Events</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        .connected {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #4CAF50;
+        }
+        .disconnected {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #f44336;
+        }
+        .event {
+            background: #f0f0f0;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .event.heartbeat {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        .event.invalidated {
+            background: #fff3e0;
+            color: #e65100;
+            font-weight: bold;
+        }
+        .event.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        #events {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 20px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .info {
+            background: #e3f2fd;
+            border: 1px solid #2196F3;
+            color: #0d47a1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Teste de Server-Sent Events (SSE)</h1>
+        
+        <div class="info">
+            <strong>ℹ️ Como usar:</strong><br>
+            1. Faça login no sistema em uma aba<br>
+            2. Abra esta página em outra aba<br>
+            3. Clique em "Conectar SSE"<br>
+            4. Faça login com o mesmo usuário em outro navegador<br>
+            5. Observe a detecção automática da invalidação
+        </div>
+        
+        <div id="status" class="status disconnected">
+            ❌ Desconectado
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <button id="connectBtn" onclick="connectSSE()">🔌 Conectar SSE</button>
+            <button id="disconnectBtn" onclick="disconnectSSE()" disabled>🔌 Desconectar</button>
+            <button onclick="clearEvents()">🗑️ Limpar Eventos</button>
+            <button onclick="testValidation()">🧪 Testar Validação</button>
+        </div>
+        
+        <h3>📊 Eventos Recebidos:</h3>
+        <div id="events"></div>
+    </div>
+
+    <script>
+        let eventSource = null;
+        let eventCount = 0;
+
+        function updateStatus(connected) {
+            const status = document.getElementById('status');
+            const connectBtn = document.getElementById('connectBtn');
+            const disconnectBtn = document.getElementById('disconnectBtn');
+            
+            if (connected) {
+                status.className = 'status connected';
+                status.innerHTML = '✅ Conectado ao SSE';
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+            } else {
+                status.className = 'status disconnected';
+                status.innerHTML = '❌ Desconectado';
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+            }
+        }
+
+        function addEvent(type, data) {
+            eventCount++;
+            const events = document.getElementById('events');
+            const event = document.createElement('div');
+            event.className = `event ${type}`;
+            
+            const timestamp = new Date().toLocaleTimeString('pt-BR');
+            event.innerHTML = `<strong>#${eventCount} [${timestamp}]</strong> ${type.toUpperCase()}: ${JSON.stringify(data, null, 2)}`;
+            
+            events.insertBefore(event, events.firstChild);
+            
+            // Limitar a 50 eventos
+            while (events.children.length > 50) {
+                events.removeChild(events.lastChild);
+            }
+        }
+
+        function connectSSE() {
+            if (eventSource) {
+                eventSource.close();
+            }
+            
+            console.log('Conectando ao SSE...');
+            addEvent('info', { message: 'Iniciando conexão SSE...' });
+            
+            eventSource = new EventSource('/api/session/events');
+            
+            eventSource.onopen = function(event) {
+                console.log('SSE conectado');
+                updateStatus(true);
+            };
+            
+            eventSource.onmessage = function(event) {
+                console.log('Mensagem SSE:', event.data);
+                
+                try {
+                    const data = JSON.parse(event.data);
+                    
+                    if (data.type === 'connected') {
+                        addEvent('connected', data);
+                    } else if (data.type === 'heartbeat') {
+                        addEvent('heartbeat', data);
+                    } else if (data.type === 'session_invalidated') {
+                        addEvent('invalidated', data);
+                        alert('⚠️ Sua sessão foi invalidada!\nMotivo: ' + data.reason);
+                        // Em produção, faria signOut() aqui
+                        disconnectSSE();
+                    } else if (data.type === 'session_expired') {
+                        addEvent('invalidated', data);
+                        alert('⏰ Sua sessão expirou!');
+                        disconnectSSE();
+                    } else if (data.type === 'timeout') {
+                        addEvent('error', data);
+                        disconnectSSE();
+                    } else {
+                        addEvent('info', data);
+                    }
+                } catch (error) {
+                    console.error('Erro ao processar mensagem:', error);
+                    addEvent('error', { message: 'Erro ao processar mensagem', error: error.message });
+                }
+            };
+            
+            eventSource.onerror = function(event) {
+                console.error('Erro SSE:', event);
+                addEvent('error', { message: 'Erro na conexão SSE' });
+                updateStatus(false);
+                
+                // Tentar reconectar após 5 segundos
+                setTimeout(() => {
+                    if (!eventSource || eventSource.readyState === EventSource.CLOSED) {
+                        console.log('Tentando reconectar...');
+                        // connectSSE(); // Descomentar para reconexão automática
+                    }
+                }, 5000);
+            };
+        }
+
+        function disconnectSSE() {
+            if (eventSource) {
+                eventSource.close();
+                eventSource = null;
+                updateStatus(false);
+                addEvent('info', { message: 'Desconectado manualmente' });
+            }
+        }
+
+        function clearEvents() {
+            document.getElementById('events').innerHTML = '';
+            eventCount = 0;
+        }
+
+        async function testValidation() {
+            try {
+                const response = await fetch('/api/session/validate');
+                const data = await response.json();
+                addEvent('info', { validation: data });
+                
+                if (data.valid) {
+                    alert('✅ Sessão válida até: ' + new Date(data.expires).toLocaleString('pt-BR'));
+                } else {
+                    alert('❌ Sessão inválida: ' + data.reason);
+                }
+            } catch (error) {
+                addEvent('error', { message: 'Erro ao validar sessão', error: error.message });
+            }
+        }
+
+        // Cleanup ao fechar a página
+        window.addEventListener('beforeunload', function() {
+            if (eventSource) {
+                eventSource.close();
+            }
+        });
+    </script>
+</body>
+</html>
