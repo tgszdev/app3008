@@ -151,6 +151,7 @@ export const authConfig: NextAuthConfig = {
   ],
   callbacks: {
     async jwt({ token, user, trigger }) {
+      // Primeiro login - criar sessão
       if (user) {
         token.id = user.id
         token.role = user.role
@@ -163,21 +164,34 @@ export const authConfig: NextAuthConfig = {
         token.sessionToken = sessionToken
         
         // Registrar sessão no banco (com invalidação de antigas)
-        await registerSession(user.id as string, sessionToken)
+        try {
+          await registerSession(user.id as string, sessionToken)
+          console.log('SessionToken criado e salvo:', sessionToken)
+        } catch (error) {
+          console.error('Erro ao registrar sessão:', error)
+        }
       }
       
-      // Verificar se a sessão ainda é válida
-      if (token.sessionToken && trigger === 'update') {
-        const { data: session } = await supabaseAdmin
-          .from('sessions')
-          .select('*')
-          .eq('sessionToken', token.sessionToken as string)
-          .gt('expires', new Date().toISOString())
-          .single()
-        
-        if (!session) {
-          // Sessão foi invalidada (login em outro dispositivo)
-          return null // Isso força o logout
+      // IMPORTANTE: Preservar o sessionToken em todas as requisições
+      // Não apenas no update
+      if (token.sessionToken) {
+        // Verificar periodicamente se a sessão ainda é válida
+        if (trigger === 'update' || Math.random() < 0.1) { // 10% das vezes verifica
+          try {
+            const { data: session } = await supabaseAdmin
+              .from('sessions')
+              .select('*')
+              .eq('sessionToken', token.sessionToken as string)
+              .gt('expires', new Date().toISOString())
+              .single()
+            
+            if (!session) {
+              console.log('Sessão invalidada no banco, forçando logout')
+              return null // Isso força o logout
+            }
+          } catch (error) {
+            console.error('Erro ao verificar sessão:', error)
+          }
         }
       }
       
