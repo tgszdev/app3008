@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
-import { SessionMonitor } from '@/components/session-monitor'
+import { SessionMonitor } from '@/components/SessionMonitor'
 import {
   Home,
   Ticket,
