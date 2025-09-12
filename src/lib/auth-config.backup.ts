@@ -1,6 +1,5 @@
 import type { NextAuthConfig } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { SupabaseAdapter } from '@auth/supabase-adapter'
 import { supabaseAdmin } from '@/lib/supabase'
 
 async function verifyPassword(password: string, hashedPassword: string) {
@@ -34,11 +33,6 @@ async function verifyPassword(password: string, hashedPassword: string) {
 }
 
 export const authConfig: NextAuthConfig = {
-  // Adapter para usar sessões no banco de dados
-  adapter: SupabaseAdapter({
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  }),
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -134,9 +128,8 @@ export const authConfig: NextAuthConfig = {
     error: '/login',
   },
   session: {
-    strategy: 'database', // MUDANÇA CRÍTICA: Usar database ao invés de JWT
-    maxAge: 24 * 60 * 60, // 24 horas (pode ajustar conforme necessário)
-    updateAge: 60 * 60, // Atualiza a sessão a cada 1 hora de atividade
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   secret: process.env.NEXTAUTH_SECRET,
   trustHost: true, // Importante para funcionar no Vercel
