@@ -385,17 +385,17 @@ export const authConfig: NextAuthConfig = {
     },
     async session({ session, token }) {
       if (session?.user) {
-        session.user.id = token.id as string
-        session.user.role = token.role as string
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
         if (token.role_name) {
-          session.user.role_name = token.role_name as string
+          session.user.role_name = token.role_name as string;
         }
-        session.user.department = token.department as string
-        session.user.avatar_url = token.avatar_url as string
-        session.user.permissions = token.permissions as any || {}
+        session.user.department = token.department as string;
+        session.user.avatar_url = token.avatar_url as string;
+        session.user.permissions = token.permissions as any || {};
         
         // IMPORTANTE: Adicionar sessionToken à sessão para as APIs poderem acessar
-        (session as any).sessionToken = token.sessionToken
+        (session as any).sessionToken = token.sessionToken;
         
         // Verificar se a sessão ainda é válida no banco
         if (token.sessionToken) {
@@ -404,12 +404,12 @@ export const authConfig: NextAuthConfig = {
             .select('*')
             .eq('sessionToken', token.sessionToken as string)
             .gt('expires', new Date().toISOString())
-            .single()
+            .single();
           
           if (!dbSession) {
             // Sessão foi invalidada
-            session.user = undefined as any
-            return { expires: new Date(0).toISOString() } as any
+            session.user = undefined as any;
+            return { expires: new Date(0).toISOString() } as any;
           }
         }
       }
