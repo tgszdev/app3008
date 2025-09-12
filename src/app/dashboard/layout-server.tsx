@@ -7,14 +7,15 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  // Verificação de autenticação no servidor (substitui o middleware)
+  // Verificar autenticação no servidor
   const session = await auth()
   
-  // Se não está autenticado, redirecionar para login
   if (!session) {
     redirect('/login')
   }
+
+  // Verificar sessão única no banco (opcional)
+  // Podemos adicionar verificação de sessão aqui também
   
-  // Se está autenticado, renderizar o layout
   return <ClientLayout>{children}</ClientLayout>
 }
