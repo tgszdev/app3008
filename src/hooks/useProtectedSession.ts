@@ -77,11 +77,11 @@ export function useProtectedSession(options: UseProtectedSessionOptions = {}) {
           if (showNotifications) {
             toast.error(
               data.reason === 'session_invalidated' 
-                ? '🔒 Sua sessão foi encerrada. Novo login detectado em outro dispositivo.'
+                ? '🔒 Sua sessão foi encerrada por um novo login em outro dispositivo.'
                 : data.reason === 'session_expired'
                 ? '⏰ Sua sessão expirou. Faça login novamente.'
                 : '❌ Sessão inválida. Redirecionando...',
-              { duration: 5000 }
+              { duration: 5000, id: 'session-invalidated' }
             )
           }
 
@@ -90,10 +90,8 @@ export function useProtectedSession(options: UseProtectedSessionOptions = {}) {
             onSessionInvalidated(data.reason)
           }
 
-          // Logout quase imediato, apenas 500ms para garantir que a notificação apareça
-          setTimeout(() => {
-            signOut({ callbackUrl: redirectTo })
-          }, 500)
+          // Logout imediato sem delay
+          signOut({ callbackUrl: redirectTo })
         }
 
         return false
@@ -157,8 +155,8 @@ export function useProtectedSession(options: UseProtectedSessionOptions = {}) {
 
               if (showNotifications) {
                 toast.error(
-                  '🔒 Sua sessão foi encerrada. Novo login detectado em outro dispositivo.',
-                  { duration: 5000 }
+                  '🔒 Sua sessão foi encerrada por um novo login em outro dispositivo.',
+                  { duration: 5000, id: 'session-invalidated-sse' }
                 )
               }
 
@@ -166,10 +164,9 @@ export function useProtectedSession(options: UseProtectedSessionOptions = {}) {
                 onSessionInvalidated(data.reason)
               }
 
-              setTimeout(() => {
-                eventSource.close()
-                signOut({ callbackUrl: redirectTo })
-              }, 500)
+              // Logout imediato sem delay
+              eventSource.close()
+              signOut({ callbackUrl: redirectTo })
             }
           } else if (data.type === 'session_expired') {
             console.log('[useProtectedSession] Sessão expirada via SSE')
@@ -184,17 +181,16 @@ export function useProtectedSession(options: UseProtectedSessionOptions = {}) {
               isInvalidatingRef.current = true
 
               if (showNotifications) {
-                toast.error('⏰ Sua sessão expirou. Faça login novamente.', { duration: 5000 })
+                toast.error('⏰ Sua sessão expirou. Faça login novamente.', { duration: 5000, id: 'session-expired' })
               }
 
               if (onSessionInvalidated) {
                 onSessionInvalidated('session_expired')
               }
 
-              setTimeout(() => {
-                eventSource.close()
-                signOut({ callbackUrl: redirectTo })
-              }, 500)
+              // Logout imediato sem delay
+              eventSource.close()
+              signOut({ callbackUrl: redirectTo })
             }
           }
         } catch (error) {

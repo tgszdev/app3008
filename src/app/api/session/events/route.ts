@@ -126,7 +126,7 @@ export async function GET(request: NextRequest) {
             heartbeatCount = 0
           }
         }
-      }, 1000) // Verificação a cada 1 segundo (mais agressivo)
+      }, 500) // Verificação a cada 500ms (ultra agressivo para logout imediato)
       
       // Cleanup quando cliente desconectar
       request.signal.addEventListener('abort', () => {

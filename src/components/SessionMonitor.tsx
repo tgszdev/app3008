@@ -40,18 +40,20 @@ export function SessionMonitor() {
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
               </svg>
               <div>
-                <div class="font-semibold">Sessão encerrada</div>
-                <div class="text-sm">Você fez login em outro dispositivo</div>
+                <div class="font-semibold">🔒 Sessão encerrada</div>
+                <div class="text-sm">Sua sessão foi encerrada por um novo login em outro dispositivo</div>
               </div>
             </div>
           `
           document.body.appendChild(notification)
           
-          // Aguardar 3 segundos e fazer logout
+          // Logout imediato - manter notificação visível por 5 segundos
           setTimeout(() => {
             document.body.removeChild(notification)
-            signOut({ callbackUrl: '/login?reason=session_expired' })
-          }, 3000)
+          }, 5000)
+          
+          // Fazer logout imediatamente
+          signOut({ callbackUrl: '/login?reason=session_expired' })
           
           // Parar verificação
           if (checkIntervalRef.current) {
@@ -62,10 +64,8 @@ export function SessionMonitor() {
         // Se não há sessão válida no banco mas temos token, verificar se expirou
         console.log('Nenhuma sessão válida encontrada no banco')
         
-        // Fazer logout se não há sessão válida
-        setTimeout(() => {
-          signOut({ callbackUrl: '/login?reason=session_invalid' })
-        }, 1000)
+        // Fazer logout imediatamente se não há sessão válida
+        signOut({ callbackUrl: '/login?reason=session_invalid' })
       }
       
       lastCheckRef.current = new Date()
