@@ -89,12 +89,13 @@ export const authConfig: NextAuthConfig = {
 
           console.log('Login successful for:', credentials.email)
 
+          // IMPORTANTE: Retornar o ID como string para compatibilidade com o adapter
           return {
-            id: user.id,
+            id: user.id.toString(), // Converter para string
             email: user.email,
             name: user.name,
-            role: user.role_name || user.role, // Usar role_name se disponível
-            role_name: user.role_name, // Incluir role_name também
+            role: user.role_name || user.role,
+            role_name: user.role_name,
             department: user.department,
             avatar_url: user.avatar_url,
           }
@@ -106,27 +107,33 @@ export const authConfig: NextAuthConfig = {
     })
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id
-        token.role = user.role
-        token.role_name = (user as any).role_name // Adicionar role_name
-        token.department = user.department
-        token.avatar_url = user.avatar_url
-      }
-      return token
-    },
-    async session({ session, token }) {
-      if (session?.user) {
-        session.user.id = token.id as string
-        session.user.role = token.role as string
-        if (token.role_name) {
-          session.user.role_name = token.role_name as string // Adicionar role_name
+    // IMPORTANTE: Com database sessions, os callbacks funcionam diferente
+    async session({ session, user }) {
+      // Com database sessions, recebemos o user completo do banco
+      if (session?.user && user) {
+        // Buscar dados adicionais do usuário no banco se necessário
+        const { data: userData } = await supabaseAdmin
+          .from('users')
+          .select('id, role_name, department, avatar_url')
+          .eq('id', user.id)
+          .single()
+        
+        if (userData) {
+          session.user.id = userData.id
+          session.user.role = userData.role_name
+          session.user.role_name = userData.role_name
+          session.user.department = userData.department
+          session.user.avatar_url = userData.avatar_url
         }
-        session.user.department = token.department as string
-        session.user.avatar_url = token.avatar_url as string
       }
       return session
+    },
+    async signIn({ user, account, profile }) {
+      // Permitir login apenas para providers credentials
+      if (account?.provider === 'credentials') {
+        return true
+      }
+      return false
     }
   },
   pages: {
@@ -135,9 +142,10 @@ export const authConfig: NextAuthConfig = {
   },
   session: {
     strategy: 'database', // MUDANÇA CRÍTICA: Usar database ao invés de JWT
-    maxAge: 24 * 60 * 60, // 24 horas (pode ajustar conforme necessário)
+    maxAge: 24 * 60 * 60, // 24 horas
     updateAge: 60 * 60, // Atualiza a sessão a cada 1 hora de atividade
   },
   secret: process.env.NEXTAUTH_SECRET,
   trustHost: true, // Importante para funcionar no Vercel
+  debug: process.env.NODE_ENV === 'development', // Adicionar debug em dev
 }

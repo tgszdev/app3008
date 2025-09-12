@@ -66,3 +66,4 @@ pids
 # PM2
 .pm2/
 ecosystem.config.jscore\n*.log\nnode_modules/\n.next/\n.env.local\n.env.production\n*.core
+core
