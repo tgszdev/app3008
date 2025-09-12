@@ -1861,17 +1861,17 @@ export default function TimesheetsAnalyticsPage() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
                             <span className="text-sm text-green-600 dark:text-green-400">
-                              {user.approvedHours.toFixed(1)}h
+                              {formatHoursToHHMM(user.approvedHours)}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
                             <span className="text-sm text-yellow-600 dark:text-yellow-400">
-                              {user.pendingHours.toFixed(1)}h
+                              {formatHoursToHHMM(user.pendingHours)}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
                             <span className="text-sm text-red-600 dark:text-red-400">
-                              {user.rejectedHours.toFixed(1)}h
+                              {formatHoursToHHMM(user.rejectedHours)}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
@@ -1881,7 +1881,7 @@ export default function TimesheetsAnalyticsPage() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
                             <span className="text-sm text-gray-600 dark:text-gray-400">
-                              {user.averageHoursPerTicket.toFixed(1)}h
+                              {formatHoursToHHMM(user.averageHoursPerTicket)}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
@@ -1915,10 +1915,10 @@ export default function TimesheetsAnalyticsPage() {
                           </span>
                           <div className="flex items-center gap-3">
                             <span className="text-xs text-gray-500 dark:text-gray-400">
-                              {user.rejectedHours > 0 && `(-${user.rejectedHours.toFixed(1)}h rejeitadas)`}
+                              {user.rejectedHours > 0 && `(-${formatHoursToHHMM(user.rejectedHours)} rejeitadas)`}
                             </span>
                             <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                              {effectiveHours.toFixed(1)}h
+                              {formatHoursToHHMM(effectiveHours)}
                             </span>
                           </div>
                         </div>
@@ -1964,7 +1964,7 @@ export default function TimesheetsAnalyticsPage() {
                               {category.ticketCount} chamados
                             </span>
                             <span className="font-semibold text-gray-900 dark:text-white">
-                              {category.hours.toFixed(1)}h
+                              {formatHoursToHHMM(category.hours)}
                             </span>
                           </div>
                         </div>
@@ -2058,13 +2058,13 @@ export default function TimesheetsAnalyticsPage() {
                         {priority.priority.toLowerCase() === 'baixa' && <TrendingDown className="h-5 w-5" />}
                       </div>
                       <div className="text-2xl font-bold mb-1">
-                        {priority.hours.toFixed(1)}h
+                        {formatHoursToHHMM(priority.hours)}
                       </div>
                       <div className="text-sm opacity-80">
                         {priority.ticketCount} chamados
                       </div>
                       <div className="text-xs opacity-70 mt-1">
-                        Média: {priority.averageHours.toFixed(1)}h/chamado
+                        Média: {formatHoursToHHMM(priority.averageHours)}/chamado
                       </div>
                       <div className="mt-2 bg-white/20 rounded-full h-1">
                         <div 
