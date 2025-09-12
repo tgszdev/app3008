@@ -130,6 +130,34 @@ const systemRolesPermissions = {
     system_backup: true,
     system_logs: true
   },
+  developer: {
+    ...defaultPermissions,
+    tickets_view: true,
+    tickets_create: true,
+    tickets_edit_own: true,
+    tickets_edit_all: true,
+    tickets_delete: false,
+    tickets_assign: true, // Desenvolvedor pode atribuir tickets
+    tickets_close: true,
+    kb_view: true,
+    kb_create: true,
+    kb_edit: true,
+    kb_delete: false,
+    kb_manage_categories: false,
+    timesheets_view_own: true,
+    timesheets_view_all: true,
+    timesheets_create: true,
+    timesheets_edit_own: true,
+    timesheets_edit_all: false,
+    timesheets_approve: false,
+    timesheets_analytics: true,
+    timesheets_analytics_full: false, // Desenvolvedor vê apenas seus próprios dados
+    system_settings: false,
+    system_users: false,
+    system_roles: false,
+    system_backup: false,
+    system_logs: false
+  },
   analyst: {
     ...defaultPermissions,
     tickets_view: true,
@@ -203,6 +231,16 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
           },
           {
             id: '2',
+            name: 'developer',
+            display_name: 'Desenvolvedor',
+            description: 'Desenvolvimento e Correções',
+            permissions: systemRolesPermissions.developer,
+            is_system: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          },
+          {
+            id: '3',
             name: 'analyst',
             display_name: 'Analista',
             description: 'Pode gerenciar tickets e criar conteúdo',
@@ -212,7 +250,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
             updated_at: new Date().toISOString()
           },
           {
-            id: '3',
+            id: '4',
             name: 'user',
             display_name: 'Usuário',
             description: 'Pode criar tickets e visualizar conteúdo',
@@ -250,6 +288,16 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
             updatedPermissions.timesheets_analytics_full = false
           }
           
+          // Ajustar permissões do developer
+          if (role.name === 'developer' || role.name === 'dev') {
+            // Garantir que desenvolvedor pode atribuir tickets
+            if (updatedPermissions.tickets_assign === undefined) {
+              updatedPermissions.tickets_assign = true
+            }
+            updatedPermissions.timesheets_analytics = true
+            updatedPermissions.timesheets_analytics_full = false
+          }
+          
           return {
             ...role,
             permissions: updatedPermissions
@@ -274,6 +322,16 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
         },
         {
           id: '2',
+          name: 'developer',
+          display_name: 'Desenvolvedor',
+          description: 'Desenvolvimento e Correções',
+          permissions: systemRolesPermissions.developer,
+          is_system: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        },
+        {
+          id: '3',
           name: 'analyst',
           display_name: 'Analista',
           description: 'Pode gerenciar tickets e criar conteúdo',
@@ -283,7 +341,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
           updated_at: new Date().toISOString()
         },
         {
-          id: '3',
+          id: '4',
           name: 'user',
           display_name: 'Usuário',
           description: 'Pode criar tickets e visualizar conteúdo',
@@ -471,6 +529,45 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
     return labels[permission] || permission
   }
 
+  const getPermissionTooltip = (permission: string) => {
+    const tooltips: Record<string, string> = {
+      // Tickets
+      tickets_view: 'Permite visualizar todos os tickets do sistema',
+      tickets_create: 'Permite criar novos tickets',
+      tickets_edit_own: 'Permite editar apenas tickets criados pelo próprio usuário',
+      tickets_edit_all: 'Permite editar todos os tickets do sistema',
+      tickets_delete: 'Permite excluir tickets permanentemente',
+      tickets_assign: 'Permite atribuir ou alterar o responsável por tickets',
+      tickets_close: 'Permite fechar tickets resolvidos',
+      
+      // Knowledge Base
+      kb_view: 'Permite visualizar artigos da base de conhecimento',
+      kb_create: 'Permite criar novos artigos na base de conhecimento',
+      kb_edit: 'Permite editar artigos existentes',
+      kb_delete: 'Permite excluir artigos da base de conhecimento',
+      kb_manage_categories: 'Permite criar, editar e excluir categorias',
+      
+      // Timesheets
+      timesheets_view_own: 'Permite visualizar apenas seus próprios apontamentos',
+      timesheets_view_all: 'Permite visualizar apontamentos de todos os colaboradores',
+      timesheets_create: 'Permite criar novos apontamentos de horas',
+      timesheets_edit_own: 'Permite editar apenas seus próprios apontamentos',
+      timesheets_edit_all: 'Permite editar apontamentos de qualquer colaborador',
+      timesheets_approve: 'Permite aprovar ou rejeitar apontamentos',
+      timesheets_analytics: 'Permite acessar relatórios e análises de apontamentos',
+      timesheets_analytics_full: 'Permite ver análises de todos os colaboradores (se desmarcado, vê apenas suas próprias)',
+      
+      // System
+      system_settings: 'Permite configurar parâmetros gerais do sistema',
+      system_users: 'Permite criar, editar e desativar usuários',
+      system_roles: 'Permite gerenciar perfis e suas permissões',
+      system_backup: 'Permite fazer backup e restaurar dados do sistema',
+      system_logs: 'Permite visualizar logs de auditoria e sistema'
+    }
+    
+    return tooltips[permission] || 'Sem descrição disponível'
+  }
+
   const groupPermissions = (permissions: Role['permissions']) => {
     const groups = {
       'Tickets': [] as string[],
@@ -514,6 +611,15 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           Configure os perfis de usuário e suas permissões no sistema
                         </p>
+                        <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                          <p className="text-xs text-blue-800 dark:text-blue-200 flex items-start gap-2">
+                            <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                            <span>
+                              <strong>Dica:</strong> Passe o mouse sobre cada permissão para ver sua descrição detalhada. 
+                              As alterações só serão aplicadas após clicar em "Limpar Cache" e o usuário fazer login novamente.
+                            </span>
+                          </p>
+                        </div>
                       </div>
                     </div>
                     <button
@@ -609,24 +715,47 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                           </div>
 
                           {/* Permissões do novo perfil */}
-                          <div className="space-y-4">
+                          <div className="space-y-6">
                             <h5 className="font-medium text-gray-900 dark:text-white">Permissões</h5>
                             {Object.entries(groupPermissions(newRole.permissions!)).map(([group, perms]) => (
-                              <div key={group} className="space-y-2">
-                                <h6 className="text-sm font-medium text-gray-700 dark:text-gray-300">{group}</h6>
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                              <div key={group} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                <h6 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                                  {group === 'Tickets' && <FileText className="h-4 w-4" />}
+                                  {group === 'Base de Conhecimento' && <Eye className="h-4 w-4" />}
+                                  {group === 'Apontamentos' && <Clock className="h-4 w-4" />}
+                                  {group === 'Sistema' && <Settings className="h-4 w-4" />}
+                                  {group}
+                                </h6>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                   {perms.map(perm => (
-                                    <label key={perm} className="flex items-center gap-2 cursor-pointer">
-                                      <input
-                                        type="checkbox"
-                                        checked={newRole.permissions![perm as keyof Role['permissions']]}
-                                        onChange={() => toggleNewRolePermission(perm as keyof Role['permissions'])}
-                                        className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                                      />
-                                      <span className="text-sm text-gray-700 dark:text-gray-300">
-                                        {getPermissionLabel(perm)}
-                                      </span>
-                                    </label>
+                                    <div 
+                                      key={perm}
+                                      className="relative group"
+                                    >
+                                      <label className="flex items-start gap-2 cursor-pointer p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                        <input
+                                          type="checkbox"
+                                          checked={newRole.permissions![perm as keyof Role['permissions']]}
+                                          onChange={() => toggleNewRolePermission(perm as keyof Role['permissions'])}
+                                          className="mt-0.5 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                                        />
+                                        <div className="flex-1">
+                                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300 block">
+                                            {getPermissionLabel(perm)}
+                                          </span>
+                                          <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 block">
+                                            {getPermissionTooltip(perm).substring(0, 50)}...
+                                          </span>
+                                        </div>
+                                      </label>
+                                      
+                                      {/* Tooltip completo */}
+                                      <div className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded-lg p-3 w-64 bottom-full left-0 mb-2 pointer-events-none">
+                                        <div className="font-semibold mb-1">{getPermissionLabel(perm)}</div>
+                                        <div>{getPermissionTooltip(perm)}</div>
+                                        <div className="absolute bottom-0 left-6 transform translate-y-1/2 rotate-45 w-2 h-2 bg-gray-900"></div>
+                                      </div>
+                                    </div>
                                   ))}
                                 </div>
                               </div>
@@ -724,6 +853,13 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                                         } else if (role.name === 'analyst') {
                                           updatedPermissions.timesheets_analytics = true
                                           updatedPermissions.timesheets_analytics_full = false
+                                        } else if (role.name === 'developer' || role.name === 'dev') {
+                                          // Garantir que desenvolvedor tem as permissões corretas
+                                          if (updatedPermissions.tickets_assign === undefined) {
+                                            updatedPermissions.tickets_assign = true
+                                          }
+                                          updatedPermissions.timesheets_analytics = true
+                                          updatedPermissions.timesheets_analytics_full = false
                                         }
                                         
                                         setEditingRole({
@@ -750,24 +886,47 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
 
                             {/* Permissões */}
                             {editingRole?.id === role.id ? (
-                              <div className="space-y-4">
+                              <div className="space-y-6">
                                 {Object.entries(groupPermissions(editingRole.permissions)).map(([group, perms]) => (
-                                  <div key={group} className="space-y-2">
-                                    <h6 className="text-sm font-medium text-gray-700 dark:text-gray-300">{group}</h6>
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                  <div key={group} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                    <h6 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                                      {group === 'Tickets' && <FileText className="h-4 w-4" />}
+                                      {group === 'Base de Conhecimento' && <Eye className="h-4 w-4" />}
+                                      {group === 'Apontamentos' && <Clock className="h-4 w-4" />}
+                                      {group === 'Sistema' && <Settings className="h-4 w-4" />}
+                                      {group}
+                                    </h6>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                       {perms.map(perm => (
-                                        <label key={perm} className="flex items-center gap-2 cursor-pointer">
-                                          <input
-                                            type="checkbox"
-                                            checked={editingRole.permissions[perm as keyof Role['permissions']]}
-                                            onChange={() => togglePermission(editingRole, perm as keyof Role['permissions'])}
-                                            className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                                            disabled={role.is_system}
-                                          />
-                                          <span className="text-sm text-gray-700 dark:text-gray-300">
-                                            {getPermissionLabel(perm)}
-                                          </span>
-                                        </label>
+                                        <div 
+                                          key={perm}
+                                          className="relative group"
+                                        >
+                                          <label className="flex items-start gap-2 cursor-pointer p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                            <input
+                                              type="checkbox"
+                                              checked={editingRole.permissions[perm as keyof Role['permissions']]}
+                                              onChange={() => togglePermission(editingRole, perm as keyof Role['permissions'])}
+                                              className="mt-0.5 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                                              disabled={role.is_system}
+                                            />
+                                            <div className="flex-1">
+                                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300 block">
+                                                {getPermissionLabel(perm)}
+                                              </span>
+                                              <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 block">
+                                                {getPermissionTooltip(perm).substring(0, 50)}...
+                                              </span>
+                                            </div>
+                                          </label>
+                                          
+                                          {/* Tooltip completo */}
+                                          <div className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded-lg p-3 w-64 bottom-full left-0 mb-2 pointer-events-none">
+                                            <div className="font-semibold mb-1">{getPermissionLabel(perm)}</div>
+                                            <div>{getPermissionTooltip(perm)}</div>
+                                            <div className="absolute bottom-0 left-6 transform translate-y-1/2 rotate-45 w-2 h-2 bg-gray-900"></div>
+                                          </div>
+                                        </div>
                                       ))}
                                     </div>
                                   </div>
