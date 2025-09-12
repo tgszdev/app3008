@@ -18,6 +18,11 @@ export async function GET(request: NextRequest) {
     const sessionToken = (session as any)?.sessionToken
     
     if (!sessionToken) {
+      console.log('[VALIDATE] Session sem token:', {
+        userId: session.user.id,
+        hasSession: !!session,
+        sessionKeys: session ? Object.keys(session) : []
+      })
       return NextResponse.json({ 
         valid: false, 
         reason: 'no_token' 

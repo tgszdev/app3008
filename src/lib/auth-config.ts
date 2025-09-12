@@ -337,7 +337,21 @@ export const authConfig: NextAuthConfig = {
       }
       
       // IMPORTANTE: Preservar o sessionToken em todas as requisições
-      // Não apenas no update
+      // Se não tem sessionToken mas tem user id, pode ser uma sessão antiga - gerar novo token
+      if (!token.sessionToken && token.id) {
+        console.log('[AUTH] Token sem sessionToken, gerando novo...')
+        const newSessionToken = `${token.id}_${Date.now()}_${Math.random().toString(36).substring(7)}`
+        token.sessionToken = newSessionToken
+        
+        try {
+          await registerSession(token.id as string, newSessionToken)
+          console.log('[AUTH] Novo sessionToken criado para sessão existente:', newSessionToken)
+        } catch (error) {
+          console.error('[AUTH] Erro ao criar novo sessionToken:', error)
+        }
+      }
+      
+      // Verificar sessão apenas em updates controlados
       if (token.sessionToken) {
         // Verificar apenas em updates controlados, não aleatoriamente
         // Removida verificação aleatória que causava logouts inesperados
@@ -379,6 +393,9 @@ export const authConfig: NextAuthConfig = {
         session.user.department = token.department as string
         session.user.avatar_url = token.avatar_url as string
         session.user.permissions = token.permissions as any || {}
+        
+        // IMPORTANTE: Adicionar sessionToken à sessão para as APIs poderem acessar
+        (session as any).sessionToken = token.sessionToken
         
         // Verificar se a sessão ainda é válida no banco
         if (token.sessionToken) {
