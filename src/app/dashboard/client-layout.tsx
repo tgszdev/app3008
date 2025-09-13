@@ -77,7 +77,6 @@ export default function DashboardLayout({
   const { theme, setTheme } = useTheme()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   
   // Proteção de sessão com notificações
@@ -176,6 +175,46 @@ export default function DashboardLayout({
               )
             })}
           </nav>
+          
+          {/* User section at bottom of mobile sidebar */}
+          <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-800">
+            <div className="space-y-3">
+              <div className="flex items-center rounded-lg p-2 bg-gray-50 dark:bg-gray-700/50">
+                <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                  {session?.user?.name?.charAt(0).toUpperCase()}
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    {session?.user?.name}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {session?.user?.email}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={async () => {
+                  setIsLoggingOut(true)
+                  setSidebarOpen(false)
+                  try {
+                    await signOut({ callbackUrl: '/login' })
+                  } catch (error) {
+                    console.error('Erro ao fazer logout:', error)
+                    window.location.href = '/login'
+                  }
+                }}
+                className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                disabled={isLoggingOut}
+              >
+                {isLoggingOut ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <LogOut className="mr-2 h-4 w-4" />
+                )}
+                <span>{isLoggingOut ? 'Saindo...' : 'Sair'}</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -263,31 +302,76 @@ export default function DashboardLayout({
           </nav>
           
           {/* User section at bottom of sidebar */}
-          <div className="border-t border-gray-200 dark:border-gray-700 p-3">
+          <div className="border-t border-gray-200 dark:border-gray-700 p-3 space-y-2">
             {sidebarCollapsed ? (
-              <Tooltip 
-                content={`${session?.user?.name} (${userRole === 'admin' ? 'Admin' : userRole === 'agent' ? 'Agente' : 'Usuário'})`} 
-                side="right"
-              >
-                <div className="flex items-center justify-center rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer">
-                  <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
+              <>
+                <Tooltip 
+                  content={`${session?.user?.name} (${userRole === 'admin' ? 'Admin' : userRole === 'agent' ? 'Agente' : 'Usuário'})`} 
+                  side="right"
+                >
+                  <div className="flex items-center justify-center rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer">
+                    <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                      {session?.user?.name?.charAt(0).toUpperCase()}
+                    </div>
+                  </div>
+                </Tooltip>
+                <Tooltip content="Sair" side="right">
+                  <button
+                    onClick={async () => {
+                      setIsLoggingOut(true)
+                      try {
+                        await signOut({ callbackUrl: '/login' })
+                      } catch (error) {
+                        console.error('Erro ao fazer logout:', error)
+                        window.location.href = '/login'
+                      }
+                    }}
+                    className="w-full flex items-center justify-center p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    disabled={isLoggingOut}
+                  >
+                    {isLoggingOut ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <LogOut className="h-5 w-5" />
+                    )}
+                  </button>
+                </Tooltip>
+              </>
+            ) : (
+              <div className="space-y-2">
+                <div className="flex items-center rounded-lg p-2 bg-gray-50 dark:bg-gray-700/50">
+                  <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white flex-shrink-0">
                     {session?.user?.name?.charAt(0).toUpperCase()}
                   </div>
+                  <div className="ml-3 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      {session?.user?.name}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {session?.user?.email}
+                    </p>
+                  </div>
                 </div>
-              </Tooltip>
-            ) : (
-              <div className="flex items-center rounded-lg p-2">
-                <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white flex-shrink-0">
-                  {session?.user?.name?.charAt(0).toUpperCase()}
-                </div>
-                <div className="ml-3 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                    {session?.user?.name}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                    {userRole === 'admin' ? 'Administrador' : userRole === 'agent' ? 'Agente' : 'Usuário'}
-                  </p>
-                </div>
+                <button
+                  onClick={async () => {
+                    setIsLoggingOut(true)
+                    try {
+                      await signOut({ callbackUrl: '/login' })
+                    } catch (error) {
+                      console.error('Erro ao fazer logout:', error)
+                      window.location.href = '/login'
+                    }
+                  }}
+                  className="w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                  disabled={isLoggingOut}
+                >
+                  {isLoggingOut ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <LogOut className="mr-2 h-4 w-4" />
+                  )}
+                  <span>{isLoggingOut ? 'Saindo...' : 'Sair'}</span>
+                </button>
               </div>
             )}
           </div>
@@ -325,59 +409,6 @@ export default function DashboardLayout({
 
               {/* Notifications */}
               <NotificationBell />
-
-              {/* User menu */}
-              <div className="relative">
-                <button
-                  onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-x-2 text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
-                    {session?.user?.name?.charAt(0).toUpperCase()}
-                  </div>
-                  <span className="hidden sm:block">{session?.user?.name}</span>
-                  <ChevronDown className="h-4 w-4" />
-                </button>
-
-                {userMenuOpen && (
-                  <div className="absolute right-0 z-50 mt-2 w-48 rounded-lg bg-white dark:bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5">
-                    <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {session?.user?.name}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {session?.user?.email}
-                      </p>
-                    </div>
-                    <button
-                      onClick={async () => {
-                        setIsLoggingOut(true)
-                        setUserMenuOpen(false)
-                        
-                        try {
-                          // Fazer signOut e redirecionar
-                          await signOut({ 
-                            callbackUrl: '/login'
-                          })
-                        } catch (error) {
-                          console.error('Erro ao fazer logout:', error)
-                          // Forçar redirecionamento se houver erro
-                          window.location.href = '/login'
-                        }
-                      }}
-                      className="flex w-full items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                      disabled={isLoggingOut}
-                    >
-                      {isLoggingOut ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <LogOut className="mr-2 h-4 w-4" />
-                      )}
-                      {isLoggingOut ? 'Saindo...' : 'Sair'}
-                    </button>
-                  </div>
-                )}
-              </div>
             </div>
           </div>
         </div>
