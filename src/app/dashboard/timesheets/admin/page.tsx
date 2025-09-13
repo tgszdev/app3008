@@ -228,7 +228,7 @@ export default function TimesheetsAdminPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 pb-6">
       {/* Navigation */}
       <TimesheetNavigation />
       
@@ -388,8 +388,8 @@ export default function TimesheetsAdminPage() {
       </div>
 
       {/* Lista de Apontamentos */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
             Apontamentos para Aprovação
           </h2>
@@ -403,72 +403,74 @@ export default function TimesheetsAdminPage() {
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200 dark:divide-gray-700">
+          <div className="divide-y divide-gray-200 dark:divide-gray-700 max-h-[calc(100vh-400px)] overflow-y-auto">
             {filteredTimesheets.map((timesheet) => (
-              <div key={timesheet.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-4">
-                      <button
-                        onClick={() => toggleRow(timesheet.id)}
-                        className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
-                      >
-                        {expandedRows.has(timesheet.id) ? (
-                          <ChevronUp className="h-4 w-4" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4" />
-                        )}
-                      </button>
-                      
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-900 dark:text-white">
-                            #{timesheet.ticket.ticket_number}
-                          </span>
-                          <span className="text-gray-600 dark:text-gray-400">
-                            {timesheet.ticket.title.toUpperCase()}
-                          </span>
-                        </div>
-                        
-                        <div className="flex items-center gap-4 mt-1 text-sm text-gray-600 dark:text-gray-400">
-                          <span className="flex items-center gap-1">
-                            <User className="h-3 w-3" />
-                            {timesheet.user.name}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            {format(parseISO(timesheet.work_date), "dd 'de' MMMM", { locale: ptBR })}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {formatHoursToHHMM(timesheet.hours_worked)}
-                          </span>
-                        </div>
+              <div key={timesheet.id} className="p-3 sm:p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                <div className="space-y-3">
+                  {/* Header com informações principais */}
+                  <div className="flex items-start gap-2">
+                    <button
+                      onClick={() => toggleRow(timesheet.id)}
+                      className="mt-1 p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors flex-shrink-0"
+                    >
+                      {expandedRows.has(timesheet.id) ? (
+                        <ChevronUp className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
+                      )}
+                    </button>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          #{timesheet.ticket.ticket_number}
+                        </span>
+                        <span className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                          {timesheet.ticket.title.toUpperCase()}
+                        </span>
                       </div>
                       
-                      <div className="flex items-center gap-2">
-                        {getStatusBadge(timesheet.status)}
-                        
-                        {timesheet.status === 'pending' && (
-                          <>
-                            <button
-                              onClick={() => handleApprove(timesheet.id)}
-                              className="p-2 text-green-600 hover:bg-green-100 dark:text-green-400 dark:hover:bg-green-900/20 rounded-lg transition-colors"
-                              title="Aprovar"
-                            >
-                              <Check className="h-4 w-4" />
-                            </button>
-                            <button
-                              onClick={() => handleReject(timesheet.id)}
-                              className="p-2 text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                              title="Rejeitar"
-                            >
-                              <X className="h-4 w-4" />
-                            </button>
-                          </>
-                        )}
+                      <div className="flex flex-wrap gap-3 mt-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                        <span className="flex items-center gap-1">
+                          <User className="h-3 w-3 flex-shrink-0" />
+                          <span className="truncate">{timesheet.user.name}</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3 flex-shrink-0" />
+                          {format(parseISO(timesheet.work_date), "dd 'de' MMM", { locale: ptBR })}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3 flex-shrink-0" />
+                          {formatHoursToHHMM(timesheet.hours_worked)}
+                        </span>
                       </div>
                     </div>
+                  </div>
+                  
+                  {/* Ações e status */}
+                  <div className="flex items-center justify-between gap-2 pl-7">
+                    <div className="flex-shrink-0">
+                      {getStatusBadge(timesheet.status)}
+                    </div>
+                    
+                    {timesheet.status === 'pending' && (
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleApprove(timesheet.id)}
+                          className="p-1.5 sm:p-2 text-green-600 hover:bg-green-100 dark:text-green-400 dark:hover:bg-green-900/20 rounded-lg transition-colors"
+                          title="Aprovar"
+                        >
+                          <Check className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleReject(timesheet.id)}
+                          className="p-1.5 sm:p-2 text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                          title="Rejeitar"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
                 
