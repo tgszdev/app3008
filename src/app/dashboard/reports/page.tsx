@@ -233,15 +233,15 @@ export default function ReportsPage() {
     pdf.setTextColor(60, 60, 60)
     let yPosition = 55
     
-    pdf.text(`Total de Tickets: ${data.summary.totalTickets}`, 20, yPosition)
+    pdf.text(`Total de Tickets: ${String(data.summary.totalTickets || 0)}`, 20, yPosition)
     yPosition += 8
-    pdf.text(`Tickets Abertos: ${data.summary.openTickets}`, 20, yPosition)
+    pdf.text(`Tickets Abertos: ${String(data.summary.openTickets || 0)}`, 20, yPosition)
     yPosition += 8
-    pdf.text(`Tickets Resolvidos: ${data.summary.resolvedTickets}`, 20, yPosition)
+    pdf.text(`Tickets Resolvidos: ${String(data.summary.resolvedTickets || 0)}`, 20, yPosition)
     yPosition += 8
-    pdf.text(`Tempo Médio de Resolução: ${data.summary.avgResolutionTime}`, 20, yPosition)
+    pdf.text(`Tempo Médio de Resolução: ${String(data.summary.avgResolutionTime || '-')}`, 20, yPosition)
     yPosition += 8
-    pdf.text(`Taxa de Satisfação: ${data.summary.satisfactionRate}%`, 20, yPosition)
+    pdf.text(`Taxa de Satisfação: ${String(data.summary.satisfactionRate || 0)}%`, 20, yPosition)
     
     // Add performance metrics
     if (config.type === 'performance' || config.type === 'summary') {
@@ -253,13 +253,13 @@ export default function ReportsPage() {
       yPosition += 10
       pdf.setFontSize(11)
       pdf.setTextColor(60, 60, 60)
-      pdf.text(`Taxa de Resolução: ${data.performance.resolutionRate}%`, 20, yPosition)
+      pdf.text(`Taxa de Resolução: ${String(data.performance.resolutionRate || 0)}%`, 20, yPosition)
       yPosition += 8
-      pdf.text(`Tempo de Primeira Resposta: ${data.performance.firstResponseTime}`, 20, yPosition)
+      pdf.text(`Tempo de Primeira Resposta: ${String(data.performance.firstResponseTime || '-')}`, 20, yPosition)
       yPosition += 8
-      pdf.text(`Taxa de Reabertura: ${data.performance.reopenRate}%`, 20, yPosition)
+      pdf.text(`Taxa de Reabertura: ${String(data.performance.reopenRate || 0)}%`, 20, yPosition)
       yPosition += 8
-      pdf.text(`Taxa de Escalonamento: ${data.performance.escalationRate}%`, 20, yPosition)
+      pdf.text(`Taxa de Escalonamento: ${String(data.performance.escalationRate || 0)}%`, 20, yPosition)
     }
     
     // Add category stats
@@ -273,7 +273,7 @@ export default function ReportsPage() {
       pdf.setFontSize(11)
       pdf.setTextColor(60, 60, 60)
       data.categoryStats.slice(0, 5).forEach(cat => {
-        pdf.text(`${cat.name}: ${cat.count} tickets (${cat.percentage}%)`, 20, yPosition)
+        pdf.text(`${String(cat.name || '-')}: ${String(cat.count || 0)} tickets (${String(cat.percentage || 0)}%)`, 20, yPosition)
         yPosition += 8
       })
     }
@@ -307,11 +307,11 @@ export default function ReportsPage() {
           yPosition = 20
         }
         
-        pdf.text(ticket.ticket_number, 22, yPosition)
-        pdf.text(ticket.title.substring(0, 30), 45, yPosition)
-        pdf.text(ticket.status, 110, yPosition)
-        pdf.text(ticket.priority, 135, yPosition)
-        pdf.text(formatDate(ticket.created_at), 160, yPosition)
+        pdf.text(String(ticket.ticket_number || '-'), 22, yPosition)
+        pdf.text(String((ticket.title || '').substring(0, 30)), 45, yPosition)
+        pdf.text(String(ticket.status || '-'), 110, yPosition)
+        pdf.text(String(ticket.priority || '-'), 135, yPosition)
+        pdf.text(String(formatDate(ticket.created_at)), 160, yPosition)
         yPosition += 8
       })
     }
@@ -323,7 +323,7 @@ export default function ReportsPage() {
       pdf.setFontSize(10)
       pdf.setTextColor(150, 150, 150)
       pdf.text(
-        `Página ${i} de ${pageCount} - Gerado em ${new Date().toLocaleDateString('pt-BR')}`,
+        String(`Página ${i} de ${pageCount} - Gerado em ${new Date().toLocaleDateString('pt-BR')}`),
         105,
         285,
         { align: 'center' }
