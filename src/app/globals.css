@@ -136,3 +136,21 @@ details[open] summary::before {
     padding: 16px 20px !important;
   }
 }
+
+/* Z-index hierárquico para componentes sobrepostos */
+:root {
+  --z-dropdown: 50;
+  --z-modal-overlay: 9998;
+  --z-modal: 9999;
+  --z-notification: 9999;
+  --z-toast: 99999;
+}
+
+/* Garantir que o painel de notificações fique acima de tudo */
+.notification-panel {
+  z-index: var(--z-notification) !important;
+}
+
+.notification-overlay {
+  z-index: var(--z-modal-overlay) !important;
+}

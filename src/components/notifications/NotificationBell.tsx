@@ -138,7 +138,15 @@ export default function NotificationBell() {
 
       {/* Dropdown de notificações */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-full sm:w-96 max-w-[calc(100vw-2rem)] sm:max-w-96 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+        <>
+          {/* Overlay para mobile */}
+          <div 
+            className="notification-overlay fixed inset-0 bg-black/30 z-[9998] lg:hidden"
+            onClick={() => setIsOpen(false)}
+          />
+          
+          {/* Painel de notificações */}
+          <div className="notification-panel fixed sm:absolute top-20 sm:top-auto left-2 right-2 sm:left-auto sm:right-0 sm:mt-2 sm:w-96 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 z-[9999]">
           {/* Header */}
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
@@ -166,7 +174,7 @@ export default function NotificationBell() {
           </div>
 
           {/* Lista de notificações */}
-          <div className="max-h-[60vh] sm:max-h-96 overflow-y-auto">
+          <div className="max-h-[50vh] sm:max-h-96 overflow-y-auto">
             {loading ? (
               <div className="p-8 text-center text-gray-500">
                 Carregando notificações...
@@ -247,6 +255,7 @@ export default function NotificationBell() {
             </div>
           )}
         </div>
+        </>
       )}
     </div>
   )
