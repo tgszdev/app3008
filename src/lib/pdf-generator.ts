@@ -2,6 +2,7 @@ import jsPDF from 'jspdf'
 import 'jspdf-autotable'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { formatHoursToHHMM } from './format-hours'
 
 // Adicionar tipo para o autoTable
 declare module 'jspdf' {
@@ -56,10 +57,15 @@ export const generatePDF = ({
     const dateText = `Gerado em: ${format(new Date(), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR })}`
     pdf.text(dateText, pdf.internal.pageSize.width / 2, subtitle ? 30 : 23, { align: 'center' })
     
+    // Garantir que todos os dados sejam strings
+    const sanitizedData = data.map(row => 
+      row.map(cell => String(cell ?? '-'))
+    )
+    
     // Adicionar tabela
     pdf.autoTable({
       head: [headers],
-      body: data,
+      body: sanitizedData,
       startY: subtitle ? 35 : 28,
       theme: 'grid',
       styles: {
@@ -124,12 +130,12 @@ export const exportTimesheetsPDF = (timesheets: any[], title: string = 'Relatór
   
   const data = timesheets.map(ts => [
     format(new Date(ts.work_date), 'dd/MM/yyyy'),
-    ts.user?.name || '-',
+    String(ts.user?.name || '-'),
     `#${ts.ticket?.ticket_number || '-'}`,
-    `${ts.hours_worked}h`,
-    ts.status === 'approved' ? 'Aprovado' : 
-    ts.status === 'rejected' ? 'Rejeitado' : 'Pendente',
-    ts.description?.substring(0, 50) + (ts.description?.length > 50 ? '...' : '') || '-'
+    String(ts.hours_worked ? formatHoursToHHMM(ts.hours_worked) : '-'),
+    String(ts.status === 'approved' ? 'Aprovado' : 
+    ts.status === 'rejected' ? 'Rejeitado' : 'Pendente'),
+    String(ts.description?.substring(0, 50) + (ts.description?.length > 50 ? '...' : '') || '-')
   ])
   
   return generatePDF({
@@ -153,11 +159,11 @@ export const exportPermissionsPDF = (users: any[], title: string = 'Relatório d
   ]
   
   const data = users.map(user => [
-    user.name || '-',
-    user.email || '-',
-    user.role_name || user.role || '-',
-    user.department || '-',
-    user.permissions ? Object.keys(user.permissions).filter(k => user.permissions[k]).join(', ') : 'Nenhuma'
+    String(user.name || '-'),
+    String(user.email || '-'),
+    String(user.role_name || user.role || '-'),
+    String(user.department || '-'),
+    String(user.permissions ? Object.keys(user.permissions).filter(k => user.permissions[k]).join(', ') : 'Nenhuma')
   ])
   
   return generatePDF({
@@ -167,5 +173,35 @@ export const exportPermissionsPDF = (users: any[], title: string = 'Relatório d
     headers,
     data,
     orientation: 'portrait'
+  })
+}
+
+// Função para exportar analytics
+export const exportAnalyticsPDF = (analytics: any[], title: string = 'Relatório de Analytics') => {
+  const headers = [
+    'Colaborador',
+    'Total de Horas',
+    'Horas Aprovadas',
+    'Horas Pendentes',
+    'Horas Rejeitadas',
+    'Taxa de Aprovação'
+  ]
+  
+  const data = analytics.map(item => [
+    String(item.user_name || '-'),
+    String(item.total_hours ? formatHoursToHHMM(item.total_hours) : '-'),
+    String(item.approved_hours ? formatHoursToHHMM(item.approved_hours) : '-'),
+    String(item.pending_hours ? formatHoursToHHMM(item.pending_hours) : '-'),
+    String(item.rejected_hours ? formatHoursToHHMM(item.rejected_hours) : '-'),
+    String(item.approval_rate ? `${item.approval_rate.toFixed(1)}%` : '-')
+  ])
+  
+  return generatePDF({
+    title,
+    subtitle: `Total de colaboradores: ${analytics.length}`,
+    filename: `analytics_${format(new Date(), 'yyyy-MM-dd_HH-mm')}.pdf`,
+    headers,
+    data,
+    orientation: 'landscape'
   })
 }
