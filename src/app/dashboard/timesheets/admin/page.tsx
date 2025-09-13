@@ -22,8 +22,10 @@ import {
   XCircle,
   User,
   Ticket,
-  Search
+  Search,
+  FileDown
 } from 'lucide-react'
+import { exportTimesheetsPDF } from '@/lib/pdf-generator'
 
 interface Ticket {
   id: string
@@ -231,9 +233,9 @@ export default function TimesheetsAdminPage() {
       <TimesheetNavigation />
       
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             Aprovação de Apontamentos
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
@@ -241,14 +243,32 @@ export default function TimesheetsAdminPage() {
           </p>
         </div>
         
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-        >
-          <Filter className="h-4 w-4" />
-          Filtros
-          {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => {
+              const success = exportTimesheetsPDF(filteredTimesheets, 'Relatório de Apontamentos - Admin')
+              if (success) {
+                toast.success('PDF exportado com sucesso!')
+              } else {
+                toast.error('Erro ao exportar PDF')
+              }
+            }}
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <FileDown className="h-4 w-4" />
+            <span className="hidden sm:inline">Exportar PDF</span>
+            <span className="sm:hidden">PDF</span>
+          </button>
+          
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          >
+            <Filter className="h-4 w-4" />
+            <span className="hidden sm:inline">Filtros</span>
+            {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </button>
+        </div>
       </div>
 
       {/* Filtros */}
@@ -368,9 +388,9 @@ export default function TimesheetsAdminPage() {
       </div>
 
       {/* Lista de Apontamentos */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
             Apontamentos para Aprovação
           </h2>
         </div>

@@ -16,8 +16,10 @@ import {
   Lock,
   Unlock,
   Check,
-  X
+  X,
+  FileDown
 } from 'lucide-react'
+import { exportPermissionsPDF } from '@/lib/pdf-generator'
 
 interface User {
   id: string
@@ -208,15 +210,35 @@ export default function TimesheetsPermissionsPage() {
       <TimesheetNavigation />
       
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             Permissões de Apontamentos
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
             Gerencie as permissões de apontamentos por usuário
           </p>
         </div>
+        
+        <button
+          onClick={() => {
+            const usersWithPermissions = users.map(user => ({
+              ...user,
+              permissions: permissions.find(p => p.user_id === user.id) || {}
+            }))
+            const success = exportPermissionsPDF(usersWithPermissions, 'Relatório de Permissões')
+            if (success) {
+              toast.success('PDF exportado com sucesso!')
+            } else {
+              toast.error('Erro ao exportar PDF')
+            }
+          }}
+          className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <FileDown className="h-4 w-4" />
+          <span className="hidden sm:inline">Exportar PDF</span>
+          <span className="sm:hidden">PDF</span>
+        </button>
       </div>
 
       {/* Estatísticas */}
@@ -313,9 +335,10 @@ export default function TimesheetsPermissionsPage() {
         </div>
       </div>
 
-      {/* Tabela de Permissões */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+      {/* Tabela de Permissões - Desktop */}
+      <div className="hidden md:block bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -402,9 +425,87 @@ export default function TimesheetsPermissionsPage() {
             })}
           </tbody>
         </table>
+        </div>
         
         {filteredPermissions.length === 0 && (
           <div className="text-center py-12">
+            <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500 dark:text-gray-400">
+              Nenhum usuário encontrado
+            </p>
+          </div>
+        )}
+      </div>
+      
+      {/* Lista de Permissões - Mobile */}
+      <div className="md:hidden space-y-4">
+        {filteredPermissions.map((permission) => {
+          const user = users.find(u => u.id === permission.user_id)
+          if (!user) return null
+          
+          return (
+            <div key={permission.user_id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+              <div className="space-y-3">
+                <div>
+                  <div className="font-medium text-gray-900 dark:text-white">
+                    {user.name}
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {user.email}
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                    user.role === 'admin' 
+                      ? 'bg-purple-100 dark:bg-purple-900/20 text-purple-800 dark:text-purple-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                  }`}>
+                    {user.role === 'admin' ? 'Administrador' : 'Usuário'}
+                  </span>
+                  {user.department && (
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      {user.department}
+                    </span>
+                  )}
+                </div>
+                
+                <div className="space-y-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Pode Submeter</span>
+                    <button
+                      onClick={() => handlePermissionChange(permission.user_id, 'can_submit', !permission.can_submit)}
+                      disabled={saving === permission.user_id}
+                      className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:opacity-50"
+                      style={{ backgroundColor: permission.can_submit ? '#10b981' : '#6b7280' }}
+                    >
+                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        permission.can_submit ? 'translate-x-6' : 'translate-x-1'
+                      }`} />
+                    </button>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Pode Aprovar</span>
+                    <button
+                      onClick={() => handlePermissionChange(permission.user_id, 'can_approve', !permission.can_approve)}
+                      disabled={saving === permission.user_id || user.role === 'admin'}
+                      className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:opacity-50"
+                      style={{ backgroundColor: permission.can_approve ? '#10b981' : '#6b7280' }}
+                    >
+                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        permission.can_approve ? 'translate-x-6' : 'translate-x-1'
+                      }`} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        })}
+        
+        {filteredPermissions.length === 0 && (
+          <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg">
             <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 dark:text-gray-400">
               Nenhum usuário encontrado
