@@ -40,32 +40,19 @@ export function SatisfactionWidget() {
       setData(response.data)
     } catch (error) {
       console.error('Error fetching satisfaction data:', error)
-      // Se a API não existir ainda, usar dados mocados para demonstração
+      // Se houver erro, mostrar dados vazios
       setData({
-        averageRating: 4.2,
-        totalRatings: 45,
-        trend: 12.5,
+        averageRating: 0,
+        totalRatings: 0,
+        trend: 0,
         distribution: {
-          1: 2,
-          2: 3,
-          3: 8,
-          4: 15,
-          5: 17
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
         },
-        recentComments: [
-          {
-            rating: 5,
-            comment: "Excelente atendimento, problema resolvido rapidamente!",
-            ticketNumber: "2024-0045",
-            createdAt: new Date().toISOString()
-          },
-          {
-            rating: 4,
-            comment: "Bom suporte, mas demorou um pouco.",
-            ticketNumber: "2024-0044",
-            createdAt: new Date().toISOString()
-          }
-        ]
+        recentComments: []
       })
     } finally {
       setLoading(false)
@@ -105,6 +92,26 @@ export function SatisfactionWidget() {
 
   if (!data) {
     return null
+  }
+
+  // Se não há avaliações, mostrar mensagem
+  if (data.totalRatings === 0) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          Satisfação do Cliente
+        </h3>
+        <div className="text-center py-8">
+          <Star className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+          <p className="text-gray-500 dark:text-gray-400 mb-2">
+            Nenhuma avaliação ainda
+          </p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">
+            As avaliações aparecerão aqui quando os tickets forem resolvidos e avaliados pelos usuários.
+          </p>
+        </div>
+      </div>
+    )
   }
 
   const satisfactionPercentage = (data.averageRating / 5) * 100
