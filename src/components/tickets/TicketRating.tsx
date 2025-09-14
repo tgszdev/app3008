@@ -64,7 +64,9 @@ export function TicketRating({
     try {
       if (existingRating && !isEditing) {
         // Delete existing rating
-        await axios.delete(`/api/tickets/${ticketId}/rating`)
+        await axios.delete(`/api/tickets/${ticketId}/rating`, {
+          data: { userId: currentUserId } // Enviando userId para delete
+        })
         setExistingRating(null)
         setRating(0)
         setComment('')
@@ -73,7 +75,8 @@ export function TicketRating({
         // Create or update rating
         const response = await axios.post(`/api/tickets/${ticketId}/rating`, {
           rating,
-          comment: comment.trim() || null
+          comment: comment.trim() || null,
+          userId: currentUserId // Enviando userId temporariamente
         })
         
         setExistingRating(response.data)

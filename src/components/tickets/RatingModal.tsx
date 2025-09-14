@@ -11,6 +11,7 @@ interface RatingModalProps {
   ticketId: string
   ticketNumber: string
   ticketTitle: string
+  userId?: string // Adicionar userId como prop opcional
 }
 
 export function RatingModal({ 
@@ -18,7 +19,8 @@ export function RatingModal({
   onClose, 
   ticketId, 
   ticketNumber,
-  ticketTitle 
+  ticketTitle,
+  userId 
 }: RatingModalProps) {
   const [rating, setRating] = useState(0)
   const [hoveredRating, setHoveredRating] = useState(0)
@@ -44,7 +46,8 @@ export function RatingModal({
     try {
       await axios.post(`/api/tickets/${ticketId}/rating`, {
         rating,
-        comment: comment.trim() || null
+        comment: comment.trim() || null,
+        userId: userId // Enviando userId temporariamente
       })
       
       toast.success('Obrigado pela sua avaliação!')

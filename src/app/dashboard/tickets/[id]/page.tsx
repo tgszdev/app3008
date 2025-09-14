@@ -1091,6 +1091,7 @@ export default function TicketDetailsPage() {
           ticketId={ticket.id}
           ticketNumber={ticket.ticket_number.toString()}
           ticketTitle={ticket.title}
+          userId={session?.user?.id}
         />
       )}
     </div>
