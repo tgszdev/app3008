@@ -13,6 +13,8 @@ import { getAttachmentUrl, isImageFile } from '@/lib/storage-utils'
 import { SimplePrintButton as PrintButton } from '@/components/SimplePrintButton'
 import ImageModal from '@/components/ImageModal'
 import { usePermissions } from '@/hooks/usePermissions'
+import { TicketRating } from '@/components/tickets/TicketRating'
+import { RatingModal } from '@/components/tickets/RatingModal'
 
 interface User {
   id: string
@@ -106,6 +108,7 @@ export default function TicketDetailsPage() {
   const [showReactivateModal, setShowReactivateModal] = useState(false)
   const [reactivateReason, setReactivateReason] = useState('')
   const [selectedImage, setSelectedImage] = useState<{url: string, name: string, size?: number, type?: string} | null>(null)
+  const [showRatingModal, setShowRatingModal] = useState(false)
   
   // Hook de permissões
   const { hasPermission, loading: permissionsLoading, permissions } = usePermissions()
@@ -296,6 +299,14 @@ export default function TicketDetailsPage() {
       
       toast.success('Status atualizado com sucesso!')
       setEditingStatus(false)
+      
+      // Se o status mudou para resolvido, mostrar modal de avaliação
+      if (newStatus === 'resolved' && ticket?.created_by_user?.id === session?.user?.id) {
+        setTimeout(() => {
+          setShowRatingModal(true)
+        }, 1000)
+      }
+      
       fetchTicket()
     } catch (error: any) {
       console.error('Erro ao atualizar status:', error)
@@ -966,6 +977,20 @@ export default function TicketDetailsPage() {
               )}
             </div>
           </div>
+
+          {/* Rating Component - Show only for resolved tickets and ticket creator */}
+          {ticket.status === 'resolved' && ticket.created_by_user?.id === session?.user?.id && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <TicketRating
+                ticketId={ticket.id}
+                ticketNumber={ticket.ticket_number.toString()}
+                currentUserId={session.user.id}
+                onRatingSubmitted={() => {
+                  toast.success('Obrigado pela sua avaliação!')
+                }}
+              />
+            </div>
+          )}
         </div>
       </div>
 
@@ -1055,6 +1080,17 @@ export default function TicketDetailsPage() {
           fileName={selectedImage.name}
           fileSize={selectedImage.size}
           fileType={selectedImage.type}
+        />
+      )}
+
+      {/* Rating Modal */}
+      {ticket && (
+        <RatingModal
+          isOpen={showRatingModal}
+          onClose={() => setShowRatingModal(false)}
+          ticketId={ticket.id}
+          ticketNumber={ticket.ticket_number.toString()}
+          ticketTitle={ticket.title}
         />
       )}
     </div>
