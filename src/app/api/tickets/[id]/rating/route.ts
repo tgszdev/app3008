@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase-admin'
+import { createClient } from '@supabase/supabase-js'
+
+// Criar cliente Supabase diretamente
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+const supabaseAdmin = createClient(supabaseUrl, supabaseAnonKey)
 
 export async function GET(
   request: NextRequest,
@@ -49,6 +55,8 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
+    console.log('Rating API called for ticket:', params.id)
+    
     // TODO: Adicionar autenticação adequada
     // const session = await getServerSession(authOptions)
     // if (!session) {
@@ -58,6 +66,8 @@ export async function POST(
     const ticketId = params.id
     const body = await request.json()
     const { rating, comment, userId } = body // Temporariamente recebendo userId do frontend
+    
+    console.log('Rating data received:', { ticketId, rating, comment, userId })
 
     // Validate rating
     if (!rating || rating < 1 || rating > 5) {
@@ -137,21 +147,26 @@ export async function POST(
     return NextResponse.json(result)
   } catch (error: any) {
     console.error('Error saving rating:', error)
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      details: error.details
+    })
     
     // Return success with mock data if table doesn't exist
     if (error.message?.includes('ticket_ratings') || error.code === '42P01') {
       return NextResponse.json({
         id: 'mock-id',
         ticket_id: params.id,
-        user_id: 'mock-user',
-        rating: 5,
-        comment: 'Mock rating - table not created yet',
+        user_id: userId || 'mock-user',
+        rating: body.rating || 5,
+        comment: body.comment || 'Mock rating - table not created yet',
         created_at: new Date().toISOString()
       })
     }
     
     return NextResponse.json(
-      { error: 'Erro ao salvar avaliação' },
+      { error: error.message || 'Erro ao salvar avaliação' },
       { status: 500 }
     )
   }
