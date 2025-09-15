@@ -1,9 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Star, TrendingUp, TrendingDown, Users, MessageSquare } from 'lucide-react'
+import { Star, TrendingUp, TrendingDown, Users, MessageSquare, ChevronRight, Eye } from 'lucide-react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import { SatisfactionModal } from './SatisfactionModal'
 
 interface SatisfactionData {
   averageRating: number
@@ -28,6 +29,7 @@ export function SatisfactionWidget() {
   const [data, setData] = useState<SatisfactionData | null>(null)
   const [loading, setLoading] = useState(true)
   const [period, setPeriod] = useState('month') // 'week', 'month', 'year'
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     fetchSatisfactionData()
@@ -97,31 +99,52 @@ export function SatisfactionWidget() {
   // Se não há avaliações, mostrar mensagem
   if (data.totalRatings === 0) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Satisfação do Cliente
-        </h3>
-        <div className="text-center py-8">
-          <Star className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-500 dark:text-gray-400 mb-2">
-            Nenhuma avaliação ainda
-          </p>
-          <p className="text-sm text-gray-400 dark:text-gray-500">
-            As avaliações aparecerão aqui quando os tickets forem resolvidos e avaliados pelos usuários.
-          </p>
+      <>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Satisfação do Cliente
+          </h3>
+          <div className="text-center py-8">
+            <Star className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <p className="text-gray-500 dark:text-gray-400 mb-2">
+              Nenhuma avaliação ainda
+            </p>
+            <p className="text-sm text-gray-400 dark:text-gray-500">
+              As avaliações aparecerão aqui quando os tickets forem resolvidos e avaliados pelos usuários.
+            </p>
+          </div>
         </div>
-      </div>
+        
+        {/* Modal */}
+        <SatisfactionModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          data={data}
+          period={period}
+        />
+      </>
     )
   }
 
   const satisfactionPercentage = (data.averageRating / 5) * 100
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative group">
+      {/* Indicador Clicável */}
+      <div 
+        className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+        onClick={() => setIsModalOpen(true)}
+      >
+        <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+      </div>
+      
       {/* Header */}
       <div className="flex justify-between items-start mb-6">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+        <div 
+          className="cursor-pointer"
+          onClick={() => setIsModalOpen(true)}
+        >
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
             Satisfação do Cliente
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -141,8 +164,11 @@ export function SatisfactionWidget() {
         </select>
       </div>
 
-      {/* Main Rating Display */}
-      <div className="flex items-center gap-6 mb-6">
+      {/* Main Rating Display - Clicável */}
+      <div 
+        className="flex items-center gap-6 mb-6 p-3 -m-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
+        onClick={() => setIsModalOpen(true)}
+      >
         <div>
           <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
             {data.averageRating.toFixed(1)}
@@ -244,15 +270,32 @@ export function SatisfactionWidget() {
         </div>
       )}
 
-      {/* Action Button */}
-      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+      {/* Action Buttons */}
+      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+        >
+          <Eye className="h-4 w-4" />
+          Ver Análise Completa
+        </button>
+        
         <button
           onClick={() => window.location.href = '/dashboard/reports'}
-          className="w-full text-center text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+          className="inline-flex items-center gap-1 text-sm text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
         >
-          Ver Relatório Completo →
+          Relatórios
+          <ChevronRight className="h-4 w-4" />
         </button>
       </div>
+      
+      {/* Modal */}
+      <SatisfactionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        data={data}
+        period={period}
+      />
     </div>
   )
 }
