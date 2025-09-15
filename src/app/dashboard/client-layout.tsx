@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import '@/styles/sidebar.css'
+import '@/styles/sticky-sidebar.css'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
@@ -17,15 +17,13 @@ import {
   LogOut,
   Moon,
   Sun,
-  ChevronDown,
-  ChevronUp,
+
   BarChart3,
   MessageSquare,
   FileText,
   Loader2,
   BookOpen,
-  ChevronLeft,
-  ChevronRight,
+
   Clock,
   Shield,
   TrendingUp,
@@ -44,7 +42,7 @@ import { cn } from '@/lib/utils'
 import NotificationBell from '@/components/notifications/NotificationBell'
 import { Tooltip } from '@/components/ui/tooltip'
 import { LucideIcon } from 'lucide-react'
-import { EnhancedSidebarSection } from '@/components/dashboard/EnhancedSidebar'
+import { StickySidebar } from '@/components/dashboard/StickySidebar'
 
 interface NavigationItem {
   name: string
@@ -111,21 +109,10 @@ export default function DashboardLayout({
   const router = useRouter()
   const { theme, setTheme } = useTheme()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  // Sidebar always collapsed in sticky mode
+  const sidebarCollapsed = true
   const [isLoggingOut, setIsLoggingOut] = useState(false)
-  const [collapsedSections, setCollapsedSections] = useState<string[]>([])
-  
-  // Toggle section collapse with localStorage persistence
-  const toggleSection = (sectionTitle: string) => {
-    setCollapsedSections(prev => {
-      const newState = prev.includes(sectionTitle) 
-        ? prev.filter(s => s !== sectionTitle)
-        : [...prev, sectionTitle]
-      
-      localStorage.setItem('collapsedSections', JSON.stringify(newState))
-      return newState
-    })
-  }
+  // Removed section collapse logic - now handled by StickySidebar
   
   // Proteção de sessão com notificações
   useProtectedSession({
@@ -137,29 +124,7 @@ export default function DashboardLayout({
   })
 
   
-  // Load sidebar and sections collapsed state from localStorage
-  useEffect(() => {
-    const savedSidebar = localStorage.getItem('sidebarCollapsed')
-    if (savedSidebar === 'true') {
-      setSidebarCollapsed(true)
-    }
-    
-    const savedSections = localStorage.getItem('collapsedSections')
-    if (savedSections) {
-      try {
-        setCollapsedSections(JSON.parse(savedSections))
-      } catch (e) {
-        console.error('Error parsing collapsed sections:', e)
-      }
-    }
-  }, [])
-  
-  // Save sidebar collapsed state to localStorage
-  const toggleSidebar = () => {
-    const newState = !sidebarCollapsed
-    setSidebarCollapsed(newState)
-    localStorage.setItem('sidebarCollapsed', newState.toString())
-  }
+  // Sidebar is always in sticky mode (64px wide)
 
   // Verificar autenticação
   useEffect(() => {
@@ -324,167 +289,78 @@ export default function DashboardLayout({
         </div>
       </div>
 
-      {/* Desktop sidebar */}
-      <div className={cn(
-        "hidden lg:fixed lg:inset-y-0 lg:flex lg:flex-col",
-        sidebarCollapsed ? "sidebar-collapsed-enhanced" : "lg:w-64 transition-all duration-300"
-      )}>
-        <div className="flex flex-1 flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
-          <div className={cn(
-            "flex h-16 items-center border-b border-gray-200 dark:border-gray-700",
-            sidebarCollapsed ? "justify-center px-2" : "justify-between px-4"
-          )}>
-            {sidebarCollapsed ? (
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
-                S
-              </div>
-            ) : (
-              <span className="text-xl font-semibold text-gray-900 dark:text-white">
-                Sistema de Suporte
-              </span>
-            )}
-            {!sidebarCollapsed && (
-              <button
-                onClick={toggleSidebar}
-                className="p-1.5 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                title="Recolher menu"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-            )}
+      {/* Desktop sidebar - Sticky Mode (Always 64px) */}
+      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:flex-col lg:w-16 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+        <div className="flex flex-1 flex-col">
+          {/* Logo/Brand */}
+          <div className="flex h-16 items-center justify-center border-b border-gray-200 dark:border-gray-700">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg">
+              S
+            </div>
           </div>
           
-          {/* Toggle button when collapsed */}
-          {sidebarCollapsed && (
-            <div className="px-2 py-2 border-b border-gray-200 dark:border-gray-700">
-              <button
-                onClick={toggleSidebar}
-                className="w-full p-1.5 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                title="Expandir menu"
-              >
-                <ChevronRight className="h-5 w-5 mx-auto" />
-              </button>
-            </div>
-          )}
-          <nav className="flex-1 space-y-2 px-2 py-4 overflow-y-auto">
+          <nav className="flex-1 overflow-y-auto">
             {/* Dashboard Link */}
-            <Link
-              href="/dashboard"
-              data-sidebar-tooltip="Dashboard"
-              className={cn(
-                "sidebar-item flex items-center text-sm font-medium rounded-lg transition-all duration-200 mb-3",
-                pathname === '/dashboard'
-                  ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
-                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700",
-                sidebarCollapsed ? "justify-center px-2.5 py-2.5" : "px-3 py-2"
-              )}
-            >
-              <Home className={cn(
-                "flex-shrink-0",
-                sidebarCollapsed ? "h-5 w-5" : "h-5 w-5",
-                !sidebarCollapsed && "mr-3"
-              )} />
-              <span className={cn("sidebar-label")}>Dashboard</span>
-            </Link>
+            <div className="px-2 pt-4 pb-2">
+              <Link
+                href="/dashboard"
+                className={cn(
+                  "flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200",
+                  pathname === '/dashboard'
+                    ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                )}
+                title="Dashboard"
+              >
+                <Home className="h-5 w-5" />
+              </Link>
+            </div>
             
-            <div className="sidebar-section-divider" />
+            <div className="mx-4 h-px bg-gray-200 dark:bg-gray-700" />
             
-            {/* Navigation Sections with Enhanced Design */}
-            {navigationSections.map((section) => (
-              <EnhancedSidebarSection
-                key={section.title}
-                section={section}
-                isAdmin={isAdmin}
-                pathname={pathname}
-                sidebarCollapsed={sidebarCollapsed}
-                isSectionCollapsed={collapsedSections.includes(section.title)}
-                onToggleSection={() => toggleSection(section.title)}
-              />
-            ))}
+            {/* Sticky Sections */}
+            <StickySidebar sections={navigationSections} isAdmin={isAdmin} />
           </nav>
           
-          {/* User section at bottom of sidebar */}
-          <div className="border-t border-gray-200 dark:border-gray-700 p-3 space-y-2">
-            {sidebarCollapsed ? (
-              <>
-                <Tooltip 
-                  content={`${session?.user?.name} (${userRole === 'admin' ? 'Admin' : userRole === 'agent' ? 'Agente' : 'Usuário'})`} 
-                  side="right"
-                >
-                  <div className="flex items-center justify-center rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer">
-                    <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
-                      {session?.user?.name?.charAt(0).toUpperCase()}
-                    </div>
-                  </div>
-                </Tooltip>
-                <Tooltip content="Sair" side="right">
-                  <button
-                    onClick={async () => {
-                      setIsLoggingOut(true)
-                      try {
-                        await signOut({ callbackUrl: '/login' })
-                      } catch (error) {
-                        console.error('Erro ao fazer logout:', error)
-                        window.location.href = '/login'
-                      }
-                    }}
-                    className="w-full flex items-center justify-center p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-                    disabled={isLoggingOut}
-                  >
-                    {isLoggingOut ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      <LogOut className="h-5 w-5" />
-                    )}
-                  </button>
-                </Tooltip>
-              </>
-            ) : (
-              <div className="space-y-2">
-                <div className="flex items-center rounded-lg p-2 bg-gray-50 dark:bg-gray-700/50">
-                  <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white flex-shrink-0">
-                    {session?.user?.name?.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="ml-3 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                      {session?.user?.name}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                      {session?.user?.email}
-                    </p>
-                  </div>
+          {/* User section at bottom of sidebar - Sticky Mode */}
+          <div className="border-t border-gray-200 dark:border-gray-700 p-2 space-y-2">
+            <Tooltip 
+              content={`${session?.user?.name} (${userRole === 'admin' ? 'Admin' : userRole === 'agent' ? 'Agente' : 'Usuário'})`} 
+              side="right"
+            >
+              <div className="flex items-center justify-center rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer">
+                <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                  {session?.user?.name?.charAt(0).toUpperCase()}
                 </div>
-                <button
-                  onClick={async () => {
-                    setIsLoggingOut(true)
-                    try {
-                      await signOut({ callbackUrl: '/login' })
-                    } catch (error) {
-                      console.error('Erro ao fazer logout:', error)
-                      window.location.href = '/login'
-                    }
-                  }}
-                  className="w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-                  disabled={isLoggingOut}
-                >
-                  {isLoggingOut ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <LogOut className="mr-2 h-4 w-4" />
-                  )}
-                  <span>{isLoggingOut ? 'Saindo...' : 'Sair'}</span>
-                </button>
               </div>
-            )}
+            </Tooltip>
+            <Tooltip content="Sair" side="right">
+              <button
+                onClick={async () => {
+                  setIsLoggingOut(true)
+                  try {
+                    await signOut({ callbackUrl: '/login' })
+                  } catch (error) {
+                    console.error('Erro ao fazer logout:', error)
+                    window.location.href = '/login'
+                  }
+                }}
+                className="w-full flex items-center justify-center p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                disabled={isLoggingOut}
+              >
+                {isLoggingOut ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <LogOut className="h-5 w-5" />
+                )}
+              </button>
+            </Tooltip>
           </div>
         </div>
       </div>
 
-      {/* Main content */}
-      <div className={cn(
-        "min-h-screen transition-all duration-300",
-        sidebarCollapsed ? "lg:ml-[64px]" : "lg:ml-64"
-      )}>
+      {/* Main content - Always 64px margin for sticky sidebar */}
+      <div className="min-h-screen lg:ml-16">
         {/* Top bar */}
         <div className="sticky top-0 z-30 flex h-16 items-center gap-x-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 sm:gap-x-6 sm:px-6 lg:px-8">
           <button

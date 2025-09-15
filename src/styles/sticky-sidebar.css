@@ -1,0 +1,77 @@
+/* Sticky Sidebar Styles */
+
+/* Animation for floating menu */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Floating menu animation */
+.animate-in {
+  animation: slideIn 200ms ease-out;
+}
+
+/* Smooth fade transitions */
+.fade-in-0 {
+  animation-duration: 200ms;
+}
+
+.zoom-in-95 {
+  animation: zoomIn 200ms ease-out;
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Custom scrollbar for floating menu */
+.floating-menu-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.floating-menu-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.floating-menu-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+.dark .floating-menu-scrollbar::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+/* Active section glow effect */
+.section-button-active {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* Hover tooltip animation */
+@keyframes tooltipSlide {
+  from {
+    opacity: 0;
+    transform: translateX(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.sidebar-tooltip {
+  animation: tooltipSlide 150ms ease-out;
+}
