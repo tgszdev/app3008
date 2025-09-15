@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -28,9 +29,15 @@ interface StickySidebarProps {
 export function StickySidebar({ sections, isAdmin }: StickySidebarProps) {
   const [activeSection, setActiveSection] = useState<string | null>(null)
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 })
+  const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
   const menuRef = useRef<HTMLDivElement>(null)
   const sidebarRef = useRef<HTMLDivElement>(null)
+  
+  // Mount check for portal
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Color mapping for sections
   const getSectionColor = (title: string) => {
@@ -80,9 +87,20 @@ export function StickySidebar({ sections, isAdmin }: StickySidebarProps) {
     } else {
       const button = event.currentTarget
       const rect = button.getBoundingClientRect()
+      
+      // Calculate position to avoid overflow
+      const menuHeight = 400 // Estimated max height
+      const viewportHeight = window.innerHeight
+      let topPosition = rect.top
+      
+      // If menu would go below viewport, position it higher
+      if (topPosition + menuHeight > viewportHeight) {
+        topPosition = Math.max(10, viewportHeight - menuHeight - 20)
+      }
+      
       setMenuPosition({
-        top: rect.top,
-        left: rect.right + 8 // 8px gap from sidebar
+        top: topPosition,
+        left: rect.right + 12 // 12px gap from sidebar for better spacing
       })
       setActiveSection(section.title)
     }
@@ -177,19 +195,19 @@ export function StickySidebar({ sections, isAdmin }: StickySidebarProps) {
         })}
       </div>
 
-      {/* Floating Submenu */}
-      {activeSection && (
+      {/* Floating Submenu - Rendered as Portal */}
+      {mounted && activeSection && createPortal(
         <div
           ref={menuRef}
           className={cn(
-            "fixed z-50 min-w-[200px] max-w-[280px] rounded-lg shadow-2xl",
+            "fixed z-[9999] min-w-[220px] max-w-[300px] rounded-lg shadow-2xl",
             "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700",
-            "animate-in fade-in-0 zoom-in-95 duration-200"
+            "animate-in fade-in-0 zoom-in-95 duration-200 floating-menu-scrollbar"
           )}
           style={{
             top: `${menuPosition.top}px`,
             left: `${menuPosition.left}px`,
-            maxHeight: 'calc(100vh - 100px)',
+            maxHeight: 'calc(100vh - 120px)',
             overflowY: 'auto'
           }}
         >
@@ -246,7 +264,8 @@ export function StickySidebar({ sections, isAdmin }: StickySidebarProps) {
               </div>
             )
           })}
-        </div>
+        </div>,
+        document.body
       )}
     </>
   )

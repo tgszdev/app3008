@@ -1,5 +1,11 @@
 /* Sticky Sidebar Styles */
 
+/* Ensure floating menu is above everything */
+.floating-menu {
+  z-index: 9999 !important;
+  position: fixed !important;
+}
+
 /* Animation for floating menu */
 @keyframes slideIn {
   from {
