@@ -108,9 +108,7 @@ export default function DashboardLayout({
   const pathname = usePathname()
   const router = useRouter()
   const { theme, setTheme } = useTheme()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  // Sidebar always collapsed in sticky mode
-  const sidebarCollapsed = true
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   // Removed section collapse logic - now handled by StickySidebar
   
@@ -158,16 +156,16 @@ export default function DashboardLayout({
       {/* Mobile sidebar */}
       <div className={cn(
         "fixed inset-0 z-50 lg:hidden",
-        sidebarOpen ? "block" : "hidden"
+        mobileMenuOpen ? "block" : "hidden"
       )}>
-        <div className="fixed inset-0 bg-gray-900/80" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-gray-900/80" onClick={() => setMobileMenuOpen(false)} />
         <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white dark:bg-gray-800">
           <div className="flex h-16 items-center justify-between px-6">
             <span className="text-xl font-semibold text-gray-900 dark:text-white">
               Suporte
             </span>
             <button
-              onClick={() => setSidebarOpen(false)}
+              onClick={() => setMobileMenuOpen(false)}
               className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             >
               <X className="h-6 w-6" />
@@ -183,7 +181,7 @@ export default function DashboardLayout({
                   ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
                   : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
               )}
-              onClick={() => setSidebarOpen(false)}
+              onClick={() => setMobileMenuOpen(false)}
             >
               <Home className="mr-3 h-5 w-5" />
               Dashboard
@@ -194,13 +192,13 @@ export default function DashboardLayout({
               // Skip admin sections for non-admin users
               if (section.adminOnly && !isAdmin) return null
               
-              const isSectionCollapsed = collapsedSections.includes(section.title)
+              const isSectionCollapsed = false // Always expanded in mobile
               const SectionIcon = section.icon
               
               return (
                 <div key={section.title} className="space-y-1">
                   <button
-                    onClick={() => toggleSection(section.title)}
+                    onClick={() => {}} // No toggle in mobile
                     className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
                   >
                     <div className="flex items-center">
@@ -233,7 +231,7 @@ export default function DashboardLayout({
                                 ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
                                 : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                             )}
-                            onClick={() => setSidebarOpen(false)}
+                            onClick={() => setMobileMenuOpen(false)}
                           >
                             <Icon className="mr-3 h-5 w-5" />
                             {item.name}
@@ -266,7 +264,7 @@ export default function DashboardLayout({
               <button
                 onClick={async () => {
                   setIsLoggingOut(true)
-                  setSidebarOpen(false)
+                  setMobileMenuOpen(false)
                   try {
                     await signOut({ callbackUrl: '/login' })
                   } catch (error) {
@@ -364,7 +362,7 @@ export default function DashboardLayout({
         {/* Top bar */}
         <div className="sticky top-0 z-30 flex h-16 items-center gap-x-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 sm:gap-x-6 sm:px-6 lg:px-8">
           <button
-            onClick={() => setSidebarOpen(true)}
+            onClick={() => setMobileMenuOpen(true)}
             className="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
             <Menu className="h-6 w-6" />
