@@ -33,6 +33,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get current period ratings
+    // Use left join (without !inner) to include ratings even if ticket was deleted
     const { data: currentRatings, error: currentError } = await supabaseAdmin
       .from('ticket_ratings')
       .select(`
@@ -40,7 +41,8 @@ export async function GET(request: NextRequest) {
         rating,
         comment,
         created_at,
-        ticket:tickets!inner(
+        ticket_id,
+        ticket:tickets(
           ticket_number,
           created_at
         )
@@ -100,7 +102,7 @@ export async function GET(request: NextRequest) {
       .map(r => ({
         rating: r.rating,
         comment: r.comment,
-        ticketNumber: r.ticket.ticket_number,
+        ticketNumber: r.ticket?.ticket_number || `Ticket #${r.ticket_id?.substring(0, 8)}`,
         createdAt: r.created_at
       })) || []
 
