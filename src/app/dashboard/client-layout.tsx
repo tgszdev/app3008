@@ -35,6 +35,8 @@ import {
   Lock,
   Gauge,
   Star,
+  FolderOpen,
+  Folder as FolderIcon,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
@@ -46,26 +48,55 @@ interface NavigationItem {
   name: string
   href: string
   icon: LucideIcon
+  adminOnly?: boolean
 }
 
-const navigation: NavigationItem[] = [
-  { name: 'Dashboard', href: '/dashboard', icon: Home },
-  { name: 'Chamados', href: '/dashboard/tickets', icon: Ticket },
-  { name: 'Apontamentos', href: '/dashboard/timesheets', icon: Clock },
-  { name: 'Comentários', href: '/dashboard/comments', icon: MessageSquare },
-  { name: 'Satisfação', href: '/dashboard/satisfaction', icon: Star },
-  { name: 'Base de Conhecimento', href: '/dashboard/knowledge-base', icon: BookOpen },
-  { name: 'Relatórios', href: '/dashboard/reports', icon: FileText },
-  { name: 'Estatísticas', href: '/dashboard/analytics', icon: BarChart3 },
-]
+interface NavigationSection {
+  title: string
+  icon: LucideIcon
+  items: NavigationItem[]
+  adminOnly?: boolean
+}
 
-const adminNavigation: NavigationItem[] = [
-  { name: 'Aprovação de Horas', href: '/dashboard/timesheets/admin', icon: CheckCircle },
-  { name: 'Analytics de Horas', href: '/dashboard/timesheets/analytics', icon: PieChart },
-  { name: 'Usuários', href: '/dashboard/users', icon: Users },
-  { name: 'Permissões', href: '/dashboard/timesheets/permissions', icon: Lock },
-  { name: 'SLA', href: '/dashboard/sla', icon: Gauge },
-  { name: 'Configurações', href: '/dashboard/settings', icon: Settings },
+const navigationSections: NavigationSection[] = [
+  {
+    title: 'OPERAÇÕES',
+    icon: ClipboardList,
+    items: [
+      { name: 'Chamados', href: '/dashboard/tickets', icon: Ticket },
+      { name: 'Apontamentos', href: '/dashboard/timesheets', icon: Clock },
+      { name: 'Comentários', href: '/dashboard/comments', icon: MessageSquare },
+    ]
+  },
+  {
+    title: 'ANÁLISES',
+    icon: BarChart3,
+    items: [
+      { name: 'Estatísticas', href: '/dashboard/analytics', icon: BarChart3 },
+      { name: 'Analytics de Horas', href: '/dashboard/timesheets/analytics', icon: PieChart, adminOnly: true },
+      { name: 'Relatórios', href: '/dashboard/reports', icon: FileText },
+      { name: 'Satisfação', href: '/dashboard/satisfaction', icon: Star },
+    ]
+  },
+  {
+    title: 'RECURSOS',
+    icon: BookOpen,
+    items: [
+      { name: 'Base de Conhecimento', href: '/dashboard/knowledge-base', icon: BookOpen },
+    ]
+  },
+  {
+    title: 'ADMINISTRAÇÃO',
+    icon: Settings,
+    adminOnly: true,
+    items: [
+      { name: 'Aprovação de Horas', href: '/dashboard/timesheets/admin', icon: CheckCircle },
+      { name: 'Usuários', href: '/dashboard/users', icon: Users },
+      { name: 'Permissões', href: '/dashboard/timesheets/permissions', icon: Lock },
+      { name: 'SLA', href: '/dashboard/sla', icon: Gauge },
+      { name: 'Configurações', href: '/dashboard/settings', icon: Settings },
+    ]
+  }
 ]
 
 export default function DashboardLayout({
@@ -80,6 +111,19 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [collapsedSections, setCollapsedSections] = useState<string[]>([])
+  
+  // Toggle section collapse with localStorage persistence
+  const toggleSection = (sectionTitle: string) => {
+    setCollapsedSections(prev => {
+      const newState = prev.includes(sectionTitle) 
+        ? prev.filter(s => s !== sectionTitle)
+        : [...prev, sectionTitle]
+      
+      localStorage.setItem('collapsedSections', JSON.stringify(newState))
+      return newState
+    })
+  }
   
   // Proteção de sessão com notificações
   useProtectedSession({
@@ -91,11 +135,20 @@ export default function DashboardLayout({
   })
 
   
-  // Load sidebar collapsed state from localStorage
+  // Load sidebar and sections collapsed state from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('sidebarCollapsed')
-    if (saved === 'true') {
+    const savedSidebar = localStorage.getItem('sidebarCollapsed')
+    if (savedSidebar === 'true') {
       setSidebarCollapsed(true)
+    }
+    
+    const savedSections = localStorage.getItem('collapsedSections')
+    if (savedSections) {
+      try {
+        setCollapsedSections(JSON.parse(savedSections))
+      } catch (e) {
+        console.error('Error parsing collapsed sections:', e)
+      }
     }
   }, [])
   
@@ -118,7 +171,6 @@ export default function DashboardLayout({
 
   const userRole = (session?.user as any)?.role
   const isAdmin = userRole === 'admin'
-  const allNavigation = isAdmin ? [...navigation, ...adminNavigation] : navigation
 
   // Mostrar loading enquanto verifica autenticação
   if (status === 'loading') {
@@ -154,26 +206,76 @@ export default function DashboardLayout({
               <X className="h-6 w-6" />
             </button>
           </div>
-          <nav className="flex-1 space-y-1 px-3 py-4">
-            {allNavigation.map((item) => {
-              const Icon = item.icon
-              const isActive = pathname === item.href
+          <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto">
+            {/* Dashboard Link */}
+            <Link
+              href="/dashboard"
+              className={cn(
+                "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors mb-4",
+                pathname === '/dashboard'
+                  ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+              )}
+              onClick={() => setSidebarOpen(false)}
+            >
+              <Home className="mr-3 h-5 w-5" />
+              Dashboard
+            </Link>
+            
+            {/* Navigation Sections */}
+            {navigationSections.map((section) => {
+              // Skip admin sections for non-admin users
+              if (section.adminOnly && !isAdmin) return null
+              
+              const isSectionCollapsed = collapsedSections.includes(section.title)
+              const SectionIcon = section.icon
               
               return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors",
-                    isActive
-                      ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
-                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                <div key={section.title} className="space-y-1">
+                  <button
+                    onClick={() => toggleSection(section.title)}
+                    className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
+                  >
+                    <div className="flex items-center">
+                      <SectionIcon className="mr-2 h-4 w-4" />
+                      {section.title}
+                    </div>
+                    {isSectionCollapsed ? (
+                      <ChevronRight className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
+                  </button>
+                  
+                  {!isSectionCollapsed && (
+                    <div className="space-y-1 ml-2">
+                      {section.items.map((item) => {
+                        // Skip admin items for non-admin users
+                        if (item.adminOnly && !isAdmin) return null
+                        
+                        const Icon = item.icon
+                        const isActive = pathname === item.href
+                        
+                        return (
+                          <Link
+                            key={item.name}
+                            href={item.href}
+                            className={cn(
+                              "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors",
+                              isActive
+                                ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                                : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                            )}
+                            onClick={() => setSidebarOpen(false)}
+                          >
+                            <Icon className="mr-3 h-5 w-5" />
+                            {item.name}
+                          </Link>
+                        )
+                      })}
+                    </div>
                   )}
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <Icon className="mr-3 h-5 w-5" />
-                  {item.name}
-                </Link>
+                </div>
               )
             })}
           </nav>
@@ -262,42 +364,119 @@ export default function DashboardLayout({
               </button>
             </div>
           )}
-          <nav className="flex-1 space-y-1 px-3 py-4">
-            {allNavigation.map((item) => {
-              const Icon = item.icon
-              const isActive = pathname === item.href
+          <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto">
+            {/* Dashboard Link */}
+            {sidebarCollapsed ? (
+              <Tooltip content="Dashboard" side="right">
+                <Link
+                  href="/dashboard"
+                  className={cn(
+                    "flex items-center justify-center px-2.5 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 mb-4",
+                    pathname === '/dashboard'
+                      ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                  )}
+                >
+                  <Home className="h-5 w-5 flex-shrink-0" />
+                </Link>
+              </Tooltip>
+            ) : (
+              <Link
+                href="/dashboard"
+                className={cn(
+                  "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors mb-4",
+                  pathname === '/dashboard'
+                    ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                )}
+              >
+                <Home className="mr-3 h-5 w-5" />
+                <span className="truncate">Dashboard</span>
+              </Link>
+            )}
+            
+            {/* Navigation Sections */}
+            {navigationSections.map((section) => {
+              // Skip admin sections for non-admin users
+              if (section.adminOnly && !isAdmin) return null
+              
+              const isSectionCollapsed = collapsedSections.includes(section.title)
+              const SectionIcon = section.icon
               
               if (sidebarCollapsed) {
+                // Collapsed sidebar - show only icons with tooltip
                 return (
-                  <Tooltip key={item.name} content={item.name} side="right">
-                    <Link
-                      href={item.href}
-                      className={cn(
-                        "flex items-center justify-center px-2.5 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
-                        isActive
-                          ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
-                          : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                      )}
-                    >
-                      <Icon className="h-5 w-5 flex-shrink-0" />
-                    </Link>
-                  </Tooltip>
+                  <div key={section.title} className="space-y-1">
+                    {section.items.map((item) => {
+                      if (item.adminOnly && !isAdmin) return null
+                      
+                      const Icon = item.icon
+                      const isActive = pathname === item.href
+                      
+                      return (
+                        <Tooltip key={item.name} content={item.name} side="right">
+                          <Link
+                            href={item.href}
+                            className={cn(
+                              "flex items-center justify-center px-2.5 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
+                              isActive
+                                ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                                : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                            )}
+                          >
+                            <Icon className="h-5 w-5 flex-shrink-0" />
+                          </Link>
+                        </Tooltip>
+                      )
+                    })}
+                  </div>
                 )
               } else {
+                // Expanded sidebar - show sections with collapsible groups
                 return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={cn(
-                      "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors",
-                      isActive
-                        ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
-                        : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                  <div key={section.title} className="space-y-1">
+                    <button
+                      onClick={() => toggleSection(section.title)}
+                      className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
+                    >
+                      <div className="flex items-center">
+                        <SectionIcon className="mr-2 h-4 w-4" />
+                        {section.title}
+                      </div>
+                      {isSectionCollapsed ? (
+                        <ChevronRight className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
+                      )}
+                    </button>
+                    
+                    {!isSectionCollapsed && (
+                      <div className="space-y-1 ml-2">
+                        {section.items.map((item) => {
+                          if (item.adminOnly && !isAdmin) return null
+                          
+                          const Icon = item.icon
+                          const isActive = pathname === item.href
+                          
+                          return (
+                            <Link
+                              key={item.name}
+                              href={item.href}
+                              className={cn(
+                                "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors",
+                                isActive
+                                  ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                              )}
+                            >
+                              <Icon className="mr-3 h-5 w-5" />
+                              <span className="truncate">{item.name}</span>
+                            </Link>
+                          )
+                        })}
+                      </div>
                     )}
-                  >
-                    <Icon className="mr-3 h-5 w-5" />
-                    <span className="truncate">{item.name}</span>
-                  </Link>
+                  </div>
                 )
               }
             })}
