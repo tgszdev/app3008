@@ -34,6 +34,7 @@ import {
   PieChart,
   Lock,
   Gauge,
+  Star,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
@@ -52,6 +53,7 @@ const navigation: NavigationItem[] = [
   { name: 'Chamados', href: '/dashboard/tickets', icon: Ticket },
   { name: 'Apontamentos', href: '/dashboard/timesheets', icon: Clock },
   { name: 'Comentários', href: '/dashboard/comments', icon: MessageSquare },
+  { name: 'Satisfação', href: '/dashboard/satisfaction', icon: Star },
   { name: 'Base de Conhecimento', href: '/dashboard/knowledge-base', icon: BookOpen },
   { name: 'Relatórios', href: '/dashboard/reports', icon: FileText },
   { name: 'Estatísticas', href: '/dashboard/analytics', icon: BarChart3 },

@@ -33,7 +33,7 @@ import {
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import { getIcon } from '@/lib/icons'
-import { SatisfactionWidget } from '@/components/dashboard/SatisfactionWidget'
+
 
 interface Stats {
   totalTickets: number
@@ -830,15 +830,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Satisfaction Widget - NEW */}
-      <div className="grid gap-3 sm:gap-4 grid-cols-1 lg:grid-cols-3">
-        <div className="lg:col-span-1">
-          <SatisfactionWidget />
-        </div>
-        <div className="lg:col-span-2">
-          {/* This space can be used for other widgets in the future */}
-        </div>
-      </div>
+
 
       {/* Category Stats Grid - MOVED AFTER STATUS STATS */}
       {categoryStats && categoryStats.categorias.length > 0 && (
