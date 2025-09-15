@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import '@/styles/sidebar.css'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
@@ -43,6 +44,7 @@ import { cn } from '@/lib/utils'
 import NotificationBell from '@/components/notifications/NotificationBell'
 import { Tooltip } from '@/components/ui/tooltip'
 import { LucideIcon } from 'lucide-react'
+import { EnhancedSidebarSection } from '@/components/dashboard/EnhancedSidebar'
 
 interface NavigationItem {
   name: string
@@ -324,10 +326,10 @@ export default function DashboardLayout({
 
       {/* Desktop sidebar */}
       <div className={cn(
-        "hidden lg:fixed lg:inset-y-0 lg:flex lg:flex-col transition-all duration-300",
-        sidebarCollapsed ? "lg:w-16" : "lg:w-64"
+        "hidden lg:fixed lg:inset-y-0 lg:flex lg:flex-col",
+        sidebarCollapsed ? "sidebar-collapsed-enhanced" : "lg:w-64 transition-all duration-300"
       )}>
-        <div className="flex flex-1 flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+        <div className="flex flex-1 flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 relative">
           <div className={cn(
             "flex h-16 items-center border-b border-gray-200 dark:border-gray-700",
             sidebarCollapsed ? "justify-center px-2" : "justify-between px-4"
@@ -364,122 +366,37 @@ export default function DashboardLayout({
               </button>
             </div>
           )}
-          <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto">
+          <nav className="flex-1 space-y-2 px-2 py-4 overflow-y-auto">
             {/* Dashboard Link */}
-            {sidebarCollapsed ? (
-              <Tooltip content="Dashboard" side="right">
-                <Link
-                  href="/dashboard"
-                  className={cn(
-                    "flex items-center justify-center px-2.5 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 mb-4",
-                    pathname === '/dashboard'
-                      ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
-                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                  )}
-                >
-                  <Home className="h-5 w-5 flex-shrink-0" />
-                </Link>
-              </Tooltip>
-            ) : (
-              <Link
-                href="/dashboard"
-                className={cn(
-                  "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors mb-4",
-                  pathname === '/dashboard'
-                    ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
-                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                )}
-              >
-                <Home className="mr-3 h-5 w-5" />
-                <span className="truncate">Dashboard</span>
-              </Link>
-            )}
+            <Link
+              href="/dashboard"
+              data-sidebar-tooltip="Dashboard"
+              className={cn(
+                "sidebar-item flex items-center text-sm font-medium rounded-lg transition-all duration-200 mb-3",
+                pathname === '/dashboard'
+                  ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
+                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700",
+                sidebarCollapsed ? "justify-center px-2.5 py-2.5" : "px-3 py-2"
+              )}
+            >
+              <Home className={cn("h-5 w-5 flex-shrink-0", !sidebarCollapsed && "mr-3")} />
+              <span className={cn("sidebar-label", sidebarCollapsed && "hidden")}>Dashboard</span>
+            </Link>
             
-            {/* Navigation Sections */}
-            {navigationSections.map((section) => {
-              // Skip admin sections for non-admin users
-              if (section.adminOnly && !isAdmin) return null
-              
-              const isSectionCollapsed = collapsedSections.includes(section.title)
-              const SectionIcon = section.icon
-              
-              if (sidebarCollapsed) {
-                // Collapsed sidebar - show only icons with tooltip
-                return (
-                  <div key={section.title} className="space-y-1">
-                    {section.items.map((item) => {
-                      if (item.adminOnly && !isAdmin) return null
-                      
-                      const Icon = item.icon
-                      const isActive = pathname === item.href
-                      
-                      return (
-                        <Tooltip key={item.name} content={item.name} side="right">
-                          <Link
-                            href={item.href}
-                            className={cn(
-                              "flex items-center justify-center px-2.5 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
-                              isActive
-                                ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
-                                : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                            )}
-                          >
-                            <Icon className="h-5 w-5 flex-shrink-0" />
-                          </Link>
-                        </Tooltip>
-                      )
-                    })}
-                  </div>
-                )
-              } else {
-                // Expanded sidebar - show sections with collapsible groups
-                return (
-                  <div key={section.title} className="space-y-1">
-                    <button
-                      onClick={() => toggleSection(section.title)}
-                      className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
-                    >
-                      <div className="flex items-center">
-                        <SectionIcon className="mr-2 h-4 w-4" />
-                        {section.title}
-                      </div>
-                      {isSectionCollapsed ? (
-                        <ChevronRight className="h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4" />
-                      )}
-                    </button>
-                    
-                    {!isSectionCollapsed && (
-                      <div className="space-y-1 ml-2">
-                        {section.items.map((item) => {
-                          if (item.adminOnly && !isAdmin) return null
-                          
-                          const Icon = item.icon
-                          const isActive = pathname === item.href
-                          
-                          return (
-                            <Link
-                              key={item.name}
-                              href={item.href}
-                              className={cn(
-                                "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors",
-                                isActive
-                                  ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
-                                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                              )}
-                            >
-                              <Icon className="mr-3 h-5 w-5" />
-                              <span className="truncate">{item.name}</span>
-                            </Link>
-                          )
-                        })}
-                      </div>
-                    )}
-                  </div>
-                )
-              }
-            })}
+            <div className="sidebar-section-divider" />
+            
+            {/* Navigation Sections with Enhanced Design */}
+            {navigationSections.map((section) => (
+              <EnhancedSidebarSection
+                key={section.title}
+                section={section}
+                isAdmin={isAdmin}
+                pathname={pathname}
+                sidebarCollapsed={sidebarCollapsed}
+                isSectionCollapsed={collapsedSections.includes(section.title)}
+                onToggleSection={() => toggleSection(section.title)}
+              />
+            ))}
           </nav>
           
           {/* User section at bottom of sidebar */}
@@ -562,7 +479,7 @@ export default function DashboardLayout({
       {/* Main content */}
       <div className={cn(
         "transition-all duration-300",
-        sidebarCollapsed ? "lg:pl-16" : "lg:pl-64"
+        sidebarCollapsed ? "lg:pl-[64px]" : "lg:pl-64"
       )}>
         {/* Top bar */}
         <div className="sticky top-0 z-30 flex h-16 items-center gap-x-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 sm:gap-x-6 sm:px-6 lg:px-8">

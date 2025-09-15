@@ -1,0 +1,207 @@
+/* Sidebar Enhanced Styles - Hover Expansion + Color Categories + Tooltips */
+
+/* Base sidebar collapsed with hover expansion */
+.sidebar-collapsed-enhanced {
+  width: 64px !important;
+  transition: width 200ms ease;
+  position: relative;
+  z-index: 40;
+  overflow: visible;
+}
+
+.sidebar-collapsed-enhanced:hover {
+  width: 240px !important;
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+}
+
+.dark .sidebar-collapsed-enhanced:hover {
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Hide/Show labels based on hover state */
+.sidebar-collapsed-enhanced:not(:hover) .sidebar-label {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  transition: opacity 150ms ease;
+}
+
+.sidebar-collapsed-enhanced:hover .sidebar-label {
+  opacity: 1;
+  width: auto;
+  transition: opacity 300ms ease 100ms;
+}
+
+/* Section color coding */
+.sidebar-section-operations {
+  border-left: 3px solid #10B981;
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.05) 0%, transparent 100%);
+}
+
+.sidebar-section-analytics {
+  border-left: 3px solid #8B5CF6;
+  background: linear-gradient(90deg, rgba(139, 92, 246, 0.05) 0%, transparent 100%);
+}
+
+.sidebar-section-resources {
+  border-left: 3px solid #F59E0B;
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.05) 0%, transparent 100%);
+}
+
+.sidebar-section-admin {
+  border-left: 3px solid #EF4444;
+  background: linear-gradient(90deg, rgba(239, 68, 68, 0.05) 0%, transparent 100%);
+}
+
+/* Dark mode section colors */
+.dark .sidebar-section-operations {
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, transparent 100%);
+}
+
+.dark .sidebar-section-analytics {
+  background: linear-gradient(90deg, rgba(139, 92, 246, 0.1) 0%, transparent 100%);
+}
+
+.dark .sidebar-section-resources {
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.1) 0%, transparent 100%);
+}
+
+.dark .sidebar-section-admin {
+  background: linear-gradient(90deg, rgba(239, 68, 68, 0.1) 0%, transparent 100%);
+}
+
+/* Icon group indicators */
+.sidebar-icon-operations { color: #10B981; }
+.sidebar-icon-analytics { color: #8B5CF6; }
+.sidebar-icon-resources { color: #F59E0B; }
+.sidebar-icon-admin { color: #EF4444; }
+
+/* Enhanced Tooltips - Only visible when sidebar is collapsed and not hovering sidebar */
+.sidebar-collapsed-enhanced:not(:hover) [data-sidebar-tooltip] {
+  position: relative;
+}
+
+.sidebar-collapsed-enhanced:not(:hover) [data-sidebar-tooltip]:hover::after {
+  content: attr(data-sidebar-tooltip);
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: #1f2937;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 9999;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+  animation: tooltipFadeIn 150ms ease;
+}
+
+.sidebar-collapsed-enhanced:not(:hover) [data-sidebar-tooltip]:hover::before {
+  content: '';
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 6px 6px 6px 0;
+  border-color: transparent #1f2937 transparent transparent;
+  z-index: 9999;
+  animation: tooltipFadeIn 150ms ease;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+}
+
+/* Section headers styling */
+.sidebar-section-header {
+  transition: all 200ms ease;
+  position: relative;
+}
+
+.sidebar-collapsed-enhanced:not(:hover) .sidebar-section-header {
+  padding: 8px;
+  justify-content: center;
+}
+
+.sidebar-collapsed-enhanced:hover .sidebar-section-header {
+  padding: 8px 12px;
+  justify-content: space-between;
+}
+
+/* Items within sections */
+.sidebar-collapsed-enhanced:not(:hover) .sidebar-item {
+  justify-content: center;
+  padding: 10px;
+}
+
+.sidebar-collapsed-enhanced:hover .sidebar-item {
+  justify-content: flex-start;
+  padding: 8px 12px 8px 20px;
+}
+
+/* Section dividers */
+.sidebar-section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(156, 163, 175, 0.3), transparent);
+  margin: 8px 0;
+}
+
+.dark .sidebar-section-divider {
+  background: linear-gradient(90deg, transparent, rgba(75, 85, 99, 0.5), transparent);
+}
+
+/* Smooth transitions for all interactive elements */
+.sidebar-collapsed-enhanced * {
+  transition-property: padding, opacity, width, transform;
+  transition-duration: 200ms;
+  transition-timing-function: ease;
+}
+
+/* Prevent text selection during animation */
+.sidebar-collapsed-enhanced {
+  user-select: none;
+}
+
+/* Active item highlight with category color */
+.sidebar-section-operations .sidebar-item.active {
+  background: rgba(16, 185, 129, 0.1);
+  border-left: 3px solid #10B981;
+}
+
+.sidebar-section-analytics .sidebar-item.active {
+  background: rgba(139, 92, 246, 0.1);
+  border-left: 3px solid #8B5CF6;
+}
+
+.sidebar-section-resources .sidebar-item.active {
+  background: rgba(245, 158, 11, 0.1);
+  border-left: 3px solid #F59E0B;
+}
+
+.sidebar-section-admin .sidebar-item.active {
+  background: rgba(239, 68, 68, 0.1);
+  border-left: 3px solid #EF4444;
+}
+
+/* Mini labels for better recognition */
+.sidebar-mini-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.7;
+  margin-top: 2px;
+}
