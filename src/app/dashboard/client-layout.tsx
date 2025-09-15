@@ -17,7 +17,8 @@ import {
   LogOut,
   Moon,
   Sun,
-
+  ChevronDown,
+  ChevronRight,
   BarChart3,
   MessageSquare,
   FileText,
@@ -197,23 +198,12 @@ export default function DashboardLayout({
               
               return (
                 <div key={section.title} className="space-y-1">
-                  <button
-                    onClick={() => {}} // No toggle in mobile
-                    className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
-                  >
-                    <div className="flex items-center">
-                      <SectionIcon className="mr-2 h-4 w-4" />
-                      {section.title}
-                    </div>
-                    {isSectionCollapsed ? (
-                      <ChevronRight className="h-4 w-4" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4" />
-                    )}
-                  </button>
+                  <div className="w-full flex items-center px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <SectionIcon className="mr-2 h-4 w-4" />
+                    {section.title}
+                  </div>
                   
-                  {!isSectionCollapsed && (
-                    <div className="space-y-1 ml-2">
+                  <div className="space-y-1 ml-2">
                       {section.items.map((item) => {
                         // Skip admin items for non-admin users
                         if (item.adminOnly && !isAdmin) return null
@@ -239,7 +229,6 @@ export default function DashboardLayout({
                         )
                       })}
                     </div>
-                  )}
                 </div>
               )
             })}
