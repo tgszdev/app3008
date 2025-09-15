@@ -329,7 +329,7 @@ export default function DashboardLayout({
         "hidden lg:fixed lg:inset-y-0 lg:flex lg:flex-col",
         sidebarCollapsed ? "sidebar-collapsed-enhanced" : "lg:w-64 transition-all duration-300"
       )}>
-        <div className="flex flex-1 flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 relative">
+        <div className="flex flex-1 flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
           <div className={cn(
             "flex h-16 items-center border-b border-gray-200 dark:border-gray-700",
             sidebarCollapsed ? "justify-center px-2" : "justify-between px-4"
@@ -379,8 +379,12 @@ export default function DashboardLayout({
                 sidebarCollapsed ? "justify-center px-2.5 py-2.5" : "px-3 py-2"
               )}
             >
-              <Home className={cn("h-5 w-5 flex-shrink-0", !sidebarCollapsed && "mr-3")} />
-              <span className={cn("sidebar-label", sidebarCollapsed && "hidden")}>Dashboard</span>
+              <Home className={cn(
+                "flex-shrink-0",
+                sidebarCollapsed ? "h-5 w-5" : "h-5 w-5",
+                !sidebarCollapsed && "mr-3"
+              )} />
+              <span className={cn("sidebar-label")}>Dashboard</span>
             </Link>
             
             <div className="sidebar-section-divider" />
@@ -478,8 +482,8 @@ export default function DashboardLayout({
 
       {/* Main content */}
       <div className={cn(
-        "transition-all duration-300",
-        sidebarCollapsed ? "lg:pl-[64px]" : "lg:pl-64"
+        "min-h-screen transition-all duration-300",
+        sidebarCollapsed ? "lg:ml-[64px]" : "lg:ml-64"
       )}>
         {/* Top bar */}
         <div className="sticky top-0 z-30 flex h-16 items-center gap-x-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 sm:gap-x-6 sm:px-6 lg:px-8">

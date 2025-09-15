@@ -4,14 +4,14 @@
 .sidebar-collapsed-enhanced {
   width: 64px !important;
   transition: width 200ms ease;
-  position: relative;
-  z-index: 40;
+  z-index: 30;
   overflow: visible;
 }
 
 .sidebar-collapsed-enhanced:hover {
   width: 256px !important;
-  box-shadow: 6px 0 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 8px 0 24px rgba(0, 0, 0, 0.15);
+  z-index: 50;
 }
 
 .dark .sidebar-collapsed-enhanced:hover {
@@ -44,25 +44,29 @@
 .sidebar-section-operations {
   border-left: 3px solid #10B981;
   background: linear-gradient(90deg, rgba(16, 185, 129, 0.08) 0%, transparent 100%);
-  margin-left: 2px;
+  margin: 0 2px;
+  padding: 2px;
 }
 
 .sidebar-section-analytics {
   border-left: 3px solid #8B5CF6;
   background: linear-gradient(90deg, rgba(139, 92, 246, 0.08) 0%, transparent 100%);
-  margin-left: 2px;
+  margin: 0 2px;
+  padding: 2px;
 }
 
 .sidebar-section-resources {
   border-left: 3px solid #F59E0B;
   background: linear-gradient(90deg, rgba(245, 158, 11, 0.08) 0%, transparent 100%);
-  margin-left: 2px;
+  margin: 0 2px;
+  padding: 2px;
 }
 
 .sidebar-section-admin {
   border-left: 3px solid #EF4444;
   background: linear-gradient(90deg, rgba(239, 68, 68, 0.08) 0%, transparent 100%);
-  margin-left: 2px;
+  margin: 0 2px;
+  padding: 2px;
 }
 
 /* Dark mode section colors */
@@ -179,6 +183,24 @@
 
 .dark .sidebar-section-divider {
   background: linear-gradient(90deg, transparent, rgba(75, 85, 99, 0.5), transparent);
+}
+
+/* Ensure sidebar stays above content but below modals */
+.sidebar-collapsed-enhanced {
+  background: white;
+}
+
+.dark .sidebar-collapsed-enhanced {
+  background: rgb(31, 41, 55);
+}
+
+/* Add background to expanded state */
+.sidebar-collapsed-enhanced:hover {
+  background: white;
+}
+
+.dark .sidebar-collapsed-enhanced:hover {
+  background: rgb(31, 41, 55);
 }
 
 /* Smooth transitions for all interactive elements */
