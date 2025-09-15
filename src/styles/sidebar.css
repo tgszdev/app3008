@@ -10,47 +10,59 @@
 }
 
 .sidebar-collapsed-enhanced:hover {
-  width: 240px !important;
-  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+  width: 256px !important;
+  box-shadow: 6px 0 16px rgba(0, 0, 0, 0.15);
 }
 
 .dark .sidebar-collapsed-enhanced:hover {
-  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 6px 0 16px rgba(0, 0, 0, 0.4);
 }
 
 /* Hide/Show labels based on hover state */
 .sidebar-collapsed-enhanced:not(:hover) .sidebar-label {
-  opacity: 0;
-  width: 0;
-  overflow: hidden;
-  transition: opacity 150ms ease;
+  display: none;
 }
 
 .sidebar-collapsed-enhanced:hover .sidebar-label {
+  display: inline;
   opacity: 1;
-  width: auto;
-  transition: opacity 300ms ease 100ms;
+  animation: fadeIn 300ms ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* Section color coding */
 .sidebar-section-operations {
   border-left: 3px solid #10B981;
-  background: linear-gradient(90deg, rgba(16, 185, 129, 0.05) 0%, transparent 100%);
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.08) 0%, transparent 100%);
+  margin-left: 2px;
 }
 
 .sidebar-section-analytics {
   border-left: 3px solid #8B5CF6;
-  background: linear-gradient(90deg, rgba(139, 92, 246, 0.05) 0%, transparent 100%);
+  background: linear-gradient(90deg, rgba(139, 92, 246, 0.08) 0%, transparent 100%);
+  margin-left: 2px;
 }
 
 .sidebar-section-resources {
   border-left: 3px solid #F59E0B;
-  background: linear-gradient(90deg, rgba(245, 158, 11, 0.05) 0%, transparent 100%);
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.08) 0%, transparent 100%);
+  margin-left: 2px;
 }
 
 .sidebar-section-admin {
   border-left: 3px solid #EF4444;
-  background: linear-gradient(90deg, rgba(239, 68, 68, 0.05) 0%, transparent 100%);
+  background: linear-gradient(90deg, rgba(239, 68, 68, 0.08) 0%, transparent 100%);
+  margin-left: 2px;
 }
 
 /* Dark mode section colors */
@@ -70,11 +82,16 @@
   background: linear-gradient(90deg, rgba(239, 68, 68, 0.1) 0%, transparent 100%);
 }
 
-/* Icon group indicators */
-.sidebar-icon-operations { color: #10B981; }
-.sidebar-icon-analytics { color: #8B5CF6; }
-.sidebar-icon-resources { color: #F59E0B; }
-.sidebar-icon-admin { color: #EF4444; }
+/* Icon group indicators with better visibility */
+.sidebar-icon-operations { color: #10B981 !important; }
+.sidebar-icon-analytics { color: #8B5CF6 !important; }
+.sidebar-icon-resources { color: #F59E0B !important; }
+.sidebar-icon-admin { color: #EF4444 !important; }
+
+.dark .sidebar-icon-operations { color: #34D399 !important; }
+.dark .sidebar-icon-analytics { color: #A78BFA !important; }
+.dark .sidebar-icon-resources { color: #FBB6CE !important; }
+.dark .sidebar-icon-admin { color: #F87171 !important; }
 
 /* Enhanced Tooltips - Only visible when sidebar is collapsed and not hovering sidebar */
 .sidebar-collapsed-enhanced:not(:hover) [data-sidebar-tooltip] {
@@ -178,23 +195,43 @@
 
 /* Active item highlight with category color */
 .sidebar-section-operations .sidebar-item.active {
-  background: rgba(16, 185, 129, 0.1);
+  background: rgba(16, 185, 129, 0.15) !important;
   border-left: 3px solid #10B981;
+  color: #10B981 !important;
 }
 
 .sidebar-section-analytics .sidebar-item.active {
-  background: rgba(139, 92, 246, 0.1);
+  background: rgba(139, 92, 246, 0.15) !important;
   border-left: 3px solid #8B5CF6;
+  color: #8B5CF6 !important;
 }
 
 .sidebar-section-resources .sidebar-item.active {
-  background: rgba(245, 158, 11, 0.1);
+  background: rgba(245, 158, 11, 0.15) !important;
   border-left: 3px solid #F59E0B;
+  color: #F59E0B !important;
 }
 
 .sidebar-section-admin .sidebar-item.active {
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(239, 68, 68, 0.15) !important;
   border-left: 3px solid #EF4444;
+  color: #EF4444 !important;
+}
+
+/* Hover effects for items */
+.sidebar-collapsed-enhanced .sidebar-item:hover {
+  transform: scale(1.05);
+  transition: transform 150ms ease;
+}
+
+/* Better icon visibility when collapsed */
+.sidebar-collapsed-enhanced:not(:hover) .sidebar-item {
+  padding: 10px 8px;
+}
+
+.sidebar-collapsed-enhanced:not(:hover) .sidebar-item svg {
+  width: 20px;
+  height: 20px;
 }
 
 /* Mini labels for better recognition */
