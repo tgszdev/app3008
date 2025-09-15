@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-// Criar cliente Supabase diretamente
+// IMPORTANTE: Usar Service Role Key para byppassar RLS
+// Esta é a forma SEGURA de acessar dados com RLS habilitado
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-const supabaseAdmin = createClient(supabaseUrl, supabaseAnonKey)
+// Tentar usar Service Role Key primeiro, fallback para Anon Key
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 
+                    process.env.SUPABASE_SERVICE_KEY || 
+                    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+const supabaseAdmin = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  }
+})
 
 export async function GET(
   request: NextRequest,
