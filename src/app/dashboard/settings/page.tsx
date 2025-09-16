@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
-import { BookOpen, Mail, Settings, Shield, Bell, Database, Folder, Clock, UserCog, ListOrdered } from 'lucide-react'
+import { BookOpen, Mail, Settings, Shield, Bell, Database, Folder, Clock, UserCog, List } from 'lucide-react'
 import SQLInstructionsModal from '@/components/SQLInstructionsModal'
 import ProfileCategorySettings from '@/components/ProfileCategorySettings'
 import EmailConfigModal from '@/components/EmailConfigModal'
@@ -297,7 +297,7 @@ export default function SettingsPage() {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
           <div className="flex items-start mb-4">
             <div className="p-2 bg-slate-100 dark:bg-slate-900/30 rounded-lg flex-shrink-0">
-              <ListOrdered className="h-6 w-6 text-slate-600 dark:text-slate-400" />
+              <List className="h-6 w-6 text-slate-600 dark:text-slate-400" />
             </div>
             <div className="ml-3">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
