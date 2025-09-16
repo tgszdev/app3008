@@ -12,6 +12,7 @@ import NotificationSettingsModal from '@/components/NotificationSettingsModal'
 import BackupRestoreModal from '@/components/BackupRestoreModal'
 import TimesheetPermissionsModalV2 from '@/components/TimesheetPermissionsModalV2'
 import RoleManagementModal from '@/components/RoleManagementModal'
+import StatusManagementModal from '@/components/StatusManagementModal'
 import toast from 'react-hot-toast'
 
 export default function SettingsPage() {
@@ -24,6 +25,7 @@ export default function SettingsPage() {
   const [backupModalOpen, setBackupModalOpen] = useState(false)
   const [timesheetPermissionsModalOpen, setTimesheetPermissionsModalOpen] = useState(false)
   const [roleManagementModalOpen, setRoleManagementModalOpen] = useState(false)
+  const [statusManagementModalOpen, setStatusManagementModalOpen] = useState(false)
   const [sqlModal, setSqlModal] = useState<{ isOpen: boolean; sql: string; instructions?: string[] }>({
     isOpen: false,
     sql: '',
@@ -143,6 +145,35 @@ export default function SettingsPage() {
           >
             <Settings className="h-5 w-5 mr-2" />
             Gerenciar Categorias
+          </button>
+        </div>
+
+        {/* Status Management Card */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
+          <div className="flex items-start mb-4">
+            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex-shrink-0">
+              <Clock className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+            </div>
+            <div className="ml-3">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Gerenciar Status
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Status dos chamados
+              </p>
+            </div>
+          </div>
+          
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-grow">
+            Configure os status disponíveis para os chamados do sistema
+          </p>
+          
+          <button
+            onClick={() => setStatusManagementModalOpen(true)}
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
+          >
+            <Settings className="h-5 w-5 mr-2" />
+            Gerenciar Status
           </button>
         </div>
 
@@ -333,6 +364,11 @@ export default function SettingsPage() {
       <RoleManagementModal
         isOpen={roleManagementModalOpen}
         onClose={() => setRoleManagementModalOpen(false)}
+      />
+
+      <StatusManagementModal
+        isOpen={statusManagementModalOpen}
+        onClose={() => setStatusManagementModalOpen(false)}
       />
 
       <SQLInstructionsModal
