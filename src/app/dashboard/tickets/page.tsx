@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { usePermissions } from '@/hooks/usePermissions'
+import { useStatuses } from '@/hooks/useStatuses'
 import {
   Plus,
   Search,
@@ -68,7 +69,8 @@ interface Ticket {
   due_date?: string
 }
 
-const statusConfig = {
+// Default status config for fallback
+const defaultStatusConfig = {
   open: {
     label: 'Aberto',
     color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
@@ -94,6 +96,28 @@ const statusConfig = {
     color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
     icon: XCircle,
   },
+}
+
+// Helper to get icon based on status characteristics
+const getStatusIcon = (status: any) => {
+  if (status?.is_final) return XCircle
+  if (status?.slug === 'resolved') return CheckCircle
+  if (status?.slug === 'in_progress') return Clock
+  return AlertCircle
+}
+
+// Helper to convert hex color to Tailwind classes for badges
+const getStatusBadgeColor = (hexColor: string) => {
+  const colorMap: { [key: string]: string } = {
+    '#2563eb': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+    '#eab308': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+    '#16a34a': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+    '#6b7280': 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
+    '#dc2626': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+    '#9333ea': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+    '#f59e0b': 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300'
+  }
+  return colorMap[hexColor?.toLowerCase()] || 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300'
 }
 
 const priorityConfig = {
@@ -128,6 +152,7 @@ export default function TicketsPage() {
   const router = useRouter()
   const { data: session } = useSession()
   const { hasPermission } = usePermissions()
+  const { statuses: availableStatuses } = useStatuses()
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -319,11 +344,11 @@ export default function TicketsPage() {
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">Todos os Status</option>
-              <option value="open">Aberto</option>
-              <option value="in_progress">Em Andamento</option>
-              <option value="resolved">Resolvido</option>
-              <option value="closed">Fechado</option>
-              <option value="cancelled">Cancelado</option>
+              {availableStatuses.map((status) => (
+                <option key={status.id} value={status.slug}>
+                  {status.name}
+                </option>
+              ))}
             </select>
 
             <select
@@ -430,7 +455,16 @@ export default function TicketsPage() {
           </div>
         ) : (
           filteredTickets.map((ticket) => {
-            const status = statusConfig[ticket.status]
+            // Get status configuration from dynamic statuses or fallback
+            const currentStatusData = availableStatuses.find(s => s.slug === ticket.status)
+            const status = currentStatusData 
+              ? {
+                  label: currentStatusData.name,
+                  color: getStatusBadgeColor(currentStatusData.color),
+                  icon: getStatusIcon(currentStatusData)
+                }
+              : defaultStatusConfig[ticket.status] || defaultStatusConfig.open
+            
             const priority = priorityConfig[ticket.priority]
             const StatusIcon = status.icon
 
@@ -584,7 +618,16 @@ export default function TicketsPage() {
                 </tr>
               ) : (
                 filteredTickets.map((ticket) => {
-                  const status = statusConfig[ticket.status]
+                  // Get status configuration from dynamic statuses or fallback
+                  const currentStatusData = availableStatuses.find(s => s.slug === ticket.status)
+                  const status = currentStatusData 
+                    ? {
+                        label: currentStatusData.name,
+                        color: getStatusBadgeColor(currentStatusData.color),
+                        icon: getStatusIcon(currentStatusData)
+                      }
+                    : defaultStatusConfig[ticket.status] || defaultStatusConfig.open
+                  
                   const priority = priorityConfig[ticket.priority]
                   const StatusIcon = status.icon
 

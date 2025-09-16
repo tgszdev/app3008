@@ -15,6 +15,7 @@ import ImageModal from '@/components/ImageModal'
 import { usePermissions } from '@/hooks/usePermissions'
 import { TicketRating } from '@/components/tickets/TicketRating'
 import { RatingModal } from '@/components/tickets/RatingModal'
+import { useStatuses } from '@/hooks/useStatuses'
 
 interface User {
   id: string
@@ -59,12 +60,36 @@ interface Ticket {
   comments?: Comment[]
 }
 
-const statusConfig = {
+// Default status config for fallback
+const defaultStatusConfig = {
   open: { label: 'Aberto', color: 'bg-blue-500', icon: AlertCircle },
   in_progress: { label: 'Em Progresso', color: 'bg-yellow-500', icon: Clock },
   resolved: { label: 'Resolvido', color: 'bg-green-500', icon: CheckCircle },
   closed: { label: 'Fechado', color: 'bg-gray-500', icon: XCircle },
   cancelled: { label: 'Cancelado', color: 'bg-red-500', icon: XCircle }
+}
+
+// Helper to get icon based on status characteristics
+const getStatusIcon = (status: any) => {
+  if (status?.is_final) return XCircle
+  if (status?.slug === 'resolved') return CheckCircle
+  if (status?.slug === 'in_progress') return Clock
+  return AlertCircle
+}
+
+// Helper to convert hex color to Tailwind bg class
+const getStatusColorClass = (hexColor: string) => {
+  // Map common colors to Tailwind classes
+  const colorMap: { [key: string]: string } = {
+    '#2563eb': 'bg-blue-500',
+    '#eab308': 'bg-yellow-500',
+    '#16a34a': 'bg-green-500',
+    '#6b7280': 'bg-gray-500',
+    '#dc2626': 'bg-red-500',
+    '#9333ea': 'bg-purple-500',
+    '#f59e0b': 'bg-amber-500'
+  }
+  return colorMap[hexColor?.toLowerCase()] || 'bg-gray-500'
 }
 
 const priorityConfig = {
@@ -90,6 +115,7 @@ export default function TicketDetailsPage() {
   const router = useRouter()
   const { data: session } = useSession()
   const ticketId = params?.id as string
+  const { statuses: availableStatuses } = useStatuses()
   
   const [ticket, setTicket] = useState<Ticket | null>(null)
   const [loading, setLoading] = useState(true)
@@ -477,7 +503,17 @@ export default function TicketDetailsPage() {
     )
   }
 
-  const StatusIcon = statusConfig[ticket.status].icon
+  // Get status configuration from dynamic statuses or fallback
+  const currentStatusData = availableStatuses.find(s => s.slug === ticket.status)
+  const statusConfig = currentStatusData 
+    ? {
+        label: currentStatusData.name,
+        color: getStatusColorClass(currentStatusData.color),
+        icon: getStatusIcon(currentStatusData)
+      }
+    : defaultStatusConfig[ticket.status] || defaultStatusConfig.open
+  
+  const StatusIcon = statusConfig.icon
   const PriorityIcon = priorityConfig[ticket.priority].icon
 
   return (
@@ -526,14 +562,21 @@ export default function TicketDetailsPage() {
                     onChange={(e) => setNewStatus(e.target.value)}
                     className="px-3 py-1 rounded-lg border dark:bg-gray-700"
                   >
-                    <option value="open">Aberto</option>
-                    <option value="in_progress">Em Progresso</option>
-                    <option value="resolved">Resolvido</option>
-                    <option value="closed">Fechado</option>
-                    {/* Cancelado apenas para quem tem permissão de deletar */}
-                    {canDeleteTickets && (
-                      <option value="cancelled">Cancelado</option>
-                    )}
+                    {availableStatuses.map((status) => {
+                      // Filter internal statuses for non-admin users
+                      if (status.is_internal && session?.user?.role !== 'admin') {
+                        return null
+                      }
+                      // Only admins can set cancelled status
+                      if (status.slug === 'cancelled' && !canDeleteTickets) {
+                        return null
+                      }
+                      return (
+                        <option key={status.id} value={status.slug}>
+                          {status.name}
+                        </option>
+                      )
+                    })}
                   </select>
                   <button
                     onClick={handleStatusUpdate}
@@ -562,7 +605,7 @@ export default function TicketDetailsPage() {
                       toast.error('Você não tem permissão para alterar o status deste ticket')
                     }
                   }}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white ${statusConfig[ticket.status].color} ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white ${statusConfig.color} ${
                     canEditThisTicket && 
                     (ticket.status !== 'cancelled' || canDeleteTickets) 
                       ? 'hover:opacity-90 cursor-pointer' 
@@ -571,7 +614,7 @@ export default function TicketDetailsPage() {
                   disabled={!canEditThisTicket}
                 >
                   <StatusIcon size={16} />
-                  {statusConfig[ticket.status].label}
+                  {statusConfig.label}
                 </button>
               )}
             </div>

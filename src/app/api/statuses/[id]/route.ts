@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { auth } from '@/lib/auth'
 
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+  return PATCH(request, { params })
+}
+
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await auth()
@@ -11,7 +15,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
     const body = await request.json()
     const updateData: any = {}
-    const allowed = ['name', 'slug', 'color', 'description', 'is_default', 'is_final', 'is_internal']
+    const allowed = ['name', 'slug', 'color', 'description', 'is_default', 'is_final', 'is_internal', 'order_index']
     for (const k of allowed) if (k in body) updateData[k] = body[k]
 
     // assegurar único default

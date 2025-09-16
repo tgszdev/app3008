@@ -10,7 +10,10 @@ import {
   Check,
   AlertCircle,
   Loader2,
-  Circle
+  Circle,
+  ChevronUp,
+  ChevronDown,
+  GripVertical
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -226,7 +229,48 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
     }
   }
 
-
+  const handleReorder = async (statusId: string, direction: 'up' | 'down') => {
+    const currentIndex = statuses.findIndex(s => s.id === statusId)
+    if (currentIndex === -1) return
+    
+    const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
+    if (newIndex < 0 || newIndex >= statuses.length) return
+    
+    // Create new array with swapped items
+    const newStatuses = [...statuses]
+    const temp = newStatuses[currentIndex]
+    newStatuses[currentIndex] = newStatuses[newIndex]
+    newStatuses[newIndex] = temp
+    
+    // Update order_index for both items
+    newStatuses[currentIndex].order_index = currentIndex + 1
+    newStatuses[newIndex].order_index = newIndex + 1
+    
+    setStatuses(newStatuses)
+    
+    // Update both statuses in the backend
+    try {
+      await Promise.all([
+        fetch(`/api/statuses/${newStatuses[currentIndex].id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ order_index: currentIndex + 1 })
+        }),
+        fetch(`/api/statuses/${newStatuses[newIndex].id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ order_index: newIndex + 1 })
+        })
+      ])
+      
+      toast.success('Ordem atualizada!')
+    } catch (error) {
+      toast.error('Erro ao atualizar ordem')
+      fetchStatuses() // Reload to get correct order
+    }
+  }
 
   if (!isOpen) return null
 
@@ -429,51 +473,84 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {statuses.map((status) => (
+                    {statuses.map((status, index) => (
                       <div
                         key={status.id}
                         className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
                       >
                         <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-3 mb-2">
-                              <div
-                                className="w-4 h-4 rounded-full border-2"
-                                style={{ 
-                                  backgroundColor: status.color,
-                                  borderColor: status.color 
-                                }}
-                              />
-                              <h5 className="text-lg font-medium text-gray-900 dark:text-white">
-                                {status.name}
-                              </h5>
-                              <span className="text-sm text-gray-500 dark:text-gray-400">
-                                ({status.slug})
-                              </span>
-                              <div className="flex space-x-2">
-                                {status.is_default && (
-                                  <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                                    Padrão
-                                  </span>
-                                )}
-                                {status.is_final && (
-                                  <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                                    Final
-                                  </span>
-                                )}
-                                {status.is_internal && (
-                                  <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400">
-                                    Interno
-                                  </span>
-                                )}
-                              </div>
+                          <div className="flex items-center space-x-3">
+                            {/* Reorder controls */}
+                            <div className="flex flex-col space-y-1">
+                              <button
+                                onClick={() => handleReorder(status.id, 'up')}
+                                disabled={index === 0}
+                                className={`p-1 rounded transition-colors ${
+                                  index === 0 
+                                    ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' 
+                                    : 'text-gray-600 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-600'
+                                }`}
+                                title="Mover para cima"
+                              >
+                                <ChevronUp className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => handleReorder(status.id, 'down')}
+                                disabled={index === statuses.length - 1}
+                                className={`p-1 rounded transition-colors ${
+                                  index === statuses.length - 1
+                                    ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                                    : 'text-gray-600 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-600'
+                                }`}
+                                title="Mover para baixo"
+                              >
+                                <ChevronDown className="h-4 w-4" />
+                              </button>
                             </div>
-                            {status.description && (
-                              <p className="text-sm text-gray-600 dark:text-gray-400">
-                                {status.description}
-                              </p>
-                            )}
+                            
+                            <GripVertical className="h-5 w-5 text-gray-400" />
+                            
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-3 mb-2">
+                                <div
+                                  className="w-4 h-4 rounded-full border-2"
+                                  style={{ 
+                                    backgroundColor: status.color,
+                                    borderColor: status.color 
+                                  }}
+                                />
+                                <h5 className="text-lg font-medium text-gray-900 dark:text-white">
+                                  {status.name}
+                                </h5>
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                  ({status.slug})
+                                </span>
+                                <div className="flex space-x-2">
+                                  {status.is_default && (
+                                    <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                                      Padrão
+                                    </span>
+                                  )}
+                                  {status.is_final && (
+                                    <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                                      Final
+                                    </span>
+                                  )}
+                                  {status.is_internal && (
+                                    <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400">
+                                      Interno
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              {status.description && (
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                  {status.description}
+                                </p>
+                              )}
+                            </div>
                           </div>
+                          
                           <div className="flex items-center space-x-2 ml-4">
                             <button
                               onClick={() => handleEdit(status)}
