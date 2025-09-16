@@ -13,8 +13,7 @@ import {
   Circle,
   ChevronUp,
   ChevronDown,
-  GripVertical,
-  MoreVertical
+  GripVertical
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -95,7 +94,6 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingStatus, setEditingStatus] = useState<Status | null>(null)
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -121,8 +119,10 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
       
       if (response.ok) {
         const data = await response.json()
+        // API retorna array direto, não um objeto com statuses
         setStatuses(Array.isArray(data) ? data : (data.statuses || []))
       } else {
+        // Use default statuses if API fails
         setStatuses(DEFAULT_STATUSES.map((s, index) => ({
           ...s,
           id: `default-${index}`
@@ -130,6 +130,7 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
       }
     } catch (error) {
       console.error('Error fetching statuses:', error)
+      // Use default statuses
       setStatuses(DEFAULT_STATUSES.map((s, index) => ({
         ...s,
         id: `default-${index}`
@@ -152,21 +153,25 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
     e.preventDefault()
     
     try {
-      const endpoint = editingStatus 
+      // Para API, não enviamos order_index no POST (é calculado no backend)
+      const statusData = editingStatus ? {
+        ...formData,
+        order_index: editingStatus.order_index
+      } : formData
+      
+      const url = editingStatus 
         ? `/api/statuses/${editingStatus.id}`
         : '/api/statuses'
       
-      const method = editingStatus ? 'PATCH' : 'POST'
-      
-      const response = await fetch(endpoint, {
-        method,
+      const response = await fetch(url, {
+        method: editingStatus ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify(formData),
+        body: JSON.stringify(statusData)
       })
-
+      
       if (!response.ok) {
         throw new Error('Erro ao salvar status')
       }
@@ -202,7 +207,6 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
       is_internal: status.is_internal
     })
     setShowForm(true)
-    setOpenMenuId(null)
   }
 
   const handleDelete = async (id: string) => {
@@ -220,7 +224,6 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
       
       toast.success('Status excluído!')
       fetchStatuses()
-      setOpenMenuId(null)
     } catch (error) {
       toast.error('Erro ao excluir status')
     }
@@ -233,16 +236,19 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
     const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
     if (newIndex < 0 || newIndex >= statuses.length) return
     
+    // Create new array with swapped items
     const newStatuses = [...statuses]
     const temp = newStatuses[currentIndex]
     newStatuses[currentIndex] = newStatuses[newIndex]
     newStatuses[newIndex] = temp
     
+    // Update order_index for both items
     newStatuses[currentIndex].order_index = currentIndex + 1
     newStatuses[newIndex].order_index = newIndex + 1
     
     setStatuses(newStatuses)
     
+    // Update both statuses in the backend
     try {
       await Promise.all([
         fetch(`/api/statuses/${newStatuses[currentIndex].id}`, {
@@ -262,7 +268,7 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
       toast.success('Ordem atualizada!')
     } catch (error) {
       toast.error('Erro ao atualizar ordem')
-      fetchStatuses()
+      fetchStatuses() // Reload to get correct order
     }
   }
 
@@ -276,39 +282,38 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
           onClick={() => !showForm && onClose()}
         />
         
-        <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full max-w-xs sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-2 sm:mx-0">
-          {/* Header - Responsivo */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-4 sm:px-6 py-3 sm:py-4">
+        <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2 sm:space-x-3">
-                <div className="bg-white/20 p-1.5 sm:p-2 rounded-lg">
-                  <Circle className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+              <div className="flex items-center space-x-3">
+                <div className="bg-white/20 p-2 rounded-lg">
+                  <Circle className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-white">
-                    Status
+                  <h3 className="text-xl font-semibold text-white">
+                    Gerenciar Status dos Chamados
                   </h3>
-                  <p className="text-blue-100 text-xs sm:text-sm hidden sm:block">
-                    Configure os status disponíveis
+                  <p className="text-blue-100 text-sm">
+                    Configure os status disponíveis para os chamados
                   </p>
                 </div>
               </div>
               <button
                 onClick={onClose}
-                className="text-white/80 hover:text-white transition-colors p-1"
+                className="text-white/80 hover:text-white transition-colors"
               >
-                <X className="h-5 w-5 sm:h-6 sm:w-6" />
+                <X className="h-6 w-6" />
               </button>
             </div>
           </div>
 
-          {/* Content - Responsivo */}
-          <div className="px-4 sm:px-6 py-4 max-h-[70vh] sm:max-h-[60vh] overflow-y-auto">
+          {/* Content */}
+          <div className="px-6 py-4 max-h-[60vh] overflow-y-auto">
             {showForm ? (
               <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Formulário em grid responsivo */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="col-span-1">
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Nome
                     </label>
@@ -323,12 +328,12 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                           slug: !editingStatus ? generateSlug(e.target.value) : formData.slug
                         })
                       }}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                       placeholder="Ex: Em Progresso"
                     />
                   </div>
 
-                  <div className="col-span-1">
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Slug
                     </label>
@@ -337,12 +342,12 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                       required
                       value={formData.slug}
                       onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                       placeholder="em-progresso"
                     />
                   </div>
 
-                  <div className="col-span-1">
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Cor
                     </label>
@@ -351,53 +356,53 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                         type="color"
                         value={formData.color}
                         onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                        className="h-10 w-16 sm:w-20 rounded cursor-pointer"
+                        className="h-10 w-20 rounded cursor-pointer"
                       />
                       <input
                         type="text"
                         value={formData.color}
                         onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                        className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       />
                     </div>
                   </div>
 
-                  <div className="col-span-1">
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Tipo de Status
                     </label>
                     <div className="space-y-2">
-                      <label className="flex items-start sm:items-center">
+                      <label className="flex items-center">
                         <input
                           type="checkbox"
                           checked={formData.is_default}
                           onChange={(e) => setFormData({ ...formData, is_default: e.target.checked })}
-                          className="mr-2 mt-1 sm:mt-0"
+                          className="mr-2"
                         />
-                        <span className="text-xs sm:text-sm">Status Padrão</span>
+                        <span className="text-sm">Status Padrão (inicial para novos chamados)</span>
                       </label>
-                      <label className="flex items-start sm:items-center">
+                      <label className="flex items-center">
                         <input
                           type="checkbox"
                           checked={formData.is_final}
                           onChange={(e) => setFormData({ ...formData, is_final: e.target.checked })}
-                          className="mr-2 mt-1 sm:mt-0"
+                          className="mr-2"
                         />
-                        <span className="text-xs sm:text-sm">Status Final</span>
+                        <span className="text-sm">Status Final (encerra o chamado)</span>
                       </label>
-                      <label className="flex items-start sm:items-center">
+                      <label className="flex items-center">
                         <input
                           type="checkbox"
                           checked={formData.is_internal}
                           onChange={(e) => setFormData({ ...formData, is_internal: e.target.checked })}
-                          className="mr-2 mt-1 sm:mt-0"
+                          className="mr-2"
                         />
-                        <span className="text-xs sm:text-sm">Status Interno</span>
+                        <span className="text-sm">Status Interno (visível apenas para agentes)</span>
                       </label>
                     </div>
                   </div>
 
-                  <div className="col-span-1 md:col-span-2">
+                  <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Descrição
                     </label>
@@ -405,14 +410,13 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       rows={3}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                       placeholder="Descrição do status..."
                     />
                   </div>
                 </div>
 
-                {/* Botões responsivos */}
-                <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-4">
+                <div className="flex justify-end space-x-3 pt-4">
                   <button
                     type="button"
                     onClick={() => {
@@ -428,13 +432,13 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                         is_internal: false
                       })
                     }}
-                    className="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm"
+                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
-                    className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center space-x-2 text-sm"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2"
                   >
                     <Save className="h-4 w-4" />
                     <span>{editingStatus ? 'Atualizar' : 'Criar'} Status</span>
@@ -443,17 +447,16 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
               </form>
             ) : (
               <>
-                {/* Header da lista responsivo */}
-                <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
-                  <h4 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">
-                    Status Cadastrados ({statuses.length})
+                <div className="mb-4 flex justify-between items-center">
+                  <h4 className="text-lg font-medium text-gray-900 dark:text-white">
+                    Status Cadastrados
                   </h4>
                   <button
                     onClick={() => setShowForm(true)}
-                    className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center sm:justify-start space-x-2 text-sm"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2"
                   >
                     <Plus className="h-4 w-4" />
-                    <span>Adicionar</span>
+                    <span>Adicionar Status</span>
                   </button>
                 </div>
 
@@ -464,120 +467,20 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                 ) : statuses.length === 0 ? (
                   <div className="text-center py-8">
                     <Circle className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-gray-500 dark:text-gray-400 text-sm">
+                    <p className="text-gray-500 dark:text-gray-400">
                       Nenhum status cadastrado
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-2 sm:space-y-3">
+                  <div className="space-y-3">
                     {statuses.map((status, index) => (
                       <div
                         key={status.id}
-                        className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 sm:p-4 border border-gray-200 dark:border-gray-600"
+                        className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
                       >
-                        {/* Mobile Layout */}
-                        <div className="flex flex-col sm:hidden space-y-3">
-                          <div className="flex items-start justify-between">
-                            <div className="flex items-center space-x-2 flex-1">
-                              <div
-                                className="w-4 h-4 rounded-full border-2 flex-shrink-0"
-                                style={{ 
-                                  backgroundColor: status.color,
-                                  borderColor: status.color 
-                                }}
-                              />
-                              <div className="flex-1">
-                                <h5 className="text-sm font-medium text-gray-900 dark:text-white">
-                                  {status.name}
-                                </h5>
-                                <span className="text-xs text-gray-500 dark:text-gray-400">
-                                  {status.slug}
-                                </span>
-                              </div>
-                            </div>
-                            
-                            {/* Mobile Menu */}
-                            <div className="relative">
-                              <button
-                                onClick={() => setOpenMenuId(openMenuId === status.id ? null : status.id)}
-                                className="p-1 text-gray-600 dark:text-gray-400"
-                              >
-                                <MoreVertical className="h-5 w-5" />
-                              </button>
-                              {openMenuId === status.id && (
-                                <div className="absolute right-0 top-8 z-10 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 w-40">
-                                  {index > 0 && (
-                                    <button
-                                      onClick={() => {
-                                        handleReorder(status.id, 'up')
-                                        setOpenMenuId(null)
-                                      }}
-                                      className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
-                                    >
-                                      <ChevronUp className="h-4 w-4" />
-                                      <span>Mover acima</span>
-                                    </button>
-                                  )}
-                                  {index < statuses.length - 1 && (
-                                    <button
-                                      onClick={() => {
-                                        handleReorder(status.id, 'down')
-                                        setOpenMenuId(null)
-                                      }}
-                                      className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
-                                    >
-                                      <ChevronDown className="h-4 w-4" />
-                                      <span>Mover abaixo</span>
-                                    </button>
-                                  )}
-                                  <button
-                                    onClick={() => handleEdit(status)}
-                                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
-                                  >
-                                    <Edit2 className="h-4 w-4" />
-                                    <span>Editar</span>
-                                  </button>
-                                  <button
-                                    onClick={() => handleDelete(status.id)}
-                                    className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                    <span>Excluir</span>
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          
-                          {/* Tags e descrição mobile */}
-                          <div className="flex flex-wrap gap-1">
-                            {status.is_default && (
-                              <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                                Padrão
-                              </span>
-                            )}
-                            {status.is_final && (
-                              <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                                Final
-                              </span>
-                            )}
-                            {status.is_internal && (
-                              <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400">
-                                Interno
-                              </span>
-                            )}
-                          </div>
-                          {status.description && (
-                            <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
-                              {status.description}
-                            </p>
-                          )}
-                        </div>
-
-                        {/* Desktop Layout */}
-                        <div className="hidden sm:flex items-start justify-between">
+                        <div className="flex items-start justify-between">
                           <div className="flex items-center space-x-3">
-                            {/* Reorder controls - Desktop */}
+                            {/* Reorder controls */}
                             <div className="flex flex-col space-y-1">
                               <button
                                 onClick={() => handleReorder(status.id, 'up')}
@@ -616,7 +519,7 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                                     borderColor: status.color 
                                   }}
                                 />
-                                <h5 className="text-base lg:text-lg font-medium text-gray-900 dark:text-white">
+                                <h5 className="text-lg font-medium text-gray-900 dark:text-white">
                                   {status.name}
                                 </h5>
                                 <span className="text-sm text-gray-500 dark:text-gray-400">
@@ -648,7 +551,6 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                             </div>
                           </div>
                           
-                          {/* Action buttons - Desktop */}
                           <div className="flex items-center space-x-2 ml-4">
                             <button
                               onClick={() => handleEdit(status)}
@@ -674,12 +576,12 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
             )}
           </div>
 
-          {/* Footer responsivo */}
+          {/* Footer */}
           {!showForm && (
-            <div className="bg-gray-50 dark:bg-gray-900 px-4 sm:px-6 py-3 border-t border-gray-200 dark:border-gray-700">
+            <div className="bg-gray-50 dark:bg-gray-900 px-6 py-3 border-t border-gray-200 dark:border-gray-700">
               <button
                 onClick={onClose}
-                className="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm"
+                className="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 Fechar
               </button>
