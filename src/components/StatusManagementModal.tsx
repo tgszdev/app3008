@@ -20,9 +20,12 @@ interface Status {
   slug: string
   color: string
   description: string
-  type: 'default' | 'final' | 'internal'
-  is_active: boolean
-  display_order: number
+  is_default: boolean
+  is_final: boolean
+  is_internal: boolean
+  order_index: number
+  created_at?: string
+  updated_at?: string
 }
 
 interface StatusManagementModalProps {
@@ -34,47 +37,52 @@ const DEFAULT_STATUSES: Omit<Status, 'id'>[] = [
   {
     name: 'Aberto',
     slug: 'aberto',
-    color: '#3B82F6',
+    color: '#2563eb',
     description: 'Chamado aberto/novo',
-    type: 'default',
-    is_active: true,
-    display_order: 1
+    is_default: true,
+    is_final: false,
+    is_internal: false,
+    order_index: 1
   },
   {
     name: 'Em Progresso',
     slug: 'em-progresso',
-    color: '#8B5CF6',
+    color: '#9333ea',
     description: 'Atendimento em andamento',
-    type: 'default',
-    is_active: true,
-    display_order: 2
+    is_default: false,
+    is_final: false,
+    is_internal: false,
+    order_index: 2
   },
   {
     name: 'Aguardando Cliente',
     slug: 'aguardando-cliente',
-    color: '#F59E0B',
+    color: '#f59e0b',
     description: 'Pausado aguardando retorno do cliente',
-    type: 'default',
-    is_active: true,
-    display_order: 3
+    is_default: false,
+    is_final: false,
+    is_internal: false,
+    order_index: 3
   },
   {
     name: 'Resolvido',
     slug: 'resolvido',
-    color: '#10B981',
+    color: '#16a34a',
     description: 'Solução aplicada, aguardando validação/fechamento',
-    type: 'final',
-    is_active: true,
-    display_order: 4
+    is_default: false,
+    is_final: true,
+    is_internal: false,
+    order_index: 4
   },
   {
     name: 'Fechado',
     slug: 'fechado',
-    color: '#6B7280',
+    color: '#334155',
     description: 'Chamado concluído/encerrado',
-    type: 'final',
-    is_active: true,
-    display_order: 5
+    is_default: false,
+    is_final: true,
+    is_internal: false,
+    order_index: 5
   }
 ]
 
@@ -88,8 +96,9 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
     slug: '',
     color: '#3B82F6',
     description: '',
-    type: 'default' as 'default' | 'final' | 'internal',
-    is_active: true
+    is_default: false,
+    is_final: false,
+    is_internal: false
   })
 
   useEffect(() => {
@@ -107,7 +116,8 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
       
       if (response.ok) {
         const data = await response.json()
-        setStatuses(data.statuses || [])
+        // API retorna array direto, não um objeto com statuses
+        setStatuses(Array.isArray(data) ? data : (data.statuses || []))
       } else {
         // Use default statuses if API fails
         setStatuses(DEFAULT_STATUSES.map((s, index) => ({
@@ -140,10 +150,11 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
     e.preventDefault()
     
     try {
-      const statusData = {
+      // Para API, não enviamos order_index no POST (é calculado no backend)
+      const statusData = editingStatus ? {
         ...formData,
-        display_order: editingStatus?.display_order || statuses.length + 1
-      }
+        order_index: editingStatus.order_index
+      } : formData
       
       const url = editingStatus 
         ? `/api/statuses/${editingStatus.id}`
@@ -171,8 +182,9 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
         slug: '',
         color: '#3B82F6',
         description: '',
-        type: 'default',
-        is_active: true
+        is_default: false,
+        is_final: false,
+        is_internal: false
       })
       fetchStatuses()
     } catch (error) {
@@ -187,8 +199,9 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
       slug: status.slug,
       color: status.color,
       description: status.description || '',
-      type: status.type,
-      is_active: status.is_active
+      is_default: status.is_default,
+      is_final: status.is_final,
+      is_internal: status.is_internal
     })
     setShowForm(true)
   }
@@ -213,30 +226,7 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
     }
   }
 
-  const handleToggleActive = async (status: Status) => {
-    try {
-      const response = await fetch(`/api/statuses/${status.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          ...status,
-          is_active: !status.is_active
-        })
-      })
-      
-      if (!response.ok) {
-        throw new Error('Erro ao alterar status')
-      }
-      
-      toast.success(`Status ${!status.is_active ? 'ativado' : 'desativado'}!`)
-      fetchStatuses()
-    } catch (error) {
-      toast.error('Erro ao alterar status')
-    }
-  }
+
 
   if (!isOpen) return null
 
@@ -335,41 +325,35 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Tipo
+                      Tipo de Status
                     </label>
-                    <div className="flex space-x-4">
+                    <div className="space-y-2">
                       <label className="flex items-center">
                         <input
-                          type="radio"
-                          name="type"
-                          value="default"
-                          checked={formData.type === 'default'}
-                          onChange={(e) => setFormData({ ...formData, type: 'default' })}
+                          type="checkbox"
+                          checked={formData.is_default}
+                          onChange={(e) => setFormData({ ...formData, is_default: e.target.checked })}
                           className="mr-2"
                         />
-                        <span className="text-sm">Padrão</span>
+                        <span className="text-sm">Status Padrão (inicial para novos chamados)</span>
                       </label>
                       <label className="flex items-center">
                         <input
-                          type="radio"
-                          name="type"
-                          value="final"
-                          checked={formData.type === 'final'}
-                          onChange={(e) => setFormData({ ...formData, type: 'final' })}
+                          type="checkbox"
+                          checked={formData.is_final}
+                          onChange={(e) => setFormData({ ...formData, is_final: e.target.checked })}
                           className="mr-2"
                         />
-                        <span className="text-sm">Final</span>
+                        <span className="text-sm">Status Final (encerra o chamado)</span>
                       </label>
                       <label className="flex items-center">
                         <input
-                          type="radio"
-                          name="type"
-                          value="internal"
-                          checked={formData.type === 'internal'}
-                          onChange={(e) => setFormData({ ...formData, type: 'internal' })}
+                          type="checkbox"
+                          checked={formData.is_internal}
+                          onChange={(e) => setFormData({ ...formData, is_internal: e.target.checked })}
                           className="mr-2"
                         />
-                        <span className="text-sm">Interno</span>
+                        <span className="text-sm">Status Interno (visível apenas para agentes)</span>
                       </label>
                     </div>
                   </div>
@@ -399,8 +383,9 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                         slug: '',
                         color: '#3B82F6',
                         description: '',
-                        type: 'default',
-                        is_active: true
+                        is_default: false,
+                        is_final: false,
+                        is_internal: false
                       })
                     }}
                     className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -466,24 +451,19 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                                 ({status.slug})
                               </span>
                               <div className="flex space-x-2">
-                                {status.type === 'default' && (
+                                {status.is_default && (
                                   <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
                                     Padrão
                                   </span>
                                 )}
-                                {status.type === 'final' && (
+                                {status.is_final && (
                                   <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
                                     Final
                                   </span>
                                 )}
-                                {status.type === 'internal' && (
+                                {status.is_internal && (
                                   <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400">
                                     Interno
-                                  </span>
-                                )}
-                                {!status.is_active && (
-                                  <span className="px-2 py-1 text-xs rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
-                                    Inativo
                                   </span>
                                 )}
                               </div>
@@ -495,17 +475,6 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                             )}
                           </div>
                           <div className="flex items-center space-x-2 ml-4">
-                            <button
-                              onClick={() => handleToggleActive(status)}
-                              className={`p-2 rounded-lg transition-colors ${
-                                status.is_active
-                                  ? 'text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20'
-                                  : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                              }`}
-                              title={status.is_active ? 'Desativar' : 'Ativar'}
-                            >
-                              <Check className="h-4 w-4" />
-                            </button>
                             <button
                               onClick={() => handleEdit(status)}
                               className="p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
