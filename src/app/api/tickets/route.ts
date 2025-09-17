@@ -238,6 +238,29 @@ export async function POST(request: NextRequest) {
       console.log(`🚨 Executando escalação para ticket ${newTicket.id}...`)
       const escalationResult = await executeEscalationForTicketSimple(newTicket.id)
       console.log(`✅ Escalação executada:`, escalationResult)
+      
+      // Processar e-mails de escalação automaticamente
+      if (escalationResult.success && escalationResult.executedRules.length > 0) {
+        try {
+          console.log(`📧 Processando e-mails de escalação para ticket ${newTicket.id}...`)
+          const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://www.ithostbr.tech'}/api/escalation/process-emails`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'User-Agent': 'Auto-Escalation-Integration/1.0'
+            }
+          })
+          
+          if (emailResponse.ok) {
+            const emailResult = await emailResponse.json()
+            console.log(`✅ E-mails de escalação processados:`, emailResult.message)
+          } else {
+            console.error(`❌ Erro ao processar e-mails de escalação: HTTP ${emailResponse.status}`)
+          }
+        } catch (emailError) {
+          console.error('Erro ao processar e-mails de escalação (ignorado):', emailError)
+        }
+      }
     } catch (escalationError) {
       console.log('Erro ao executar escalação (ignorado):', escalationError)
     }
@@ -461,6 +484,29 @@ async function handleUpdate(request: NextRequest) {
           console.log(`🚨 Executando escalação para ticket atualizado ${id}...`)
           const escalationResult = await executeEscalationForTicketSimple(id)
           console.log(`✅ Escalação executada após atualização:`, escalationResult)
+          
+          // Processar e-mails de escalação automaticamente
+          if (escalationResult.success && escalationResult.executedRules.length > 0) {
+            try {
+              console.log(`📧 Processando e-mails de escalação para ticket atualizado ${id}...`)
+              const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://www.ithostbr.tech'}/api/escalation/process-emails`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'User-Agent': 'Auto-Escalation-Integration/1.0'
+                }
+              })
+              
+              if (emailResponse.ok) {
+                const emailResult = await emailResponse.json()
+                console.log(`✅ E-mails de escalação processados após atualização:`, emailResult.message)
+              } else {
+                console.error(`❌ Erro ao processar e-mails de escalação após atualização: HTTP ${emailResponse.status}`)
+              }
+            } catch (emailError) {
+              console.error('Erro ao processar e-mails de escalação após atualização (ignorado):', emailError)
+            }
+          }
         } catch (escalationError) {
           console.log('Erro ao executar escalação após atualização (ignorado):', escalationError)
         }
