@@ -3,7 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { auth } from '@/lib/auth'
 import { createAndSendNotification } from '@/lib/notifications'
 import { executeWorkflowsForTicket } from '@/lib/workflow-engine'
-import { executeEscalationForTicket } from '@/lib/escalation-engine'
+import { executeEscalationForTicketSimple } from '@/lib/escalation-engine-simple'
 
 // GET - Listar todos os tickets
 export async function GET(request: NextRequest) {
@@ -233,10 +233,10 @@ export async function POST(request: NextRequest) {
       console.log('Erro ao executar workflows (ignorado):', workflowError)
     }
 
-    // Executar escalação automática
+    // Executar escalação automática (versão simplificada)
     try {
       console.log(`🚨 Executando escalação para ticket ${newTicket.id}...`)
-      const escalationResult = await executeEscalationForTicket(newTicket.id)
+      const escalationResult = await executeEscalationForTicketSimple(newTicket.id)
       console.log(`✅ Escalação executada:`, escalationResult)
     } catch (escalationError) {
       console.log('Erro ao executar escalação (ignorado):', escalationError)
@@ -456,10 +456,10 @@ async function handleUpdate(request: NextRequest) {
           console.log('Erro ao executar workflows após atualização (ignorado):', workflowError)
         }
 
-        // Executar escalação automática após atualização
+        // Executar escalação automática após atualização (versão simplificada)
         try {
           console.log(`🚨 Executando escalação para ticket atualizado ${id}...`)
-          const escalationResult = await executeEscalationForTicket(id)
+          const escalationResult = await executeEscalationForTicketSimple(id)
           console.log(`✅ Escalação executada após atualização:`, escalationResult)
         } catch (escalationError) {
           console.log('Erro ao executar escalação após atualização (ignorado):', escalationError)
