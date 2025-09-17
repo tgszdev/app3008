@@ -340,8 +340,8 @@ async function calculateTimeElapsed(timeCondition: string, ticket: TicketData): 
   switch (timeCondition) {
     case 'unassigned_time':
       // Tempo desde criação se não atribuído, ou tempo desde última desatribuição
-      const createdAt = new Date(ticket.created_at)
-      return differenceInMinutes(now, createdAt)
+      const createdAtUnassigned = new Date(ticket.created_at)
+      return differenceInMinutes(now, createdAtUnassigned)
 
     case 'no_response_time':
       // Tempo desde último comentário ou criação se não há comentários
@@ -349,14 +349,14 @@ async function calculateTimeElapsed(timeCondition: string, ticket: TicketData): 
         const lastCommentAt = new Date(ticket.last_comment_at)
         return differenceInMinutes(now, lastCommentAt)
       } else {
-        const createdAt = new Date(ticket.created_at)
-        return differenceInMinutes(now, createdAt)
+        const createdAtNoResponse = new Date(ticket.created_at)
+        return differenceInMinutes(now, createdAtNoResponse)
       }
 
     case 'resolution_time':
       // Tempo desde criação
-      const createdAt = new Date(ticket.created_at)
-      return differenceInMinutes(now, createdAt)
+      const createdAtResolution = new Date(ticket.created_at)
+      return differenceInMinutes(now, createdAtResolution)
 
     default:
       return 0
