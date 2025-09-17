@@ -228,6 +228,43 @@ async function executeEscalationActionsSimple(rule: any, ticket: any): Promise<b
       console.log(`   📢 [SIMPLE] Gerência seria notificada`)
     }
 
+    // Criar notificação para e-mail
+    if (actions.send_email_notification && typeof actions.send_email_notification === 'object') {
+      const emailConfig = actions.send_email_notification
+      if (emailConfig.recipients && Array.isArray(emailConfig.recipients)) {
+        console.log(`   📧 [SIMPLE] Criando notificações de e-mail para ${emailConfig.recipients.length} destinatários`)
+        
+        // Criar notificação para cada destinatário
+        for (const recipientId of emailConfig.recipients) {
+          try {
+            const { error: notificationError } = await supabaseAdmin
+              .from('notifications')
+              .insert({
+                user_id: recipientId,
+                type: 'escalation_email',
+                title: emailConfig.subject || 'Escalação de Ticket',
+                message: emailConfig.message || 'Ticket escalado automaticamente',
+                data: {
+                  ticket_id: ticket.id,
+                  ticket_title: ticket.title,
+                  rule_name: rule.name,
+                  escalation_type: rule.time_condition
+                },
+                is_read: false
+              })
+
+            if (notificationError) {
+              console.error(`   ❌ [SIMPLE] Erro ao criar notificação para ${recipientId}:`, notificationError.message)
+            } else {
+              console.log(`   ✅ [SIMPLE] Notificação criada para usuário ${recipientId}`)
+            }
+          } catch (error: any) {
+            console.error(`   ❌ [SIMPLE] Erro ao criar notificação:`, error.message)
+          }
+        }
+      }
+    }
+
     return true
   } catch (error: any) {
     console.error('   ❌ [SIMPLE] Erro ao executar ações:', error.message)

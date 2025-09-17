@@ -10,8 +10,8 @@ export async function POST(request: NextRequest) {
     const { data: tickets, error } = await supabaseAdmin
       .from('tickets')
       .select('id, title, status, priority, created_at, updated_at, assigned_to')
-      .in('status', ['open', 'in_progress'])
-      .not('assigned_to', 'is', null) // Apenas tickets atribuídos para algumas regras
+      .in('status', ['aberto', 'em-progresso'])
+      .is('assigned_to', null) // Apenas tickets não atribuídos para algumas regras
       .order('created_at', { ascending: true })
       .limit(50) // Limitar para evitar timeout
 
