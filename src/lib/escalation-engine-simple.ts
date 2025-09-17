@@ -254,11 +254,25 @@ function increasePrioritySimple(currentPriority: string): string | null {
  */
 async function addEscalationCommentSimple(ticket: any, comment: string): Promise<void> {
   try {
+    console.log(`   💬 [SIMPLE] Tentando adicionar comentário: ${comment}`)
+    
+    // Buscar um usuário admin para usar como autor do comentário
+    const { data: adminUser, error: adminError } = await supabaseAdmin
+      .from('users')
+      .select('id')
+      .eq('role', 'admin')
+      .limit(1)
+      .single()
+
+    const userId = adminUser?.id || '00000000-0000-0000-0000-000000000000'
+    
+    console.log(`   💬 [SIMPLE] Usando usuário: ${userId}`)
+
     const { error } = await supabaseAdmin
       .from('ticket_comments')
       .insert({
         ticket_id: ticket.id,
-        user_id: ticket.created_by || '00000000-0000-0000-0000-000000000000', // Usuário sistema
+        user_id: userId,
         content: comment,
         is_internal: true,
         created_at: new Date().toISOString(),
@@ -266,10 +280,12 @@ async function addEscalationCommentSimple(ticket: any, comment: string): Promise
       })
 
     if (error) {
-      console.error('Erro ao adicionar comentário de escalação:', error.message)
+      console.error('   ❌ [SIMPLE] Erro ao adicionar comentário de escalação:', error.message)
+    } else {
+      console.log('   ✅ [SIMPLE] Comentário adicionado com sucesso')
     }
   } catch (error: any) {
-    console.error('Erro ao adicionar comentário de escalação:', error.message)
+    console.error('   ❌ [SIMPLE] Erro ao adicionar comentário de escalação:', error.message)
   }
 }
 
