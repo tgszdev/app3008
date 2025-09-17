@@ -239,9 +239,14 @@ async function executeActions(actions: any, ticket: TicketData): Promise<boolean
           updateData.assigned_to = autoAssignUser
           shouldUpdate = true
         }
-      } else if (actions.assign_to !== ticket.assigned_to) {
-        updateData.assigned_to = actions.assign_to
-        shouldUpdate = true
+      } else {
+        // Atribuição específica de usuário
+        // Verificar se o usuário existe e pode ser atribuído
+        const isValidUser = await validateAssignableUser(actions.assign_to)
+        if (isValidUser && actions.assign_to !== ticket.assigned_to) {
+          updateData.assigned_to = actions.assign_to
+          shouldUpdate = true
+        }
       }
     }
 
@@ -317,6 +322,35 @@ async function executeActions(actions: any, ticket: TicketData): Promise<boolean
   } catch (error: any) {
     console.error('Erro ao executar ações:', error)
     throw error
+  }
+}
+
+/**
+ * Valida se um usuário pode ser atribuído a tickets
+ */
+async function validateAssignableUser(userId: string): Promise<boolean> {
+  try {
+    const { data: user, error } = await supabaseAdmin
+      .from('users')
+      .select('id, role, is_active')
+      .eq('id', userId)
+      .single()
+
+    if (error || !user) {
+      console.log(`⚠️ Usuário ${userId} não encontrado`)
+      return false
+    }
+
+    // Verificar se o usuário está ativo e tem role adequada
+    if (!user.is_active || (user.role !== 'analyst' && user.role !== 'admin')) {
+      console.log(`⚠️ Usuário ${userId} não pode ser atribuído (role: ${user.role}, ativo: ${user.is_active})`)
+      return false
+    }
+
+    return true
+  } catch (error) {
+    console.error('Erro ao validar usuário para atribuição:', error)
+    return false
   }
 }
 

@@ -59,6 +59,13 @@ type WorkflowFormData = {
   }
 }
 
+type User = {
+  id: string
+  name: string
+  email: string
+  role: string
+}
+
 export default function WorkflowManagementModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [loading, setLoading] = useState(false)
   const [rules, setRules] = useState<WorkflowRule[]>([])
@@ -66,6 +73,7 @@ export default function WorkflowManagementModal({ isOpen, onClose }: { isOpen: b
   const [showForm, setShowForm] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
   const [statuses, setStatuses] = useState<Status[]>([])
+  const [users, setUsers] = useState<User[]>([])
   const [form, setForm] = useState<WorkflowFormData>({
     name: '',
     description: '',
@@ -79,6 +87,7 @@ export default function WorkflowManagementModal({ isOpen, onClose }: { isOpen: b
     loadRules()
     loadCategories()
     loadStatuses()
+    loadUsers()
   }, [isOpen])
 
   const loadRules = async () => {
@@ -123,6 +132,24 @@ export default function WorkflowManagementModal({ isOpen, onClose }: { isOpen: b
       }
     } catch (error) {
       console.error('Erro ao carregar status:', error)
+    }
+  }
+
+  const loadUsers = async () => {
+    try {
+      const res = await fetch('/api/users')
+      const data = await res.json()
+      if (res.ok) {
+        // Filtrar apenas usuários que podem ser atribuídos (analyst e admin)
+        const assignableUsers = data.filter((user: User) => 
+          user.role === 'analyst' || user.role === 'admin'
+        )
+        setUsers(assignableUsers || [])
+      } else {
+        console.error('Erro ao carregar usuários:', data?.error)
+      }
+    } catch (error) {
+      console.error('Erro ao carregar usuários:', error)
     }
   }
 
@@ -435,7 +462,7 @@ export default function WorkflowManagementModal({ isOpen, onClose }: { isOpen: b
                           <option value="low">Baixa</option>
                           <option value="medium">Média</option>
                           <option value="high">Alta</option>
-                          <option value="urgent">Urgente</option>
+                          <option value="critical">Urgente</option>
                         </select>
                       </div>
 
@@ -504,6 +531,11 @@ export default function WorkflowManagementModal({ isOpen, onClose }: { isOpen: b
                         >
                           <option value="">Não alterar</option>
                           <option value="auto">Auto-atribuição por categoria</option>
+                          {users.map(user => (
+                            <option key={user.id} value={user.id}>
+                              {user.name} ({user.role})
+                            </option>
+                          ))}
                         </select>
                       </div>
 
@@ -518,7 +550,7 @@ export default function WorkflowManagementModal({ isOpen, onClose }: { isOpen: b
                           <option value="low">Baixa</option>
                           <option value="medium">Média</option>
                           <option value="high">Alta</option>
-                          <option value="urgent">Urgente</option>
+                          <option value="critical">Urgente</option>
                         </select>
                       </div>
 
