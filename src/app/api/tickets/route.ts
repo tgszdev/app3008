@@ -233,6 +233,15 @@ export async function POST(request: NextRequest) {
       console.log('Erro ao executar workflows (ignorado):', workflowError)
     }
 
+    // Executar escalação automática
+    try {
+      console.log(`🚨 Executando escalação para ticket ${newTicket.id}...`)
+      const escalationResult = await executeEscalationForTicket(newTicket.id)
+      console.log(`✅ Escalação executada:`, escalationResult)
+    } catch (escalationError) {
+      console.log('Erro ao executar escalação (ignorado):', escalationError)
+    }
+
     return NextResponse.json(newTicket, { status: 201 })
   } catch (error: any) {
     console.error('Erro no servidor:', error)
@@ -445,6 +454,15 @@ async function handleUpdate(request: NextRequest) {
           console.log(`✅ Workflows executados após atualização:`, workflowResult)
         } catch (workflowError) {
           console.log('Erro ao executar workflows após atualização (ignorado):', workflowError)
+        }
+
+        // Executar escalação automática após atualização
+        try {
+          console.log(`🚨 Executando escalação para ticket atualizado ${id}...`)
+          const escalationResult = await executeEscalationForTicket(id)
+          console.log(`✅ Escalação executada após atualização:`, escalationResult)
+        } catch (escalationError) {
+          console.log('Erro ao executar escalação após atualização (ignorado):', escalationError)
         }
       }
     }
