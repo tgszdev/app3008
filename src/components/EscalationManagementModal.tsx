@@ -50,11 +50,36 @@ interface EscalationManagementModalProps {
   onClose: () => void
 }
 
+type Status = {
+  id: string
+  name: string
+  slug: string
+  color?: string
+  description?: string
+  is_default: boolean
+  is_final: boolean
+  is_internal: boolean
+  order_index: number
+}
+
+type EscalationAction = {
+  id: string
+  name: string
+  display_name: string
+  description?: string
+  action_type: string
+  is_active: boolean
+  requires_config: boolean
+  config_schema?: any
+}
+
 export default function EscalationManagementModal({ isOpen, onClose }: EscalationManagementModalProps) {
   const [loading, setLoading] = useState(false)
   const [rules, setRules] = useState<EscalationRule[]>([])
   const [editingRule, setEditingRule] = useState<EscalationRule | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [statuses, setStatuses] = useState<Status[]>([])
+  const [actions, setActions] = useState<EscalationAction[]>([])
   const [form, setForm] = useState<EscalationFormData>({
     name: '',
     description: '',
@@ -77,6 +102,8 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
   useEffect(() => {
     if (isOpen) {
       loadRules()
+      loadStatuses()
+      loadActions()
     }
   }, [isOpen])
 
@@ -97,6 +124,34 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
       toast.error('Erro ao carregar regras de escalação')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadStatuses = async () => {
+    try {
+      const res = await fetch('/api/statuses')
+      const data = await res.json()
+      if (res.ok) {
+        setStatuses(data || [])
+      } else {
+        console.error('Erro ao carregar status:', data?.error)
+      }
+    } catch (error) {
+      console.error('Erro ao carregar status:', error)
+    }
+  }
+
+  const loadActions = async () => {
+    try {
+      const res = await fetch('/api/escalation/actions')
+      const data = await res.json()
+      if (res.ok) {
+        setActions(data || [])
+      } else {
+        console.error('Erro ao carregar ações:', data?.error)
+      }
+    } catch (error) {
+      console.error('Erro ao carregar ações:', error)
     }
   }
 
@@ -545,11 +600,11 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         <option value="">Qualquer status</option>
-                        <option value="open">Aberto</option>
-                        <option value="in_progress">Em Progresso</option>
-                        <option value="waiting_customer">Aguardando Cliente</option>
-                        <option value="resolved">Resolvido</option>
-                        <option value="closed">Fechado</option>
+                        {statuses.map(status => (
+                          <option key={status.id} value={status.slug}>
+                            {status.name}
+                          </option>
+                        ))}
                       </select>
                     </div>
 
@@ -591,45 +646,26 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
                     <h4 className="font-medium text-gray-900 dark:text-white">Ações</h4>
                     
                     <div className="space-y-3">
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={form.actions.notify_supervisor || false}
-                          onChange={(e) => updateAction('notify_supervisor', e.target.checked)}
-                          className="mr-2"
-                        />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">Notificar supervisor</span>
-                      </label>
-
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={form.actions.escalate_to_management || false}
-                          onChange={(e) => updateAction('escalate_to_management', e.target.checked)}
-                          className="mr-2"
-                        />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">Escalar para gerência</span>
-                      </label>
-
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={form.actions.increase_priority || false}
-                          onChange={(e) => updateAction('increase_priority', e.target.checked)}
-                          className="mr-2"
-                        />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">Aumentar prioridade</span>
-                      </label>
-
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={form.actions.auto_assign || false}
-                          onChange={(e) => updateAction('auto_assign', e.target.checked)}
-                          className="mr-2"
-                        />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">Atribuir automaticamente</span>
-                      </label>
+                      {actions.map(action => (
+                        <label key={action.id} className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={form.actions[action.name] || false}
+                            onChange={(e) => updateAction(action.name, e.target.checked)}
+                            className="mr-2"
+                          />
+                          <div className="flex flex-col">
+                            <span className="text-sm text-gray-700 dark:text-gray-300">
+                              {action.display_name}
+                            </span>
+                            {action.description && (
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                {action.description}
+                              </span>
+                            )}
+                          </div>
+                        </label>
+                      ))}
                     </div>
 
                     <div>
