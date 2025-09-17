@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { auth } from '@/lib/auth'
 import { createAndSendNotification } from '@/lib/notifications'
+import { executeWorkflowsForTicket } from '@/lib/workflow-engine'
 
 // GET - Listar todos os tickets
 export async function GET(request: NextRequest) {
@@ -222,6 +223,15 @@ export async function POST(request: NextRequest) {
       console.log('Erro ao notificar admins (ignorado):', notificationError)
     }
 
+    // Executar workflows automáticos
+    try {
+      console.log(`🔄 Executando workflows para ticket ${newTicket.id}...`)
+      const workflowResult = await executeWorkflowsForTicket(newTicket.id)
+      console.log(`✅ Workflows executados:`, workflowResult)
+    } catch (workflowError) {
+      console.log('Erro ao executar workflows (ignorado):', workflowError)
+    }
+
     return NextResponse.json(newTicket, { status: 201 })
   } catch (error: any) {
     console.error('Erro no servidor:', error)
@@ -423,6 +433,17 @@ async function handleUpdate(request: NextRequest) {
           }
         } catch (notificationError) {
           console.log('Erro ao enviar notificações (ignorado):', notificationError)
+        }
+      }
+
+      // Executar workflows automáticos após atualização
+      if (changes.length > 0) {
+        try {
+          console.log(`🔄 Executando workflows para ticket atualizado ${id}...`)
+          const workflowResult = await executeWorkflowsForTicket(id)
+          console.log(`✅ Workflows executados após atualização:`, workflowResult)
+        } catch (workflowError) {
+          console.log('Erro ao executar workflows após atualização (ignorado):', workflowError)
         }
       }
     }

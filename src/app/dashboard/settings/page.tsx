@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
-import { BookOpen, Mail, Settings, Shield, Bell, Database, Folder, Clock, UserCog, List } from 'lucide-react'
+import { BookOpen, Mail, Settings, Shield, Bell, Database, Folder, Clock, UserCog, List, Workflow } from 'lucide-react'
 import SQLInstructionsModal from '@/components/SQLInstructionsModal'
 import ProfileCategorySettings from '@/components/ProfileCategorySettings'
 import EmailConfigModal from '@/components/EmailConfigModal'
@@ -13,6 +13,7 @@ import BackupRestoreModal from '@/components/BackupRestoreModal'
 import TimesheetPermissionsModalV2 from '@/components/TimesheetPermissionsModalV2'
 import RoleManagementModal from '@/components/RoleManagementModal'
 import StatusManagementModal from '@/components/StatusManagementModal'
+import WorkflowManagementModal from '@/components/WorkflowManagementModal'
 import toast from 'react-hot-toast'
 
 export default function SettingsPage() {
@@ -26,6 +27,7 @@ export default function SettingsPage() {
   const [timesheetPermissionsModalOpen, setTimesheetPermissionsModalOpen] = useState(false)
   const [roleManagementModalOpen, setRoleManagementModalOpen] = useState(false)
   const [statusManagementModalOpen, setStatusManagementModalOpen] = useState(false)
+  const [workflowManagementModalOpen, setWorkflowManagementModalOpen] = useState(false)
   const [sqlModal, setSqlModal] = useState<{ isOpen: boolean; sql: string; instructions?: string[] }>({
     isOpen: false,
     sql: '',
@@ -350,6 +352,35 @@ export default function SettingsPage() {
             Gerenciar Status
           </button>
         </div>
+
+        {/* Workflow Automation Card */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
+          <div className="flex items-start mb-4">
+            <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex-shrink-0">
+              <Workflow className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div className="ml-3">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Automação de Workflows
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Regras automáticas para tickets
+              </p>
+            </div>
+          </div>
+          
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-grow">
+            Configure regras para atribuição automática, escalação e notificações baseadas em condições específicas.
+          </p>
+          
+          <button
+            onClick={() => setWorkflowManagementModalOpen(true)}
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors"
+          >
+            <Settings className="h-5 w-5 mr-2" />
+            Configurar Workflows
+          </button>
+        </div>
       </div>
 
       {/* Modals */}
@@ -398,6 +429,11 @@ export default function SettingsPage() {
       <StatusManagementModal
         isOpen={statusManagementModalOpen}
         onClose={() => setStatusManagementModalOpen(false)}
+      />
+
+      <WorkflowManagementModal
+        isOpen={workflowManagementModalOpen}
+        onClose={() => setWorkflowManagementModalOpen(false)}
       />
 
       <SQLInstructionsModal
