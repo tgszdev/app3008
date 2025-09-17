@@ -312,7 +312,7 @@ async function addEscalationCommentSimple(ticket: any, comment: string): Promise
     console.log(`   💬 [SIMPLE] Usando usuário: ${userId}`)
 
     const { error } = await supabaseAdmin
-      .from('ticket_comments')
+      .from('comments')
       .insert({
         ticket_id: ticket.id,
         user_id: userId,
