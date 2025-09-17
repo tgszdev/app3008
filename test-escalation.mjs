@@ -2,7 +2,15 @@
 
 // Script para testar escalação manualmente
 import { createClient } from '@supabase/supabase-js'
-import { executeEscalationForTicket } from './src/lib/escalation-engine.js'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
+
+// Configurar __dirname para ES modules
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
+// Importar o motor de escalação
+const { executeEscalationForTicket } = await import(join(__dirname, 'src/lib/escalation-engine.js'))
 
 // Configurações do Supabase
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
