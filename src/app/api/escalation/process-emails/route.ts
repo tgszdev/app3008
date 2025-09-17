@@ -70,22 +70,53 @@ export async function POST(request: NextRequest) {
 
         // 3. Enviar e-mail
         const emailData = notification.data as any;
+        const emailSubject = notification.title || 'Escalação de Ticket';
+        const emailMessage = notification.message || 'Ticket escalado automaticamente';
+        
+        console.log(`📧 [EMAIL-PROCESSOR] Tentando enviar e-mail para ${user.email}...`);
+        
         const emailResult = await sendEmail({
           to: user.email,
-          subject: notification.title,
-          template: 'escalation',
-          data: {
-            userName: user.name,
-            ticketId: emailData.ticket_id,
-            ticketTitle: emailData.ticket_title,
-            ruleName: emailData.rule_name,
-            escalationType: emailData.escalation_type,
-            message: notification.message,
-            appUrl: process.env.NEXT_PUBLIC_APP_URL || 'https://www.ithostbr.tech'
-          }
+          subject: emailSubject,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #dc2626;">🚨 Escalação de Ticket</h2>
+              <p>Olá <strong>${user.name}</strong>,</p>
+              <p>${emailMessage}</p>
+              <div style="background-color: #f3f4f6; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <h3>Detalhes do Ticket:</h3>
+                <p><strong>ID:</strong> ${emailData.ticket_id || 'N/A'}</p>
+                <p><strong>Título:</strong> ${emailData.ticket_title || 'N/A'}</p>
+                <p><strong>Regra:</strong> ${emailData.rule_name || 'N/A'}</p>
+                <p><strong>Tipo:</strong> ${emailData.escalation_type || 'N/A'}</p>
+              </div>
+              <p>Acesse o sistema para mais detalhes: <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://www.ithostbr.tech'}" style="color: #3b82f6;">${process.env.NEXT_PUBLIC_APP_URL || 'https://www.ithostbr.tech'}</a></p>
+              <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e7eb;">
+              <p style="font-size: 12px; color: #6b7280;">Este é um e-mail automático do sistema de escalação.</p>
+            </div>
+          `,
+          text: `
+            🚨 Escalação de Ticket
+            
+            Olá ${user.name},
+            
+            ${emailMessage}
+            
+            Detalhes do Ticket:
+            - ID: ${emailData.ticket_id || 'N/A'}
+            - Título: ${emailData.ticket_title || 'N/A'}
+            - Regra: ${emailData.rule_name || 'N/A'}
+            - Tipo: ${emailData.escalation_type || 'N/A'}
+            
+            Acesse o sistema: ${process.env.NEXT_PUBLIC_APP_URL || 'https://www.ithostbr.tech'}
+            
+            Este é um e-mail automático do sistema de escalação.
+          `
         });
 
-        if (emailResult.success) {
+        console.log(`📧 [EMAIL-PROCESSOR] Resultado do sendEmail:`, emailResult, typeof emailResult);
+
+        if (emailResult === true) {
           // 4. Marcar notificação como lida
           await supabaseAdmin
             .from('notifications')
@@ -102,13 +133,14 @@ export async function POST(request: NextRequest) {
             message: `E-mail enviado com sucesso para ${user.email}`
           });
         } else {
-          console.error(`❌ [EMAIL-PROCESSOR] Erro ao enviar e-mail para ${user.email}:`, emailResult.error);
+          const errorMsg = emailResult === false ? 'Falha no envio do e-mail' : `Resultado inesperado: ${emailResult} (${typeof emailResult})`;
+          console.error(`❌ [EMAIL-PROCESSOR] Erro ao enviar e-mail para ${user.email}:`, errorMsg);
           results.push({
             notification_id: notification.id,
             user_email: user.email,
             success: false,
-            error: emailResult.error,
-            message: `Erro ao enviar e-mail: ${emailResult.error}`
+            error: errorMsg,
+            message: `Erro ao enviar e-mail: ${errorMsg}`
           });
         }
 
