@@ -142,12 +142,18 @@ function shouldExecuteEscalationSimple(rule: any, ticket: any): { shouldExecute:
     }
 
     // Verificar condições básicas
-    if (rule.conditions.status && ticket.status !== rule.conditions.status) {
-      return { shouldExecute: false, reason: 'Status não corresponde', escalationType: 'status_mismatch', timeElapsed }
+    if (rule.conditions.status) {
+      const statusArray = Array.isArray(rule.conditions.status) ? rule.conditions.status : [rule.conditions.status]
+      if (!statusArray.includes(ticket.status)) {
+        return { shouldExecute: false, reason: `Status não corresponde (${ticket.status} não está em ${JSON.stringify(statusArray)})`, escalationType: 'status_mismatch', timeElapsed }
+      }
     }
 
-    if (rule.conditions.priority && ticket.priority !== rule.conditions.priority) {
-      return { shouldExecute: false, reason: 'Prioridade não corresponde', escalationType: 'priority_mismatch', timeElapsed }
+    if (rule.conditions.priority) {
+      const priorityArray = Array.isArray(rule.conditions.priority) ? rule.conditions.priority : [rule.conditions.priority]
+      if (!priorityArray.includes(ticket.priority)) {
+        return { shouldExecute: false, reason: `Prioridade não corresponde (${ticket.priority} não está em ${JSON.stringify(priorityArray)})`, escalationType: 'priority_mismatch', timeElapsed }
+      }
     }
 
     if ('assigned_to' in rule.conditions) {
