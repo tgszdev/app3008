@@ -16,6 +16,28 @@ type WorkflowRule = {
   updated_at: string
 }
 
+type Category = {
+  id: string
+  name: string
+  slug: string
+  description?: string
+  icon?: string
+  color?: string
+  is_active: boolean
+}
+
+type Status = {
+  id: string
+  name: string
+  slug: string
+  color?: string
+  description?: string
+  is_default: boolean
+  is_final: boolean
+  is_internal: boolean
+  order_index: number
+}
+
 type WorkflowFormData = {
   name: string
   description: string
@@ -42,6 +64,8 @@ export default function WorkflowManagementModal({ isOpen, onClose }: { isOpen: b
   const [rules, setRules] = useState<WorkflowRule[]>([])
   const [editingRule, setEditingRule] = useState<WorkflowRule | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [categories, setCategories] = useState<Category[]>([])
+  const [statuses, setStatuses] = useState<Status[]>([])
   const [form, setForm] = useState<WorkflowFormData>({
     name: '',
     description: '',
@@ -53,6 +77,8 @@ export default function WorkflowManagementModal({ isOpen, onClose }: { isOpen: b
   useEffect(() => {
     if (!isOpen) return
     loadRules()
+    loadCategories()
+    loadStatuses()
   }, [isOpen])
 
   const loadRules = async () => {
@@ -69,6 +95,34 @@ export default function WorkflowManagementModal({ isOpen, onClose }: { isOpen: b
       toast.error('Erro ao carregar regras')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadCategories = async () => {
+    try {
+      const res = await fetch('/api/categories?active_only=true')
+      const data = await res.json()
+      if (res.ok) {
+        setCategories(data || [])
+      } else {
+        console.error('Erro ao carregar categorias:', data?.error)
+      }
+    } catch (error) {
+      console.error('Erro ao carregar categorias:', error)
+    }
+  }
+
+  const loadStatuses = async () => {
+    try {
+      const res = await fetch('/api/statuses')
+      const data = await res.json()
+      if (res.ok) {
+        setStatuses(data || [])
+      } else {
+        console.error('Erro ao carregar status:', data?.error)
+      }
+    } catch (error) {
+      console.error('Erro ao carregar status:', error)
     }
   }
 
@@ -362,10 +416,11 @@ export default function WorkflowManagementModal({ isOpen, onClose }: { isOpen: b
                           className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800"
                         >
                           <option value="">Qualquer categoria</option>
-                          <option value="hardware">Hardware</option>
-                          <option value="software">Software</option>
-                          <option value="rede">Rede</option>
-                          <option value="geral">Geral</option>
+                          {categories.map(category => (
+                            <option key={category.id} value={category.slug}>
+                              {category.name}
+                            </option>
+                          ))}
                         </select>
                       </div>
 
@@ -392,10 +447,11 @@ export default function WorkflowManagementModal({ isOpen, onClose }: { isOpen: b
                           className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800"
                         >
                           <option value="">Qualquer status</option>
-                          <option value="open">Aberto</option>
-                          <option value="in_progress">Em Progresso</option>
-                          <option value="waiting_customer">Aguardando Cliente</option>
-                          <option value="resolved">Resolvido</option>
+                          {statuses.map(status => (
+                            <option key={status.id} value={status.slug}>
+                              {status.name}
+                            </option>
+                          ))}
                         </select>
                       </div>
 
@@ -474,10 +530,11 @@ export default function WorkflowManagementModal({ isOpen, onClose }: { isOpen: b
                           className="w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-800"
                         >
                           <option value="">Não alterar</option>
-                          <option value="open">Aberto</option>
-                          <option value="in_progress">Em Progresso</option>
-                          <option value="waiting_customer">Aguardando Cliente</option>
-                          <option value="resolved">Resolvido</option>
+                          {statuses.map(status => (
+                            <option key={status.id} value={status.slug}>
+                              {status.name}
+                            </option>
+                          ))}
                         </select>
                       </div>
 

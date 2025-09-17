@@ -167,7 +167,17 @@ async function evaluateConditions(conditions: any, ticket: TicketData): Promise<
 
   // Status
   if (conditions.status) {
-    if (ticket.status !== conditions.status) {
+    // Mapear slug da tabela ticket_statuses para valor hardcoded da tabela tickets
+    const statusMapping: Record<string, string> = {
+      'aberto': 'open',
+      'em-progresso': 'in_progress',
+      'aguardando-cliente': 'waiting_customer',
+      'resolvido': 'resolved',
+      'fechado': 'closed'
+    }
+    
+    const expectedStatus = statusMapping[conditions.status] || conditions.status
+    if (ticket.status !== expectedStatus) {
       return false
     }
   }
@@ -242,9 +252,21 @@ async function executeActions(actions: any, ticket: TicketData): Promise<boolean
     }
 
     // Definir status
-    if (actions.set_status && actions.set_status !== ticket.status) {
-      updateData.status = actions.set_status
-      shouldUpdate = true
+    if (actions.set_status) {
+      // Mapear slug da tabela ticket_statuses para valor hardcoded da tabela tickets
+      const statusMapping: Record<string, string> = {
+        'aberto': 'open',
+        'em-progresso': 'in_progress',
+        'aguardando-cliente': 'waiting_customer',
+        'resolvido': 'resolved',
+        'fechado': 'closed'
+      }
+      
+      const mappedStatus = statusMapping[actions.set_status] || actions.set_status
+      if (mappedStatus !== ticket.status) {
+        updateData.status = mappedStatus
+        shouldUpdate = true
+      }
     }
 
     // Atualizar ticket se houver mudanças
