@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { auth } from '@/lib/auth'
 import { createAndSendNotification } from '@/lib/notifications'
 import { executeWorkflowsForTicket } from '@/lib/workflow-engine'
+import { executeEscalationForTicket } from '@/lib/escalation-engine'
 
 // GET - Listar todos os tickets
 export async function GET(request: NextRequest) {
