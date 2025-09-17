@@ -524,6 +524,11 @@ async function executeEscalationActions(rule: EscalationRule, ticket: TicketData
       }
     }
 
+    // Enviar email de notificação
+    if (actions.send_email_notification) {
+      await sendEmailNotification(ticket, rule, actions.send_email_notification)
+    }
+
     return true
   } catch (error: any) {
     console.error('Erro ao executar ações de escalação:', error)
@@ -586,16 +591,190 @@ async function notifySupervisor(ticket: TicketData, rule: EscalationRule, action
         })
       }
 
-      // TODO: Implementar envio de email se notificationType for 'email' ou 'both'
+      // Enviar email se notificationType for 'email' ou 'both'
       if (notificationType === 'email' || notificationType === 'both') {
-        console.log(`📧 Email seria enviado para ${supervisor.email} sobre ticket ${ticket.id}`)
-        // Aqui você pode implementar o envio de email usando o sistema de email existente
+        try {
+          const { sendEmail } = await import('./email-config')
+          
+          const emailResult = await sendEmail({
+            to: supervisor.email,
+            subject: `🚨 Escalação de Ticket #${ticket.id}`,
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
+                  <h1>🚨 Escalação de Ticket</h1>
+                </div>
+                <div style="padding: 20px; background-color: #f9fafb;">
+                  <h2>Ticket #${ticket.id} - ${ticket.title}</h2>
+                  <p><strong>Regra de Escalação:</strong> ${rule.name}</p>
+                  <p><strong>Descrição:</strong> ${rule.description || 'N/A'}</p>
+                  <p><strong>Prioridade:</strong> ${ticket.priority}</p>
+                  <p><strong>Categoria:</strong> ${ticket.category}</p>
+                  <p><strong>Criado em:</strong> ${new Date(ticket.created_at).toLocaleString('pt-BR')}</p>
+                  <p><strong>Status:</strong> ${ticket.status}</p>
+                  ${ticket.assigned_to ? `<p><strong>Atribuído para:</strong> ${ticket.assigned_to}</p>` : '<p><strong>Status:</strong> Não atribuído</p>'}
+                  <br>
+                  <div style="text-align: center;">
+                    <a href="${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/dashboard/tickets/${ticket.id}" 
+                       style="display: inline-block; padding: 12px 24px; background-color: #3b82f6; color: white; text-decoration: none; border-radius: 5px;">
+                      Ver Ticket
+                    </a>
+                  </div>
+                </div>
+                <div style="padding: 20px; text-align: center; font-size: 12px; color: #666;">
+                  <p>Este é um email automático do sistema de escalação.</p>
+                </div>
+              </div>
+            `,
+            text: `
+              ESCALAÇÃO DE TICKET
+              
+              Ticket #${ticket.id} - ${ticket.title}
+              Regra de Escalação: ${rule.name}
+              Descrição: ${rule.description || 'N/A'}
+              Prioridade: ${ticket.priority}
+              Categoria: ${ticket.category}
+              Criado em: ${new Date(ticket.created_at).toLocaleString('pt-BR')}
+              Status: ${ticket.status}
+              ${ticket.assigned_to ? `Atribuído para: ${ticket.assigned_to}` : 'Status: Não atribuído'}
+              
+              Ver ticket: ${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/dashboard/tickets/${ticket.id}
+            `
+          })
+
+          if (emailResult.success) {
+            console.log(`✅ Email enviado com sucesso para ${supervisor.email}`)
+          } else {
+            console.error(`❌ Erro ao enviar email para ${supervisor.email}:`, emailResult.error)
+          }
+        } catch (error) {
+          console.error(`❌ Erro ao enviar email para ${supervisor.email}:`, error)
+        }
       }
     }
 
     console.log(`✅ Notificação enviada para ${supervisors.length} supervisor(es)`)
   } catch (error) {
     console.error('Erro ao notificar supervisor:', error)
+  }
+}
+
+/**
+ * Envia email de notificação
+ */
+async function sendEmailNotification(ticket: TicketData, rule: EscalationRule, actionConfig: any): Promise<void> {
+  try {
+    if (!actionConfig?.recipients || actionConfig.recipients.length === 0) {
+      console.log('Nenhum destinatário configurado para envio de email')
+      return
+    }
+
+    // Buscar dados dos usuários destinatários
+    const { data: recipients, error } = await supabaseAdmin
+      .from('users')
+      .select('id, name, email')
+      .in('id', actionConfig.recipients)
+      .eq('is_active', true)
+
+    if (error || !recipients || recipients.length === 0) {
+      console.log('Nenhum destinatário válido encontrado para envio de email')
+      return
+    }
+
+    const { sendEmail } = await import('./email-config')
+    
+    // Determinar assunto e mensagem baseado no template
+    let subject = `🚨 Escalação de Ticket #${ticket.id}`
+    let message = `Ticket #${ticket.id} - ${ticket.title}`
+    
+    if (actionConfig.email_template === 'custom' && actionConfig.subject) {
+      subject = actionConfig.subject
+    }
+    
+    if (actionConfig.email_template === 'custom' && actionConfig.message) {
+      message = actionConfig.message
+    } else {
+      // Usar template padrão baseado no tipo
+      switch (actionConfig.email_template) {
+        case 'priority_increase':
+          subject = `📈 Prioridade Aumentada - Ticket #${ticket.id}`
+          message = `A prioridade do ticket #${ticket.id} foi aumentada automaticamente.`
+          break
+        case 'assignment':
+          subject = `👤 Ticket Atribuído - #${ticket.id}`
+          message = `O ticket #${ticket.id} foi atribuído automaticamente.`
+          break
+        default: // escalation
+          subject = `🚨 Escalação de Ticket #${ticket.id}`
+          message = `O ticket #${ticket.id} foi escalado automaticamente.`
+      }
+    }
+
+    // Enviar email para cada destinatário
+    for (const recipient of recipients) {
+      try {
+        const emailResult = await sendEmail({
+          to: recipient.email,
+          subject: subject,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <div style="background-color: #dc2626; color: white; padding: 20px; text-align: center;">
+                <h1>🚨 Notificação de Escalação</h1>
+              </div>
+              <div style="padding: 20px; background-color: #f9fafb;">
+                <h2>${message}</h2>
+                <p><strong>Regra de Escalação:</strong> ${rule.name}</p>
+                <p><strong>Descrição:</strong> ${rule.description || 'N/A'}</p>
+                <p><strong>Ticket:</strong> #${ticket.id} - ${ticket.title}</p>
+                <p><strong>Prioridade:</strong> ${ticket.priority}</p>
+                <p><strong>Categoria:</strong> ${ticket.category}</p>
+                <p><strong>Criado em:</strong> ${new Date(ticket.created_at).toLocaleString('pt-BR')}</p>
+                <p><strong>Status:</strong> ${ticket.status}</p>
+                ${ticket.assigned_to ? `<p><strong>Atribuído para:</strong> ${ticket.assigned_to}</p>` : '<p><strong>Status:</strong> Não atribuído</p>'}
+                <br>
+                <div style="text-align: center;">
+                  <a href="${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/dashboard/tickets/${ticket.id}" 
+                     style="display: inline-block; padding: 12px 24px; background-color: #3b82f6; color: white; text-decoration: none; border-radius: 5px;">
+                    Ver Ticket
+                  </a>
+                </div>
+              </div>
+              <div style="padding: 20px; text-align: center; font-size: 12px; color: #666;">
+                <p>Este é um email automático do sistema de escalação.</p>
+              </div>
+            </div>
+          `,
+          text: `
+            NOTIFICAÇÃO DE ESCALAÇÃO
+            
+            ${message}
+            
+            Regra de Escalação: ${rule.name}
+            Descrição: ${rule.description || 'N/A'}
+            Ticket: #${ticket.id} - ${ticket.title}
+            Prioridade: ${ticket.priority}
+            Categoria: ${ticket.category}
+            Criado em: ${new Date(ticket.created_at).toLocaleString('pt-BR')}
+            Status: ${ticket.status}
+            ${ticket.assigned_to ? `Atribuído para: ${ticket.assigned_to}` : 'Status: Não atribuído'}
+            
+            Ver ticket: ${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/dashboard/tickets/${ticket.id}
+          `
+        })
+
+        if (emailResult.success) {
+          console.log(`✅ Email de notificação enviado com sucesso para ${recipient.email}`)
+        } else {
+          console.error(`❌ Erro ao enviar email de notificação para ${recipient.email}:`, emailResult.error)
+        }
+      } catch (error) {
+        console.error(`❌ Erro ao enviar email de notificação para ${recipient.email}:`, error)
+      }
+    }
+
+    console.log(`✅ Emails de notificação enviados para ${recipients.length} destinatário(s)`)
+  } catch (error) {
+    console.error('Erro ao enviar emails de notificação:', error)
   }
 }
 

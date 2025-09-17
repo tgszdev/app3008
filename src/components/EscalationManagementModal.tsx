@@ -823,6 +823,88 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
                                   </select>
                                 </div>
                               )}
+
+                              {action.name === 'send_email_notification' && (
+                                <>
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                      Destinatários *
+                                    </label>
+                                    <div className="space-y-2 max-h-32 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-md p-2">
+                                      {users.map(user => (
+                                        <label key={user.id} className="flex items-center">
+                                          <input
+                                            type="checkbox"
+                                            checked={form.actions[action.name]?.recipients?.includes(user.id) || false}
+                                            onChange={(e) => {
+                                              const currentRecipients = form.actions[action.name]?.recipients || []
+                                              const newRecipients = e.target.checked
+                                                ? [...currentRecipients, user.id]
+                                                : currentRecipients.filter((id: string) => id !== user.id)
+                                              updateActionConfig(action.name, 'recipients', newRecipients)
+                                            }}
+                                            className="mr-2"
+                                          />
+                                          <span className="text-sm text-gray-700 dark:text-gray-300">
+                                            {user.name} ({user.email}) - {user.role}
+                                          </span>
+                                        </label>
+                                      ))}
+                                    </div>
+                                    {form.actions[action.name]?.recipients?.length === 0 && (
+                                      <p className="text-xs text-red-500 mt-1">
+                                        Selecione pelo menos um destinatário
+                                      </p>
+                                    )}
+                                  </div>
+
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                      Template de Email
+                                    </label>
+                                    <select
+                                      value={form.actions[action.name]?.email_template || 'escalation'}
+                                      onChange={(e) => updateActionConfig(action.name, 'email_template', e.target.value)}
+                                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    >
+                                      <option value="escalation">Escalação de Ticket</option>
+                                      <option value="priority_increase">Aumento de Prioridade</option>
+                                      <option value="assignment">Atribuição de Ticket</option>
+                                      <option value="custom">Personalizado</option>
+                                    </select>
+                                  </div>
+
+                                  {form.actions[action.name]?.email_template === 'custom' && (
+                                    <>
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                          Assunto do Email
+                                        </label>
+                                        <input
+                                          type="text"
+                                          value={form.actions[action.name]?.subject || ''}
+                                          onChange={(e) => updateActionConfig(action.name, 'subject', e.target.value)}
+                                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                          placeholder="Digite o assunto do email..."
+                                        />
+                                      </div>
+
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                          Mensagem
+                                        </label>
+                                        <textarea
+                                          value={form.actions[action.name]?.message || ''}
+                                          onChange={(e) => updateActionConfig(action.name, 'message', e.target.value)}
+                                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                          rows={3}
+                                          placeholder="Digite a mensagem do email..."
+                                        />
+                                      </div>
+                                    </>
+                                  )}
+                                </>
+                              )}
                             </div>
                           )}
                         </div>

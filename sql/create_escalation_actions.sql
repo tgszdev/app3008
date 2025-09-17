@@ -183,18 +183,33 @@ INSERT INTO escalation_actions (name, display_name, description, action_type, re
     '{
       "type": "object",
       "properties": {
-        "email_template": {
-          "type": "string",
-          "title": "Template de Email",
-          "description": "Template de email a ser usado"
-        },
         "recipients": {
           "type": "array",
           "title": "Destinatários",
-          "description": "Lista de emails dos destinatários"
+          "description": "Selecione os usuários que receberão o email",
+          "items": {
+            "type": "string"
+          }
+        },
+        "email_template": {
+          "type": "string",
+          "title": "Template de Email",
+          "description": "Template de email a ser usado",
+          "enum": ["escalation", "priority_increase", "assignment", "custom"],
+          "default": "escalation"
+        },
+        "subject": {
+          "type": "string",
+          "title": "Assunto do Email",
+          "description": "Assunto personalizado do email"
+        },
+        "message": {
+          "type": "string",
+          "title": "Mensagem",
+          "description": "Mensagem personalizada do email"
         }
       },
-      "required": ["email_template", "recipients"]
+      "required": ["recipients"]
     }'
   )
 ON CONFLICT (name) DO UPDATE SET
