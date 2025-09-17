@@ -116,7 +116,10 @@ export async function POST(request: NextRequest) {
 
         console.log(`📧 [EMAIL-PROCESSOR] Resultado do sendEmail:`, emailResult, typeof emailResult);
 
-        if (emailResult === true) {
+        // O email-config.ts retorna um objeto {success: boolean, error?: string}
+        const emailSuccess = emailResult && typeof emailResult === 'object' ? emailResult.success : emailResult;
+
+        if (emailSuccess === true) {
           // 4. Marcar notificação como lida
           await supabaseAdmin
             .from('notifications')
@@ -133,7 +136,11 @@ export async function POST(request: NextRequest) {
             message: `E-mail enviado com sucesso para ${user.email}`
           });
         } else {
-          const errorMsg = emailResult === false ? 'Falha no envio do e-mail' : `Resultado inesperado: ${emailResult} (${typeof emailResult})`;
+          // Extrair mensagem de erro específica do objeto retornado
+          const errorMsg = emailResult && typeof emailResult === 'object' && emailResult.error 
+            ? emailResult.error 
+            : `Falha no envio do e-mail (resultado: ${JSON.stringify(emailResult)})`;
+          
           console.error(`❌ [EMAIL-PROCESSOR] Erro ao enviar e-mail para ${user.email}:`, errorMsg);
           results.push({
             notification_id: notification.id,
