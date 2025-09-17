@@ -24,7 +24,8 @@ async function executeAutoEscalation() {
   try {
     console.log(`🔄 [CRON] Iniciando execução automática de escalação - ${new Date().toISOString()}`)
     
-    const response = await fetch(`${API_URL}/api/escalation/auto-execute`, {
+    // 1. Executar escalação automática
+    const escalationResponse = await fetch(`${API_URL}/api/escalation/auto-execute`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -32,27 +33,52 @@ async function executeAutoEscalation() {
       }
     })
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    if (!escalationResponse.ok) {
+      throw new Error(`HTTP ${escalationResponse.status}: ${escalationResponse.statusText}`)
     }
 
-    const result = await response.json()
+    const escalationResult = await escalationResponse.json()
     
-    if (result.success) {
-      console.log(`✅ [CRON] Execução automática concluída: ${result.message}`)
-      console.log(`📊 [CRON] Estatísticas: ${result.processed} processados, ${result.executed} executados`)
+    if (escalationResult.success) {
+      console.log(`✅ [CRON] Execução automática concluída: ${escalationResult.message}`)
+      console.log(`📊 [CRON] Estatísticas: ${escalationResult.processed} processados, ${escalationResult.executed} executados`)
       
-      if (result.results && result.results.length > 0) {
+      if (escalationResult.results && escalationResult.results.length > 0) {
         console.log('📋 [CRON] Resultados detalhados:')
-        result.results.forEach((item, index) => {
+        escalationResult.results.forEach((item, index) => {
           if (item.success && item.executed_rules.length > 0) {
             console.log(`  ${index + 1}. ${item.ticket_title}: ${item.executed_rules.join(', ')}`)
           }
         })
       }
     } else {
-      console.error(`❌ [CRON] Erro na execução automática: ${result.error}`)
+      console.error(`❌ [CRON] Erro na execução automática: ${escalationResult.error}`)
       process.exit(1)
+    }
+
+    // 2. Processar e-mails de escalação
+    console.log('📧 [CRON] Processando e-mails de escalação...')
+    
+    try {
+      const emailResponse = await fetch(`${API_URL}/api/escalation/process-emails`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'Auto-Escalation-Cron/1.0'
+        }
+      })
+
+      if (emailResponse.ok) {
+        const emailResult = await emailResponse.json()
+        console.log(`✅ [CRON] E-mails processados: ${emailResult.message}`)
+        console.log(`📧 [CRON] Estatísticas de e-mail: ${emailResult.processed} processados, ${emailResult.sent} enviados`)
+      } else {
+        console.error(`❌ [CRON] Erro ao processar e-mails: HTTP ${emailResponse.status}`)
+        // Não sair com erro aqui, pois a escalação pode ter funcionado
+      }
+    } catch (emailError) {
+      console.error(`❌ [CRON] Erro ao processar e-mails:`, emailError)
+      // Não sair com erro aqui, pois a escalação pode ter funcionado
     }
 
   } catch (error) {
