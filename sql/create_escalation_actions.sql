@@ -30,23 +30,41 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER set_escalation_actions_updated_at
-  BEFORE UPDATE ON escalation_actions
-  FOR EACH ROW
-  EXECUTE FUNCTION set_escalation_actions_updated_at();
+-- Trigger para updated_at (apenas se não existir)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_trigger 
+    WHERE tgname = 'set_escalation_actions_updated_at'
+  ) THEN
+    CREATE TRIGGER set_escalation_actions_updated_at
+      BEFORE UPDATE ON escalation_actions
+      FOR EACH ROW
+      EXECUTE FUNCTION set_escalation_actions_updated_at();
+  END IF;
+END $$;
 
 -- RLS
 ALTER TABLE escalation_actions ENABLE ROW LEVEL SECURITY;
 
--- Política RLS
-CREATE POLICY "Admins can manage escalation actions" ON escalation_actions
-  FOR ALL USING (
-    EXISTS (
-      SELECT 1 FROM users 
-      WHERE users.id = auth.uid() 
-      AND users.role = 'admin'
-    )
-  );
+-- Política RLS (apenas se não existir)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'escalation_actions' 
+    AND policyname = 'Admins can manage escalation actions'
+  ) THEN
+    CREATE POLICY "Admins can manage escalation actions" ON escalation_actions
+      FOR ALL USING (
+        EXISTS (
+          SELECT 1 FROM users 
+          WHERE users.id = auth.uid() 
+          AND users.role = 'admin'
+        )
+      );
+  END IF;
+END $$;
 
 -- Inserir ações padrão do sistema
 INSERT INTO escalation_actions (name, display_name, description, action_type, requires_config, config_schema) VALUES
@@ -55,8 +73,28 @@ INSERT INTO escalation_actions (name, display_name, description, action_type, re
     'Notificar Supervisor',
     'Envia notificação para supervisores (analysts e admins) sobre o ticket',
     'notification',
-    false,
-    null
+    true,
+    '{
+      "type": "object",
+      "properties": {
+        "recipients": {
+          "type": "array",
+          "title": "Destinatários",
+          "description": "Selecione os usuários que receberão a notificação",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notification_type": {
+          "type": "string",
+          "title": "Tipo de Notificação",
+          "description": "Tipo de notificação a ser enviada",
+          "enum": ["email", "in_app", "both"],
+          "default": "both"
+        }
+      },
+      "required": ["recipients"]
+    }'
   ),
   (
     'escalate_to_management',

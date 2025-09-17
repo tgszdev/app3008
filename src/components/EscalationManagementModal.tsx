@@ -73,6 +73,13 @@ type EscalationAction = {
   config_schema?: any
 }
 
+type User = {
+  id: string
+  name: string
+  email: string
+  role: string
+}
+
 export default function EscalationManagementModal({ isOpen, onClose }: EscalationManagementModalProps) {
   const [loading, setLoading] = useState(false)
   const [rules, setRules] = useState<EscalationRule[]>([])
@@ -80,6 +87,8 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
   const [showForm, setShowForm] = useState(false)
   const [statuses, setStatuses] = useState<Status[]>([])
   const [actions, setActions] = useState<EscalationAction[]>([])
+  const [users, setUsers] = useState<User[]>([])
+  const [selectedActionConfig, setSelectedActionConfig] = useState<string | null>(null)
   const [form, setForm] = useState<EscalationFormData>({
     name: '',
     description: '',
@@ -104,6 +113,7 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
       loadRules()
       loadStatuses()
       loadActions()
+      loadUsers()
     }
   }, [isOpen])
 
@@ -155,6 +165,24 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
     }
   }
 
+  const loadUsers = async () => {
+    try {
+      const res = await fetch('/api/users')
+      const data = await res.json()
+      if (res.ok) {
+        // Filtrar apenas usuários que podem ser notificados (analysts e admins)
+        const assignableUsers = data.filter((user: User) => 
+          user.role === 'analyst' || user.role === 'admin'
+        )
+        setUsers(assignableUsers || [])
+      } else {
+        console.error('Erro ao carregar usuários:', data?.error)
+      }
+    } catch (error) {
+      console.error('Erro ao carregar usuários:', error)
+    }
+  }
+
   const resetForm = () => {
     setForm({
       name: '',
@@ -194,6 +222,19 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
       actions: {
         ...prev.actions,
         [key]: value
+      }
+    }))
+  }
+
+  const updateActionConfig = (actionName: string, configKey: string, value: any) => {
+    setForm(prev => ({
+      ...prev,
+      actions: {
+        ...prev.actions,
+        [actionName]: {
+          ...prev.actions[actionName],
+          [configKey]: value
+        }
       }
     }))
   }
@@ -645,41 +686,149 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
                   <div className="space-y-4">
                     <h4 className="font-medium text-gray-900 dark:text-white">Ações</h4>
                     
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       {actions.map(action => (
-                        <label key={action.id} className="flex items-center">
-                          <input
-                            type="checkbox"
-                            checked={form.actions[action.name] || false}
-                            onChange={(e) => updateAction(action.name, e.target.checked)}
-                            className="mr-2"
-                          />
-                          <div className="flex flex-col">
-                            <span className="text-sm text-gray-700 dark:text-gray-300">
-                              {action.display_name}
-                            </span>
-                            {action.description && (
-                              <span className="text-xs text-gray-500 dark:text-gray-400">
-                                {action.description}
+                        <div key={action.id} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={form.actions[action.name] || false}
+                              onChange={(e) => {
+                                updateAction(action.name, e.target.checked)
+                                if (e.target.checked && action.requires_config) {
+                                  setSelectedActionConfig(action.name)
+                                } else if (!e.target.checked) {
+                                  setSelectedActionConfig(null)
+                                }
+                              }}
+                              className="mr-2"
+                            />
+                            <div className="flex flex-col">
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                {action.display_name}
                               </span>
-                            )}
-                          </div>
-                        </label>
+                              {action.description && (
+                                <span className="text-xs text-gray-500 dark:text-gray-400">
+                                  {action.description}
+                                </span>
+                              )}
+                            </div>
+                          </label>
+
+                          {/* Configuração da ação */}
+                          {action.requires_config && form.actions[action.name] && (
+                            <div className="mt-3 ml-6 space-y-3">
+                              {action.name === 'notify_supervisor' && (
+                                <>
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                      Destinatários *
+                                    </label>
+                                    <div className="space-y-2 max-h-32 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-md p-2">
+                                      {users.map(user => (
+                                        <label key={user.id} className="flex items-center">
+                                          <input
+                                            type="checkbox"
+                                            checked={form.actions[action.name]?.recipients?.includes(user.id) || false}
+                                            onChange={(e) => {
+                                              const currentRecipients = form.actions[action.name]?.recipients || []
+                                              const newRecipients = e.target.checked
+                                                ? [...currentRecipients, user.id]
+                                                : currentRecipients.filter((id: string) => id !== user.id)
+                                              updateActionConfig(action.name, 'recipients', newRecipients)
+                                            }}
+                                            className="mr-2"
+                                          />
+                                          <span className="text-sm text-gray-700 dark:text-gray-300">
+                                            {user.name} ({user.email}) - {user.role}
+                                          </span>
+                                        </label>
+                                      ))}
+                                    </div>
+                                    {form.actions[action.name]?.recipients?.length === 0 && (
+                                      <p className="text-xs text-red-500 mt-1">
+                                        Selecione pelo menos um destinatário
+                                      </p>
+                                    )}
+                                  </div>
+
+                                  <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                      Tipo de Notificação
+                                    </label>
+                                    <select
+                                      value={form.actions[action.name]?.notification_type || 'both'}
+                                      onChange={(e) => updateActionConfig(action.name, 'notification_type', e.target.value)}
+                                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    >
+                                      <option value="both">Email + Notificação no Sistema</option>
+                                      <option value="email">Apenas Email</option>
+                                      <option value="in_app">Apenas Notificação no Sistema</option>
+                                    </select>
+                                  </div>
+                                </>
+                              )}
+
+                              {action.name === 'add_comment' && (
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Comentário Automático *
+                                  </label>
+                                  <textarea
+                                    value={form.actions[action.name]?.comment_text || ''}
+                                    onChange={(e) => updateActionConfig(action.name, 'comment_text', e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    rows={3}
+                                    placeholder="Digite o comentário que será adicionado automaticamente..."
+                                  />
+                                </div>
+                              )}
+
+                              {action.name === 'set_status' && (
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Status de Destino *
+                                  </label>
+                                  <select
+                                    value={form.actions[action.name]?.target_status || ''}
+                                    onChange={(e) => updateActionConfig(action.name, 'target_status', e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  >
+                                    <option value="">Selecione um status</option>
+                                    {statuses.map(status => (
+                                      <option key={status.id} value={status.slug}>
+                                        {status.name}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                              )}
+
+                              {action.name === 'assign_to_user' && (
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Usuário para Atribuição *
+                                  </label>
+                                  <select
+                                    value={form.actions[action.name]?.user_id || ''}
+                                    onChange={(e) => updateActionConfig(action.name, 'user_id', e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  >
+                                    <option value="">Selecione um usuário</option>
+                                    {users.map(user => (
+                                      <option key={user.id} value={user.id}>
+                                        {user.name} ({user.email}) - {user.role}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       ))}
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Comentário Automático
-                      </label>
-                      <textarea
-                        value={form.actions.add_comment || ''}
-                        onChange={(e) => updateAction('add_comment', e.target.value || undefined)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        rows={3}
-                        placeholder="Comentário que será adicionado automaticamente..."
-                      />
-                    </div>
                   </div>
 
                   {/* Configurações de Horário */}

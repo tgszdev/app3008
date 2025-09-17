@@ -446,7 +446,7 @@ async function executeEscalationActions(rule: EscalationRule, ticket: TicketData
 
     // Notificar supervisor
     if (actions.notify_supervisor) {
-      await notifySupervisor(ticket, rule)
+      await notifySupervisor(ticket, rule, actions.notify_supervisor)
     }
 
     // Escalar para gerência
@@ -472,6 +472,33 @@ async function executeEscalationActions(rule: EscalationRule, ticket: TicketData
       }
     }
 
+    // Atribuir para usuário específico
+    if (actions.assign_to_user && actions.assign_to_user.user_id) {
+      const isValidUser = await validateAssignableUser(actions.assign_to_user.user_id)
+      if (isValidUser && actions.assign_to_user.user_id !== ticket.assigned_to) {
+        updateData.assigned_to = actions.assign_to_user.user_id
+        shouldUpdate = true
+      }
+    }
+
+    // Alterar status
+    if (actions.set_status && actions.set_status.target_status) {
+      // Mapear slug da tabela ticket_statuses para valor hardcoded da tabela tickets
+      const statusMapping: Record<string, string> = {
+        'aberto': 'open',
+        'em-progresso': 'in_progress',
+        'aguardando-cliente': 'waiting_customer',
+        'resolvido': 'resolved',
+        'fechado': 'closed'
+      }
+      
+      const mappedStatus = statusMapping[actions.set_status.target_status] || actions.set_status.target_status
+      if (mappedStatus !== ticket.status) {
+        updateData.status = mappedStatus
+        shouldUpdate = true
+      }
+    }
+
     // Atualizar ticket se houver mudanças
     if (shouldUpdate) {
       updateData.updated_at = new Date().toISOString()
@@ -489,7 +516,12 @@ async function executeEscalationActions(rule: EscalationRule, ticket: TicketData
 
     // Adicionar comentário
     if (actions.add_comment) {
-      await addEscalationComment(ticket, actions.add_comment)
+      const commentText = typeof actions.add_comment === 'string' 
+        ? actions.add_comment 
+        : actions.add_comment?.comment_text
+      if (commentText) {
+        await addEscalationComment(ticket, commentText)
+      }
     }
 
     return true
@@ -502,35 +534,66 @@ async function executeEscalationActions(rule: EscalationRule, ticket: TicketData
 /**
  * Notifica supervisor
  */
-async function notifySupervisor(ticket: TicketData, rule: EscalationRule): Promise<void> {
+async function notifySupervisor(ticket: TicketData, rule: EscalationRule, actionConfig?: any): Promise<void> {
   try {
-    // Buscar supervisores (analysts e admins)
-    const { data: supervisors, error } = await supabaseAdmin
-      .from('users')
-      .select('id, name, email')
-      .in('role', ['analyst', 'admin'])
-      .eq('is_active', true)
+    let supervisors: any[] = []
 
-    if (error || !supervisors || supervisors.length === 0) {
+    // Se há configuração específica de destinatários, usar ela
+    if (actionConfig?.recipients && actionConfig.recipients.length > 0) {
+      const { data: configuredUsers, error } = await supabaseAdmin
+        .from('users')
+        .select('id, name, email')
+        .in('id', actionConfig.recipients)
+        .eq('is_active', true)
+
+      if (!error && configuredUsers) {
+        supervisors = configuredUsers
+      }
+    } else {
+      // Fallback: buscar supervisores (analysts e admins)
+      const { data: allSupervisors, error } = await supabaseAdmin
+        .from('users')
+        .select('id, name, email')
+        .in('role', ['analyst', 'admin'])
+        .eq('is_active', true)
+
+      if (!error && allSupervisors) {
+        supervisors = allSupervisors
+      }
+    }
+
+    if (supervisors.length === 0) {
       console.log('Nenhum supervisor encontrado para notificação')
       return
     }
 
+    const notificationType = actionConfig?.notification_type || 'both'
+
     // Enviar notificação para cada supervisor
     for (const supervisor of supervisors) {
-      await createAndSendNotification({
-        user_id: supervisor.id,
-        type: 'escalation',
-        title: 'Escalação de Ticket',
-        message: `Ticket #${ticket.id} precisa de atenção: ${rule.name}`,
-        data: {
-          ticket_id: ticket.id,
-          ticket_title: ticket.title,
-          escalation_rule: rule.name,
-          escalation_type: 'supervisor_notification'
-        }
-      })
+      if (notificationType === 'both' || notificationType === 'in_app') {
+        await createAndSendNotification({
+          user_id: supervisor.id,
+          type: 'escalation',
+          title: 'Escalação de Ticket',
+          message: `Ticket #${ticket.id} precisa de atenção: ${rule.name}`,
+          data: {
+            ticket_id: ticket.id,
+            ticket_title: ticket.title,
+            escalation_rule: rule.name,
+            escalation_type: 'supervisor_notification'
+          }
+        })
+      }
+
+      // TODO: Implementar envio de email se notificationType for 'email' ou 'both'
+      if (notificationType === 'email' || notificationType === 'both') {
+        console.log(`📧 Email seria enviado para ${supervisor.email} sobre ticket ${ticket.id}`)
+        // Aqui você pode implementar o envio de email usando o sistema de email existente
+      }
     }
+
+    console.log(`✅ Notificação enviada para ${supervisors.length} supervisor(es)`)
   } catch (error) {
     console.error('Erro ao notificar supervisor:', error)
   }
