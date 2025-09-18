@@ -96,10 +96,4 @@ async function executeAutoEscalation() {
   }
 }
 
-export async function GET(request: NextRequest) {
-  return NextResponse.json({
-    message: 'API de execução automática de escalação',
-    usage: 'POST para executar escalação automática',
-    timestamp: new Date().toISOString()
-  })
-}
+// Função GET removida - já existe na linha 6
