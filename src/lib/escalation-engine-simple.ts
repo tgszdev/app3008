@@ -1,5 +1,31 @@
 import { supabaseAdmin } from './supabase'
 
+/**
+ * Verifica se um ticket já foi escalado recentemente pela mesma regra
+ */
+async function checkRecentEscalation(ticketId: string, ruleId: string): Promise<boolean> {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('escalation_logs')
+      .select('id, triggered_at')
+      .eq('ticket_id', ticketId)
+      .eq('rule_id', ruleId)
+      .eq('success', true)
+      .gte('triggered_at', new Date(Date.now() - 30 * 60 * 1000).toISOString()) // Últimos 30 minutos
+      .limit(1)
+
+    if (error) {
+      console.error('Erro ao verificar escalação recente:', error)
+      return false
+    }
+
+    return data && data.length > 0
+  } catch (error) {
+    console.error('Erro ao verificar escalação recente:', error)
+    return false
+  }
+}
+
 export interface EscalationExecutionResult {
   success: boolean
   executedRules: string[]
@@ -68,6 +94,13 @@ export async function executeEscalationForTicketSimple(ticketId: string): Promis
     for (const rule of rules) {
       try {
         console.log(`🔍 [SIMPLE] Verificando regra: ${rule.name}`)
+        
+        // Verificar se já foi escalado recentemente (evitar loop)
+        const recentEscalation = await checkRecentEscalation(ticket.id, rule.id)
+        if (recentEscalation) {
+          console.log(`⏭️ [SIMPLE] Ticket ${ticket.id} já foi escalado recentemente pela regra ${rule.name}`)
+          continue
+        }
         
         // Verificar se a regra se aplica ao ticket (versão simplificada)
         const shouldExecute = shouldExecuteEscalationSimple(rule, ticket)
