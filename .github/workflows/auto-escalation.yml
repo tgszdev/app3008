@@ -1,0 +1,50 @@
+name: Auto Escalation System
+
+on:
+  schedule:
+    # Executa a cada 5 minutos
+    - cron: '*/5 * * * *'
+  workflow_dispatch: # Permite execução manual
+
+jobs:
+  auto-escalation:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Execute Auto Escalation
+      run: |
+        echo "🔄 Executando escalação automática..."
+        
+        # Executar escalação automática
+        ESCALATION_RESPONSE=$(curl -s -X POST "https://www.ithostbr.tech/api/escalation/auto-execute" \
+          -H "Content-Type: application/json" \
+          -H "User-Agent: GitHub-Actions-Auto-Escalation/1.0")
+        
+        echo "📊 Resultado da escalação: $ESCALATION_RESPONSE"
+        
+        # Processar e-mails de escalação
+        EMAIL_RESPONSE=$(curl -s -X POST "https://www.ithostbr.tech/api/escalation/process-emails" \
+          -H "Content-Type: application/json" \
+          -H "User-Agent: GitHub-Actions-Auto-Escalation/1.0")
+        
+        echo "📧 Resultado do processamento de e-mails: $EMAIL_RESPONSE"
+        
+        # Verificar se houve sucesso
+        if echo "$ESCALATION_RESPONSE" | grep -q '"success":true'; then
+          echo "✅ Escalação executada com sucesso"
+        else
+          echo "❌ Erro na execução da escalação"
+          exit 1
+        fi
+        
+        if echo "$EMAIL_RESPONSE" | grep -q '"success":true'; then
+          echo "✅ E-mails processados com sucesso"
+        else
+          echo "❌ Erro no processamento de e-mails"
+          exit 1
+        fi
+
+    - name: Log Execution
+      run: |
+        echo "🎯 Execução automática concluída em $(date)"
+        echo "📅 Próxima execução em 5 minutos"
