@@ -292,13 +292,35 @@ async function executeEscalationActionsSimple(rule: any, ticket: any): Promise<b
     }
 
     // Criar notificação para e-mail
-    if (actions.send_email_notification && typeof actions.send_email_notification === 'object') {
-      const emailConfig = actions.send_email_notification
-      if (emailConfig.recipients && Array.isArray(emailConfig.recipients)) {
-        console.log(`   📧 [SIMPLE] Criando notificações de e-mail para ${emailConfig.recipients.length} destinatários`)
+    if (actions.send_email_notification) {
+      let emailConfig: any = {}
+      let recipients: string[] = []
+
+      // Verificar se é objeto com configuração ou apenas true
+      if (typeof actions.send_email_notification === 'object') {
+        emailConfig = actions.send_email_notification
+        recipients = emailConfig.recipients || []
+      } else if (actions.send_email_notification === true) {
+        // Se for true, usar configuração padrão
+        emailConfig = {
+          subject: 'Escalação de Ticket',
+          message: 'Ticket escalado automaticamente'
+        }
+        
+        // Buscar destinatários da ação notify_supervisor ou usar destinatário padrão
+        if (actions.notify_supervisor && typeof actions.notify_supervisor === 'object' && actions.notify_supervisor.recipients) {
+          recipients = actions.notify_supervisor.recipients
+        } else {
+          // Usar destinatário padrão se disponível
+          recipients = ['2a33241e-ed38-48b5-9c84-e8c354ae9606'] // ID do supervisor padrão
+        }
+      }
+
+      if (recipients && recipients.length > 0) {
+        console.log(`   📧 [SIMPLE] Criando notificações de e-mail para ${recipients.length} destinatários`)
         
         // Criar notificação para cada destinatário
-        for (const recipientId of emailConfig.recipients) {
+        for (const recipientId of recipients) {
           try {
             const { error: notificationError } = await supabaseAdmin
               .from('notifications')
@@ -325,6 +347,8 @@ async function executeEscalationActionsSimple(rule: any, ticket: any): Promise<b
             console.error(`   ❌ [SIMPLE] Erro ao criar notificação:`, error.message)
           }
         }
+      } else {
+        console.log(`   ⚠️ [SIMPLE] send_email_notification é true mas não há destinatários configurados`)
       }
     }
 
