@@ -132,8 +132,7 @@ export async function POST(request: NextRequest) {
       assigned_to,
       due_date,
       is_internal: is_internal || false, // Adicionar campo is_internal
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      // Remover created_at e updated_at - deixar o Supabase gerenciar automaticamente
     }
 
     // Adicionar category_id se fornecido
@@ -168,8 +167,8 @@ export async function POST(request: NextRequest) {
         .insert({
           ticket_id: newTicket.id,
           user_id: created_by,
-          action: 'created',
-          created_at: new Date().toISOString()
+          action: 'created'
+          // Remover created_at - deixar o Supabase gerenciar automaticamente
         })
     } catch (historyError) {
       console.log('Erro ao criar histórico (ignorado):', historyError)
