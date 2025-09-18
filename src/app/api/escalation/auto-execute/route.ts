@@ -2,7 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { executeEscalationForTicketSimple } from '@/lib/escalation-engine-simple'
 
+// GET - Para Vercel Cron Jobs
+export async function GET() {
+  return await executeAutoEscalation();
+}
+
+// POST - Para chamadas manuais
 export async function POST(request: NextRequest) {
+  return await executeAutoEscalation();
+}
+
+async function executeAutoEscalation() {
   try {
     console.log('🔄 [AUTO-ESCALATION] Iniciando execução automática de escalação...')
     

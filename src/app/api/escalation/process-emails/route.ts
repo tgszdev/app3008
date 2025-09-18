@@ -2,7 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { sendEmail } from '@/lib/email-config';
 
+// GET - Para Vercel Cron Jobs
+export async function GET() {
+  return await processEmails();
+}
+
+// POST - Para chamadas manuais
 export async function POST(request: NextRequest) {
+  return await processEmails();
+}
+
+async function processEmails() {
   try {
     console.log('📧 [EMAIL-PROCESSOR] Iniciando processamento de e-mails de escalação...');
 

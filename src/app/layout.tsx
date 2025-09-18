@@ -4,6 +4,7 @@ import './globals.css'
 import { Toaster } from 'react-hot-toast'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { AuthProvider } from '@/components/providers/auth-provider'
+// AppInitializer removido - não funciona no Vercel
 
 const inter = Inter({ subsets: ['latin'] })
 
