@@ -176,8 +176,32 @@ function shouldExecuteEscalationSimple(rule: any, ticket: any): { shouldExecute:
 
     // Verificar condições básicas
     if (rule.conditions.status) {
-      const statusArray = Array.isArray(rule.conditions.status) ? rule.conditions.status : [rule.conditions.status]
-      if (!statusArray.includes(ticket.status)) {
+      let statusArray: string[] = []
+      
+      if (Array.isArray(rule.conditions.status)) {
+        statusArray = rule.conditions.status
+      } else if (typeof rule.conditions.status === 'string') {
+        statusArray = [rule.conditions.status]
+      }
+      
+      // Mapear status em inglês para português
+      const statusMap: { [key: string]: string[] } = {
+        'open': ['open', 'aberto'],
+        'aberto': ['open', 'aberto'],
+        'in_progress': ['in_progress', 'em-progresso'],
+        'em-progresso': ['in_progress', 'em-progresso']
+      }
+      
+      let statusMatches = false
+      for (const ruleStatus of statusArray) {
+        const mappedStatuses = statusMap[ruleStatus] || [ruleStatus]
+        if (mappedStatuses.includes(ticket.status)) {
+          statusMatches = true
+          break
+        }
+      }
+      
+      if (!statusMatches) {
         return { shouldExecute: false, reason: `Status não corresponde (${ticket.status} não está em ${JSON.stringify(statusArray)})`, escalationType: 'status_mismatch', timeElapsed }
       }
     }
