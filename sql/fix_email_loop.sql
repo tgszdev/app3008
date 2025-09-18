@@ -7,8 +7,7 @@
 SELECT 'Marcando todas as notificações de escalação como processadas...' as status;
 
 UPDATE notifications 
-SET is_read = true, 
-    updated_at = NOW()
+SET is_read = true
 WHERE type = 'escalation_email' 
 AND is_read = false;
 

@@ -133,7 +133,7 @@ async function processEmails() {
           // 4. Marcar notificação como lida
           await supabaseAdmin
             .from('notifications')
-            .update({ is_read: true, updated_at: new Date().toISOString() })
+            .update({ is_read: true })
             .eq('id', notification.id);
 
           sentCount++;
