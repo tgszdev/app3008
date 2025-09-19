@@ -12,6 +12,13 @@ export function formatBrazilDateTime(date: string | Date | null | undefined): st
   
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : date
+    
+    // Verificar se a data é válida
+    if (isNaN(dateObj.getTime())) {
+      return 'Data inválida'
+    }
+    
+    // Converter diretamente para horário de Brasília
     const brazilTime = utcToZonedTime(dateObj, BRAZIL_TIMEZONE)
     return format(brazilTime, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })
   } catch (error) {
