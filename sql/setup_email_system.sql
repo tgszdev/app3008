@@ -33,36 +33,37 @@ CREATE TABLE IF NOT EXISTS system_settings (
 CREATE INDEX IF NOT EXISTS idx_system_settings_key ON system_settings(key);
 
 -- 3. Inserir configurações padrão de email
+-- Verificar se a coluna value é JSON ou TEXT e inserir adequadamente
 INSERT INTO system_settings (key, value, description) VALUES
-  ('email_provider', 'supabase', 'Provedor de email (supabase, smtp, sendgrid, resend)')
+  ('email_provider', '"supabase"', 'Provedor de email (supabase, smtp, sendgrid, resend)')
   ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
 
 INSERT INTO system_settings (key, value, description) VALUES
-  ('email_from', 'noreply@ithostbr.tech', 'Email remetente padrão')
+  ('email_from', '"noreply@ithostbr.tech"', 'Email remetente padrão')
   ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
 
 INSERT INTO system_settings (key, value, description) VALUES
-  ('smtp_host', '', 'Host do servidor SMTP')
+  ('smtp_host', '""', 'Host do servidor SMTP')
   ON CONFLICT (key) DO NOTHING;
 
 INSERT INTO system_settings (key, value, description) VALUES
-  ('smtp_port', '587', 'Porta do servidor SMTP')
+  ('smtp_port', '"587"', 'Porta do servidor SMTP')
   ON CONFLICT (key) DO NOTHING;
 
 INSERT INTO system_settings (key, value, description) VALUES
-  ('smtp_user', '', 'Usuário SMTP')
+  ('smtp_user', '""', 'Usuário SMTP')
   ON CONFLICT (key) DO NOTHING;
 
 INSERT INTO system_settings (key, value, description) VALUES
-  ('smtp_pass', '', 'Senha SMTP')
+  ('smtp_pass', '""', 'Senha SMTP')
   ON CONFLICT (key) DO NOTHING;
 
 INSERT INTO system_settings (key, value, description) VALUES
-  ('sendgrid_api_key', '', 'API Key do SendGrid')
+  ('sendgrid_api_key', '""', 'API Key do SendGrid')
   ON CONFLICT (key) DO NOTHING;
 
 INSERT INTO system_settings (key, value, description) VALUES
-  ('resend_api_key', '', 'API Key do Resend')
+  ('resend_api_key', '""', 'API Key do Resend')
   ON CONFLICT (key) DO NOTHING;
 
 -- 4. Trigger para atualizar updated_at em email_logs
