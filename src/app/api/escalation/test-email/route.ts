@@ -38,6 +38,7 @@ export async function GET(request: NextRequest) {
     // Enviar email de teste
     const result = await sendEscalationEmail(
       'TEST-' + Date.now().toString(),
+      '999999', // Número de teste
       'TESTE - Ticket de Exemplo para Verificar Escalação',
       'Teste de Email - Regra de 1 hora',
       [recipientEmail]
@@ -110,6 +111,7 @@ export async function POST(request: NextRequest) {
     // Enviar email de teste
     const result = await sendEscalationEmail(
       'TEST-' + Date.now().toString(),
+      '999999', // Número de teste
       'TESTE - Verificação do Sistema de Escalação',
       'Email de Teste - Sistema Funcionando',
       [email]

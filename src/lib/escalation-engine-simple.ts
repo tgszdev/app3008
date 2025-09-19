@@ -338,9 +338,22 @@ async function executeEscalationActionsSimple(rule: any, ticket: any): Promise<b
         if (users && users.length > 0) {
           const emails = users.map(u => u.email).filter(Boolean)
           
+          // Buscar ticket_number se não estiver disponível
+          let ticketNumber = ticket.ticket_number
+          if (!ticketNumber) {
+            const { data: fullTicket } = await supabaseAdmin
+              .from('tickets')
+              .select('ticket_number')
+              .eq('id', ticket.id)
+              .single()
+            
+            ticketNumber = fullTicket?.ticket_number || ticket.id.slice(0, 8)
+          }
+          
           // Enviar email real
           const emailSent = await sendEscalationEmail(
             ticket.id,
+            ticketNumber,
             ticket.title,
             rule.name,
             emails

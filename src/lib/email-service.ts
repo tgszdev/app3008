@@ -6,17 +6,18 @@ import { sendEmail as sendEmailConfig, sendNotificationEmail } from './email-con
  */
 export async function sendEscalationEmail(
   ticketId: string,
+  ticketNumber: string, // Adicionado ticket_number
   ticketTitle: string,
   ruleName: string,
   recipientEmails: string[]
 ): Promise<boolean> {
   try {
     console.log(`🚨 [ESCALATION-EMAIL] Preparando email de escalação`)
-    console.log(`🚨 [ESCALATION-EMAIL] Ticket: ${ticketTitle} (${ticketId})`)
+    console.log(`🚨 [ESCALATION-EMAIL] Ticket #${ticketNumber}: ${ticketTitle}`)
     console.log(`🚨 [ESCALATION-EMAIL] Regra: ${ruleName}`)
     console.log(`🚨 [ESCALATION-EMAIL] Destinatários: ${recipientEmails.join(', ')}`)
     
-    const subject = `🚨 Escalação Automática - Ticket #${ticketId.slice(0, 8)}`
+    const subject = `🚨 Escalação Automática - Chamado #${ticketNumber}`
     
     const html = `
       <!DOCTYPE html>
@@ -65,8 +66,8 @@ export async function sendEscalationEmail(
                       <table cellpadding="0" cellspacing="0" border="0" width="100%">
                         <tr>
                           <td style="padding: 8px 0;">
-                            <strong style="color: #6b7280; width: 120px; display: inline-block;">ID:</strong>
-                            <span style="color: #1f2937;">#${ticketId.slice(0, 8)}</span>
+                            <strong style="color: #6b7280; width: 120px; display: inline-block;">Número:</strong>
+                            <span style="color: #1f2937; font-weight: bold;">#${ticketNumber}</span>
                           </td>
                         </tr>
                         <tr>
@@ -140,7 +141,7 @@ ATENÇÃO NECESSÁRIA: Este ticket foi escalado automaticamente.
 
 DETALHES DO TICKET:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-ID: #${ticketId.slice(0, 8)}
+Chamado: #${ticketNumber}
 Título: ${ticketTitle}
 Motivo: ${ruleName}
 Data/Hora: ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}

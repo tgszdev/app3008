@@ -6,6 +6,9 @@
     "src/app/api/escalation/auto-execute-v2/route.ts": {
       "maxDuration": 10
     },
+    "src/app/api/escalation/auto-execute-v3/route.ts": {
+      "maxDuration": 10
+    },
     "src/app/api/escalation/test/route.ts": {
       "maxDuration": 10
     },
@@ -15,7 +18,7 @@
   },
   "crons": [
     {
-      "path": "/api/escalation/auto-execute-v2",
+      "path": "/api/escalation/auto-execute-v3",
       "schedule": "*/5 * * * *"
     }
   ]
