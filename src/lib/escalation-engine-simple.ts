@@ -1,5 +1,7 @@
 import { supabaseAdmin } from './supabase'
 import { sendEscalationEmail } from './email-service'
+// Importar getNowInBrazil do date-utils (versão sem date-fns-tz)
+import { getNowInBrazil } from './date-utils'
 
 /**
  * Verifica se um ticket já foi escalado recentemente pela mesma regra

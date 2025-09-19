@@ -1,6 +1,8 @@
 import { supabaseAdmin } from './supabase'
 import { createAndSendNotification } from './notifications'
 import { differenceInMinutes, isWeekend, setHours, setMinutes, isAfter, isBefore, parseISO } from 'date-fns'
+// Importar funções do date-utils (versão sem date-fns-tz)
+import { getNowInBrazil, isBusinessHours } from './date-utils'
 
 export interface EscalationRule {
   id: string
