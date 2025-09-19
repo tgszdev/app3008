@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendEscalationEmail } from '@/lib/email-service'
 import { supabaseAdmin } from '@/lib/supabase'
+import { clearEmailConfigCache } from '@/lib/email-config'
 
 export async function GET(request: NextRequest) {
   try {
@@ -30,6 +31,9 @@ export async function GET(request: NextRequest) {
     const recipientEmail = testEmail || ''
     
     console.log(`📧 [TEST-EMAIL] Enviando email de teste para: ${recipientEmail}`)
+    
+    // Limpar cache de configuração para forçar buscar do banco
+    clearEmailConfigCache()
     
     // Enviar email de teste
     const result = await sendEscalationEmail(
