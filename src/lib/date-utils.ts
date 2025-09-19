@@ -11,13 +11,44 @@ export function formatBrazilDateTime(date: string | Date | null | undefined): st
   if (!date) return 'N/A'
   
   try {
-    // Se for string, fazer parse direto
-    const dateObj = typeof date === 'string' ? new Date(date) : date
+    let dateObj: Date
+    
+    // Tratamento especial para diferentes formatos de data
+    if (typeof date === 'string') {
+      // Remove timezone offset se presente para forçar interpretação como UTC
+      const cleanDate = date.replace(/[+-]\d{2}:\d{2}$/, '')
+      
+      // Se não tem 'Z' ou timezone, assume UTC
+      if (!date.endsWith('Z') && !date.match(/[+-]\d{2}:\d{2}$/)) {
+        dateObj = new Date(cleanDate + 'Z')
+      } else {
+        dateObj = new Date(date)
+      }
+      
+      // Fallback para parse direto se ainda falhar
+      if (isNaN(dateObj.getTime())) {
+        dateObj = new Date(date)
+      }
+    } else {
+      dateObj = date
+    }
     
     // Verificar se a data é válida
     if (!dateObj || isNaN(dateObj.getTime())) {
-      console.error('Data inválida recebida:', date)
-      return 'N/A'
+      console.error('Data inválida após parsing:', date, 'Resultado:', dateObj)
+      // Tentar parseISO como último recurso
+      if (typeof date === 'string') {
+        try {
+          dateObj = parseISO(date)
+          if (isNaN(dateObj.getTime())) {
+            throw new Error('parseISO também falhou')
+          }
+        } catch {
+          return 'N/A'
+        }
+      } else {
+        return 'N/A'
+      }
     }
     
     // Converter para horário de Brasília
@@ -28,10 +59,20 @@ export function formatBrazilDateTime(date: string | Date | null | undefined): st
     // Tentar formatação simples como fallback
     try {
       const d = new Date(date as string)
-      return d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleString('pt-BR', { 
+          timeZone: 'America/Sao_Paulo',
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+      }
     } catch {
-      return 'N/A'
+      // Ignorar erro do fallback
     }
+    return 'N/A'
   }
 }
 
@@ -42,7 +83,22 @@ export function formatBrazilDate(date: string | Date | null | undefined): string
   if (!date) return 'N/A'
   
   try {
-    const dateObj = typeof date === 'string' ? new Date(date) : date
+    let dateObj: Date
+    
+    if (typeof date === 'string') {
+      const cleanDate = date.replace(/[+-]\d{2}:\d{2}$/, '')
+      if (!date.endsWith('Z') && !date.match(/[+-]\d{2}:\d{2}$/)) {
+        dateObj = new Date(cleanDate + 'Z')
+      } else {
+        dateObj = new Date(date)
+      }
+      if (isNaN(dateObj.getTime())) {
+        dateObj = new Date(date)
+      }
+    } else {
+      dateObj = date
+    }
+    
     if (!dateObj || isNaN(dateObj.getTime())) return 'N/A'
     
     const brazilTime = utcToZonedTime(dateObj, BRAZIL_TIMEZONE)
@@ -60,7 +116,22 @@ export function formatBrazilTime(date: string | Date | null | undefined): string
   if (!date) return 'N/A'
   
   try {
-    const dateObj = typeof date === 'string' ? new Date(date) : date
+    let dateObj: Date
+    
+    if (typeof date === 'string') {
+      const cleanDate = date.replace(/[+-]\d{2}:\d{2}$/, '')
+      if (!date.endsWith('Z') && !date.match(/[+-]\d{2}:\d{2}$/)) {
+        dateObj = new Date(cleanDate + 'Z')
+      } else {
+        dateObj = new Date(date)
+      }
+      if (isNaN(dateObj.getTime())) {
+        dateObj = new Date(date)
+      }
+    } else {
+      dateObj = date
+    }
+    
     if (!dateObj || isNaN(dateObj.getTime())) return 'N/A'
     
     const brazilTime = utcToZonedTime(dateObj, BRAZIL_TIMEZONE)
@@ -92,7 +163,22 @@ export function formatRelativeTime(date: string | Date | null | undefined): stri
   if (!date) return 'N/A'
   
   try {
-    const dateObj = typeof date === 'string' ? new Date(date) : date
+    let dateObj: Date
+    
+    if (typeof date === 'string') {
+      const cleanDate = date.replace(/[+-]\d{2}:\d{2}$/, '')
+      if (!date.endsWith('Z') && !date.match(/[+-]\d{2}:\d{2}$/)) {
+        dateObj = new Date(cleanDate + 'Z')
+      } else {
+        dateObj = new Date(date)
+      }
+      if (isNaN(dateObj.getTime())) {
+        dateObj = new Date(date)
+      }
+    } else {
+      dateObj = date
+    }
+    
     if (!dateObj || isNaN(dateObj.getTime())) return 'N/A'
     
     const brazilTime = utcToZonedTime(dateObj, BRAZIL_TIMEZONE)
@@ -111,7 +197,7 @@ export function formatRelativeTime(date: string | Date | null | undefined): stri
     return formatBrazilDateTime(date)
   } catch (error) {
     console.error('Erro ao formatar tempo relativo:', error)
-    return 'Data inválida'
+    return 'N/A'
   }
 }
 
