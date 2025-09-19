@@ -1,11 +1,11 @@
-import { format, parseISO, isValid, differenceInMinutes, differenceInHours, differenceInDays } from 'date-fns'
+import { format, parseISO, isValid } from 'date-fns'
+import { utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz'
 import { ptBR } from 'date-fns/locale'
 
 const BRAZIL_TIMEZONE = 'America/Sao_Paulo'
-const BRAZIL_OFFSET = -3 // UTC-3
 
 /**
- * Função auxiliar mais simples para converter qualquer formato de data
+ * Função auxiliar mais simples e robusta para converter qualquer formato de data
  */
 function parseDate(date: string | Date | null | undefined): Date | null {
   if (!date) return null
@@ -24,7 +24,7 @@ function parseDate(date: string | Date | null | undefined): Date | null {
       return null
     }
     
-    // Tentar conversão direta primeiro
+    // Tentar conversão direta primeiro (funciona para a maioria dos formatos)
     try {
       const directDate = new Date(trimmed)
       if (isValid(directDate) && !isNaN(directDate.getTime())) {
@@ -80,38 +80,6 @@ function parseDate(date: string | Date | null | undefined): Date | null {
 }
 
 /**
- * Converte uma data UTC para o horário de Brasília usando toLocaleString
- * Fallback que não depende de date-fns-tz
- */
-function toBrazilTime(date: Date): Date {
-  // Usar toLocaleString para obter a data no timezone brasileiro
-  const brazilDateStr = date.toLocaleString('en-US', {
-    timeZone: BRAZIL_TIMEZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false
-  })
-  
-  // Parse da string resultante
-  const [datePart, timePart] = brazilDateStr.split(', ')
-  const [month, day, year] = datePart.split('/')
-  const [hour, minute, second] = timePart.split(':')
-  
-  return new Date(
-    parseInt(year),
-    parseInt(month) - 1,
-    parseInt(day),
-    parseInt(hour),
-    parseInt(minute),
-    parseInt(second)
-  )
-}
-
-/**
  * Converte uma data UTC para o horário de Brasília e formata
  */
 export function formatBrazilDateTime(date: string | Date | null | undefined): string {
@@ -119,24 +87,15 @@ export function formatBrazilDateTime(date: string | Date | null | undefined): st
     const dateObj = parseDate(date)
     
     if (!dateObj) {
+      // Log mais discreto
       if (date) {
         console.debug('formatBrazilDateTime: Não conseguiu converter:', date)
       }
       return 'N/A'
     }
     
-    // Usar toLocaleString como fallback
-    const formatted = dateObj.toLocaleString('pt-BR', {
-      timeZone: BRAZIL_TIMEZONE,
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-    
-    // Substituir vírgula por "às"
-    return formatted.replace(',', ' às')
+    const brazilTime = utcToZonedTime(dateObj, BRAZIL_TIMEZONE)
+    return format(brazilTime, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })
   } catch (error) {
     console.error('formatBrazilDateTime erro:', error)
     return 'N/A'
@@ -157,12 +116,8 @@ export function formatBrazilDate(date: string | Date | null | undefined): string
       return 'N/A'
     }
     
-    return dateObj.toLocaleDateString('pt-BR', {
-      timeZone: BRAZIL_TIMEZONE,
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    })
+    const brazilTime = utcToZonedTime(dateObj, BRAZIL_TIMEZONE)
+    return format(brazilTime, 'dd/MM/yyyy', { locale: ptBR })
   } catch (error) {
     console.error('formatBrazilDate erro:', error)
     return 'N/A'
@@ -183,11 +138,8 @@ export function formatBrazilTime(date: string | Date | null | undefined): string
       return 'N/A'
     }
     
-    return dateObj.toLocaleTimeString('pt-BR', {
-      timeZone: BRAZIL_TIMEZONE,
-      hour: '2-digit',
-      minute: '2-digit'
-    })
+    const brazilTime = utcToZonedTime(dateObj, BRAZIL_TIMEZONE)
+    return format(brazilTime, 'HH:mm', { locale: ptBR })
   } catch (error) {
     console.error('formatBrazilTime erro:', error)
     return 'N/A'
@@ -196,10 +148,11 @@ export function formatBrazilTime(date: string | Date | null | undefined): string
 
 /**
  * Formata tempo relativo (ex: "há 2 horas")
- * VERSÃO SEM date-fns-tz
+ * VERSÃO SIMPLIFICADA E CORRIGIDA
  */
 export function formatRelativeTime(date: string | Date | null | undefined): string {
   try {
+    // Tentar parse direto primeiro
     const dateObj = parseDate(date)
     
     if (!dateObj) {
@@ -211,8 +164,10 @@ export function formatRelativeTime(date: string | Date | null | undefined): stri
         try {
           const lastTry = new Date(trimmed)
           if (isValid(lastTry) && !isNaN(lastTry.getTime())) {
-            const now = new Date()
-            const diffMs = now.getTime() - lastTry.getTime()
+            const brazilTime = utcToZonedTime(lastTry, BRAZIL_TIMEZONE)
+            const now = getNowInBrazil()
+            
+            const diffMs = now.getTime() - brazilTime.getTime()
             const diffMinutes = Math.floor(diffMs / 60000)
             const diffHours = Math.floor(diffMinutes / 60)
             const diffDays = Math.floor(diffHours / 24)
@@ -246,11 +201,14 @@ export function formatRelativeTime(date: string | Date | null | undefined): stri
       return 'Data indisponível'
     }
     
-    // Se conseguiu fazer o parse - calcular diferença diretamente
-    const now = new Date()
-    const diffMinutes = differenceInMinutes(now, dateObj)
-    const diffHours = differenceInHours(now, dateObj)
-    const diffDays = differenceInDays(now, dateObj)
+    // Se conseguiu fazer o parse
+    const brazilTime = utcToZonedTime(dateObj, BRAZIL_TIMEZONE)
+    const now = getNowInBrazil()
+    
+    const diffMs = now.getTime() - brazilTime.getTime()
+    const diffMinutes = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMinutes / 60)
+    const diffDays = Math.floor(diffHours / 24)
     
     // Verificar se a diferença é negativa (data no futuro)
     if (diffMinutes < 0) {
@@ -279,51 +237,23 @@ export function formatRelativeTime(date: string | Date | null | undefined): stri
 
 /**
  * Converte uma data do horário de Brasília para UTC (para salvar no banco)
- * Versão simplificada sem date-fns-tz
  */
 export function brazilToUTC(date: Date): Date {
-  // Adicionar 3 horas para converter de Brasil (UTC-3) para UTC
-  return new Date(date.getTime() + (3 * 60 * 60 * 1000))
+  return zonedTimeToUtc(date, BRAZIL_TIMEZONE)
 }
 
 /**
  * Retorna a data/hora atual no horário de Brasília
- * Versão simplificada sem date-fns-tz
  */
 export function getNowInBrazil(): Date {
-  const now = new Date()
-  // Usar toLocaleString para obter a data no timezone brasileiro
-  const brazilDateStr = now.toLocaleString('en-US', {
-    timeZone: BRAZIL_TIMEZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false
-  })
-  
-  // Parse da string resultante
-  const [datePart, timePart] = brazilDateStr.split(', ')
-  const [month, day, year] = datePart.split('/')
-  const [hour, minute, second] = timePart.split(':')
-  
-  return new Date(
-    parseInt(year),
-    parseInt(month) - 1,
-    parseInt(day),
-    parseInt(hour),
-    parseInt(minute),
-    parseInt(second)
-  )
+  return utcToZonedTime(new Date(), BRAZIL_TIMEZONE)
 }
 
 /**
  * Verifica se uma data está no horário comercial brasileiro
  */
 export function isBusinessHours(date?: Date): boolean {
-  const brazilTime = date ? toBrazilTime(date) : getNowInBrazil()
+  const brazilTime = date ? utcToZonedTime(date, BRAZIL_TIMEZONE) : getNowInBrazil()
   const hours = brazilTime.getHours()
   const day = brazilTime.getDay()
   
@@ -343,8 +273,3 @@ export function getMinutesDifference(date1: string | Date, date2: string | Date)
   const diffMs = Math.abs(d2.getTime() - d1.getTime())
   return Math.floor(diffMs / 60000)
 }
-
-// Exportar também as funções utilitárias usadas pelo sistema de escalação
-// Para manter compatibilidade com imports existentes
-export const utcToZonedTime = toBrazilTime
-export const zonedTimeToUtc = brazilToUTC
