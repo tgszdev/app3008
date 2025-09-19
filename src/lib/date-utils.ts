@@ -18,7 +18,7 @@ function parseDate(date: string | Date | null | undefined): Date | null {
   // Se é string
   if (typeof date === 'string') {
     const trimmed = date.trim()
-    if (!trimmed) return null
+    if (!trimmed || trimmed === 'null' || trimmed === 'undefined') return null
     
     // Lista de tentativas de parsing em ordem de prioridade
     const parsers = [
@@ -26,6 +26,15 @@ function parseDate(date: string | Date | null | undefined): Date | null {
       () => {
         const parsed = parseISO(trimmed)
         return isValid(parsed) ? parsed : null
+      },
+      // 1.5. Formato PostgreSQL com espaço em vez de T
+      () => {
+        if (trimmed.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/)) {
+          const isoFormat = trimmed.replace(' ', 'T')
+          const parsed = parseISO(isoFormat.includes('Z') || isoFormat.includes('+') || isoFormat.includes('-') ? isoFormat : isoFormat + 'Z')
+          return isValid(parsed) ? parsed : null
+        }
+        return null
       },
       // 2. Formato ISO sem Z (assumir UTC)
       () => {
@@ -207,7 +216,27 @@ export function formatRelativeTime(date: string | Date | null | undefined): stri
     const dateObj = parseDate(date)
     
     if (!dateObj) {
-      console.warn('formatRelativeTime: Data inválida ou nula:', date)
+      console.warn('formatRelativeTime: Data inválida ou nula:', date, 'Tipo:', typeof date)
+      // Tentar mais uma vez com string direta se for string
+      if (typeof date === 'string' && date && date !== 'null' && date !== 'undefined') {
+        const lastTry = new Date(date)
+        if (isValid(lastTry)) {
+          console.log('formatRelativeTime: Conseguiu converter na última tentativa')
+          const brazilTime = utcToZonedTime(lastTry, BRAZIL_TIMEZONE)
+          const now = getNowInBrazil()
+          const diffMs = now.getTime() - brazilTime.getTime()
+          const diffMinutes = Math.floor(diffMs / 60000)
+          const diffHours = Math.floor(diffMinutes / 60)
+          const diffDays = Math.floor(diffHours / 24)
+          
+          if (diffMinutes < 1) return 'agora'
+          if (diffMinutes < 60) return `há ${diffMinutes} minuto${diffMinutes > 1 ? 's' : ''}`
+          if (diffHours < 24) return `há ${diffHours} hora${diffHours > 1 ? 's' : ''}`
+          if (diffDays < 30) return `há ${diffDays} dia${diffDays > 1 ? 's' : ''}`
+          
+          return formatBrazilDateTime(date)
+        }
+      }
       return 'N/A'
     }
     

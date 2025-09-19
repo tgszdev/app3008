@@ -232,7 +232,15 @@ export default function TicketsPage() {
       console.warn('getTimeAgo: Data vazia ou nula recebida')
       return 'N/A'
     }
-    return formatRelativeTime(date)
+    // Debug temporário para ver o formato da data
+    if (process.env.NODE_ENV === 'development') {
+      console.log('getTimeAgo recebeu:', date, 'tipo:', typeof date)
+    }
+    const result = formatRelativeTime(date)
+    if (result === 'N/A' && process.env.NODE_ENV === 'development') {
+      console.error('formatRelativeTime retornou N/A para:', date)
+    }
+    return result
   }
 
   const getCategoryInfo = (ticket: Ticket) => {
@@ -707,7 +715,7 @@ export default function TicketsPage() {
                         <div className="text-sm text-gray-500 dark:text-gray-400">
                           <div className="flex items-center">
                             <Calendar className="h-3 w-3 mr-1" />
-                            {getTimeAgo(ticket.created_at)}
+                            {ticket.created_at ? getTimeAgo(ticket.created_at) : 'Data não disponível'}
                           </div>
                         </div>
                       </td>
