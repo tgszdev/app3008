@@ -166,6 +166,28 @@ Este é um email automático do sistema de escalação.
       text
     })
     
+    // Registrar no banco de dados
+    try {
+      const { supabaseAdmin } = await import('./supabase')
+      
+      for (const email of recipientEmails) {
+        await supabaseAdmin
+          .from('email_logs')
+          .insert({
+            to: email,
+            subject,
+            body: html,
+            status: result.success ? 'sent' : 'failed',
+            provider: 'smtp',
+            error_message: result.success ? null : (result.error || 'Unknown error'),
+            metadata: result.success ? { messageId: result.messageId, accepted: result.accepted } : null,
+            created_at: new Date().toISOString()
+          })
+      }
+    } catch (logError) {
+      console.error('⚠️ [ESCALATION-EMAIL] Erro ao registrar log:', logError)
+    }
+    
     if (result.success) {
       console.log(`✅ [ESCALATION-EMAIL] Email de escalação enviado com sucesso`)
       console.log(`✅ [ESCALATION-EMAIL] MessageId: ${result.messageId}`)
@@ -173,6 +195,7 @@ Este é um email automático do sistema de escalação.
       return true
     } else {
       console.error(`❌ [ESCALATION-EMAIL] Falha ao enviar email de escalação:`, result.error)
+      console.error(`❌ [ESCALATION-EMAIL] Detalhes:`, result.details)
       return false
     }
     
