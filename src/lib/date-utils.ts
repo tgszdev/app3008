@@ -1,6 +1,7 @@
 import { format, parseISO } from 'date-fns'
 import { utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz'
 import { ptBR } from 'date-fns/locale'
+import { fixDatabaseDate } from './date-fix'
 
 const BRAZIL_TIMEZONE = 'America/Sao_Paulo'
 
@@ -18,8 +19,11 @@ export function formatBrazilDateTime(date: string | Date | null | undefined): st
       return 'Data inválida'
     }
     
-    // Converter diretamente para horário de Brasília
-    const brazilTime = utcToZonedTime(dateObj, BRAZIL_TIMEZONE)
+    // Corrigir data se estiver em 2025 (problema do servidor)
+    const correctedDate = fixDatabaseDate(dateObj)
+    
+    // Converter para horário de Brasília
+    const brazilTime = utcToZonedTime(correctedDate, BRAZIL_TIMEZONE)
     return format(brazilTime, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })
   } catch (error) {
     console.error('Erro ao formatar data:', error)
@@ -35,7 +39,8 @@ export function formatBrazilDate(date: string | Date | null | undefined): string
   
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : date
-    const brazilTime = utcToZonedTime(dateObj, BRAZIL_TIMEZONE)
+    const correctedDate = fixDatabaseDate(dateObj)
+    const brazilTime = utcToZonedTime(correctedDate, BRAZIL_TIMEZONE)
     return format(brazilTime, "dd/MM/yyyy", { locale: ptBR })
   } catch (error) {
     console.error('Erro ao formatar data:', error)
@@ -51,7 +56,8 @@ export function formatBrazilTime(date: string | Date | null | undefined): string
   
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : date
-    const brazilTime = utcToZonedTime(dateObj, BRAZIL_TIMEZONE)
+    const correctedDate = fixDatabaseDate(dateObj)
+    const brazilTime = utcToZonedTime(correctedDate, BRAZIL_TIMEZONE)
     return format(brazilTime, "HH:mm", { locale: ptBR })
   } catch (error) {
     console.error('Erro ao formatar hora:', error)
@@ -81,7 +87,8 @@ export function formatRelativeTime(date: string | Date | null | undefined): stri
   
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : date
-    const brazilTime = utcToZonedTime(dateObj, BRAZIL_TIMEZONE)
+    const correctedDate = fixDatabaseDate(dateObj)
+    const brazilTime = utcToZonedTime(correctedDate, BRAZIL_TIMEZONE)
     const now = getNowInBrazil()
     
     const diffMs = now.getTime() - brazilTime.getTime()

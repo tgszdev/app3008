@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth'
 import { createAndSendNotification } from '@/lib/notifications'
 import { executeWorkflowsForTicket } from '@/lib/workflow-engine'
 import { executeEscalationForTicketSimple } from '@/lib/escalation-engine-simple'
+import { getRealISOString } from '@/lib/date-fix'
 
 // GET - Listar todos os tickets
 export async function GET(request: NextRequest) {
@@ -132,7 +133,9 @@ export async function POST(request: NextRequest) {
       assigned_to,
       due_date,
       is_internal: is_internal || false, // Adicionar campo is_internal
-      // Remover created_at e updated_at - deixar o Supabase gerenciar automaticamente
+      // CORREÇÃO: Forçar data/hora correta devido ao problema do servidor
+      created_at: getRealISOString(),
+      updated_at: getRealISOString()
     }
 
     // Adicionar category_id se fornecido
