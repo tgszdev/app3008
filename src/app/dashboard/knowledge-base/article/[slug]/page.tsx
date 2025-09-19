@@ -293,9 +293,7 @@ export default function ArticlePage() {
                 
                 <div className="flex items-center">
                   <Calendar className="h-4 w-4 mr-1" />
-                  {format(new Date(article.published_at || article.created_at), "dd 'de' MMMM 'de' yyyy", {
-                    locale: ptBR
-                  })}
+                  {formatBrazilDate(article.published_at || article.created_at)}
                 </div>
                 
                 <div className="flex items-center">

@@ -3,8 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import axios from 'axios'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { formatBrazilDateTime, formatRelativeTime } from '@/lib/date-utils'
 import { ArrowLeft, Clock, User, Tag, AlertCircle, MessageSquare, Paperclip, Edit, Trash2, Send, CheckCircle, XCircle, AlertTriangle, ChevronDown, Lock, Eye, EyeOff, Image as ImageIcon } from 'lucide-react'
 import { getIcon } from '@/lib/icons'
 import toast from 'react-hot-toast'
@@ -548,7 +547,7 @@ export default function TicketDetailsPage() {
               )}
             </div>
             <p className="text-gray-600 dark:text-gray-400">
-              Criado em {format(new Date(ticket.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+              Criado em {formatBrazilDateTime(ticket.created_at)}
             </p>
           </div>
           
@@ -699,7 +698,7 @@ export default function TicketDetailsPage() {
                             </a>
                           )}
                           <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {formatFileSize(attachment.file_size)} • {format(new Date(attachment.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+                            {formatFileSize(attachment.file_size)} • {formatBrazilDateTime(attachment.created_at)}
                           </p>
                         </div>
                       </div>
@@ -731,7 +730,7 @@ export default function TicketDetailsPage() {
                       <div>
                         <p className="font-semibold">{comment.user.name}</p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {format(new Date(comment.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                          {formatBrazilDateTime(comment.created_at)}
                         </p>
                       </div>
                       {comment.is_internal && (
@@ -913,7 +912,7 @@ export default function TicketDetailsPage() {
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">SLA</p>
                   <p className="font-semibold">
-                    {format(new Date(ticket.due_date), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                    {formatBrazilDateTime(ticket.due_date)}
                   </p>
                 </div>
               )}
@@ -922,7 +921,7 @@ export default function TicketDetailsPage() {
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Última atualização</p>
                 <p className="font-semibold">
-                  {format(new Date(ticket.updated_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                  {formatBrazilDateTime(ticket.updated_at)}
                 </p>
               </div>
             </div>

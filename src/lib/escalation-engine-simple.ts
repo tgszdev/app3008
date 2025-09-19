@@ -1,4 +1,5 @@
 import { supabaseAdmin } from './supabase'
+import { sendEscalationEmail } from './email-service'
 
 /**
  * Verifica se um ticket já foi escalado recentemente pela mesma regra
@@ -291,64 +292,91 @@ async function executeEscalationActionsSimple(rule: any, ticket: any): Promise<b
       console.log(`   📢 [SIMPLE] Gerência seria notificada`)
     }
 
-    // Criar notificação para e-mail
-    if (actions.send_email_notification) {
-      let emailConfig: any = {}
-      let recipients: string[] = []
-
-      // Verificar se é objeto com configuração ou apenas true
-      if (typeof actions.send_email_notification === 'object') {
-        emailConfig = actions.send_email_notification
-        recipients = emailConfig.recipients || []
-      } else if (actions.send_email_notification === true) {
-        // Se for true, usar configuração padrão
-        emailConfig = {
-          subject: 'Escalação de Ticket',
-          message: 'Ticket escalado automaticamente'
-        }
+    // Enviar email de notificação
+    if (actions.send_email_notification || actions.notify_supervisor || actions.escalate_to_management) {
+      let recipientIds: string[] = []
+      
+      // Determinar destinatários baseado nas ações
+      if (actions.escalate_to_management) {
+        // Buscar administradores
+        const { data: admins } = await supabaseAdmin
+          .from('users')
+          .select('id, email')
+          .eq('role', 'admin')
         
-        // Buscar destinatários da ação notify_supervisor ou usar destinatário padrão
-        if (actions.notify_supervisor && typeof actions.notify_supervisor === 'object' && actions.notify_supervisor.recipients) {
-          recipients = actions.notify_supervisor.recipients
-        } else {
-          // Usar destinatário padrão se disponível
-          recipients = ['2a33241e-ed38-48b5-9c84-e8c354ae9606'] // ID do supervisor padrão
+        if (admins) {
+          recipientIds = admins.map(u => u.id)
+        }
+      } else if (actions.notify_supervisor) {
+        // Buscar supervisores (analysts e admins)
+        const { data: supervisors } = await supabaseAdmin
+          .from('users')
+          .select('id, email')
+          .in('role', ['admin', 'analyst'])
+        
+        if (supervisors) {
+          recipientIds = supervisors.map(u => u.id)
         }
       }
-
-      if (recipients && recipients.length > 0) {
-        console.log(`   📧 [SIMPLE] Criando notificações de e-mail para ${recipients.length} destinatários`)
+      
+      // Se send_email_notification tem destinatários específicos
+      if (typeof actions.send_email_notification === 'object' && actions.send_email_notification.recipients) {
+        recipientIds = [...new Set([...recipientIds, ...actions.send_email_notification.recipients])]
+      }
+      
+      if (recipientIds.length > 0) {
+        console.log(`   📧 [SIMPLE] Enviando emails para ${recipientIds.length} destinatários`)
         
-        // Criar notificação para cada destinatário
-        for (const recipientId of recipients) {
-          try {
-            const { error: notificationError } = await supabaseAdmin
-              .from('notifications')
-              .insert({
-                user_id: recipientId,
-                type: 'escalation_email',
-                title: emailConfig.subject || 'Escalação de Ticket',
-                message: emailConfig.message || 'Ticket escalado automaticamente',
-                data: {
-                  ticket_id: ticket.id,
-                  ticket_title: ticket.title,
-                  rule_name: rule.name,
-                  escalation_type: rule.time_condition
-                },
-                is_read: false
-              })
-
-            if (notificationError) {
-              console.error(`   ❌ [SIMPLE] Erro ao criar notificação para ${recipientId}:`, notificationError.message)
-            } else {
-              console.log(`   ✅ [SIMPLE] Notificação criada para usuário ${recipientId}`)
+        // Buscar emails dos destinatários
+        const { data: users } = await supabaseAdmin
+          .from('users')
+          .select('id, email')
+          .in('id', recipientIds)
+        
+        if (users && users.length > 0) {
+          const emails = users.map(u => u.email).filter(Boolean)
+          
+          // Enviar email real
+          const emailSent = await sendEscalationEmail(
+            ticket.id,
+            ticket.title,
+            rule.name,
+            emails
+          )
+          
+          if (emailSent) {
+            console.log(`   ✅ [SIMPLE] Emails enviados com sucesso`)
+          } else {
+            console.log(`   ⚠️ [SIMPLE] Falha ao enviar alguns emails`)
+          }
+          
+          // Também criar notificações no sistema
+          for (const user of users) {
+            try {
+              await supabaseAdmin
+                .from('notifications')
+                .insert({
+                  user_id: user.id,
+                  type: 'escalation',
+                  title: `Escalação: ${rule.name}`,
+                  message: `Ticket #${ticket.id.slice(0, 8)} foi escalado automaticamente`,
+                  data: {
+                    ticket_id: ticket.id,
+                    ticket_title: ticket.title,
+                    rule_name: rule.name,
+                    escalation_type: rule.time_condition
+                  },
+                  is_read: false
+                })
+              
+              console.log(`   ✅ [SIMPLE] Notificação criada para ${user.email}`)
+            } catch (error: any) {
+              console.error(`   ❌ [SIMPLE] Erro ao criar notificação:`, error.message)
             }
-          } catch (error: any) {
-            console.error(`   ❌ [SIMPLE] Erro ao criar notificação:`, error.message)
           }
         }
       } else {
-        console.log(`   ⚠️ [SIMPLE] send_email_notification é true mas não há destinatários configurados`)
+        console.log(`   ⚠️ [SIMPLE] Nenhum destinatário encontrado para notificação`)
       }
     }
 

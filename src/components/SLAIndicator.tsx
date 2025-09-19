@@ -3,8 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Clock, AlertTriangle, CheckCircle, XCircle } from 'lucide-react'
 import { calculateSLAStatus, formatMinutes, getSLAStatusColor, getSLAStatusIcon, SLAConfiguration, SLAStatus } from '@/lib/sla-utils'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { formatBrazilDateTime } from '@/lib/date-utils'
 
 interface SLAIndicatorProps {
   ticket: {
@@ -145,7 +144,7 @@ export function SLAIndicator({ ticket, configuration, showDetails = false, compa
           {showDetails && (
             <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
               <div className="flex justify-between">
-                <span>Meta: {format(slaStatus.first_response.target, "dd/MM HH:mm", { locale: ptBR })}</span>
+                <span>Meta: {formatBrazilDateTime(slaStatus.first_response.target)}</span>
                 <span>
                   {ticket.first_response_at 
                     ? `Respondido em ${formatMinutes(slaStatus.first_response.elapsed_minutes)}`
@@ -188,7 +187,7 @@ export function SLAIndicator({ ticket, configuration, showDetails = false, compa
           {showDetails && (
             <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
               <div className="flex justify-between">
-                <span>Meta: {format(slaStatus.resolution.target, "dd/MM HH:mm", { locale: ptBR })}</span>
+                <span>Meta: {formatBrazilDateTime(slaStatus.resolution.target)}</span>
                 <span>
                   {ticket.resolved_at || ticket.status === 'resolved'
                     ? `Resolvido em ${formatMinutes(slaStatus.resolution.elapsed_minutes)}`

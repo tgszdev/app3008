@@ -26,8 +26,7 @@ import {
 } from 'lucide-react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
-import { format, formatDistanceToNow } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { formatBrazilDateTime, formatRelativeTime } from '@/lib/date-utils'
 
 interface User {
   id: string
@@ -422,10 +421,7 @@ export default function CommentsPage() {
                           </span>
                         )}
                         <time className="text-xs text-gray-500 dark:text-gray-400">
-                          {formatDistanceToNow(new Date(comment.created_at), {
-                            addSuffix: true,
-                            locale: ptBR
-                          })}
+                          {formatRelativeTime(comment.created_at)}
                         </time>
                       </div>
                     </div>
@@ -489,9 +485,7 @@ export default function CommentsPage() {
                     {/* Data de criação completa */}
                     <div className="mt-2">
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {format(new Date(comment.created_at), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", {
-                          locale: ptBR
-                        })}
+                        {formatBrazilDateTime(comment.created_at)}
                       </p>
                     </div>
                   </div>

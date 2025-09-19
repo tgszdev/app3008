@@ -33,8 +33,7 @@ import {
 } from 'lucide-react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { formatBrazilDate } from '@/lib/date-utils'
 import dynamic from 'next/dynamic'
 
 const KnowledgeBaseSetup = dynamic(() => import('@/components/KnowledgeBaseSetup'), {
@@ -533,7 +532,7 @@ export default function KnowledgeBasePage() {
                           </span>
                           <span className="flex items-center">
                             <Clock className="h-3 w-3 mr-1" />
-                            {format(new Date(article.updated_at), 'dd/MM', { locale: ptBR })}
+                            {formatBrazilDate(article.updated_at)}
                           </span>
                         </div>
                         

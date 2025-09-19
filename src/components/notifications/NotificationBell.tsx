@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { Bell, X, Check, Trash2, Settings, CheckCheck } from 'lucide-react'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { formatBrazilDateTime } from '@/lib/date-utils'
 import Link from 'next/link'
 import axios from 'axios'
 import toast from 'react-hot-toast'
@@ -205,7 +204,7 @@ export default function NotificationBell() {
                             {notification.message}
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-                            {format(new Date(notification.created_at), "d 'de' MMMM 'às' HH:mm", { locale: ptBR })}
+                            {formatBrazilDateTime(notification.created_at)}
                           </p>
                           {notification.action_url && (
                             <Link

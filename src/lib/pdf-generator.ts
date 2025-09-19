@@ -3,6 +3,7 @@ import 'jspdf-autotable'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { formatHoursToHHMM } from './format-hours'
+import { formatBrazilDateTime, formatBrazilDate } from './date-utils'
 
 // Adicionar tipo para o autoTable
 declare module 'jspdf' {
@@ -54,7 +55,7 @@ export const generatePDF = ({
     // Adicionar data de geração
     pdf.setFontSize(10)
     pdf.setTextColor(128)
-    const dateText = `Gerado em: ${format(new Date(), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR })}`
+    const dateText = `Gerado em: ${formatBrazilDateTime(new Date())}`
     pdf.text(dateText, pdf.internal.pageSize.width / 2, subtitle ? 30 : 23, { align: 'center' })
     
     // Garantir que todos os dados sejam strings
@@ -129,7 +130,7 @@ export const exportTimesheetsPDF = (timesheets: any[], title: string = 'Relatór
   ]
   
   const data = timesheets.map(ts => [
-    format(new Date(ts.work_date), 'dd/MM/yyyy'),
+    formatBrazilDate(ts.work_date),
     String(ts.user?.name || '-'),
     `#${ts.ticket?.ticket_number || '-'}`,
     String(ts.hours_worked ? formatHoursToHHMM(ts.hours_worked) : '-'),

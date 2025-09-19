@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react'
 import { Star, TrendingUp, TrendingDown, Calendar, Download, RefreshCw, Filter } from 'lucide-react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { formatBrazilDateTime } from '@/lib/date-utils'
 
 interface SatisfactionData {
   averageRating: number
@@ -83,11 +82,7 @@ export default function SatisfactionPage() {
   }
 
   const formatDate = (dateString: string) => {
-    try {
-      return format(new Date(dateString), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })
-    } catch {
-      return dateString
-    }
+    return formatBrazilDateTime(dateString)
   }
 
   const getPeriodLabel = () => {

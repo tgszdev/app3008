@@ -6,6 +6,7 @@ import Link from 'next/link'
 import apiClient from '@/lib/api-client'
 import { format, startOfMonth, endOfMonth, parseISO } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { formatBrazilDateTime, formatBrazilDate } from '@/lib/date-utils'
 import toast from 'react-hot-toast'
 import TimesheetNavigation from '@/components/TimesheetNavigation'
 import { formatHoursToHHMM } from '@/lib/format-hours'
@@ -756,7 +757,7 @@ export default function TimesheetsPage() {
                               <div className="flex flex-wrap gap-3 text-xs text-slate-400">
                                 <span className="flex items-center gap-1 whitespace-nowrap">
                                   <Calendar className="h-3 w-3 flex-shrink-0" />
-                                  {format(parseISO(timesheet.work_date), "dd/MM/yyyy", { locale: ptBR })}
+                                  {formatBrazilDate(timesheet.work_date)}
                                 </span>
                                 <span className="flex items-center gap-1">
                                   <Clock className="h-3 w-3 flex-shrink-0" />
@@ -1212,7 +1213,7 @@ export default function TimesheetsPage() {
                         <div className="flex items-center gap-4 mt-1 text-sm text-gray-600 dark:text-gray-400">
                           <span className="flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
-                            {format(parseISO(timesheet.work_date), "dd 'de' MMMM", { locale: ptBR })}
+                            {formatBrazilDate(timesheet.work_date)}
                           </span>
                           <span className="flex items-center gap-1">
                             <Clock className="h-3 w-3" />
@@ -1279,7 +1280,7 @@ export default function TimesheetsPage() {
                     {timesheet.status === 'approved' && timesheet.approver && (
                       <div className="text-sm text-gray-600 dark:text-gray-400">
                         Aprovado por {timesheet.approver.name} em{' '}
-                        {format(parseISO(timesheet.approval_date!), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                        {formatBrazilDateTime(timesheet.approval_date!)}
                       </div>
                     )}
                     

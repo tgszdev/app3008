@@ -28,8 +28,7 @@ import { getIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import axios from 'axios'
 import toast from 'react-hot-toast'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { formatBrazilDateTime, formatRelativeTime } from '@/lib/date-utils'
 
 interface User {
   id: string
@@ -229,15 +228,7 @@ export default function TicketsPage() {
   })
 
   const getTimeAgo = (date: string) => {
-    const now = new Date()
-    const created = new Date(date)
-    const diffInHours = Math.floor((now.getTime() - created.getTime()) / (1000 * 60 * 60))
-    
-    if (diffInHours < 1) return 'Agora mesmo'
-    if (diffInHours < 24) return `${diffInHours}h atrás`
-    if (diffInHours < 48) return 'Ontem'
-    if (diffInHours < 168) return `${Math.floor(diffInHours / 24)} dias atrás`
-    return format(created, "dd 'de' MMM", { locale: ptBR })
+    return formatRelativeTime(date)
   }
 
   const getCategoryInfo = (ticket: Ticket) => {

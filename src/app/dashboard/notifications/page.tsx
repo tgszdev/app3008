@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Bell, Check, CheckCheck, Trash2, Filter, Search, Calendar, AlertCircle, Info, CheckCircle, XCircle, Clock, Loader2 } from 'lucide-react'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { formatBrazilDateTime } from '@/lib/date-utils'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
@@ -366,11 +365,11 @@ export default function NotificationsPage() {
                             <div className="flex items-center gap-4 mt-2">
                               <span className="text-xs text-gray-500 dark:text-gray-500 flex items-center gap-1">
                                 <Clock className="h-3 w-3" />
-                                {format(new Date(notification.created_at), "d 'de' MMMM 'às' HH:mm", { locale: ptBR })}
+                                {formatBrazilDateTime(notification.created_at)}
                               </span>
                               {notification.is_read && notification.read_at && (
                                 <span className="text-xs text-gray-500 dark:text-gray-500">
-                                  Lida em {format(new Date(notification.read_at), "d/MM 'às' HH:mm", { locale: ptBR })}
+                                  Lida em {formatBrazilDateTime(notification.read_at)}
                                 </span>
                               )}
                             </div>

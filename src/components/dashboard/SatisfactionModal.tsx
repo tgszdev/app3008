@@ -3,8 +3,7 @@
 import { Fragment, useState } from 'react'
 import { Dialog, Transition, Tab } from '@headlessui/react'
 import { X, TrendingUp, TrendingDown, Star, MessageSquare, BarChart3, Calendar, FileText } from 'lucide-react'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { formatBrazilDateTime } from '@/lib/date-utils'
 
 interface SatisfactionData {
   averageRating: number
@@ -59,7 +58,7 @@ export function SatisfactionModal({ isOpen, onClose, data, period }: Satisfactio
   
   const formatDate = (dateString: string) => {
     try {
-      return format(new Date(dateString), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })
+      return formatBrazilDateTime(dateString)
     } catch {
       return dateString
     }

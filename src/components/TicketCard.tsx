@@ -4,6 +4,7 @@ import { Clock, AlertCircle, CheckCircle, XCircle, User, Calendar, Eye, Edit, Tr
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { useStatuses } from '@/hooks/useStatuses'
+import { formatRelativeTime } from '@/lib/date-utils'
 
 interface User {
   id: string
@@ -173,7 +174,7 @@ export default function TicketCard({ ticket, userRole, onDelete, getTimeAgo }: T
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1">
             <Calendar className="h-3 w-3" />
-            <span>{getTimeAgo ? getTimeAgo(ticket.created_at) : ticket.created_at}</span>
+            <span>{formatRelativeTime(ticket.created_at)}</span>
           </div>
           {ticket.assigned_to_user && (
             <div className="flex items-center gap-1">
