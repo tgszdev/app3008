@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import apiClient from '@/lib/api-client'
 import { format, parseISO } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { formatBrazilDateTime, formatBrazilDate } from '@/lib/date-utils'
 import toast from 'react-hot-toast'
 import TimesheetNavigation from '@/components/TimesheetNavigation'
 import { formatHoursToHHMM } from '@/lib/format-hours'
@@ -437,7 +438,7 @@ export default function TimesheetsAdminPage() {
                         </span>
                         <span className="flex items-center gap-1">
                           <Calendar className="h-3 w-3 flex-shrink-0" />
-                          {format(parseISO(timesheet.work_date), "dd 'de' MMM", { locale: ptBR })}
+                          {formatBrazilDate(timesheet.work_date)}
                         </span>
                         <span className="flex items-center gap-1">
                           <Clock className="h-3 w-3 flex-shrink-0" />
@@ -492,7 +493,7 @@ export default function TimesheetsAdminPage() {
                         </p>
                         {timesheet.approval_date && (
                           <p className="text-sm text-green-700 dark:text-green-300 mt-1">
-                            <span className="font-medium">Data:</span> {format(parseISO(timesheet.approval_date), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                            <span className="font-medium">Data:</span> {formatBrazilDateTime(timesheet.approval_date)}
                           </p>
                         )}
                       </div>
