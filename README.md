@@ -2,7 +2,7 @@
 
 ## 📋 Visão Geral
 
-Sistema completo de Help Desk desenvolvido com Next.js 15, TypeScript, Supabase e TailwindCSS. Oferece gerenciamento de tickets, base de conhecimento, controle de timesheets e sistema avançado de permissões.
+Sistema completo de Help Desk desenvolvido com Next.js 15, TypeScript, Supabase e TailwindCSS. Oferece gerenciamento de tickets com **escalação automática por email**, base de conhecimento, controle de timesheets e sistema avançado de permissões. **100% funcional** com timezone Brasil (America/Sao_Paulo) configurado.
 
 ## ✨ Funcionalidades Principais
 
@@ -18,6 +18,9 @@ Sistema completo de Help Desk desenvolvido com Next.js 15, TypeScript, Supabase 
 - ✅ Tickets internos (visíveis apenas para staff)
 - ✅ Sistema de comentários
 - ✅ Histórico de alterações
+- ✅ **NOVO: Escalação automática por email** (1h sem atribuição, 4h sem resposta, 24h sem resolução)
+- ✅ **NOVO: Timezone Brasil** (America/Sao_Paulo) em todas as datas
+- ✅ **NOVO: Cron jobs** executando a cada 3 minutos no Vercel
 
 #### 🔐 **Sistema de Permissões**
 - ✅ **24 permissões granulares** configuráveis
@@ -55,10 +58,17 @@ Sistema completo de Help Desk desenvolvido com Next.js 15, TypeScript, Supabase 
 - ✅ Gráficos interativos
 - ✅ Relatórios customizáveis
 
+#### 📧 **Sistema de Email e Escalação**
+- ✅ Envio automático de emails para escalação
+- ✅ Suporte a múltiplos provedores (SendGrid, SMTP, Resend, Supabase)
+- ✅ Templates de email personalizáveis
+- ✅ Logs de envio e rastreamento
+- ✅ Regras de escalação configuráveis via SQL
+
 ### 🚧 Funcionalidades em Desenvolvimento
 - [ ] Integração com Slack/Discord
-- [ ] Automação de workflows
-- [ ] SLA avançado
+- [ ] Automação de workflows avançada
+- [ ] SLA com múltiplos níveis
 - [ ] Chat em tempo real
 - [ ] App mobile
 
@@ -109,21 +119,54 @@ npm install
 
 # Configure as variáveis de ambiente
 cp .env.example .env.local
+# IMPORTANTE: Configure as credenciais de email em .env.local
 
 # Execute as migrations do banco
 npm run db:migrate
+
+# Configure as regras de escalação automática
+npx supabase db push < sql/insert_escalation_rules.sql
 
 # Inicie o servidor de desenvolvimento
 npm run dev
 ```
 
+### ⚡ Configuração Rápida de Email
+```bash
+# Para Gmail - adicione em .env.local:
+EMAIL_SERVER_HOST=smtp.gmail.com
+EMAIL_SERVER_PORT=587
+EMAIL_SERVER_USER=seu-email@gmail.com
+EMAIL_SERVER_PASSWORD=sua-senha-de-app  # Use senha de app, não a senha normal
+EMAIL_FROM=seu-email@gmail.com
+```
+
 ### Variáveis de Ambiente
 ```env
+# Supabase
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
+
+# NextAuth
 NEXTAUTH_URL=
 NEXTAUTH_SECRET=
+
+# Email (configure apenas UM provedor)
+# Opção 1: SendGrid
+SENDGRID_API_KEY=
+
+# Opção 2: SMTP
+EMAIL_SERVER_HOST=
+EMAIL_SERVER_PORT=
+EMAIL_SERVER_USER=
+EMAIL_SERVER_PASSWORD=
+
+# Opção 3: Resend
+RESEND_API_KEY=
+
+# Email From (para todos os provedores)
+EMAIL_FROM=
 ```
 
 ## 📖 Guia do Usuário
@@ -160,14 +203,25 @@ pm2 logs webapp      # Ver logs
 
 ## 📈 Status do Projeto
 
-- **Versão**: 1.5.6
-- **Status**: ✅ Produção
-- **Última Atualização**: 11/09/2025
+- **Versão**: 1.6.0
+- **Status**: ✅ Produção - 100% Funcional
+- **Última Atualização**: 18/09/2025
 - **GitHub**: https://github.com/tgszdev/app3008
 - **URL de Desenvolvimento**: https://3000-i968ax1d7t7cf739vyajj-6532622b.e2b.dev
 - **Backup**: https://page.gensparksite.com/project_backups/toolu_01WULLFFS16LGgcFQgK6DcxA.tar.gz
 
 ## 🔧 Resolução de Problemas
+
+### Emails de escalação não estão sendo enviados
+1. Configure as credenciais de email em `.env.local`
+2. Execute o SQL em `sql/insert_escalation_rules.sql` no Supabase
+3. Verifique logs em: `SELECT * FROM email_logs ORDER BY created_at DESC`
+4. Consulte a documentação completa em `docs/CONFIGURACAO_EMAIL.md`
+
+### Datas aparecem como "Data Inválida" ou "N/A"
+- Problema corrigido na versão 1.6.0
+- Todas as datas agora usam timezone America/Sao_Paulo
+- Se persistir, verifique o formato da data no banco
 
 ### Permissões não funcionam após criar/editar roles
 1. Acesse **Configurações > Gerenciar Perfis**
