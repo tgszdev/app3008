@@ -1,7 +1,6 @@
 import { format, parseISO } from 'date-fns'
 import { utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz'
 import { ptBR } from 'date-fns/locale'
-import { fixDatabaseDate } from './date-fix'
 
 const BRAZIL_TIMEZONE = 'America/Sao_Paulo'
 
@@ -12,22 +11,27 @@ export function formatBrazilDateTime(date: string | Date | null | undefined): st
   if (!date) return 'N/A'
   
   try {
-    const dateObj = typeof date === 'string' ? parseISO(date) : date
+    // Se for string, fazer parse direto
+    const dateObj = typeof date === 'string' ? new Date(date) : date
     
     // Verificar se a data é válida
-    if (isNaN(dateObj.getTime())) {
-      return 'Data inválida'
+    if (!dateObj || isNaN(dateObj.getTime())) {
+      console.error('Data inválida recebida:', date)
+      return 'N/A'
     }
     
-    // Corrigir data se estiver em 2025 (problema do servidor)
-    const correctedDate = fixDatabaseDate(dateObj)
-    
     // Converter para horário de Brasília
-    const brazilTime = utcToZonedTime(correctedDate, BRAZIL_TIMEZONE)
+    const brazilTime = utcToZonedTime(dateObj, BRAZIL_TIMEZONE)
     return format(brazilTime, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })
   } catch (error) {
-    console.error('Erro ao formatar data:', error)
-    return 'Data inválida'
+    console.error('Erro ao formatar data:', error, 'Data recebida:', date)
+    // Tentar formatação simples como fallback
+    try {
+      const d = new Date(date as string)
+      return d.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })
+    } catch {
+      return 'N/A'
+    }
   }
 }
 
@@ -38,13 +42,14 @@ export function formatBrazilDate(date: string | Date | null | undefined): string
   if (!date) return 'N/A'
   
   try {
-    const dateObj = typeof date === 'string' ? parseISO(date) : date
-    const correctedDate = fixDatabaseDate(dateObj)
-    const brazilTime = utcToZonedTime(correctedDate, BRAZIL_TIMEZONE)
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+    if (!dateObj || isNaN(dateObj.getTime())) return 'N/A'
+    
+    const brazilTime = utcToZonedTime(dateObj, BRAZIL_TIMEZONE)
     return format(brazilTime, "dd/MM/yyyy", { locale: ptBR })
   } catch (error) {
     console.error('Erro ao formatar data:', error)
-    return 'Data inválida'
+    return 'N/A'
   }
 }
 
@@ -55,13 +60,14 @@ export function formatBrazilTime(date: string | Date | null | undefined): string
   if (!date) return 'N/A'
   
   try {
-    const dateObj = typeof date === 'string' ? parseISO(date) : date
-    const correctedDate = fixDatabaseDate(dateObj)
-    const brazilTime = utcToZonedTime(correctedDate, BRAZIL_TIMEZONE)
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+    if (!dateObj || isNaN(dateObj.getTime())) return 'N/A'
+    
+    const brazilTime = utcToZonedTime(dateObj, BRAZIL_TIMEZONE)
     return format(brazilTime, "HH:mm", { locale: ptBR })
   } catch (error) {
     console.error('Erro ao formatar hora:', error)
-    return 'Hora inválida'
+    return 'N/A'
   }
 }
 
@@ -86,9 +92,10 @@ export function formatRelativeTime(date: string | Date | null | undefined): stri
   if (!date) return 'N/A'
   
   try {
-    const dateObj = typeof date === 'string' ? parseISO(date) : date
-    const correctedDate = fixDatabaseDate(dateObj)
-    const brazilTime = utcToZonedTime(correctedDate, BRAZIL_TIMEZONE)
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+    if (!dateObj || isNaN(dateObj.getTime())) return 'N/A'
+    
+    const brazilTime = utcToZonedTime(dateObj, BRAZIL_TIMEZONE)
     const now = getNowInBrazil()
     
     const diffMs = now.getTime() - brazilTime.getTime()
