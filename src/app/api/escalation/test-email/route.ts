@@ -1,0 +1,129 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { sendEscalationEmail } from '@/lib/email-service'
+import { supabaseAdmin } from '@/lib/supabase'
+
+export async function GET(request: NextRequest) {
+  try {
+    console.log('🧪 [TEST-EMAIL] Iniciando teste de email de escalação...')
+    
+    // Obter email de teste dos parâmetros ou usar padrão
+    const searchParams = request.nextUrl.searchParams
+    const testEmail = searchParams.get('email')
+    
+    if (!testEmail) {
+      // Buscar email de um admin do sistema
+      const { data: admin } = await supabaseAdmin
+        .from('users')
+        .select('email')
+        .eq('role', 'admin')
+        .limit(1)
+        .single()
+      
+      if (!admin || !admin.email) {
+        return NextResponse.json({
+          success: false,
+          error: 'Nenhum email de admin encontrado. Use ?email=seu@email.com'
+        }, { status: 400 })
+      }
+    }
+    
+    const recipientEmail = testEmail || ''
+    
+    console.log(`📧 [TEST-EMAIL] Enviando email de teste para: ${recipientEmail}`)
+    
+    // Enviar email de teste
+    const result = await sendEscalationEmail(
+      'TEST-' + Date.now().toString(),
+      'TESTE - Ticket de Exemplo para Verificar Escalação',
+      'Teste de Email - Regra de 1 hora',
+      [recipientEmail]
+    )
+    
+    if (result) {
+      console.log('✅ [TEST-EMAIL] Email enviado com sucesso!')
+      
+      // Verificar log no banco
+      const { data: logs } = await supabaseAdmin
+        .from('email_logs')
+        .select('*')
+        .eq('to', recipientEmail)
+        .order('created_at', { ascending: false })
+        .limit(1)
+      
+      return NextResponse.json({
+        success: true,
+        message: 'Email de teste enviado com sucesso!',
+        recipient: recipientEmail,
+        log: logs?.[0] || null,
+        timestamp: new Date().toISOString()
+      })
+    } else {
+      console.error('❌ [TEST-EMAIL] Falha ao enviar email')
+      
+      // Buscar erro no log
+      const { data: errorLogs } = await supabaseAdmin
+        .from('email_logs')
+        .select('*')
+        .eq('to', recipientEmail)
+        .eq('status', 'failed')
+        .order('created_at', { ascending: false })
+        .limit(1)
+      
+      return NextResponse.json({
+        success: false,
+        error: 'Falha ao enviar email',
+        recipient: recipientEmail,
+        errorLog: errorLogs?.[0] || null,
+        hint: 'Verifique as configurações SMTP no sistema'
+      }, { status: 500 })
+    }
+    
+  } catch (error: any) {
+    console.error('❌ [TEST-EMAIL] Erro:', error)
+    return NextResponse.json({
+      success: false,
+      error: 'Erro ao processar teste',
+      details: error.message,
+      stack: error.stack
+    }, { status: 500 })
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { email } = body
+    
+    if (!email) {
+      return NextResponse.json({
+        success: false,
+        error: 'Email é obrigatório no body da requisição'
+      }, { status: 400 })
+    }
+    
+    console.log(`📧 [TEST-EMAIL-POST] Enviando email de teste para: ${email}`)
+    
+    // Enviar email de teste
+    const result = await sendEscalationEmail(
+      'TEST-' + Date.now().toString(),
+      'TESTE - Verificação do Sistema de Escalação',
+      'Email de Teste - Sistema Funcionando',
+      [email]
+    )
+    
+    return NextResponse.json({
+      success: result,
+      message: result ? 'Email enviado com sucesso!' : 'Falha ao enviar email',
+      recipient: email,
+      timestamp: new Date().toISOString()
+    })
+    
+  } catch (error: any) {
+    console.error('❌ [TEST-EMAIL-POST] Erro:', error)
+    return NextResponse.json({
+      success: false,
+      error: 'Erro ao processar teste',
+      details: error.message
+    }, { status: 500 })
+  }
+}

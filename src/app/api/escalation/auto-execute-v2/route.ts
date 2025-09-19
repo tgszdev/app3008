@@ -80,7 +80,34 @@ export async function GET() {
                 is_internal: true
               })
             
-            // 3. Registrar log
+            // 3. Enviar email de notificação
+            try {
+              // Buscar emails dos supervisores/admins
+              const { data: supervisors } = await supabaseAdmin
+                .from('users')
+                .select('email')
+                .in('role', ['admin', 'analyst'])
+                .limit(10)
+              
+              if (supervisors && supervisors.length > 0) {
+                const emails = supervisors.map(u => u.email).filter(Boolean)
+                if (emails.length > 0) {
+                  // Importar e chamar função de email
+                  const { sendEscalationEmail } = await import('@/lib/email-service')
+                  await sendEscalationEmail(
+                    ticket.id,
+                    ticket.title,
+                    'Ticket não atribuído (1 hora)',
+                    emails
+                  )
+                  console.log(`📧 Email de escalação enviado para ${emails.length} destinatários`)
+                }
+              }
+            } catch (emailError: any) {
+              console.error(`⚠️ Erro ao enviar email de escalação:`, emailError.message)
+            }
+            
+            // 4. Registrar log
             await supabaseAdmin
               .from('escalation_logs')
               .insert({
