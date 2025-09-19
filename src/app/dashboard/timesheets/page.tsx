@@ -757,7 +757,7 @@ export default function TimesheetsPage() {
                               <div className="flex flex-wrap gap-3 text-xs text-slate-400">
                                 <span className="flex items-center gap-1 whitespace-nowrap">
                                   <Calendar className="h-3 w-3 flex-shrink-0" />
-                                  {formatBrazilDate(timesheet.work_date)}
+                                  {timesheet.work_date ? formatBrazilDate(timesheet.work_date) : 'N/A'}
                                 </span>
                                 <span className="flex items-center gap-1">
                                   <Clock className="h-3 w-3 flex-shrink-0" />
@@ -1213,7 +1213,7 @@ export default function TimesheetsPage() {
                         <div className="flex items-center gap-4 mt-1 text-sm text-gray-600 dark:text-gray-400">
                           <span className="flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
-                            {formatBrazilDate(timesheet.work_date)}
+                            {timesheet.work_date ? formatBrazilDate(timesheet.work_date) : 'N/A'}
                           </span>
                           <span className="flex items-center gap-1">
                             <Clock className="h-3 w-3" />

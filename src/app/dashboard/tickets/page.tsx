@@ -228,6 +228,10 @@ export default function TicketsPage() {
   })
 
   const getTimeAgo = (date: string) => {
+    if (!date) {
+      console.warn('getTimeAgo: Data vazia ou nula recebida')
+      return 'N/A'
+    }
     return formatRelativeTime(date)
   }
 
