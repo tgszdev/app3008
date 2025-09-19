@@ -1,20 +1,22 @@
 {
   "functions": {
     "src/app/api/escalation/auto-execute/route.ts": {
-      "maxDuration": 30
+      "maxDuration": 10
+    },
+    "src/app/api/escalation/auto-execute-v2/route.ts": {
+      "maxDuration": 10
+    },
+    "src/app/api/escalation/test/route.ts": {
+      "maxDuration": 10
     },
     "src/app/api/escalation/process-emails/route.ts": {
-      "maxDuration": 30
+      "maxDuration": 10
     }
   },
   "crons": [
     {
-      "path": "/api/escalation/auto-execute",
-      "schedule": "*/3 * * * *"
-    },
-    {
-      "path": "/api/escalation/process-emails", 
-      "schedule": "*/2 * * * *"
+      "path": "/api/escalation/auto-execute-v2",
+      "schedule": "*/5 * * * *"
     }
   ]
 }
