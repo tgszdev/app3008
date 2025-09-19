@@ -344,7 +344,7 @@ export async function sendEscalationEmail(
               <h2 style="color: #dc2626;">Ticket #${ticketId.slice(0, 8)}</h2>
               <p><strong>Título:</strong> ${ticketTitle}</p>
               <p><strong>Regra de Escalação:</strong> ${ruleName}</p>
-              <p><strong>Data/Hora da Escalação:</strong> ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</p>
+              <p><strong>Data/Hora da Escalação:</strong> ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }).replace(',', ' às')}</p>
             </div>
             
             <p><strong>Ação Requerida:</strong></p>

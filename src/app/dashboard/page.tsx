@@ -378,7 +378,14 @@ export default function DashboardPage() {
       
       // Build PDF content with better layout
       const now = new Date()
-      const formattedDateTime = `${now.toLocaleDateString('pt-BR')} às ${now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`
+      const formattedDateTime = now.toLocaleString('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).replace(',', ' às')
       
       // Build PDF HTML with A4 dimensions and margins
       // A4: 210mm x 297mm
@@ -987,10 +994,13 @@ function formatDateShort(date: string | null | undefined) {
   // Try to parse as ISO date with time (handles timestamps like "2024-01-15T10:30:00.000Z")
   const dateObj = new Date(date)
   if (!isNaN(dateObj.getTime())) {
-    const day = String(dateObj.getDate()).padStart(2, '0')
-    const month = String(dateObj.getMonth() + 1).padStart(2, '0')
-    const year = dateObj.getFullYear()
-    return `${day}/${month}/${year}`
+    // Use toLocaleDateString com timezone do Brasil
+    return dateObj.toLocaleDateString('pt-BR', { 
+      timeZone: 'America/Sao_Paulo',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    })
   }
   
   // If not a valid date object, try parsing as YYYY-MM-DD manually

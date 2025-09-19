@@ -28,8 +28,7 @@ import {
 } from 'lucide-react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { formatBrazilDate } from '@/lib/date-utils'
 
 interface Category {
   id: string
@@ -346,11 +345,11 @@ export default function EditArticlePage() {
                 </span>
                 <span className="flex items-center">
                   <Calendar className="h-4 w-4 mr-1" />
-                  Criado em {format(new Date(article.created_at), 'dd/MM/yyyy', { locale: ptBR })}
+                  Criado em {formatBrazilDate(article.created_at)}
                 </span>
                 <span className="flex items-center">
                   <Calendar className="h-4 w-4 mr-1" />
-                  Atualizado em {format(new Date(article.updated_at), 'dd/MM/yyyy', { locale: ptBR })}
+                  Atualizado em {formatBrazilDate(article.updated_at)}
                 </span>
               </div>
             </div>

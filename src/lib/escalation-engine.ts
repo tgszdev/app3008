@@ -610,7 +610,7 @@ async function notifySupervisor(ticket: TicketData, rule: EscalationRule, action
                   <p><strong>Descrição:</strong> ${rule.description || 'N/A'}</p>
                   <p><strong>Prioridade:</strong> ${ticket.priority}</p>
                   <p><strong>Categoria:</strong> ${ticket.category}</p>
-                  <p><strong>Criado em:</strong> ${new Date(ticket.created_at).toLocaleString('pt-BR')}</p>
+                  <p><strong>Criado em:</strong> ${new Date(ticket.created_at).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }).replace(',', ' às')}</p>
                   <p><strong>Status:</strong> ${ticket.status}</p>
                   ${ticket.assigned_to ? `<p><strong>Atribuído para:</strong> ${ticket.assigned_to}</p>` : '<p><strong>Status:</strong> Não atribuído</p>'}
                   <br>
@@ -634,7 +634,7 @@ async function notifySupervisor(ticket: TicketData, rule: EscalationRule, action
               Descrição: ${rule.description || 'N/A'}
               Prioridade: ${ticket.priority}
               Categoria: ${ticket.category}
-              Criado em: ${new Date(ticket.created_at).toLocaleString('pt-BR')}
+              Criado em: ${new Date(ticket.created_at).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }).replace(',', ' às')}
               Status: ${ticket.status}
               ${ticket.assigned_to ? `Atribuído para: ${ticket.assigned_to}` : 'Status: Não atribuído'}
               
@@ -728,7 +728,7 @@ async function sendEmailNotification(ticket: TicketData, rule: EscalationRule, a
                 <p><strong>Ticket:</strong> #${ticket.id} - ${ticket.title}</p>
                 <p><strong>Prioridade:</strong> ${ticket.priority}</p>
                 <p><strong>Categoria:</strong> ${ticket.category}</p>
-                <p><strong>Criado em:</strong> ${new Date(ticket.created_at).toLocaleString('pt-BR')}</p>
+                <p><strong>Criado em:</strong> ${new Date(ticket.created_at).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }).replace(',', ' às')}</p>
                 <p><strong>Status:</strong> ${ticket.status}</p>
                 ${ticket.assigned_to ? `<p><strong>Atribuído para:</strong> ${ticket.assigned_to}</p>` : '<p><strong>Status:</strong> Não atribuído</p>'}
                 <br>
@@ -754,7 +754,7 @@ async function sendEmailNotification(ticket: TicketData, rule: EscalationRule, a
             Ticket: #${ticket.id} - ${ticket.title}
             Prioridade: ${ticket.priority}
             Categoria: ${ticket.category}
-            Criado em: ${new Date(ticket.created_at).toLocaleString('pt-BR')}
+            Criado em: ${new Date(ticket.created_at).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }).replace(',', ' às')}
             Status: ${ticket.status}
             ${ticket.assigned_to ? `Atribuído para: ${ticket.assigned_to}` : 'Status: Não atribuído'}
             

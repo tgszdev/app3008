@@ -54,7 +54,7 @@ export function SimplePrintButton({ ticket, loading }: SimplePrintButtonProps) {
           </head>
           <body>
             <h1>Ticket #${ticket.ticket_number || ticket.id}</h1>
-            <p>Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
+            <p>Gerado em: ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }).replace(',', ' às')}</p>
             
             <h2>Informações do Ticket</h2>
             <div class="info-grid">
@@ -72,7 +72,7 @@ export function SimplePrintButton({ ticket, loading }: SimplePrintButtonProps) {
               </div>
               <div class="info-item">
                 <strong>Criado em:</strong>
-                ${new Date(ticket.created_at).toLocaleString('pt-BR')}
+                ${new Date(ticket.created_at).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }).replace(',', ' às')}
               </div>
             </div>
             
@@ -97,7 +97,7 @@ export function SimplePrintButton({ ticket, loading }: SimplePrintButtonProps) {
                     ${comment.is_internal ? '<span class="internal-badge">Interno</span>' : ''}
                   </div>
                   <div class="comment-date">
-                    ${new Date(comment.created_at).toLocaleString('pt-BR')}
+                    ${new Date(comment.created_at).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }).replace(',', ' às')}
                   </div>
                   <div>${comment.content}</div>
                 </div>

@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
                         Este é um email automático de teste.
                       </p>
                       <p style="margin: 5px 0 0 0; color: #999999; font-size: 14px;">
-                        Enviado em: ${new Date().toLocaleString('pt-BR')}
+                        Enviado em: ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }).replace(',', ' às')}
                       </p>
                     </td>
                   </tr>
@@ -166,7 +166,7 @@ Configurações Testadas:
 
 Agora o sistema pode enviar notificações por email para os usuários.
 
-Enviado em: ${new Date().toLocaleString('pt-BR')}
+Enviado em: ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }).replace(',', ' às')}
       `.trim()
     }
 

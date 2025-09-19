@@ -283,7 +283,9 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('pt-BR')
+    return new Date(dateString).toLocaleString('pt-BR', { 
+      timeZone: 'America/Sao_Paulo' 
+    }).replace(',', ' às')
   }
 
   const getStatusColor = (status: string) => {

@@ -60,7 +60,7 @@ export function formatBrazilDateTime(date: string | Date | null | undefined): st
     try {
       const d = new Date(date as string)
       if (!isNaN(d.getTime())) {
-        return d.toLocaleString('pt-BR', { 
+        const dateStr = d.toLocaleString('pt-BR', { 
           timeZone: 'America/Sao_Paulo',
           day: '2-digit',
           month: '2-digit',
@@ -68,6 +68,8 @@ export function formatBrazilDateTime(date: string | Date | null | undefined): st
           hour: '2-digit',
           minute: '2-digit'
         })
+        // Substituir a vírgula por " às " para manter o padrão
+        return dateStr.replace(',', ' às')
       }
     } catch {
       // Ignorar erro do fallback

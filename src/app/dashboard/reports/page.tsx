@@ -323,7 +323,7 @@ export default function ReportsPage() {
       pdf.setFontSize(10)
       pdf.setTextColor(150, 150, 150)
       pdf.text(
-        String(`Página ${i} de ${pageCount} - Gerado em ${new Date().toLocaleDateString('pt-BR')}`),
+        String(`Página ${i} de ${pageCount} - Gerado em ${new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })}`),
         105,
         285,
         { align: 'center' }
@@ -413,7 +413,7 @@ export default function ReportsPage() {
   }
 
   const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('pt-BR')
+    return new Date(date).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })
   }
 
   const openReportConfig = (type: ReportConfig['type']) => {
