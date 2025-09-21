@@ -536,12 +536,12 @@ export default function DashboardPage() {
       // Close categories section and first page
       pdfHTML += `
             </div>
-            <!-- Page number and footer for page 1 -->
-            <div style="position: absolute; bottom: 5mm; right: 0; font-size: 9px; color: #6b7280;">Página 1${secondPageCategories.length > 0 ? ' de 2' : ''}</div>
+            <!-- Page number for page 1 (moved to top right) -->
+            <div style="position: absolute; top: 0; right: 0; font-size: 9px; color: #6b7280; background: rgba(255,255,255,0.8); padding: 2mm; border-radius: 3px;">Página 1${secondPageCategories.length > 0 ? ' de 2' : ''}</div>
             
             ${!secondPageCategories.length ? `
             <!-- Footer for single page -->
-            <div style="position: absolute; bottom: 5mm; left: 0; right: 30mm; text-align: center; border-top: 1px solid #3b82f6; padding-top: 3mm; width: 180mm;">
+            <div style="position: absolute; bottom: 8mm; left: 0; text-align: center; border-top: 1px solid #3b82f6; padding-top: 3mm; width: 180mm;">
               <p style="margin: 1px 0; font-size: 9px; color: #374151; font-weight: 600;">RELATÓRIO GERADO EM: ${formattedDateTime.toUpperCase()}</p>
               <p style="margin: 1px 0; font-size: 8px; color: #6b7280;">Dashboard gerado automaticamente pelo sistema de suporte técnico</p>
               <p style="margin: 1px 0; font-size: 7px; color: #9ca3af;">© 2025 - Sistema de Gestão de Tickets</p>
@@ -606,11 +606,11 @@ export default function DashboardPage() {
               return page2HTML
             })()}
             
-            <!-- Page number and footer for page 2 -->
-            <div style="position: absolute; bottom: 5mm; right: 0; font-size: 9px; color: #6b7280;">Página 2 de 2</div>
+            <!-- Page number for page 2 (moved to top right) -->
+            <div style="position: absolute; top: 0; right: 0; font-size: 9px; color: #6b7280; background: rgba(255,255,255,0.8); padding: 2mm; border-radius: 3px;">Página 2 de 2</div>
             
             <!-- Footer for page 2 -->
-            <div style="position: absolute; bottom: 5mm; left: 0; right: 30mm; text-align: center; border-top: 1px solid #3b82f6; padding-top: 3mm; width: 180mm;">
+            <div style="position: absolute; bottom: 8mm; left: 0; text-align: center; border-top: 1px solid #3b82f6; padding-top: 3mm; width: 180mm;">
               <p style="margin: 1px 0; font-size: 9px; color: #374151; font-weight: 600;">RELATÓRIO GERADO EM: ${formattedDateTime.toUpperCase()}</p>
               <p style="margin: 1px 0; font-size: 8px; color: #6b7280;">Dashboard gerado automaticamente pelo sistema de suporte técnico</p>
               <p style="margin: 1px 0; font-size: 7px; color: #9ca3af;">© 2025 - Sistema de Gestão de Tickets</p>
