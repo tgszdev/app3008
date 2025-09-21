@@ -172,7 +172,7 @@ export default function DashboardLayout({
               <X className="h-6 w-6" />
             </button>
           </div>
-          <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto pb-32">
+          <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto" style={{ paddingBottom: '180px' }}>
             {/* Dashboard Link */}
             <Link
               href="/dashboard"
