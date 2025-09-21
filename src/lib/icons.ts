@@ -241,7 +241,36 @@ import {
   Clipboard as Checklist,
   ClipboardPen,
   ScanBarcode,
-  QrCodeIcon
+  QrCodeIcon,
+  // Integração entre sistemas
+  Workflow,
+  Network,
+  Share2,
+  RefreshCcw,
+  ArrowLeftRight,
+  Repeat,
+  Shuffle,
+  GitMerge,
+  // Recebimento de mercadoria
+  TruckIcon,
+  PackageCheck,
+  ClipboardCheck,
+  FileCheck,
+  CheckSquare,
+  ShieldCheck,
+  // Expedição
+  Send,
+  PackageSearch,
+  MapPin,
+  Calendar,
+  ClockIcon,
+  // Inventário
+  ListChecks,
+  Calculator,
+  FileSpreadsheet,
+  BarChart4,
+  PlusSquare,
+  MinusSquare
 } from 'lucide-react'
 import { LucideIcon } from 'lucide-react'
 
@@ -507,6 +536,39 @@ export const iconMap: Record<string, LucideIcon> = {
   // FTP & FILE TRANSFER
   'file-transfer': FileTransfer,
   'building': Building,
+  
+  // INTEGRAÇÃO ENTRE SISTEMAS
+  'workflow': Workflow,
+  'network': Network,
+  'share-2': Share2,
+  'refresh-ccw': RefreshCcw,
+  'arrow-left-right': ArrowLeftRight,
+  'repeat': Repeat,
+  'shuffle': Shuffle,
+  'git-merge': GitMerge,
+  
+  // RECEBIMENTO DE MERCADORIA
+  'truck-icon': TruckIcon,
+  'package-check': PackageCheck,
+  'clipboard-check': ClipboardCheck,
+  'file-check': FileCheck,
+  'check-square': CheckSquare,
+  'shield-check': ShieldCheck,
+  
+  // EXPEDIÇÃO
+  'send': Send,
+  'package-search': PackageSearch,
+  'map-pin': MapPin,
+  'calendar': Calendar,
+  'clock-icon': ClockIcon,
+  
+  // INVENTÁRIO
+  'list-checks': ListChecks,
+  'calculator': Calculator,
+  'file-spreadsheet': FileSpreadsheet,
+  'bar-chart-4': BarChart4,
+  'plus-square': PlusSquare,
+  'minus-square': MinusSquare,
 }
 
 // Função helper para obter o ícone correto
