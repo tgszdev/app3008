@@ -167,7 +167,7 @@ import {
   Bike,
   Route,
   MapPin,
-  // Novos ícones para sistemas específicos
+  // Expansão completa de ícones por domínio
   Store,
   BarChart3,
   Terminal,
@@ -175,7 +175,73 @@ import {
   FileTransfer,
   HardDrive,
   Disc,
-  Building
+  Building,
+  // E-commerce & Vendas
+  BadgeDollarSign,
+  Receipt,
+  Wallet,
+  CreditCard as Card,
+  Banknote,
+  ShoppingBag as Bag,
+  Package as Box2,
+  Gift as Present,
+  Percent as Discount,
+  // Logistics & Transport
+  Forklift,
+  Containers,
+  PlaneTakeoff,
+  ShipWheel,
+  CarFront,
+  BusFront,
+  Train,
+  MapPin as Location,
+  Route as Path,
+  Navigation as GPS,
+  // Technology & IT
+  HardDrive as Storage,
+  Disc as DVD,
+  Cpu as Processor,
+  MemoryStick,
+  Router,
+  Cable,
+  Ethernet,
+  MousePointer,
+  Keyboard,
+  // Development
+  FileCode,
+  Braces,
+  CommandIcon,
+  PackageOpen,
+  FileJson,
+  FileX,
+  Merge,
+  PullRequest,
+  // Database & Analytics
+  TableProperties,
+  BarChart2,
+  LineChart,
+  Gauge,
+  CircuitBoard,
+  Binary,
+  DatabaseZap,
+  // Help & Support
+  Headset,
+  MessageCircle as Chat,
+  Phone as PhoneCall,
+  PhoneOutgoing,
+  PhoneIncoming,
+  LifeBuoy,
+  UserRound,
+  Users2,
+  // Warehouse & Inventory
+  Package2 as Parcel,
+  PackageOpen as OpenBox,
+  Boxes as MultipleBoxes,
+  ArchiveRestore,
+  Clipboard as Checklist,
+  ClipboardPen,
+  ScanBarcode,
+  QrCodeIcon
 } from 'lucide-react'
 import { LucideIcon } from 'lucide-react'
 
@@ -360,14 +426,86 @@ export const iconMap: Record<string, LucideIcon> = {
   'trello': Trello,
   'figma': Figma,
   
-  // Novos ícones para sistemas específicos
+  // E-COMMERCE & VENDAS
   'store': Store,
-  'bar-chart-3': BarChart3,
-  'terminal': Terminal,
+  'badge-dollar-sign': BadgeDollarSign,
+  'receipt': Receipt,
+  'wallet': Wallet,
+  'card': Card,
+  'banknote': Banknote,
+  'bag': Bag,
+  'present': Present,
+  'discount': Discount,
+  
+  // LOGISTICS & TRANSPORT (TMS)
+  'forklift': Forklift,
+  'containers': Containers,
+  'plane-takeoff': PlaneTakeoff,
+  'ship-wheel': ShipWheel,
+  'car-front': CarFront,
+  'bus-front': BusFront,
+  'train': Train,
+  'location': Location,
+  'path': Path,
+  'gps': GPS,
+  
+  // TECHNOLOGY & IT
+  'storage': Storage,
+  'dvd': DVD,
+  'processor': Processor,
+  'memory-stick': MemoryStick,
+  'router': Router,
+  'cable': Cable,
+  'ethernet': Ethernet,
+  'mouse-pointer': MousePointer,
+  'keyboard': Keyboard,
+  
+  // DEVELOPMENT
+  'file-code': FileCode,
+  'braces': Braces,
+  'command': CommandIcon,
+  'package-open': PackageOpen,
+  'file-json': FileJson,
+  'file-x': FileX,
+  'merge': Merge,
+  'pull-request': PullRequest,
   'git-branch': GitBranch,
-  'file-transfer': FileTransfer,
+  'terminal': Terminal,
+  
+  // DATABASE & ANALYTICS
+  'table-properties': TableProperties,
+  'bar-chart-2': BarChart2,
+  'bar-chart-3': BarChart3,
+  'line-chart': LineChart,
+  'gauge': Gauge,
+  'circuit-board': CircuitBoard,
+  'binary': Binary,
+  'database-zap': DatabaseZap,
   'hard-drive': HardDrive,
   'disc': Disc,
+  
+  // HELP DESK & SUPPORT
+  'headset': Headset,
+  'chat': Chat,
+  'phone-call': PhoneCall,
+  'phone-outgoing': PhoneOutgoing,
+  'phone-incoming': PhoneIncoming,
+  'life-buoy': LifeBuoy,
+  'user-round': UserRound,
+  'users-2': Users2,
+  
+  // WAREHOUSE & INVENTORY (WMS)
+  'parcel': Parcel,
+  'open-box': OpenBox,
+  'multiple-boxes': MultipleBoxes,
+  'archive-restore': ArchiveRestore,
+  'checklist': Checklist,
+  'clipboard-pen': ClipboardPen,
+  'scan-barcode': ScanBarcode,
+  'qr-code-icon': QrCodeIcon,
+  
+  // FTP & FILE TRANSFER
+  'file-transfer': FileTransfer,
   'building': Building,
 }
 

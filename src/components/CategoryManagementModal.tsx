@@ -122,7 +122,53 @@ import {
   Key,
   FileTransfer,
   HardDrive,
-  Disc
+  Disc,
+  // Expansão completa de ícones
+  BadgeDollarSign,
+  Receipt,
+  Wallet,
+  Banknote,
+  ShoppingBag,
+  Gift,
+  Percent,
+  Forklift,
+  Containers,
+  PlaneTakeoff,
+  ShipWheel,
+  CarFront,
+  BusFront,
+  Train,
+  MemoryStick,
+  Router,
+  Cable,
+  Ethernet,
+  MousePointer,
+  Keyboard,
+  FileCode,
+  Braces,
+  CommandIcon,
+  PackageOpen,
+  FileJson,
+  FileX,
+  Merge,
+  PullRequest,
+  TableProperties,
+  BarChart2,
+  LineChart,
+  Gauge,
+  CircuitBoard,
+  Binary,
+  DatabaseZap,
+  Headset,
+  PhoneOutgoing,
+  PhoneIncoming,
+  LifeBuoy,
+  UserRound,
+  Users2,
+  Package2,
+  ArchiveRestore,
+  ClipboardPen,
+  ScanBarcode
 } from 'lucide-react'
 import { getIcon } from '@/lib/icons'
 
@@ -157,7 +203,6 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [showIconDropdown, setShowIconDropdown] = useState(false)
-  const [iconSearchTerm, setIconSearchTerm] = useState('')
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -247,7 +292,6 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
       
       setShowCategoryModal(false)
       setShowIconDropdown(false)
-      setIconSearchTerm('')
       setEditingCategory(null)
       setFormData({
         name: '',
@@ -387,94 +431,164 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
     category.description?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  // Lista de ícones organizados por categoria (sem duplicatas)
+  // Lista completa de ícones por domínio empresarial
   const iconsList = [
-    // E-COMMERCE
-    { value: 'store', label: 'E-commerce', icon: 'Store' },
+    // E-COMMERCE & VENDAS
+    { value: 'store', label: 'Loja', icon: 'Store' },
     { value: 'shopping-cart', label: 'Carrinho', icon: 'ShoppingCart' },
-    { value: 'credit-card', label: 'Pagamento', icon: 'CreditCard' },
-    { value: 'dollar-sign', label: 'Financeiro', icon: 'DollarSign' },
+    { value: 'shopping-bag', label: 'Sacola', icon: 'ShoppingBag' },
+    { value: 'credit-card', label: 'Cartão', icon: 'CreditCard' },
+    { value: 'dollar-sign', label: 'Dinheiro', icon: 'DollarSign' },
+    { value: 'badge-dollar-sign', label: 'Badge $', icon: 'BadgeDollarSign' },
+    { value: 'receipt', label: 'Recibo', icon: 'Receipt' },
+    { value: 'wallet', label: 'Carteira', icon: 'Wallet' },
+    { value: 'banknote', label: 'Nota', icon: 'Banknote' },
+    { value: 'gift', label: 'Presente', icon: 'Gift' },
+    { value: 'percent', label: 'Desconto', icon: 'Percent' },
     
-    // WMS (Warehouse Management System)
+    // WMS - WAREHOUSE MANAGEMENT
     { value: 'warehouse', label: 'Armazém', icon: 'Warehouse' },
     { value: 'package', label: 'Pacote', icon: 'Package' },
-    { value: 'boxes', label: 'Estoque', icon: 'Boxes' },
+    { value: 'package-2', label: 'Pacote 2', icon: 'Package2' },
+    { value: 'package-open', label: 'Pacote Aberto', icon: 'PackageOpen' },
+    { value: 'boxes', label: 'Caixas', icon: 'Boxes' },
+    { value: 'archive', label: 'Arquivo', icon: 'Archive' },
+    { value: 'archive-restore', label: 'Restaurar', icon: 'ArchiveRestore' },
     { value: 'scan', label: 'Scanner', icon: 'Scan' },
+    { value: 'scan-barcode', label: 'Código Barras', icon: 'ScanBarcode' },
     { value: 'qr-code', label: 'QR Code', icon: 'QrCode' },
+    { value: 'clipboard', label: 'Prancheta', icon: 'Clipboard' },
+    { value: 'clipboard-pen', label: 'Inventário', icon: 'ClipboardPen' },
     
-    // TMS (Transportation Management System)
-    { value: 'truck', label: 'Transporte', icon: 'Truck' },
+    // TMS - TRANSPORTATION & LOGISTICS
+    { value: 'truck', label: 'Caminhão', icon: 'Truck' },
+    { value: 'forklift', label: 'Empilhadeira', icon: 'Forklift' },
+    { value: 'containers', label: 'Containers', icon: 'Containers' },
     { value: 'route', label: 'Rota', icon: 'Route' },
-    { value: 'map-pin', label: 'Localização', icon: 'MapPin' },
-    { value: 'navigation', label: 'Navegação', icon: 'Navigation' },
+    { value: 'map-pin', label: 'Local', icon: 'MapPin' },
+    { value: 'navigation', label: 'GPS', icon: 'Navigation' },
     { value: 'plane', label: 'Avião', icon: 'Plane' },
+    { value: 'plane-takeoff', label: 'Decolagem', icon: 'PlaneTakeoff' },
     { value: 'ship', label: 'Navio', icon: 'Ship' },
+    { value: 'ship-wheel', label: 'Timão', icon: 'ShipWheel' },
+    { value: 'car', label: 'Carro', icon: 'Car' },
+    { value: 'car-front', label: 'Veículo', icon: 'CarFront' },
+    { value: 'bus-front', label: 'Ônibus', icon: 'BusFront' },
+    { value: 'train', label: 'Trem', icon: 'Train' },
+    { value: 'bike', label: 'Bicicleta', icon: 'Bike' },
     
-    // ERP (Enterprise Resource Planning)
-    { value: 'bar-chart-3', label: 'Analytics', icon: 'BarChart3' },
-    { value: 'pie-chart', label: 'Relatórios', icon: 'PieChart' },
+    // DATABASE & ANALYTICS
+    { value: 'database', label: 'Database', icon: 'Database' },
+    { value: 'database-zap', label: 'DB Ativo', icon: 'DatabaseZap' },
+    { value: 'hard-drive', label: 'HD', icon: 'HardDrive' },
+    { value: 'disc', label: 'Disco', icon: 'Disc' },
+    { value: 'table-properties', label: 'Tabela', icon: 'TableProperties' },
+    { value: 'bar-chart', label: 'Gráfico', icon: 'BarChart' },
+    { value: 'bar-chart-2', label: 'Chart 2', icon: 'BarChart2' },
+    { value: 'bar-chart-3', label: 'Chart 3', icon: 'BarChart3' },
+    { value: 'pie-chart', label: 'Pizza', icon: 'PieChart' },
+    { value: 'line-chart', label: 'Linha', icon: 'LineChart' },
     { value: 'trending-up', label: 'Crescimento', icon: 'TrendingUp' },
-    { value: 'layers', label: 'Módulos', icon: 'Layers' },
-    { value: 'briefcase', label: 'Negócios', icon: 'Briefcase' },
+    { value: 'gauge', label: 'Medidor', icon: 'Gauge' },
+    { value: 'binary', label: 'Binário', icon: 'Binary' },
     
-    // TI (Tecnologia da Informação)
-    { value: 'monitor', label: 'Sistema', icon: 'Monitor' },
-    { value: 'cpu', label: 'Hardware', icon: 'Cpu' },
-    { value: 'wifi', label: 'Rede', icon: 'Wifi' },
+    // TECHNOLOGY & IT
+    { value: 'monitor', label: 'Monitor', icon: 'Monitor' },
+    { value: 'cpu', label: 'CPU', icon: 'Cpu' },
+    { value: 'memory-stick', label: 'Memória', icon: 'MemoryStick' },
+    { value: 'circuit-board', label: 'Placa', icon: 'CircuitBoard' },
+    { value: 'server', label: 'Servidor', icon: 'Server' },
     { value: 'cloud', label: 'Nuvem', icon: 'Cloud' },
-    { value: 'settings', label: 'Configuração', icon: 'Settings' },
+    { value: 'wifi', label: 'WiFi', icon: 'Wifi' },
+    { value: 'router', label: 'Roteador', icon: 'Router' },
+    { value: 'cable', label: 'Cabo', icon: 'Cable' },
+    { value: 'ethernet', label: 'Ethernet', icon: 'Ethernet' },
+    { value: 'mouse-pointer', label: 'Mouse', icon: 'MousePointer' },
+    { value: 'keyboard', label: 'Teclado', icon: 'Keyboard' },
+    { value: 'smartphone', label: 'Celular', icon: 'Smartphone' },
+    { value: 'settings', label: 'Config', icon: 'Settings' },
     
-    // DEVELOPER
+    // DEVELOPMENT
     { value: 'code', label: 'Código', icon: 'Code' },
+    { value: 'file-code', label: 'Arquivo Code', icon: 'FileCode' },
     { value: 'terminal', label: 'Terminal', icon: 'Terminal' },
+    { value: 'command', label: 'Comando', icon: 'CommandIcon' },
     { value: 'git-branch', label: 'Git', icon: 'GitBranch' },
-    { value: 'bug', label: 'Debug', icon: 'Bug' },
-    { value: 'wrench', label: 'Ferramentas', icon: 'Wrench' },
+    { value: 'merge', label: 'Merge', icon: 'Merge' },
+    { value: 'pull-request', label: 'PR', icon: 'PullRequest' },
+    { value: 'braces', label: 'Chaves', icon: 'Braces' },
+    { value: 'file-json', label: 'JSON', icon: 'FileJson' },
+    { value: 'file-x', label: 'Erro', icon: 'FileX' },
+    { value: 'bug', label: 'Bug', icon: 'Bug' },
+    { value: 'wrench', label: 'Ferramenta', icon: 'Wrench' },
+    
+    // HELP DESK & SUPPORT
+    { value: 'headset', label: 'Suporte', icon: 'Headset' },
+    { value: 'life-buoy', label: 'Ajuda', icon: 'LifeBuoy' },
+    { value: 'help-circle', label: 'Dúvida', icon: 'HelpCircle' },
+    { value: 'phone', label: 'Telefone', icon: 'Phone' },
+    { value: 'phone-outgoing', label: 'Ligar', icon: 'PhoneOutgoing' },
+    { value: 'phone-incoming', label: 'Receber', icon: 'PhoneIncoming' },
+    { value: 'message-square', label: 'Chat', icon: 'MessageSquare' },
+    { value: 'message-circle', label: 'Mensagem', icon: 'MessageCircle' },
+    { value: 'mail', label: 'Email', icon: 'Mail' },
+    { value: 'user-round', label: 'Usuário', icon: 'UserRound' },
+    { value: 'users', label: 'Equipe', icon: 'Users' },
+    { value: 'users-2', label: 'Grupo', icon: 'Users2' },
+    { value: 'user', label: 'Pessoa', icon: 'User' },
+    
+    // FTP & FILE TRANSFER
+    { value: 'file-transfer', label: 'FTP', icon: 'FileTransfer' },
+    { value: 'folder', label: 'Pasta', icon: 'Folder' },
+    { value: 'file-text', label: 'Arquivo', icon: 'FileText' },
+    { value: 'upload', label: 'Upload', icon: 'Upload' },
+    { value: 'download', label: 'Download', icon: 'Download' },
+    { value: 'share', label: 'Compartilhar', icon: 'Share' },
+    { value: 'link', label: 'Link', icon: 'Link' },
     
     // SECURITY
     { value: 'shield', label: 'Segurança', icon: 'Shield' },
-    { value: 'lock', label: 'Criptografia', icon: 'Lock' },
-    { value: 'key', label: 'Autenticação', icon: 'Key' },
+    { value: 'lock', label: 'Bloqueado', icon: 'Lock' },
+    { value: 'unlock', label: 'Desbloqueado', icon: 'Unlock' },
+    { value: 'key', label: 'Chave', icon: 'Key' },
+    { value: 'eye', label: 'Visível', icon: 'Eye' },
+    { value: 'eye-off', label: 'Oculto', icon: 'EyeOff' },
     
-    // FTP / TRANSFERÊNCIA
-    { value: 'file-transfer', label: 'FTP', icon: 'FileTransfer' },
-    { value: 'server', label: 'Servidor', icon: 'Server' },
-    { value: 'folder', label: 'Diretório', icon: 'Folder' },
-    
-    // BANCO DE DADOS
-    { value: 'database', label: 'Database', icon: 'Database' },
-    { value: 'hard-drive', label: 'Armazenamento', icon: 'HardDrive' },
-    { value: 'disc', label: 'PostgreSQL', icon: 'Disc' },
-    
-    // COMUNICAÇÃO
-    { value: 'mail', label: 'E-mail', icon: 'Mail' },
-    { value: 'phone', label: 'Telefone', icon: 'Phone' },
-    { value: 'message-square', label: 'Chat', icon: 'MessageSquare' },
-    
-    // GESTÃO
-    { value: 'users', label: 'Equipe', icon: 'Users' },
-    { value: 'user', label: 'Usuário', icon: 'User' },
-    { value: 'calendar', label: 'Agenda', icon: 'Calendar' },
+    // BUSINESS & MANAGEMENT
+    { value: 'building', label: 'Empresa', icon: 'Building' },
+    { value: 'briefcase', label: 'Negócios', icon: 'Briefcase' },
+    { value: 'layers', label: 'Camadas', icon: 'Layers' },
+    { value: 'calendar', label: 'Calendário', icon: 'Calendar' },
     { value: 'clock', label: 'Tempo', icon: 'Clock' },
-    
-    // DOCUMENTAÇÃO
-    { value: 'file-text', label: 'Documento', icon: 'FileText' },
     { value: 'book-open', label: 'Manual', icon: 'BookOpen' },
-    { value: 'clipboard', label: 'Formulário', icon: 'Clipboard' },
-    
-    // STATUS & ALERTAS
-    { value: 'check-circle', label: 'Sucesso', icon: 'CheckCircle' },
-    { value: 'alert-circle', label: 'Alerta', icon: 'AlertCircle' },
-    { value: 'info', label: 'Informação', icon: 'Info' },
-    { value: 'help-circle', label: 'Ajuda', icon: 'HelpCircle' },
-    
-    // GERAL
-    { value: 'home', label: 'Início', icon: 'Home' },
-    { value: 'star', label: 'Favorito', icon: 'Star' },
     { value: 'target', label: 'Meta', icon: 'Target' },
-    { value: 'zap', label: 'Performance', icon: 'Zap' },
+    { value: 'flag', label: 'Bandeira', icon: 'Flag' },
+    { value: 'award', label: 'Prêmio', icon: 'Award' },
+    { value: 'star', label: 'Estrela', icon: 'Star' },
+    
+    // STATUS & ALERTS
+    { value: 'check-circle', label: 'OK', icon: 'CheckCircle' },
+    { value: 'alert-circle', label: 'Alerta', icon: 'AlertCircle' },
+    { value: 'alert-triangle', label: 'Atenção', icon: 'AlertTriangle' },
+    { value: 'info', label: 'Info', icon: 'Info' },
+    { value: 'bell', label: 'Sino', icon: 'Bell' },
+    { value: 'zap', label: 'Energia', icon: 'Zap' },
+    { value: 'activity', label: 'Atividade', icon: 'Activity' },
+    
+    // GENERAL
+    { value: 'home', label: 'Início', icon: 'Home' },
     { value: 'globe', label: 'Global', icon: 'Globe' },
-    { value: 'building', label: 'Empresa', icon: 'Building' }
+    { value: 'search', label: 'Busca', icon: 'Search' },
+    { value: 'filter', label: 'Filtro', icon: 'Filter' },
+    { value: 'tag', label: 'Tag', icon: 'Tag' },
+    { value: 'hash', label: 'Hash', icon: 'Hash' },
+    { value: 'lightbulb', label: 'Ideia', icon: 'Lightbulb' },
+    { value: 'heart', label: 'Coração', icon: 'Heart' },
+    { value: 'image', label: 'Imagem', icon: 'Image' },
+    { value: 'video', label: 'Vídeo', icon: 'Video' },
+    { value: 'camera', label: 'Câmera', icon: 'Camera' },
+    { value: 'headphones', label: 'Fone', icon: 'Headphones' },
+    { value: 'printer', label: 'Impressora', icon: 'Printer' }
   ]
 
   if (!isOpen) return null
@@ -663,7 +777,6 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                 onClick={() => {
                   setShowCategoryModal(false)
                   setShowIconDropdown(false)
-                  setIconSearchTerm('')
                 }}
               />
               <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
@@ -754,8 +867,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                 <div 
                                   className="fixed inset-0 bg-black bg-opacity-50" 
                                   onClick={() => {
-                                    setShowIconDropdown(false)
-                                    setIconSearchTerm('')
+                                        setShowIconDropdown(false)
                                   }}
                                 />
                                 
@@ -769,7 +881,6 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                         type="button"
                                         onClick={() => {
                                           setShowIconDropdown(false)
-                                          setIconSearchTerm('')
                                         }}
                                         className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                                       >
@@ -777,31 +888,12 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                       </button>
                                     </div>
                                     
-                                    {/* Search Bar */}
-                                    <div className="mt-3">
-                                      <div className="relative">
-                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                        <input
-                                          type="text"
-                                          placeholder="Buscar ícone..."
-                                          value={iconSearchTerm}
-                                          onChange={(e) => setIconSearchTerm(e.target.value)}
-                                          className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                          autoFocus
-                                        />
-                                      </div>
-                                    </div>
                                   </div>
                                   
                                   {/* Icons Grid */}
                                   <div className="p-4 overflow-y-auto max-h-[70vh]">
                                     <div className="grid grid-cols-8 sm:grid-cols-10 lg:grid-cols-12 gap-2">
-                                      {iconsList
-                                        .filter(icon => 
-                                          icon.label.toLowerCase().includes(iconSearchTerm.toLowerCase()) ||
-                                          icon.value.toLowerCase().includes(iconSearchTerm.toLowerCase())
-                                        )
-                                        .map(icon => {
+                                      {iconsList.map(icon => {
                                           const IconComponent = getIcon(icon.value)
                                           const isSelected = formData.icon === icon.value
                                           return (
@@ -810,8 +902,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                               type="button"
                                               onClick={() => {
                                                 setFormData({ ...formData, icon: icon.value })
-                                                setShowIconDropdown(false)
-                                                setIconSearchTerm('')
+                                        setShowIconDropdown(false)
                                               }}
                                               className={`
                                                 flex items-center justify-center p-3 rounded-lg border-2 transition-all w-12 h-12
@@ -827,15 +918,6 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                           )
                                         })}
                                     </div>
-                                    
-                                    {iconsList.filter(icon => 
-                                      icon.label.toLowerCase().includes(iconSearchTerm.toLowerCase()) ||
-                                      icon.value.toLowerCase().includes(iconSearchTerm.toLowerCase())
-                                    ).length === 0 && (
-                                      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                                        Nenhum ícone encontrado para "{iconSearchTerm}"
-                                      </div>
-                                    )}
                                   </div>
                                 </div>
                               </div>
@@ -883,8 +965,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                       type="button"
                       onClick={() => {
                         setShowCategoryModal(false)
-                        setShowIconDropdown(false)
-                        setIconSearchTerm('')
+                                        setShowIconDropdown(false)
                       }}
                       className="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                     >
