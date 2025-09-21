@@ -14,6 +14,8 @@ export interface Permission {
   tickets_delete: boolean
   tickets_assign: boolean
   tickets_close: boolean
+  tickets_change_priority: boolean
+  tickets_view_history: boolean
   kb_view: boolean
   kb_create: boolean
   kb_edit: boolean
@@ -45,6 +47,8 @@ const defaultSystemPermissions: Record<string, Permission> = {
     tickets_delete: true,
     tickets_assign: true,
     tickets_close: true,
+    tickets_change_priority: true,
+    tickets_view_history: true,
     kb_view: true,
     kb_create: true,
     kb_edit: true,
@@ -72,6 +76,8 @@ const defaultSystemPermissions: Record<string, Permission> = {
     tickets_delete: true,
     tickets_assign: true,
     tickets_close: true,
+    tickets_change_priority: true,
+    tickets_view_history: true,
     kb_view: true,
     kb_create: true,
     kb_edit: true,
@@ -98,6 +104,8 @@ const defaultSystemPermissions: Record<string, Permission> = {
     tickets_delete: false,
     tickets_assign: true,
     tickets_close: true,
+    tickets_change_priority: true,
+    tickets_view_history: true,
     kb_view: true,
     kb_create: true,
     kb_edit: true,
@@ -125,6 +133,8 @@ const defaultSystemPermissions: Record<string, Permission> = {
     tickets_delete: false,
     tickets_assign: true,
     tickets_close: true,
+    tickets_change_priority: false,
+    tickets_view_history: true,
     kb_view: true,
     kb_create: true,
     kb_edit: true,
@@ -151,6 +161,8 @@ const defaultSystemPermissions: Record<string, Permission> = {
     tickets_delete: false,
     tickets_assign: false,
     tickets_close: false,
+    tickets_change_priority: false,
+    tickets_view_history: false,
     kb_view: true,
     kb_create: false,
     kb_edit: false,

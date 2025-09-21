@@ -26,6 +26,8 @@ export async function GET(request: NextRequest) {
       'tickets_delete',
       'tickets_assign',
       'tickets_close',
+      'tickets_change_priority',
+      'tickets_view_history',
       'kb_view',
       'kb_create',
       'kb_edit',

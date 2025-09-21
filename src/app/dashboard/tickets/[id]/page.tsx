@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import axios from 'axios'
 import { formatBrazilDateTime, formatRelativeTime } from '@/lib/date-utils'
-import { ArrowLeft, Clock, User, Tag, AlertCircle, MessageSquare, Paperclip, Edit, Trash2, Send, CheckCircle, XCircle, AlertTriangle, ChevronDown, Lock, Eye, EyeOff, Image as ImageIcon } from 'lucide-react'
+import { ArrowLeft, Clock, User, Tag, AlertCircle, MessageSquare, Paperclip, Edit, Trash2, Send, CheckCircle, XCircle, AlertTriangle, ChevronDown, Lock, Eye, EyeOff, Image as ImageIcon, Activity } from 'lucide-react'
 import { getIcon } from '@/lib/icons'
 import toast from 'react-hot-toast'
 import { useSession } from 'next-auth/react'
@@ -15,6 +15,7 @@ import { usePermissions } from '@/hooks/usePermissions'
 import { TicketRating } from '@/components/tickets/TicketRating'
 import { RatingModal } from '@/components/tickets/RatingModal'
 import { useStatuses } from '@/hooks/useStatuses'
+import TicketHistory from '@/components/TicketHistory'
 
 interface User {
   id: string
@@ -126,6 +127,8 @@ export default function TicketDetailsPage() {
   const [users, setUsers] = useState<User[]>([])
   const [editingAssignee, setEditingAssignee] = useState(false)
   const [newAssignee, setNewAssignee] = useState<string>('')
+  const [editingPriority, setEditingPriority] = useState(false)
+  const [newPriority, setNewPriority] = useState<string>('')
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const [uploadingFile, setUploadingFile] = useState(false)
   const [showCancelModal, setShowCancelModal] = useState(false)
@@ -144,6 +147,8 @@ export default function TicketDetailsPage() {
   const canEditOwnTickets = hasPermission('tickets_edit_own')
   const canCloseTickets = hasPermission('tickets_close')
   const canDeleteTickets = hasPermission('tickets_delete')
+  const canChangePriority = hasPermission('tickets_change_priority')
+  const canViewHistory = hasPermission('tickets_view_history')
   
   // Debug: Log permissions para verificar se estão sendo carregadas corretamente
   useEffect(() => {
@@ -337,6 +342,34 @@ export default function TicketDetailsPage() {
       console.error('Erro ao atualizar status:', error)
       console.error('Detalhes do erro:', error.response?.data)
       toast.error(error.response?.data?.error || 'Erro ao atualizar status')
+    }
+  }
+
+  const handlePriorityUpdate = async () => {
+    if (!ticket || newPriority === ticket.priority) {
+      setEditingPriority(false)
+      return
+    }
+
+    try {
+      console.log('=== DEBUG UPDATE PRIORITY ===')
+      console.log('ID do ticket:', ticket.id)
+      console.log('Nova prioridade:', newPriority)
+      console.log('User ID:', session?.user?.id)
+      
+      const response = await axios.patch(`/api/tickets/${ticket.id}/priority`, {
+        priority: newPriority
+      })
+      
+      console.log('Resposta da atualização de prioridade:', response.data)
+      
+      toast.success('Prioridade atualizada com sucesso!')
+      setEditingPriority(false)
+      fetchTicket()
+    } catch (error: any) {
+      console.error('Erro ao atualizar prioridade:', error)
+      console.error('Detalhes do erro:', error.response?.data)
+      toast.error(error.response?.data?.error || 'Erro ao atualizar prioridade')
     }
   }
 
@@ -619,10 +652,47 @@ export default function TicketDetailsPage() {
             </div>
             
             {/* Priority */}
-            <div className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white ${priorityConfig[ticket.priority].color}`}>
-              <PriorityIcon size={16} />
-              {priorityConfig[ticket.priority].label}
-            </div>
+            {editingPriority ? (
+              <div className="flex items-center gap-2">
+                <select
+                  value={newPriority}
+                  onChange={(e) => setNewPriority(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                >
+                  <option value="low">Baixa</option>
+                  <option value="medium">Média</option>
+                  <option value="high">Alta</option>
+                  <option value="critical">Crítica</option>
+                </select>
+                <button
+                  onClick={handlePriorityUpdate}
+                  className="px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                >
+                  Salvar
+                </button>
+                <button
+                  onClick={() => setEditingPriority(false)}
+                  className="px-3 py-1 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                >
+                  Cancelar
+                </button>
+              </div>
+            ) : (
+              <div className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white ${priorityConfig[ticket.priority].color} ${canChangePriority ? 'cursor-pointer hover:opacity-80' : ''}`}
+                onClick={() => {
+                  if (canChangePriority) {
+                    setEditingPriority(true)
+                    setNewPriority(ticket.priority)
+                  }
+                }}
+              >
+                <PriorityIcon size={16} />
+                {priorityConfig[ticket.priority].label}
+                {canChangePriority && (
+                  <Edit size={14} className="ml-1 opacity-70" />
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -712,6 +782,11 @@ export default function TicketDetailsPage() {
                 })}
               </div>
             </div>
+          )}
+
+          {/* Histórico do Ticket */}
+          {canViewHistory && (
+            <TicketHistory ticketId={ticket.id} className="mb-6" />
           )}
 
           {/* Comments */}
