@@ -75,7 +75,7 @@ export async function GET(
           description,
           metadata,
           created_at,
-          user:users!ticket_history_user_id_fkey(id, name, email, avatar_url)
+          user:users!fk_ticket_history_user_id(id, name, email, avatar_url)
         `)
         .eq('ticket_id', ticketId)
         .order('created_at', { ascending: false })
