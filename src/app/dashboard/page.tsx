@@ -161,26 +161,43 @@ const CategoryCard = ({ category }: { category: CategoryStat }) => {
           })}
         </div>
         
-        {/* Status breakdown with improved presentation */}
-        <div className="mt-3 space-y-1">
+        {/* Status breakdown - Minimalist design */}
+        <div className="mt-3 grid grid-cols-2 gap-2">
           {category.status_breakdown_detailed
             .filter(status => status.count > 0)
-            .map((status) => (
-              <div key={status.slug} className="flex items-center justify-between text-xs">
-                <div className="flex items-center">
-                  <div 
-                    className="w-2 h-2 rounded-full mr-2 flex-shrink-0"
-                    style={{ backgroundColor: status.color }}
-                  />
-                  <span className="text-gray-600 dark:text-gray-400 truncate">
-                    {status.name}
-                  </span>
+            .map((status) => {
+              // Map status to consistent icons and colors like main cards
+              const statusConfig: Record<string, { icon: string; color: string; bgColor: string }> = {
+                'aberto': { icon: '⚠️', color: '#f59e0b', bgColor: 'bg-yellow-50 border-yellow-200' },
+                'em-progresso': { icon: '🔄', color: '#ea580c', bgColor: 'bg-orange-50 border-orange-200' },
+                'resolvido': { icon: '✅', color: '#16a34a', bgColor: 'bg-green-50 border-green-200' },
+                'cancelled': { icon: '❌', color: '#dc2626', bgColor: 'bg-red-50 border-red-200' },
+                'fechado': { icon: '📋', color: '#64748b', bgColor: 'bg-slate-50 border-slate-200' },
+                'aguardando-cliente': { icon: '⏳', color: '#f59e0b', bgColor: 'bg-yellow-50 border-yellow-200' },
+                'ag-deploy-em-producao': { icon: '🚀', color: '#10b981', bgColor: 'bg-emerald-50 border-emerald-200' }
+              }
+              
+              const config = statusConfig[status.slug] || { 
+                icon: '📊', 
+                color: status.color, 
+                bgColor: 'bg-gray-50 border-gray-200' 
+              }
+              
+              return (
+                <div 
+                  key={status.slug} 
+                  className={`${config.bgColor} border rounded-lg p-2 text-center`}
+                >
+                  <div className="text-lg font-bold" style={{ color: config.color }}>
+                    {status.count}
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400 mt-1 flex items-center justify-center gap-1">
+                    <span>{config.icon}</span>
+                    <span className="truncate">{status.name}</span>
+                  </div>
                 </div>
-                <span className="font-medium text-gray-900 dark:text-white ml-2">
-                  {status.count}
-                </span>
-              </div>
-            ))
+              )
+            })
           }
         </div>
       </div>
@@ -492,10 +509,23 @@ export default function DashboardPage() {
                 </div>
                 <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%); border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid ${category.color || '#6b7280'}40; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);">
                   <div style="font-size: 11px; color: #374151; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">Distribuição por Status:</div>
-                  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 11px;">
-                    ${category.status_breakdown_detailed.filter(s => s.count > 0).map(status => 
-                      `<div style="display: flex; align-items: center;"><span style="color: ${status.color}; font-size: 14px; margin-right: 4px;">●</span> <span style="font-weight: 600; color: #374151;">${status.name}:</span> <span style="font-weight: 700; color: #111827; margin-left: 4px;">${status.count}</span></div>`
-                    ).join('')}
+                  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 10px;">
+                    ${category.status_breakdown_detailed.filter(s => s.count > 0).map(status => {
+                      const statusIcons: Record<string, string> = {
+                        'aberto': '⚠️',
+                        'em-progresso': '🔄', 
+                        'resolvido': '✅',
+                        'cancelled': '❌',
+                        'fechado': '📋',
+                        'aguardando-cliente': '⏳',
+                        'ag-deploy-em-producao': '🚀'
+                      }
+                      const icon = statusIcons[status.slug] || '📊'
+                      return `<div style="background: ${status.color}10; border: 1px solid ${status.color}30; border-radius: 6px; padding: 8px; text-align: center;">
+                        <div style="font-size: 16px; font-weight: bold; color: ${status.color}; line-height: 1;">${status.count}</div>
+                        <div style="font-size: 9px; color: #374151; margin-top: 2px;">${icon} ${status.name}</div>
+                      </div>`
+                    }).join('')}
                   </div>
                 </div>
               </div>
@@ -557,10 +587,23 @@ export default function DashboardPage() {
                         </div>
                         <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%); border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid ${category.color || '#6b7280'}40; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);">
                           <div style="font-size: 11px; color: #374151; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">Distribuição por Status:</div>
-                          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 11px;">
-                            ${category.status_breakdown_detailed.filter(s => s.count > 0).map(status => 
-                              `<div style="display: flex; align-items: center;"><span style="color: ${status.color}; font-size: 14px; margin-right: 4px;">●</span> <span style="font-weight: 600; color: #374151;">${status.name}:</span> <span style="font-weight: 700; color: #111827; margin-left: 4px;">${status.count}</span></div>`
-                            ).join('')}
+                          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 10px;">
+                            ${category.status_breakdown_detailed.filter(s => s.count > 0).map(status => {
+                              const statusIcons: Record<string, string> = {
+                                'aberto': '⚠️',
+                                'em-progresso': '🔄', 
+                                'resolvido': '✅',
+                                'cancelled': '❌',
+                                'fechado': '📋',
+                                'aguardando-cliente': '⏳',
+                                'ag-deploy-em-producao': '🚀'
+                              }
+                              const icon = statusIcons[status.slug] || '📊'
+                              return `<div style="background: ${status.color}10; border: 1px solid ${status.color}30; border-radius: 6px; padding: 8px; text-align: center;">
+                                <div style="font-size: 16px; font-weight: bold; color: ${status.color}; line-height: 1;">${status.count}</div>
+                                <div style="font-size: 9px; color: #374151; margin-top: 2px;">${icon} ${status.name}</div>
+                              </div>`
+                            }).join('')}
                           </div>
                         </div>
                       </div>
