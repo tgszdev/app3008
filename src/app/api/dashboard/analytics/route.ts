@@ -168,12 +168,45 @@ export async function GET(request: Request) {
       ? Math.round(((activeUsers - previousActiveUsers) / previousActiveUsers) * 100)
       : 0
 
-    // Tickets by status
+    // Get dynamic status data from ticket_statuses table
+    const { data: statuses } = await supabaseAdmin
+      .from('ticket_statuses')
+      .select('id, name, slug, color, order_index')
+      .order('order_index', { ascending: true })
+
+    // Tickets by status - Dynamic from database
+    const ticketsByStatusDynamic: Record<string, number> = {}
+    const ticketsByStatusDetailed: Array<{
+      slug: string
+      name: string
+      color: string
+      count: number
+      order_index: number
+    }> = []
+
+    // Build dynamic status counts
+    if (statuses) {
+      statuses.forEach(status => {
+        const count = tickets?.filter(t => t.status === status.slug).length || 0
+        ticketsByStatusDynamic[status.slug] = count
+        ticketsByStatusDetailed.push({
+          slug: status.slug,
+          name: status.name,
+          color: status.color,
+          count: count,
+          order_index: status.order_index
+        })
+      })
+    }
+
+    // Legacy format for compatibility (hardcoded mapping)
     const ticketsByStatus = {
-      open: tickets?.filter(t => t.status === 'open').length || 0,
-      in_progress: tickets?.filter(t => t.status === 'in_progress').length || 0,
-      resolved: tickets?.filter(t => t.status === 'resolved').length || 0,
-      cancelled: tickets?.filter(t => t.status === 'cancelled').length || 0
+      open: ticketsByStatusDynamic['aberto'] || ticketsByStatusDynamic['open'] || 0,
+      in_progress: (ticketsByStatusDynamic['em-progresso'] || ticketsByStatusDynamic['in_progress'] || 0) +
+                   (ticketsByStatusDynamic['aguardando-cliente'] || 0) +
+                   (ticketsByStatusDynamic['ag-deploy-em-producao'] || 0),
+      resolved: ticketsByStatusDynamic['resolvido'] || ticketsByStatusDynamic['resolved'] || 0,
+      cancelled: ticketsByStatusDynamic['cancelled'] || ticketsByStatusDynamic['cancelado'] || 0
     }
 
     // Tickets by priority
@@ -383,7 +416,9 @@ export async function GET(request: Request) {
         activeUsers,
         activeUsersTrend
       },
-      ticketsByStatus,
+      ticketsByStatus, // Legacy format for compatibility
+      ticketsByStatusDetailed, // New dynamic format
+      availableStatuses: statuses || [], // Available status from database
       ticketsByPriority,
       ticketsByCategory,
       ticketsTrend,

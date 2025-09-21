@@ -75,6 +75,20 @@ interface AnalyticsData {
     resolved: number
     cancelled: number
   }
+  ticketsByStatusDetailed: Array<{
+    slug: string
+    name: string
+    color: string
+    count: number
+    order_index: number
+  }>
+  availableStatuses: Array<{
+    id: string
+    name: string
+    slug: string
+    color: string
+    order_index: number
+  }>
   ticketsByPriority: {
     low: number
     medium: number
@@ -220,62 +234,59 @@ export default function AnalyticsPage() {
     ]
   }
 
+  // Dynamic status distribution using real database data
   const statusDistributionData = {
-    labels: ['Abertos', 'Em Progresso', 'Resolvidos', 'Cancelados'],
+    labels: analyticsData.ticketsByStatusDetailed
+      .filter(status => status.count > 0) // Only show status with tickets
+      .map(status => status.name),
     datasets: [
       {
-        data: [
-          analyticsData.ticketsByStatus.open,
-          analyticsData.ticketsByStatus.in_progress,
-          analyticsData.ticketsByStatus.resolved,
-          analyticsData.ticketsByStatus.cancelled
-        ],
-        backgroundColor: [
-          'rgb(251, 191, 36)',
-          'rgb(251, 146, 60)',
-          'rgb(34, 197, 94)',
-          'rgb(239, 68, 68)'
-        ],
+        data: analyticsData.ticketsByStatusDetailed
+          .filter(status => status.count > 0) // Only show status with tickets
+          .map(status => status.count),
+        backgroundColor: analyticsData.ticketsByStatusDetailed
+          .filter(status => status.count > 0) // Only show status with tickets
+          .map(status => status.color || '#6b7280'),
         borderWidth: 0
       }
     ]
   }
 
+  // Dynamic priority distribution - only show priorities with tickets
+  const priorityData = [
+    { name: 'Baixa', value: analyticsData.ticketsByPriority.low, color: 'rgba(156, 163, 175, 0.8)', borderColor: 'rgb(156, 163, 175)' },
+    { name: 'Média', value: analyticsData.ticketsByPriority.medium, color: 'rgba(59, 130, 246, 0.8)', borderColor: 'rgb(59, 130, 246)' },
+    { name: 'Alta', value: analyticsData.ticketsByPriority.high, color: 'rgba(251, 146, 60, 0.8)', borderColor: 'rgb(251, 146, 60)' },
+    { name: 'Crítica', value: analyticsData.ticketsByPriority.critical, color: 'rgba(239, 68, 68, 0.8)', borderColor: 'rgb(239, 68, 68)' }
+  ].filter(priority => priority.value > 0) // Only show priorities with tickets
+
   const priorityDistributionData = {
-    labels: ['Baixa', 'Média', 'Alta', 'Crítica'],
+    labels: priorityData.map(p => p.name),
     datasets: [
       {
         label: 'Tickets por Prioridade',
-        data: [
-          analyticsData.ticketsByPriority.low,
-          analyticsData.ticketsByPriority.medium,
-          analyticsData.ticketsByPriority.high,
-          analyticsData.ticketsByPriority.critical
-        ],
-        backgroundColor: [
-          'rgba(156, 163, 175, 0.8)',
-          'rgba(59, 130, 246, 0.8)',
-          'rgba(251, 146, 60, 0.8)',
-          'rgba(239, 68, 68, 0.8)'
-        ],
-        borderColor: [
-          'rgb(156, 163, 175)',
-          'rgb(59, 130, 246)',
-          'rgb(251, 146, 60)',
-          'rgb(239, 68, 68)'
-        ],
+        data: priorityData.map(p => p.value),
+        backgroundColor: priorityData.map(p => p.color),
+        borderColor: priorityData.map(p => p.borderColor),
         borderWidth: 1
       }
     ]
   }
 
+  // Dynamic category distribution - only show categories with tickets
   const categoryDistributionData = {
-    labels: analyticsData.ticketsByCategory.map(c => c.name),
+    labels: analyticsData.ticketsByCategory
+      .filter(c => c.count > 0) // Only show categories with tickets
+      .map(c => c.name),
     datasets: [
       {
         label: 'Tickets por Categoria',
-        data: analyticsData.ticketsByCategory.map(c => c.count),
-        backgroundColor: analyticsData.ticketsByCategory.map(c => c.color || '#6b7280'),
+        data: analyticsData.ticketsByCategory
+          .filter(c => c.count > 0) // Only show categories with tickets
+          .map(c => c.count),
+        backgroundColor: analyticsData.ticketsByCategory
+          .filter(c => c.count > 0) // Only show categories with tickets
+          .map(c => c.color || '#6b7280'),
         borderWidth: 0
       }
     ]
