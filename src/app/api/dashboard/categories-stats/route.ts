@@ -2,6 +2,14 @@ import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 
+interface StatusInfo {
+  id: string
+  name: string
+  slug: string
+  color: string
+  order_index: number
+}
+
 export async function GET(request: Request) {
   try {
     const session = await auth()
@@ -36,6 +44,33 @@ export async function GET(request: Request) {
     }
 
     console.log('Using dates for query:', { filterStartDate, filterEndDate })
+
+    // First, get all available status from ticket_statuses table
+    const { data: statusData, error: statusError } = await supabaseAdmin
+      .from('ticket_statuses')
+      .select('id, name, slug, color, order_index')
+      .order('order_index', { ascending: true })
+
+    if (statusError) {
+      console.error('Error fetching status:', statusError)
+      return NextResponse.json({ error: 'Failed to fetch status' }, { status: 500 })
+    }
+
+    // Create status mapping for easy lookup
+    const statusMap = new Map<string, StatusInfo>()
+    const statusList: StatusInfo[] = statusData || []
+    
+    statusList.forEach(status => {
+      statusMap.set(status.slug, {
+        id: status.id,
+        name: status.name,
+        slug: status.slug,
+        color: status.color || '#6b7280',
+        order_index: status.order_index || 0
+      })
+    })
+
+    console.log(`Found ${statusList.length} status: ${statusList.map(s => s.slug).join(', ')}`)
 
     // Get all tickets within the date range with category information
     let query = supabaseAdmin
@@ -80,10 +115,7 @@ export async function GET(request: Request) {
       icon: string | null
       color: string | null
       count: number
-      openCount: number
-      inProgressCount: number
-      resolvedCount: number
-      cancelledCount: number
+      statusCounts: Map<string, number>
     }>()
 
     tickets?.forEach((ticket: any) => {
@@ -100,59 +132,86 @@ export async function GET(request: Request) {
           icon: categoryIcon,
           color: categoryColor,
           count: 0,
-          openCount: 0,
-          inProgressCount: 0,
-          resolvedCount: 0,
-          cancelledCount: 0
+          statusCounts: new Map<string, number>()
         })
       }
 
       const stats = categoryStats.get(categoryId)!
       stats.count++
       
-      // Count by status
-      switch (ticket.status) {
-        case 'open':
-          stats.openCount++
-          break
-        case 'in_progress':
-          stats.inProgressCount++
-          break
-        case 'resolved':
-          stats.resolvedCount++
-          break
-        case 'cancelled':
-          stats.cancelledCount++
-          break
-      }
+      // Count by status (dynamic)
+      const ticketStatus = ticket.status
+      const currentCount = stats.statusCounts.get(ticketStatus) || 0
+      stats.statusCounts.set(ticketStatus, currentCount + 1)
     })
 
     // Convert to array and calculate percentages
-    const categoriesArray = Array.from(categoryStats.values()).map(cat => ({
-      id: cat.id,
-      nome: cat.name,
-      icon: cat.icon,
-      color: cat.color,
-      quantidade: cat.count,
-      percentual: totalTickets > 0 ? parseFloat(((cat.count / totalTickets) * 100).toFixed(2)) : 0,
-      status_breakdown: {
-        open: cat.openCount,
-        in_progress: cat.inProgressCount,
-        resolved: cat.resolvedCount,
-        cancelled: cat.cancelledCount
+    const categoriesArray = Array.from(categoryStats.values()).map(cat => {
+      // Create status breakdown with all available status
+      const statusBreakdown: Record<string, number> = {}
+      const statusBreakdownDetailed: Array<{
+        slug: string
+        name: string
+        color: string
+        count: number
+        order_index: number
+      }> = []
+      
+      // Initialize all status with 0 count
+      statusList.forEach(status => {
+        const count = cat.statusCounts.get(status.slug) || 0
+        statusBreakdown[status.slug] = count
+        statusBreakdownDetailed.push({
+          slug: status.slug,
+          name: status.name,
+          color: status.color,
+          count: count,
+          order_index: status.order_index
+        })
+      })
+      
+      // Sort status by order_index
+      statusBreakdownDetailed.sort((a, b) => a.order_index - b.order_index)
+      
+      return {
+        id: cat.id,
+        nome: cat.name,
+        icon: cat.icon,
+        color: cat.color,
+        quantidade: cat.count,
+        percentual: totalTickets > 0 ? parseFloat(((cat.count / totalTickets) * 100).toFixed(2)) : 0,
+        status_breakdown: statusBreakdown,
+        status_breakdown_detailed: statusBreakdownDetailed
       }
-    }))
+    })
 
     // Sort by quantity (descending)
     categoriesArray.sort((a, b) => b.quantidade - a.quantidade)
 
-    // Get tickets by status for the period
-    const statusCounts = {
-      open: tickets?.filter(t => t.status === 'open').length || 0,
-      in_progress: tickets?.filter(t => t.status === 'in_progress').length || 0,
-      resolved: tickets?.filter(t => t.status === 'resolved').length || 0,
-      cancelled: tickets?.filter(t => t.status === 'cancelled').length || 0
-    }
+    // Get tickets by status for the period (dynamic)
+    const statusCounts: Record<string, number> = {}
+    const statusCountsDetailed: Array<{
+      slug: string
+      name: string
+      color: string
+      count: number
+      order_index: number
+    }> = []
+    
+    statusList.forEach(status => {
+      const count = tickets?.filter(t => t.status === status.slug).length || 0
+      statusCounts[status.slug] = count
+      statusCountsDetailed.push({
+        slug: status.slug,
+        name: status.name,
+        color: status.color,
+        count: count,
+        order_index: status.order_index
+      })
+    })
+    
+    // Sort status by order_index
+    statusCountsDetailed.sort((a, b) => a.order_index - b.order_index)
 
     // Calculate average resolution time for resolved tickets in this period
     const resolvedTickets = tickets?.filter(t => t.status === 'resolved') || []
@@ -196,6 +255,8 @@ export async function GET(request: Request) {
       },
       categorias: categoriesArray,
       status_summary: statusCounts,
+      status_summary_detailed: statusCountsDetailed,
+      available_status: statusList,
       average_resolution_time: averageResolutionTime
     }
 

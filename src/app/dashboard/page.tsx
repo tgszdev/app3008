@@ -44,6 +44,14 @@ interface Stats {
   ticketsTrend: string
 }
 
+interface StatusInfo {
+  slug: string
+  name: string
+  color: string
+  count: number
+  order_index: number
+}
+
 interface CategoryStat {
   id: string
   nome: string
@@ -51,12 +59,8 @@ interface CategoryStat {
   color: string | null
   quantidade: number
   percentual: number
-  status_breakdown: {
-    open: number
-    in_progress: number
-    resolved: number
-    cancelled: number
-  }
+  status_breakdown: Record<string, number>
+  status_breakdown_detailed: StatusInfo[]
 }
 
 interface RecentTicket {
@@ -137,43 +141,47 @@ const CategoryCard = ({ category }: { category: CategoryStat }) => {
         </div>
       </div>
       
-      {/* Status breakdown bar */}
+      {/* Status breakdown bar - Dynamic */}
       <div className="mt-3 sm:mt-4">
         <div className="flex h-2 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700">
-          {category.status_breakdown.open > 0 && (
-            <div 
-              className="bg-blue-500 transition-all duration-300" 
-              style={{ width: `${(category.status_breakdown.open / category.quantidade) * 100}%` }}
-              title={`Abertos: ${category.status_breakdown.open}`}
-            />
-          )}
-          {category.status_breakdown.in_progress > 0 && (
-            <div 
-              className="bg-yellow-500 transition-all duration-300" 
-              style={{ width: `${(category.status_breakdown.in_progress / category.quantidade) * 100}%` }}
-              title={`Em Progresso: ${category.status_breakdown.in_progress}`}
-            />
-          )}
-          {category.status_breakdown.resolved > 0 && (
-            <div 
-              className="bg-green-500 transition-all duration-300" 
-              style={{ width: `${(category.status_breakdown.resolved / category.quantidade) * 100}%` }}
-              title={`Resolvidos: ${category.status_breakdown.resolved}`}
-            />
-          )}
-          {category.status_breakdown.cancelled > 0 && (
-            <div 
-              className="bg-red-500 transition-all duration-300" 
-              style={{ width: `${(category.status_breakdown.cancelled / category.quantidade) * 100}%` }}
-              title={`Cancelados: ${category.status_breakdown.cancelled}`}
-            />
-          )}
+          {category.status_breakdown_detailed.map((status, index) => {
+            if (status.count <= 0) return null
+            
+            return (
+              <div 
+                key={status.slug}
+                className="transition-all duration-300" 
+                style={{ 
+                  width: `${(status.count / category.quantidade) * 100}%`,
+                  backgroundColor: status.color
+                }}
+                title={`${status.name}: ${status.count}`}
+              />
+            )
+          })}
         </div>
-        <div className="flex justify-between mt-1.5 sm:mt-2 text-xs text-gray-500 dark:text-gray-400">
-          <span className="truncate">A: {category.status_breakdown.open}</span>
-          <span className="truncate">P: {category.status_breakdown.in_progress}</span>
-          <span className="truncate">R: {category.status_breakdown.resolved}</span>
-          <span className="truncate">C: {category.status_breakdown.cancelled}</span>
+        
+        {/* Status breakdown with improved presentation */}
+        <div className="mt-3 space-y-1">
+          {category.status_breakdown_detailed
+            .filter(status => status.count > 0)
+            .map((status) => (
+              <div key={status.slug} className="flex items-center justify-between text-xs">
+                <div className="flex items-center">
+                  <div 
+                    className="w-2 h-2 rounded-full mr-2 flex-shrink-0"
+                    style={{ backgroundColor: status.color }}
+                  />
+                  <span className="text-gray-600 dark:text-gray-400 truncate">
+                    {status.name}
+                  </span>
+                </div>
+                <span className="font-medium text-gray-900 dark:text-white ml-2">
+                  {status.count}
+                </span>
+              </div>
+            ))
+          }
         </div>
       </div>
     </div>
@@ -485,10 +493,9 @@ export default function DashboardPage() {
                 <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%); border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid ${category.color || '#6b7280'}40; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);">
                   <div style="font-size: 11px; color: #374151; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">Distribuição por Status:</div>
                   <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 11px;">
-                    <div style="display: flex; align-items: center;"><span style="color: #d97706; font-size: 14px; margin-right: 4px;">●</span> <span style="font-weight: 600; color: #374151;">Abertos:</span> <span style="font-weight: 700; color: #111827; margin-left: 4px;">${category.status_breakdown.open}</span></div>
-                    <div style="display: flex; align-items: center;"><span style="color: #ea580c; font-size: 14px; margin-right: 4px;">●</span> <span style="font-weight: 600; color: #374151;">Progresso:</span> <span style="font-weight: 700; color: #111827; margin-left: 4px;">${category.status_breakdown.in_progress}</span></div>
-                    <div style="display: flex; align-items: center;"><span style="color: #16a34a; font-size: 14px; margin-right: 4px;">●</span> <span style="font-weight: 600; color: #374151;">Resolvidos:</span> <span style="font-weight: 700; color: #111827; margin-left: 4px;">${category.status_breakdown.resolved}</span></div>
-                    <div style="display: flex; align-items: center;"><span style="color: #dc2626; font-size: 14px; margin-right: 4px;">●</span> <span style="font-weight: 600; color: #374151;">Cancelados:</span> <span style="font-weight: 700; color: #111827; margin-left: 4px;">${category.status_breakdown.cancelled}</span></div>
+                    ${category.status_breakdown_detailed.filter(s => s.count > 0).map(status => 
+                      `<div style="display: flex; align-items: center;"><span style="color: ${status.color}; font-size: 14px; margin-right: 4px;">●</span> <span style="font-weight: 600; color: #374151;">${status.name}:</span> <span style="font-weight: 700; color: #111827; margin-left: 4px;">${status.count}</span></div>`
+                    ).join('')}
                   </div>
                 </div>
               </div>
@@ -551,10 +558,9 @@ export default function DashboardPage() {
                         <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%); border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid ${category.color || '#6b7280'}40; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);">
                           <div style="font-size: 11px; color: #374151; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">Distribuição por Status:</div>
                           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 11px;">
-                            <div style="display: flex; align-items: center;"><span style="color: #d97706; font-size: 14px; margin-right: 4px;">●</span> <span style="font-weight: 600; color: #374151;">Abertos:</span> <span style="font-weight: 700; color: #111827; margin-left: 4px;">${category.status_breakdown.open}</span></div>
-                            <div style="display: flex; align-items: center;"><span style="color: #ea580c; font-size: 14px; margin-right: 4px;">●</span> <span style="font-weight: 600; color: #374151;">Progresso:</span> <span style="font-weight: 700; color: #111827; margin-left: 4px;">${category.status_breakdown.in_progress}</span></div>
-                            <div style="display: flex; align-items: center;"><span style="color: #16a34a; font-size: 14px; margin-right: 4px;">●</span> <span style="font-weight: 600; color: #374151;">Resolvidos:</span> <span style="font-weight: 700; color: #111827; margin-left: 4px;">${category.status_breakdown.resolved}</span></div>
-                            <div style="display: flex; align-items: center;"><span style="color: #dc2626; font-size: 14px; margin-right: 4px;">●</span> <span style="font-weight: 600; color: #374151;">Cancelados:</span> <span style="font-weight: 700; color: #111827; margin-left: 4px;">${category.status_breakdown.cancelled}</span></div>
+                            ${category.status_breakdown_detailed.filter(s => s.count > 0).map(status => 
+                              `<div style="display: flex; align-items: center;"><span style="color: ${status.color}; font-size: 14px; margin-right: 4px;">●</span> <span style="font-weight: 600; color: #374151;">${status.name}:</span> <span style="font-weight: 700; color: #111827; margin-left: 4px;">${status.count}</span></div>`
+                            ).join('')}
                           </div>
                         </div>
                       </div>
