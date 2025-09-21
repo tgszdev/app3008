@@ -29,6 +29,7 @@ import { cn } from '@/lib/utils'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import { formatBrazilDateTime, formatRelativeTime } from '@/lib/date-utils'
+import InstantTooltip from '@/components/InstantTooltip'
 
 interface User {
   id: string
@@ -728,28 +729,26 @@ export default function TicketsPage() {
                       </td>
                       <td style={{ minWidth: '60px', width: '60px' }} className="px-3 py-3 whitespace-nowrap text-center">
                         {ticket.assigned_to_user ? (
-                          <div 
-                            className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto cursor-help flex-shrink-0"
-                            title={ticket.assigned_to_user.name}
-                          >
-                            <span className="text-blue-600 dark:text-blue-300 font-medium text-xs">
-                              {getInitials(ticket.assigned_to_user.name)}
-                            </span>
-                          </div>
+                          <InstantTooltip content={ticket.assigned_to_user.name}>
+                            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto cursor-help flex-shrink-0">
+                              <span className="text-blue-600 dark:text-blue-300 font-medium text-xs">
+                                {getInitials(ticket.assigned_to_user.name)}
+                              </span>
+                            </div>
+                          </InstantTooltip>
                         ) : (
                           <span className="text-gray-500 dark:text-gray-400 text-xs">—</span>
                         )}
                       </td>
                       <td style={{ minWidth: '60px', width: '60px' }} className="px-3 py-3 whitespace-nowrap text-center">
                         {ticket.created_by_user ? (
-                          <div 
-                            className="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto cursor-help flex-shrink-0"
-                            title={ticket.created_by_user.name}
-                          >
-                            <span className="text-gray-600 dark:text-gray-300 font-medium text-xs">
-                              {getInitials(ticket.created_by_user.name)}
-                            </span>
-                          </div>
+                          <InstantTooltip content={ticket.created_by_user.name}>
+                            <div className="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto cursor-help flex-shrink-0">
+                              <span className="text-gray-600 dark:text-gray-300 font-medium text-xs">
+                                {getInitials(ticket.created_by_user.name)}
+                              </span>
+                            </div>
+                          </InstantTooltip>
                         ) : (
                           <span className="text-gray-500 dark:text-gray-400 text-xs">—</span>
                         )}
