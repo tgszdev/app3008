@@ -139,7 +139,7 @@ const CategoryCard = ({ category }: { category: CategoryStat }) => {
   
   return (
     <div 
-      className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3 sm:p-4 md:p-6"
+      className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-3 sm:p-4 md:p-6"
       style={{ borderLeft: `4px solid ${borderColor}` }}
     >
       <div className="flex items-start justify-between mb-3 sm:mb-4">
