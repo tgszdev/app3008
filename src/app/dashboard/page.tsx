@@ -93,43 +93,44 @@ interface PeriodFilter {
   end_date: string
 }
 
-const StatCard = ({ title, value, icon: Icon, trend, color, statusColor }: any) => (
-  <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 p-3 sm:p-4 hover:shadow-sm transition-shadow duration-200">
-    {/* Header with dot and title */}
-    <div className="flex items-center gap-2 mb-2">
-      <div 
-        className="w-2 h-2 rounded-full flex-shrink-0"
-        style={{ backgroundColor: statusColor || (color === 'bg-blue-600' ? '#2563eb' : '#6b7280') }}
-      />
-      <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400 truncate">
-        {title}
-      </h3>
-    </div>
+const StatCard = ({ title, value, icon: Icon, trend, color, statusColor }: any) => {
+  // Get status color with fallback logic
+  const getCardColor = (statusColor: string, title: string) => {
+    if (statusColor && statusColor !== '#6b7280') {
+      return statusColor
+    }
     
-    {/* Value */}
-    <div className="flex items-center justify-between">
-      <span className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-        {value}
-      </span>
-      
-      {/* Small icon */}
-      <Icon 
-        className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 opacity-60" 
-        style={{ color: statusColor || (color === 'bg-blue-600' ? '#2563eb' : '#6b7280') }}
-      />
-    </div>
-    
-    {/* Trend (if exists) */}
-    {trend && (
-      <div className={`flex items-center gap-1 mt-1 text-xs ${
-        trend.startsWith('+') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-      }`}>
-        <TrendingUp className="h-3 w-3" />
-        <span className="font-medium">{trend}</span>
+    // Fallback colors based on title
+    if (title.includes('Total')) return '#2563eb' // blue
+    if (title.includes('Aberto') || title.includes('Open')) return '#3b82f6' // blue
+    if (title.includes('Progresso') || title.includes('Progress') || title.includes('Aguardando') || title.includes('Deploy')) return '#f59e0b' // amber
+    if (title.includes('Resolvido') || title.includes('Resolved') || title.includes('Fechado') || title.includes('Closed')) return '#10b981' // emerald
+    if (title.includes('Cancelado') || title.includes('Cancelled')) return '#ef4444' // red
+    return '#6b7280' // gray
+  }
+  
+  const cardColor = getCardColor(statusColor, title)
+  
+  return (
+    <div 
+      className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-3 hover:shadow-md transition-shadow duration-200"
+      style={{
+        borderLeftColor: cardColor,
+        borderLeftWidth: '3px'
+      }}
+    >
+      <div className="text-center">
+        <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{title}</p>
+        <p 
+          className="text-xl font-bold"
+          style={{ color: cardColor }}
+        >
+          {value}
+        </p>
       </div>
-    )}
-  </div>
-)
+    </div>
+  )
+}
 
 const CategoryCard = ({ category }: { category: CategoryStat }) => {
   const Icon = getIcon(category.icon)
@@ -828,7 +829,7 @@ export default function DashboardPage() {
 
       {/* Status Stats Grid - Dynamic & Complete */}
       {categoryStats && categoryStats.status_summary_detailed && (
-        <div className="grid gap-2 sm:gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-4">
           <StatCard
             title="Total no Período"
             value={categoryStats.total_tickets}
