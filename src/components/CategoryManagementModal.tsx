@@ -872,7 +872,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                 />
                                 
                                 {/* Popup Modal */}
-                                <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+                                <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl" style={{ height: '700px' }}>
                                   {/* Header */}
                                   <div className="bg-gray-50 dark:bg-gray-900 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                                     <div className="flex items-center justify-between">
@@ -891,7 +891,14 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                   </div>
                                   
                                   {/* Icons Grid */}
-                                  <div className="p-4 overflow-y-auto max-h-[70vh]">
+                                  <div 
+                                    className="p-4 overflow-y-auto" 
+                                    style={{ 
+                                      height: '560px',
+                                      scrollbarWidth: 'thin',
+                                      scrollbarColor: '#9CA3AF #E5E7EB'
+                                    }}
+                                  >
                                     <div className="grid grid-cols-8 sm:grid-cols-10 lg:grid-cols-12 gap-2">
                                       {iconsList.map(icon => {
                                           const IconComponent = getIcon(icon.value)
