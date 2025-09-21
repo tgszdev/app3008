@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { usePermissions } from '@/hooks/usePermissions'
 import { useStatuses } from '@/hooks/useStatuses'
+import { useStatusesWithCount } from '@/hooks/useStatusesWithCount'
+import { usePrioritiesWithCount } from '@/hooks/usePrioritiesWithCount'
 import {
   Plus,
   Search,
@@ -153,6 +155,8 @@ export default function TicketsPage() {
   const { data: session } = useSession()
   const { hasPermission } = usePermissions()
   const { statuses: availableStatuses } = useStatuses()
+  const { statuses: statusesWithCount } = useStatusesWithCount()
+  const { priorities: prioritiesWithCount } = usePrioritiesWithCount()
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -386,11 +390,14 @@ export default function TicketsPage() {
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">Todos os Status</option>
-              {availableStatuses.map((status) => (
-                <option key={status.id} value={status.slug}>
-                  {status.name}
-                </option>
-              ))}
+              {/* Only show status that have tickets (count > 0) */}
+              {statusesWithCount
+                .filter(status => status.count > 0)
+                .map((status) => (
+                  <option key={status.id} value={status.slug}>
+                    {status.name} ({status.count})
+                  </option>
+                ))}
             </select>
 
             <select
@@ -399,10 +406,14 @@ export default function TicketsPage() {
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">Todas as Prioridades</option>
-              <option value="low">Baixa</option>
-              <option value="medium">Média</option>
-              <option value="high">Alta</option>
-              <option value="critical">Crítica</option>
+              {/* Only show priorities that have tickets (count > 0) */}
+              {prioritiesWithCount
+                .filter(priority => priority.count > 0)
+                .map((priority) => (
+                  <option key={priority.slug} value={priority.slug}>
+                    {priority.name} ({priority.count})
+                  </option>
+                ))}
             </select>
           </div>
         </div>
