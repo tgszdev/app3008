@@ -779,15 +779,15 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                   
                                   {/* Grid Fixo de Ícones */}
                                   <div 
-                                    className="p-4 overflow-y-auto overflow-x-hidden" 
+                                    className="p-6 overflow-y-auto overflow-x-hidden" 
                                     style={{ 
                                       height: '600px',
                                       scrollbarWidth: 'thin',
                                       scrollbarColor: '#9CA3AF #E5E7EB'
                                     }}
                                   >
-                                    <div className="flex justify-center">
-                                      <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-3 w-fit">
+                                    <div className="flex justify-center px-4">
+                                      <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-4 w-fit mx-auto">
                                       {allIcons.map((iconName) => {
                                         const IconComponent = getIcon(iconName)
                                         const isSelected = formData.icon === iconName
