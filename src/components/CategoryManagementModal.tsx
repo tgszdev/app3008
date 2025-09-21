@@ -746,7 +746,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                       const IconComponent = getIcon(formData.icon)
                                       return <IconComponent className="h-4 w-4" />
                                     })()}
-                                    <span>{iconsList.find(i => i.value === formData.icon)?.label || formData.icon}</span>
+                                    <span>{formData.icon}</span>
                                   </>
                                 ) : (
                                   <span className="text-gray-500">Selecione...</span>
@@ -779,7 +779,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                   
                                   {/* Grid Simples de Ícones */}
                                   <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(80vh - 120px)' }}>
-                                    <div className="grid grid-cols-12 sm:grid-cols-15 md:grid-cols-18 lg:grid-cols-20 gap-2">
+                                    <div className="grid grid-cols-8 sm:grid-cols-10 md:grid-cols-12 lg:grid-cols-14 gap-3">
                                       {allIcons.map((iconName) => {
                                         const IconComponent = getIcon(iconName)
                                         const isSelected = formData.icon === iconName
@@ -792,7 +792,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                               setShowIconDropdown(false)
                                             }}
                                             className={`
-                                              flex items-center justify-center w-8 h-8 rounded border transition-colors
+                                              flex items-center justify-center w-12 h-12 rounded border transition-colors
                                               ${isSelected 
                                                 ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' 
                                                 : 'border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
@@ -800,7 +800,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                             `}
                                             title={iconName}
                                           >
-                                            <IconComponent className="w-4 h-4" />
+                                            <IconComponent className="w-6 h-6" />
                                           </button>
                                         )
                                       })}
