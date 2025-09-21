@@ -30,6 +30,7 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { formatBrazilDate } from '@/lib/date-utils'
 
 interface Article {
   id: string
