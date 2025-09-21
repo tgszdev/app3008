@@ -163,30 +163,25 @@ const CategoryCard = ({ category }: { category: CategoryStat }) => {
         
         {/* Status breakdown with improved presentation */}
         <div className="mt-3 space-y-1">
-          {category.quantidade > 0 ? (
-            category.status_breakdown_detailed
-              .filter(status => status.count > 0)
-              .map((status) => (
-                <div key={status.slug} className="flex items-center justify-between text-xs">
-                  <div className="flex items-center">
-                    <div 
-                      className="w-2 h-2 rounded-full mr-2 flex-shrink-0"
-                      style={{ backgroundColor: status.color }}
-                    />
-                    <span className="text-gray-600 dark:text-gray-400 truncate">
-                      {status.name}
-                    </span>
-                  </div>
-                  <span className="font-medium text-gray-900 dark:text-white ml-2">
-                    {status.count}
+          {category.status_breakdown_detailed
+            .filter(status => status.count > 0)
+            .map((status) => (
+              <div key={status.slug} className="flex items-center justify-between text-xs">
+                <div className="flex items-center">
+                  <div 
+                    className="w-2 h-2 rounded-full mr-2 flex-shrink-0"
+                    style={{ backgroundColor: status.color }}
+                  />
+                  <span className="text-gray-600 dark:text-gray-400 truncate">
+                    {status.name}
                   </span>
                 </div>
-              ))
-          ) : (
-            <div className="text-xs text-gray-500 dark:text-gray-400 italic text-center py-2">
-              Nenhum ticket no período selecionado
-            </div>
-          )}
+                <span className="font-medium text-gray-900 dark:text-white ml-2">
+                  {status.count}
+                </span>
+              </div>
+            ))
+          }
         </div>
       </div>
     </div>

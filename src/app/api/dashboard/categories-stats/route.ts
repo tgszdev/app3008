@@ -72,20 +72,7 @@ export async function GET(request: Request) {
 
     console.log(`Found ${statusList.length} status: ${statusList.map(s => s.slug).join(', ')}`)
 
-    // Get all categories first to ensure all are shown even with 0 tickets
-    const { data: allCategories, error: categoriesError } = await supabaseAdmin
-      .from('categories')
-      .select('id, name, icon, color')
-      .order('name', { ascending: true })
-
-    if (categoriesError) {
-      console.error('Error fetching categories:', categoriesError)
-      return NextResponse.json({ error: 'Failed to fetch categories' }, { status: 500 })
-    }
-
-    console.log(`Found ${allCategories?.length || 0} categories`)
-
-    // Get all tickets within the date range with category information
+    // Get all tickets within the date range with category information (INNER JOIN)
     let query = supabaseAdmin
       .from('tickets')
       .select(`
@@ -94,7 +81,7 @@ export async function GET(request: Request) {
         created_at,
         created_by,
         category_id,
-        categories (
+        categories!inner (
           id,
           name,
           icon,
@@ -121,7 +108,7 @@ export async function GET(request: Request) {
     // Calculate statistics by category
     const totalTickets = tickets?.length || 0
     
-    // Initialize all categories with zero counts
+    // Only process categories that have tickets (no zero categories)
     const categoryStats = new Map<string, {
       id: string
       name: string
@@ -131,44 +118,33 @@ export async function GET(request: Request) {
       statusCounts: Map<string, number>
     }>()
 
-    // Initialize all categories (even those with 0 tickets)
-    allCategories?.forEach(category => {
-      categoryStats.set(category.id, {
-        id: category.id,
-        name: category.name,
-        icon: category.icon,
-        color: category.color,
-        count: 0,
-        statusCounts: new Map<string, number>()
-      })
-    })
-
-    // Process tickets and update counts
+    // Process tickets and build category stats
     tickets?.forEach((ticket: any) => {
       const category = ticket.categories
       const categoryId = category?.id || 'uncategorized'
-      
-      // Handle uncategorized tickets
-      if (categoryId === 'uncategorized' && !categoryStats.has('uncategorized')) {
-        categoryStats.set('uncategorized', {
-          id: 'uncategorized',
-          name: 'Sem Categoria',
-          icon: 'folder',
-          color: '#6B7280',
+      const categoryName = category?.name || 'Sem Categoria'
+      const categoryIcon = category?.icon || 'folder'
+      const categoryColor = category?.color || '#6B7280'
+
+      // Initialize category if not exists
+      if (!categoryStats.has(categoryId)) {
+        categoryStats.set(categoryId, {
+          id: categoryId,
+          name: categoryName,
+          icon: categoryIcon,
+          color: categoryColor,
           count: 0,
           statusCounts: new Map<string, number>()
         })
       }
 
-      const stats = categoryStats.get(categoryId)
-      if (stats) {
-        stats.count++
-        
-        // Count by status (dynamic)
-        const ticketStatus = ticket.status
-        const currentCount = stats.statusCounts.get(ticketStatus) || 0
-        stats.statusCounts.set(ticketStatus, currentCount + 1)
-      }
+      const stats = categoryStats.get(categoryId)!
+      stats.count++
+      
+      // Count by status (dynamic)
+      const ticketStatus = ticket.status
+      const currentCount = stats.statusCounts.get(ticketStatus) || 0
+      stats.statusCounts.set(ticketStatus, currentCount + 1)
     })
 
     // Convert to array and calculate percentages
