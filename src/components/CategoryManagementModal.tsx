@@ -764,7 +764,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                 />
                                 
                                 {/* Modal Minimalista */}
-                                <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-7xl max-h-[90vh] overflow-hidden">
+                                <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl h-[700px] overflow-hidden">
                                   {/* Header Simples */}
                                   <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
                                     <h3 className="text-lg font-medium text-gray-900 dark:text-white">Selecionar Ícone</h3>
@@ -777,16 +777,17 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                     </button>
                                   </div>
                                   
-                                  {/* Grid Simples de Ícones */}
+                                  {/* Grid Fixo de Ícones */}
                                   <div 
-                                    className="p-2 sm:p-4 overflow-y-auto" 
+                                    className="p-4 overflow-y-auto overflow-x-hidden" 
                                     style={{ 
-                                      maxHeight: 'calc(90vh - 120px)',
+                                      height: '600px',
                                       scrollbarWidth: 'thin',
                                       scrollbarColor: '#9CA3AF #E5E7EB'
                                     }}
                                   >
-                                    <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-12 lg:grid-cols-16 xl:grid-cols-20 gap-2 sm:gap-3">
+                                    <div className="flex justify-center">
+                                      <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-3 w-fit">
                                       {allIcons.map((iconName) => {
                                         const IconComponent = getIcon(iconName)
                                         const isSelected = formData.icon === iconName
@@ -799,7 +800,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                               setShowIconDropdown(false)
                                             }}
                                             className={`
-                                              flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded border transition-colors
+                                              flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded border transition-colors flex-shrink-0
                                               ${isSelected 
                                                 ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' 
                                                 : 'border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
@@ -811,6 +812,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                           </button>
                                         )
                                       })}
+                                      </div>
                                     </div>
                                   </div>
                                   
