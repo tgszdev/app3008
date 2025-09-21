@@ -412,6 +412,9 @@ export default function DashboardPage() {
         minute: '2-digit'
       }).replace(',', ' às')
       
+      // Calculate dynamic space allocation first
+      const statusCount = (categoryStats?.status_summary_detailed?.filter(s => s.count > 0) || []).length + 1 // +1 for Total card
+      
       // Build PDF HTML with A4 dimensions and margins
       // A4: 210mm x 297mm
       // Margins: 15mm all sides
@@ -423,8 +426,8 @@ export default function DashboardPage() {
           <div style="page-break-after: always; padding: 15mm; padding-bottom: 20mm; min-height: 297mm; box-sizing: border-box; position: relative;">
             <div style="width: 180mm; min-height: 262mm; position: relative;">
             
-            <!-- Header (20mm) -->
-            <div style="text-align: center; margin-bottom: 10mm; padding-bottom: 3mm; border-bottom: 2px solid #3b82f6;">
+            <!-- Header (15mm) -->
+            <div style="text-align: center; margin-bottom: 8mm; padding-bottom: 2mm; border-bottom: 2px solid #3b82f6;">
               <h1 style="margin: 0; font-size: 20px; color: #111827; font-weight: bold;">RELATÓRIO DE TICKETS</h1>
               <h2 style="margin: 3px 0 0 0; font-size: 16px; color: #3b82f6; font-weight: 600;">DASHBOARD</h2>
               <p style="margin: 5px 0 2px 0; font-size: 11px; color: #6b7280;">
@@ -433,8 +436,8 @@ export default function DashboardPage() {
               ${myTicketsOnly ? `<p style="margin: 2px 0; font-size: 10px; color: #3b82f6; font-weight: 500;"><strong>Filtrado por:</strong> Tickets de ${session?.user?.name}</p>` : ''}
             </div>
             
-            <!-- Summary Box (30mm) -->
-            <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 15px; border-radius: 8px; margin-bottom: 10mm; box-shadow: 0 6px 15px rgba(59, 130, 246, 0.2);">
+            <!-- Summary Box (20mm) -->
+            <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 10px; border-radius: 6px; margin-bottom: 8mm; box-shadow: 0 4px 8px rgba(59, 130, 246, 0.2);">
               <div style="text-align: center;">
                 <div style="font-size: 36px; font-weight: bold; line-height: 1;">${categoryStats?.total_tickets || 0}</div>
                 <div style="font-size: 12px; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 500;">TOTAL DE TICKETS</div>
@@ -442,40 +445,56 @@ export default function DashboardPage() {
             </div>
             
             <!-- Clean Status Cards - ALL status without abbreviations -->
-            <div style="margin-bottom: 10mm;">
-              <h2 style="font-size: 16px; color: #111827; margin-bottom: 12px; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 3px;">TICKETS POR STATUS</h2>
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px;">
+            <div style="margin-bottom: 8mm;">
+              <h2 style="font-size: 16px; color: #111827; margin-bottom: 8px; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 2px;">TICKETS POR STATUS</h2>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 6px; max-height: 40mm; overflow: hidden;">
                 <!-- Total Card -->
-                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px; text-align: center;">
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: ${statusCount > 6 ? '6px' : '8px'}; text-align: center;">
                   <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 4px;">
                     <div style="width: 6px; height: 6px; border-radius: 50%; background: #2563eb;"></div>
-                    <div style="font-size: 9px; color: #6b7280; font-weight: 600;">Total no Período</div>
+                    <div style="font-size: ${statusCount > 6 ? '8px' : '9px'}; color: #6b7280; font-weight: 600;">Total no Período</div>
                   </div>
-                  <div style="font-size: 20px; font-weight: 800; color: #111827;">${categoryStats?.total_tickets || 0}</div>
+                  <div style="font-size: ${statusCount > 6 ? '16px' : '20px'}; font-weight: 800; color: #111827;">${categoryStats?.total_tickets || 0}</div>
                 </div>
                 
                 <!-- Status Cards - Only show status with tickets (count > 0) -->
                 ${categoryStats?.status_summary_detailed?.filter(status => status.count > 0).map(status => 
-                  `<div style="background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px; text-align: center;">
+                  `<div style="background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: ${statusCount > 6 ? '6px' : '8px'}; text-align: center;">
                     <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 4px;">
                       <div style="width: 6px; height: 6px; border-radius: 50%; background: ${status.color};"></div>
-                      <div style="font-size: 9px; color: #6b7280; font-weight: 600;">${status.name}</div>
+                      <div style="font-size: ${statusCount > 6 ? '8px' : '9px'}; color: #6b7280; font-weight: 600;">${status.name}</div>
                     </div>
-                    <div style="font-size: 20px; font-weight: 800; color: #111827;">${status.count}</div>
+                    <div style="font-size: ${statusCount > 6 ? '16px' : '20px'}; font-weight: 800; color: #111827;">${status.count}</div>
                   </div>`
                 ).join('') || ''}
               </div>
             </div>
           
-            <!-- Categories Section (remaining space ~152mm for 4 cards = 38mm each) -->
+            <!-- Categories Section (dynamic space allocation) -->
             <div>
               <h2 style="font-size: 16px; color: #111827; margin-bottom: 8px; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 3px;">TICKETS POR CATEGORIA</h2>
       `
       
-      // Process categories - first 4 on page 1, rest on page 2
+      // Calculate dynamic space allocation
       const categories = categoryStats?.categorias || []
-      const firstPageCategories = categories.slice(0, 4)
-      const secondPageCategories = categories.slice(4)
+      
+      // Calculate dynamic heights (A4 usable area: 262mm)
+      const headerHeight = 15      // Header section
+      const summaryHeight = 20     // Summary box  
+      const statusHeight = Math.min(40, Math.ceil(statusCount / 4) * 15 + 15) // Dynamic based on status count
+      const footerHeight = 15      // Footer space
+      const marginHeight = 25      // Various margins and gaps
+      
+      const availableHeight = 262 - headerHeight - summaryHeight - statusHeight - footerHeight - marginHeight
+      const maxCategoryHeight = Math.floor(availableHeight / 2) // 2 rows of categories
+      
+      // Adjust category card height dynamically
+      const categoryCardHeight = Math.min(60, maxCategoryHeight)
+      
+      // Calculate how many categories fit on page 1 based on available space
+      const categoriesPerPage = Math.floor(availableHeight / (categoryCardHeight + 6)) * 2 // 2 columns
+      const firstPageCategories = categories.slice(0, Math.min(categoriesPerPage, 4))
+      const secondPageCategories = categories.slice(firstPageCategories.length)
       
       // Add first page categories (up to 4)
       for (let i = 0; i < firstPageCategories.length; i += 2) {
@@ -485,7 +504,7 @@ export default function DashboardPage() {
         
         if (pair.length > 0) {
           pdfHTML += `
-            <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+            <div style="display: flex; gap: 6px; margin-bottom: 6px;">
           `
         
         pair.forEach(category => {
@@ -493,7 +512,7 @@ export default function DashboardPage() {
           const borderColor = category.color || '#d1d5db'
         
             pdfHTML += `
-              <div style="flex: 1; position: relative; overflow: hidden; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%), linear-gradient(135deg, ${category.color || '#6b7280'}15 0%, ${category.color || '#6b7280'}10 100%); border-left: 5px solid ${category.color || '#6b7280'}; padding: 12px; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.15), 0 8px 16px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8), inset 0 -1px 0 rgba(0,0,0,0.05); border: 1px solid ${category.color || '#6b7280'}60; position: relative; min-height: 70mm; max-width: 86mm;">
+              <div style="flex: 1; position: relative; overflow: hidden; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%), linear-gradient(135deg, ${category.color || '#6b7280'}15 0%, ${category.color || '#6b7280'}10 100%); border-left: 5px solid ${category.color || '#6b7280'}; padding: 8px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8); border: 1px solid ${category.color || '#6b7280'}40; position: relative; min-height: ${categoryCardHeight}mm; max-width: 86mm;">
                 <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
                   <h3 style="margin: 0; font-size: 14px; color: #111827; font-weight: 700; text-transform: uppercase; flex: 1; padding-right: 10px;">${category.nome}</h3>
                   <div style="text-align: right; flex-shrink: 0;">
@@ -510,7 +529,7 @@ export default function DashboardPage() {
                     <div style="background: linear-gradient(90deg, ${category.color || '#6b7280'}, ${category.color || '#6b7280'}dd); height: 100%; width: ${category.percentual}%; border-radius: 3px;"></div>
                   </div>
                 </div>
-                <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%); border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid ${category.color || '#6b7280'}40; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);">
+                <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%); border-radius: 8px; padding: 8px; margin-top: 12px; border: 1px solid ${category.color || '#6b7280'}40; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);">
                   <div style="font-size: 11px; color: #374151; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">Distribuição por Status:</div>
                   <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 11px;">
                     ${category.status_breakdown_detailed.filter(s => s.count > 0).map(status => 
@@ -567,7 +586,7 @@ export default function DashboardPage() {
                   
                   pair.forEach(category => {
                     page2HTML += `
-                      <div style="flex: 1; position: relative; overflow: hidden; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%), linear-gradient(135deg, ${category.color || '#6b7280'}15 0%, ${category.color || '#6b7280'}10 100%); border-left: 5px solid ${category.color || '#6b7280'}; padding: 12px; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.15), 0 8px 16px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8), inset 0 -1px 0 rgba(0,0,0,0.05); border: 1px solid ${category.color || '#6b7280'}60; position: relative; min-height: 70mm; max-width: 86mm;">
+                      <div style="flex: 1; position: relative; overflow: hidden; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%), linear-gradient(135deg, ${category.color || '#6b7280'}15 0%, ${category.color || '#6b7280'}10 100%); border-left: 5px solid ${category.color || '#6b7280'}; padding: 8px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8); border: 1px solid ${category.color || '#6b7280'}40; position: relative; min-height: ${categoryCardHeight}mm; max-width: 86mm;">
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
                           <h3 style="margin: 0; font-size: 14px; color: #111827; font-weight: 700; text-transform: uppercase; flex: 1; padding-right: 10px;">${category.nome}</h3>
                           <div style="text-align: right; flex-shrink: 0;">
@@ -584,7 +603,7 @@ export default function DashboardPage() {
                             <div style="background: linear-gradient(90deg, ${category.color || '#6b7280'}, ${category.color || '#6b7280'}dd); height: 100%; width: ${category.percentual}%; border-radius: 3px;"></div>
                           </div>
                         </div>
-                        <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%); border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid ${category.color || '#6b7280'}40; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);">
+                        <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%); border-radius: 8px; padding: 8px; margin-top: 12px; border: 1px solid ${category.color || '#6b7280'}40; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);">
                           <div style="font-size: 11px; color: #374151; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">Distribuição por Status:</div>
                           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 11px;">
                             ${category.status_breakdown_detailed.filter(s => s.count > 0).map(status => 
