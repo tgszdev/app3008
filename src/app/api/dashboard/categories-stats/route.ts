@@ -253,7 +253,7 @@ export async function GET(request: Request) {
       open: statusCounts['aberto'] || 0,
       in_progress: statusCounts['em-progresso'] || 0, 
       resolved: statusCounts['resolvido'] || 0,
-      cancelled: statusCounts['cancelado'] || 0,
+      cancelled: statusCounts['cancelled'] || 0, // Corrigido: cancelled em inglês
       closed: statusCounts['fechado'] || 0
     }
 
