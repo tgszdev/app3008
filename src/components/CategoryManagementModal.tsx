@@ -98,10 +98,31 @@ import {
   Printer,
   Smartphone,
   Target,
-  Wifi,
   Headphones,
   Camera,
-  Video
+  Video,
+  Store,
+  ShoppingCart,
+  CreditCard,
+  Package,
+  Truck,
+  Warehouse,
+  BarChart3,
+  PieChart,
+  TrendingUp,
+  Layers,
+  Database,
+  Server,
+  Code,
+  Terminal,
+  Bug,
+  GitBranch,
+  Shield,
+  Lock,
+  Key,
+  FileTransfer,
+  HardDrive,
+  Disc
 } from 'lucide-react'
 import { getIcon } from '@/lib/icons'
 
@@ -366,120 +387,94 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
     category.description?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  // Lista de ícones disponíveis com foco em logística e WMS
+  // Lista de ícones organizados por categoria (sem duplicatas)
   const iconsList = [
-    // WMS - Warehouse Management System
+    // E-COMMERCE
+    { value: 'store', label: 'E-commerce', icon: 'Store' },
+    { value: 'shopping-cart', label: 'Carrinho', icon: 'ShoppingCart' },
+    { value: 'credit-card', label: 'Pagamento', icon: 'CreditCard' },
+    { value: 'dollar-sign', label: 'Financeiro', icon: 'DollarSign' },
+    
+    // WMS (Warehouse Management System)
     { value: 'warehouse', label: 'Armazém', icon: 'Warehouse' },
     { value: 'package', label: 'Pacote', icon: 'Package' },
-    { value: 'package-2', label: 'Caixa Aberta', icon: 'Package2' },
-    { value: 'package-check', label: 'Pacote Verificado', icon: 'PackageCheck' },
-    { value: 'package-x', label: 'Pacote Rejeitado', icon: 'PackageX' },
-    { value: 'package-search', label: 'Buscar Pacote', icon: 'PackageSearch' },
-    { value: 'package-plus', label: 'Adicionar Pacote', icon: 'PackagePlus' },
-    { value: 'package-minus', label: 'Remover Pacote', icon: 'PackageMinus' },
-    { value: 'boxes', label: 'Múltiplas Caixas', icon: 'Boxes' },
-    { value: 'container', label: 'Container', icon: 'Container' },
-    { value: 'pallet', label: 'Palete', icon: 'Package' },
-    { value: 'barcode', label: 'Código de Barras', icon: 'ScanLine' },
-    { value: 'qr-code', label: 'QR Code', icon: 'QrCode' },
+    { value: 'boxes', label: 'Estoque', icon: 'Boxes' },
     { value: 'scan', label: 'Scanner', icon: 'Scan' },
-    { value: 'forklift', label: 'Empilhadeira', icon: 'Truck' },
+    { value: 'qr-code', label: 'QR Code', icon: 'QrCode' },
     
-    // Logística e Transporte
-    { value: 'truck', label: 'Caminhão', icon: 'Truck' },
-    { value: 'truck-delivery', label: 'Entrega', icon: 'Truck' },
-    { value: 'shopping-cart', label: 'Carrinho', icon: 'ShoppingCart' },
-    { value: 'shopping-bag', label: 'Sacola', icon: 'ShoppingBag' },
-    { value: 'archive', label: 'Arquivo', icon: 'Archive' },
-    { value: 'box', label: 'Caixa', icon: 'Box' },
-    { value: 'map', label: 'Mapa', icon: 'Map' },
+    // TMS (Transportation Management System)
+    { value: 'truck', label: 'Transporte', icon: 'Truck' },
+    { value: 'route', label: 'Rota', icon: 'Route' },
+    { value: 'map-pin', label: 'Localização', icon: 'MapPin' },
     { value: 'navigation', label: 'Navegação', icon: 'Navigation' },
-    { value: 'compass', label: 'Bússola', icon: 'Compass' },
     { value: 'plane', label: 'Avião', icon: 'Plane' },
     { value: 'ship', label: 'Navio', icon: 'Ship' },
-    { value: 'car', label: 'Carro', icon: 'Car' },
-    { value: 'bike', label: 'Bicicleta', icon: 'Bike' },
-    { value: 'route', label: 'Rota', icon: 'Route' },
-    { value: 'map-pin', label: 'Local', icon: 'MapPin' },
     
-    // Inventário e Estoque
-    { value: 'clipboard-list', label: 'Lista de Inventário', icon: 'ClipboardList' },
-    { value: 'clipboard-check', label: 'Checklist', icon: 'ClipboardCheck' },
-    { value: 'list-checks', label: 'Lista de Tarefas', icon: 'ListChecks' },
-    { value: 'layers', label: 'Camadas/Níveis', icon: 'Layers' },
-    { value: 'layout-grid', label: 'Grade de Layout', icon: 'LayoutGrid' },
-    { value: 'grid-3x3', label: 'Grade 3x3', icon: 'Grid3x3' },
+    // ERP (Enterprise Resource Planning)
+    { value: 'bar-chart-3', label: 'Analytics', icon: 'BarChart3' },
+    { value: 'pie-chart', label: 'Relatórios', icon: 'PieChart' },
+    { value: 'trending-up', label: 'Crescimento', icon: 'TrendingUp' },
+    { value: 'layers', label: 'Módulos', icon: 'Layers' },
+    { value: 'briefcase', label: 'Negócios', icon: 'Briefcase' },
     
-    // Documentação e Gestão
-    { value: 'file-text', label: 'Documento', icon: 'FileText' },
-    { value: 'clipboard', label: 'Prancheta', icon: 'Clipboard' },
-    { value: 'book-open', label: 'Manual', icon: 'BookOpen' },
-    { value: 'folder', label: 'Pasta', icon: 'Folder' },
-    { value: 'briefcase', label: 'Maleta', icon: 'Briefcase' },
-    
-    // Status e Alertas
-    { value: 'help-circle', label: 'Ajuda', icon: 'HelpCircle' },
-    { value: 'info', label: 'Informação', icon: 'Info' },
-    { value: 'alert-circle', label: 'Alerta', icon: 'AlertCircle' },
-    { value: 'check-circle', label: 'Concluído', icon: 'CheckCircle' },
-    { value: 'clock', label: 'Tempo', icon: 'Clock' },
-    { value: 'calendar', label: 'Calendário', icon: 'Calendar' },
-    
-    // Ferramentas e Configurações
-    { value: 'settings', label: 'Configurações', icon: 'Settings' },
-    { value: 'tool', label: 'Ferramenta', icon: 'Wrench' },
-    { value: 'wrench', label: 'Chave Inglesa', icon: 'Wrench' },
-    { value: 'shield', label: 'Segurança', icon: 'Shield' },
-    { value: 'lock', label: 'Bloqueado', icon: 'Lock' },
-    { value: 'key', label: 'Chave', icon: 'Key' },
-    
-    // Tecnologia
-    { value: 'database', label: 'Banco de Dados', icon: 'Database' },
-    { value: 'server', label: 'Servidor', icon: 'Server' },
+    // TI (Tecnologia da Informação)
+    { value: 'monitor', label: 'Sistema', icon: 'Monitor' },
+    { value: 'cpu', label: 'Hardware', icon: 'Cpu' },
+    { value: 'wifi', label: 'Rede', icon: 'Wifi' },
     { value: 'cloud', label: 'Nuvem', icon: 'Cloud' },
-    { value: 'wifi', label: 'Wi-Fi', icon: 'Wifi' },
-    { value: 'cpu', label: 'Processador', icon: 'Cpu' },
-    { value: 'monitor', label: 'Monitor', icon: 'Monitor' },
+    { value: 'settings', label: 'Configuração', icon: 'Settings' },
     
-    // Comunicação
+    // DEVELOPER
+    { value: 'code', label: 'Código', icon: 'Code' },
+    { value: 'terminal', label: 'Terminal', icon: 'Terminal' },
+    { value: 'git-branch', label: 'Git', icon: 'GitBranch' },
+    { value: 'bug', label: 'Debug', icon: 'Bug' },
+    { value: 'wrench', label: 'Ferramentas', icon: 'Wrench' },
+    
+    // SECURITY
+    { value: 'shield', label: 'Segurança', icon: 'Shield' },
+    { value: 'lock', label: 'Criptografia', icon: 'Lock' },
+    { value: 'key', label: 'Autenticação', icon: 'Key' },
+    
+    // FTP / TRANSFERÊNCIA
+    { value: 'file-transfer', label: 'FTP', icon: 'FileTransfer' },
+    { value: 'server', label: 'Servidor', icon: 'Server' },
+    { value: 'folder', label: 'Diretório', icon: 'Folder' },
+    
+    // BANCO DE DADOS
+    { value: 'database', label: 'Database', icon: 'Database' },
+    { value: 'hard-drive', label: 'Armazenamento', icon: 'HardDrive' },
+    { value: 'disc', label: 'PostgreSQL', icon: 'Disc' },
+    
+    // COMUNICAÇÃO
     { value: 'mail', label: 'E-mail', icon: 'Mail' },
     { value: 'phone', label: 'Telefone', icon: 'Phone' },
-    { value: 'message-square', label: 'Mensagem', icon: 'MessageSquare' },
-    { value: 'send', label: 'Enviar', icon: 'Send' },
+    { value: 'message-square', label: 'Chat', icon: 'MessageSquare' },
     
-    // Finanças
-    { value: 'dollar-sign', label: 'Financeiro', icon: 'DollarSign' },
-    { value: 'credit-card', label: 'Cartão', icon: 'CreditCard' },
-    { value: 'bar-chart', label: 'Gráfico', icon: 'BarChart' },
-    { value: 'trending-up', label: 'Crescimento', icon: 'TrendingUp' },
-    
-    // Usuários
+    // GESTÃO
     { value: 'users', label: 'Equipe', icon: 'Users' },
     { value: 'user', label: 'Usuário', icon: 'User' },
-    { value: 'user-check', label: 'Usuário Verificado', icon: 'UserCheck' },
+    { value: 'calendar', label: 'Agenda', icon: 'Calendar' },
+    { value: 'clock', label: 'Tempo', icon: 'Clock' },
     
-    // Outros
+    // DOCUMENTAÇÃO
+    { value: 'file-text', label: 'Documento', icon: 'FileText' },
+    { value: 'book-open', label: 'Manual', icon: 'BookOpen' },
+    { value: 'clipboard', label: 'Formulário', icon: 'Clipboard' },
+    
+    // STATUS & ALERTAS
+    { value: 'check-circle', label: 'Sucesso', icon: 'CheckCircle' },
+    { value: 'alert-circle', label: 'Alerta', icon: 'AlertCircle' },
+    { value: 'info', label: 'Informação', icon: 'Info' },
+    { value: 'help-circle', label: 'Ajuda', icon: 'HelpCircle' },
+    
+    // GERAL
     { value: 'home', label: 'Início', icon: 'Home' },
     { value: 'star', label: 'Favorito', icon: 'Star' },
-    { value: 'flag', label: 'Bandeira', icon: 'Flag' },
-    { value: 'tag', label: 'Etiqueta', icon: 'Tag' },
-    { value: 'zap', label: 'Energia', icon: 'Zap' },
-    { value: 'activity', label: 'Atividade', icon: 'Activity' },
-    
-    // Ícones Adicionais
-    { value: 'building', label: 'Prédio', icon: 'Building' },
-    { value: 'cog', label: 'Engrenagem', icon: 'Cog' },
-    { value: 'filter', label: 'Filtro', icon: 'Filter' },
+    { value: 'target', label: 'Meta', icon: 'Target' },
+    { value: 'zap', label: 'Performance', icon: 'Zap' },
     { value: 'globe', label: 'Global', icon: 'Globe' },
-    { value: 'heart', label: 'Favorito', icon: 'Heart' },
-    { value: 'image', label: 'Imagem', icon: 'Image' },
-    { value: 'lightbulb', label: 'Ideia', icon: 'Lightbulb' },
-    { value: 'printer', label: 'Impressora', icon: 'Printer' },
-    { value: 'smartphone', label: 'Celular', icon: 'Smartphone' },
-    { value: 'target', label: 'Alvo', icon: 'Target' },
-    { value: 'headphones', label: 'Fone de Ouvido', icon: 'Headphones' },
-    { value: 'camera', label: 'Câmera', icon: 'Camera' },
-    { value: 'video', label: 'Vídeo', icon: 'Video' }
+    { value: 'building', label: 'Empresa', icon: 'Building' }
   ]
 
   if (!isOpen) return null
@@ -800,7 +795,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                   
                                   {/* Icons Grid */}
                                   <div className="p-4 overflow-y-auto max-h-[70vh]">
-                                    <div className="grid grid-cols-6 sm:grid-cols-8 lg:grid-cols-10 gap-3">
+                                    <div className="grid grid-cols-8 sm:grid-cols-10 lg:grid-cols-12 gap-2">
                                       {iconsList
                                         .filter(icon => 
                                           icon.label.toLowerCase().includes(iconSearchTerm.toLowerCase()) ||
@@ -819,18 +814,15 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                                 setIconSearchTerm('')
                                               }}
                                               className={`
-                                                flex flex-col items-center justify-center p-4 rounded-lg border-2 transition-all min-h-[80px]
+                                                flex items-center justify-center p-3 rounded-lg border-2 transition-all w-12 h-12
                                                 ${isSelected 
                                                   ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
                                                   : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
-                                                } hover:shadow-md hover:scale-105
+                                                } hover:shadow-md hover:scale-110
                                               `}
                                               title={icon.label}
                                             >
-                                              <IconComponent className={`h-6 w-6 mb-1 ${isSelected ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`} />
-                                              <span className={`text-xs ${isSelected ? 'text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-600 dark:text-gray-400'}`}>
-                                                {icon.label}
-                                              </span>
+                                              <IconComponent className={`h-5 w-5 ${isSelected ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`} />
                                             </button>
                                           )
                                         })}

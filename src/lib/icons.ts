@@ -166,7 +166,16 @@ import {
   Car,
   Bike,
   Route,
-  MapPin
+  MapPin,
+  // Novos ícones para sistemas específicos
+  Store,
+  BarChart3,
+  Terminal,
+  GitBranch,
+  FileTransfer,
+  HardDrive,
+  Disc,
+  Building
 } from 'lucide-react'
 import { LucideIcon } from 'lucide-react'
 
@@ -350,6 +359,16 @@ export const iconMap: Record<string, LucideIcon> = {
   'slack': Slack,
   'trello': Trello,
   'figma': Figma,
+  
+  // Novos ícones para sistemas específicos
+  'store': Store,
+  'bar-chart-3': BarChart3,
+  'terminal': Terminal,
+  'git-branch': GitBranch,
+  'file-transfer': FileTransfer,
+  'hard-drive': HardDrive,
+  'disc': Disc,
+  'building': Building,
 }
 
 // Função helper para obter o ícone correto
