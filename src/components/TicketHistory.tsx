@@ -215,12 +215,30 @@ export default function TicketHistory({ ticketId, className = '', initiallyColla
             )}
           </div>
         </div>
-      </div>
+        </div>
 
-      {/* Conteúdo Colapsável */}
-      {!collapsed && (
-        <div className="p-6">
-          {loading ? (
+        {/* Conteúdo Colapsável */}
+        {!collapsed && (
+          <div className="p-6">
+            {/* Aviso se histórico não está configurado */}
+            {history.length > 0 && history[0]?.metadata?.fallback && (
+              <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                <div className="flex items-center">
+                  <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mr-2" />
+                  <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                    <strong>Histórico limitado:</strong> A tabela de histórico ainda não foi configurada. 
+                    <button 
+                      onClick={() => window.open('/EXECUTAR_NO_SUPABASE.md', '_blank')}
+                      className="ml-1 underline hover:no-underline"
+                    >
+                      Ver instruções de configuração
+                    </button>
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {loading ? (
             <div className="animate-pulse space-y-3">
               {[1, 2, 3].map(i => (
                 <div key={i} className="flex items-center space-x-3">
