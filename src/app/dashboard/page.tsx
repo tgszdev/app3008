@@ -94,53 +94,40 @@ interface PeriodFilter {
 }
 
 const StatCard = ({ title, value, icon: Icon, trend, color, statusColor }: any) => (
-  <div className="group relative overflow-hidden bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all duration-300 hover:border-gray-200 dark:hover:border-gray-600">
-    {/* Gradient overlay */}
-    <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-gray-50/80 dark:from-gray-800 dark:via-gray-800 dark:to-gray-900/80" />
-    
-    {/* Content */}
-    <div className="relative p-4 sm:p-5">
-      <div className="flex items-start justify-between">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2">
-            <div 
-              className="w-2 h-2 rounded-full flex-shrink-0"
-              style={{ backgroundColor: statusColor || (color === 'bg-blue-600' ? '#2563eb' : '#6b7280') }}
-            />
-            <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-              {title}
-            </p>
-          </div>
-          <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-1">
-            {value}
-          </p>
-          {trend && (
-            <div className={`flex items-center gap-1 text-xs ${
-              trend.startsWith('+') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-            }`}>
-              <TrendingUp className="h-3 w-3" />
-              <span className="font-medium">{trend}</span>
-            </div>
-          )}
-        </div>
-        
-        {/* Icon container */}
-        <div className="flex-shrink-0 ml-3">
-          <div 
-            className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-200"
-            style={{ 
-              backgroundColor: statusColor ? `${statusColor}15` : (color === 'bg-blue-600' ? '#2563eb15' : '#6b728015'),
-              border: `1px solid ${statusColor ? `${statusColor}30` : (color === 'bg-blue-600' ? '#2563eb30' : '#6b728030')}`
-            }}
-          >
-            <Icon 
-              className="h-5 w-5 sm:h-6 sm:w-6" 
-              style={{ color: statusColor || (color === 'bg-blue-600' ? '#2563eb' : '#6b7280') }}
-            />
-          </div>
-        </div>
-      </div>
+  <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 p-3 sm:p-4 hover:shadow-sm transition-shadow duration-200">
+    {/* Header with dot and title */}
+    <div className="flex items-center gap-2 mb-2">
+      <div 
+        className="w-2 h-2 rounded-full flex-shrink-0"
+        style={{ backgroundColor: statusColor || (color === 'bg-blue-600' ? '#2563eb' : '#6b7280') }}
+      />
+      <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400 truncate">
+        {title}
+      </h3>
     </div>
+    
+    {/* Value */}
+    <div className="flex items-center justify-between">
+      <span className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+        {value}
+      </span>
+      
+      {/* Small icon */}
+      <Icon 
+        className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 opacity-60" 
+        style={{ color: statusColor || (color === 'bg-blue-600' ? '#2563eb' : '#6b7280') }}
+      />
+    </div>
+    
+    {/* Trend (if exists) */}
+    {trend && (
+      <div className={`flex items-center gap-1 mt-1 text-xs ${
+        trend.startsWith('+') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+      }`}>
+        <TrendingUp className="h-3 w-3" />
+        <span className="font-medium">{trend}</span>
+      </div>
+    )}
   </div>
 )
 
@@ -453,33 +440,27 @@ export default function DashboardPage() {
               </div>
             </div>
             
-            <!-- Modern Dynamic Status Cards (35mm) -->
+            <!-- Clean Status Cards - ALL status without abbreviations -->
             <div style="margin-bottom: 10mm;">
-              <h2 style="font-size: 16px; color: #111827; margin-bottom: 12px; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 3px;">TOTAL DE TICKETS POR STATUS</h2>
-              <div style="display: flex; gap: 12px; justify-content: space-between;">
+              <h2 style="font-size: 16px; color: #111827; margin-bottom: 12px; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 3px;">TICKETS POR STATUS</h2>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px;">
                 <!-- Total Card -->
-                <div style="flex: 1; position: relative; background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-radius: 8px; padding: 16px 12px; box-shadow: 0 3px 8px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; overflow: hidden;">
-                  <div style="position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: #2563eb;"></div>
-                  <div style="text-align: center;">
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 6px;">
-                      <div style="width: 4px; height: 4px; border-radius: 50%; background: #2563eb;"></div>
-                      <div style="font-size: 8px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Total</div>
-                    </div>
-                    <div style="font-size: 24px; font-weight: 800; color: #0f172a; line-height: 1;">${categoryStats?.total_tickets || 0}</div>
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px; text-align: center;">
+                  <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 4px;">
+                    <div style="width: 6px; height: 6px; border-radius: 50%; background: #2563eb;"></div>
+                    <div style="font-size: 9px; color: #6b7280; font-weight: 600;">Total no Período</div>
                   </div>
+                  <div style="font-size: 20px; font-weight: 800; color: #111827;">${categoryStats?.total_tickets || 0}</div>
                 </div>
                 
-                <!-- Dynamic Status Cards -->
-                ${categoryStats?.status_summary_detailed?.slice(0, 4).map(status => 
-                  `<div style="flex: 1; position: relative; background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-radius: 8px; padding: 16px 12px; box-shadow: 0 3px 8px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; overflow: hidden;">
-                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: ${status.color};"></div>
-                    <div style="text-align: center;">
-                      <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 6px;">
-                        <div style="width: 4px; height: 4px; border-radius: 50%; background: ${status.color};"></div>
-                        <div style="font-size: 8px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">${status.name}</div>
-                      </div>
-                      <div style="font-size: 24px; font-weight: 800; color: #0f172a; line-height: 1;">${status.count}</div>
+                <!-- All Status Cards -->
+                ${categoryStats?.status_summary_detailed?.map(status => 
+                  `<div style="background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px; text-align: center;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 4px;">
+                      <div style="width: 6px; height: 6px; border-radius: 50%; background: ${status.color};"></div>
+                      <div style="font-size: 9px; color: #6b7280; font-weight: 600;">${status.name}</div>
                     </div>
+                    <div style="font-size: 20px; font-weight: 800; color: #111827;">${status.count}</div>
                   </div>`
                 ).join('') || ''}
               </div>
@@ -845,9 +826,9 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Status Stats Grid - Dynamic */}
+      {/* Status Stats Grid - Dynamic & Complete */}
       {categoryStats && categoryStats.status_summary_detailed && (
-        <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+        <div className="grid gap-2 sm:gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
           <StatCard
             title="Total no Período"
             value={categoryStats.total_tickets}
@@ -855,8 +836,8 @@ export default function DashboardPage() {
             color="bg-blue-600"
             statusColor="#2563eb"
           />
-          {/* Dynamic Status Cards */}
-          {categoryStats.status_summary_detailed.slice(0, 4).map((status) => {
+          {/* Dynamic Status Cards - Show ALL status without abbreviations */}
+          {categoryStats.status_summary_detailed.map((status) => {
             // Map status slugs to appropriate icons
             const getStatusIcon = (slug: string) => {
               if (slug.includes('aberto') || slug.includes('open')) return AlertCircle
