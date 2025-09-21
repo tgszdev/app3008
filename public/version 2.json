@@ -1,0 +1,20 @@
+{
+  "version": "1.5.7",
+  "buildDate": "2025-01-09T19:45:00Z",
+  "features": {
+    "tooltipsFixed": true,
+    "infoIconsKPI": true,
+    "ticketDeletionValidation": true,
+    "filtersOnTop": true,
+    "uppercaseTitles": true,
+    "sidebarReorganized": true
+  },
+  "lastChanges": [
+    "Corrigido tooltip do gráfico que estava sendo cortado",
+    "Melhorado UX dos tooltips com ícones Info",
+    "Adicionada validação para impedir exclusão de tickets com apontamentos",
+    "Filtros movidos para o topo das páginas",
+    "Títulos de tickets em maiúsculas",
+    "Sidebar reorganizada logicamente"
+  ]
+}
