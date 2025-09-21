@@ -87,7 +87,21 @@ import {
   Flag,
   Tag,
   Zap,
-  Activity
+  Activity,
+  Building,
+  Cog,
+  Filter,
+  Globe,
+  Heart,
+  Image,
+  Lightbulb,
+  Printer,
+  Smartphone,
+  Target,
+  Wifi,
+  Headphones,
+  Camera,
+  Video
 } from 'lucide-react'
 import { getIcon } from '@/lib/icons'
 
@@ -450,7 +464,22 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
     { value: 'flag', label: 'Bandeira', icon: 'Flag' },
     { value: 'tag', label: 'Etiqueta', icon: 'Tag' },
     { value: 'zap', label: 'Energia', icon: 'Zap' },
-    { value: 'activity', label: 'Atividade', icon: 'Activity' }
+    { value: 'activity', label: 'Atividade', icon: 'Activity' },
+    
+    // Ícones Adicionais
+    { value: 'building', label: 'Prédio', icon: 'Building' },
+    { value: 'cog', label: 'Engrenagem', icon: 'Cog' },
+    { value: 'filter', label: 'Filtro', icon: 'Filter' },
+    { value: 'globe', label: 'Global', icon: 'Globe' },
+    { value: 'heart', label: 'Favorito', icon: 'Heart' },
+    { value: 'image', label: 'Imagem', icon: 'Image' },
+    { value: 'lightbulb', label: 'Ideia', icon: 'Lightbulb' },
+    { value: 'printer', label: 'Impressora', icon: 'Printer' },
+    { value: 'smartphone', label: 'Celular', icon: 'Smartphone' },
+    { value: 'target', label: 'Alvo', icon: 'Target' },
+    { value: 'headphones', label: 'Fone de Ouvido', icon: 'Headphones' },
+    { value: 'camera', label: 'Câmera', icon: 'Camera' },
+    { value: 'video', label: 'Vídeo', icon: 'Video' }
   ]
 
   if (!isOpen) return null
@@ -736,7 +765,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                 />
                                 
                                 {/* Popup Modal */}
-                                <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+                                <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
                                   {/* Header */}
                                   <div className="bg-gray-50 dark:bg-gray-900 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                                     <div className="flex items-center justify-between">
@@ -770,8 +799,8 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                   </div>
                                   
                                   {/* Icons Grid */}
-                                  <div className="p-4 overflow-y-auto max-h-[60vh]">
-                                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                                  <div className="p-4 overflow-y-auto max-h-[70vh]">
+                                    <div className="grid grid-cols-6 sm:grid-cols-8 lg:grid-cols-10 gap-3">
                                       {iconsList
                                         .filter(icon => 
                                           icon.label.toLowerCase().includes(iconSearchTerm.toLowerCase()) ||
@@ -790,11 +819,11 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                                 setIconSearchTerm('')
                                               }}
                                               className={`
-                                                flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all
+                                                flex flex-col items-center justify-center p-4 rounded-lg border-2 transition-all min-h-[80px]
                                                 ${isSelected 
                                                   ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
                                                   : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
-                                                }
+                                                } hover:shadow-md hover:scale-105
                                               `}
                                               title={icon.label}
                                             >
