@@ -786,7 +786,11 @@ export default function TicketDetailsPage() {
 
           {/* Histórico do Ticket */}
           {canViewHistory && (
-            <TicketHistory ticketId={ticket.id} className="mb-6" />
+            <TicketHistory 
+              ticketId={ticket.id} 
+              className="mb-6" 
+              initiallyCollapsed={true}
+            />
           )}
 
           {/* Comments */}

@@ -16,7 +16,12 @@ import {
   CheckCircle, 
   PlusCircle,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  ChevronRight,
+  History,
+  AlertCircle,
+  Eye,
+  EyeOff
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -47,6 +52,7 @@ interface HistoryEntry {
 interface TicketHistoryProps {
   ticketId: string
   className?: string
+  initiallyCollapsed?: boolean
 }
 
 const iconMap: Record<string, React.ElementType> = {
@@ -72,24 +78,39 @@ const colorMap: Record<string, string> = {
   'gray': 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-700'
 }
 
-export default function TicketHistory({ ticketId, className = '' }: TicketHistoryProps) {
+export default function TicketHistory({ ticketId, className = '', initiallyCollapsed = false }: TicketHistoryProps) {
   const [history, setHistory] = useState<HistoryEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [expanded, setExpanded] = useState(false)
+  const [collapsed, setCollapsed] = useState(initiallyCollapsed)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchHistory()
-  }, [ticketId])
+  }, [ticketId, collapsed])
+
+  const toggleCollapse = () => {
+    setCollapsed(!collapsed)
+    // Se estiver expandindo e não tem dados, carregar
+    if (collapsed && history.length === 0) {
+      fetchHistory()
+    }
+  }
 
   const fetchHistory = async () => {
+    // Se estiver colapsado, não carregar até expandir
+    if (collapsed) {
+      setLoading(false)
+      return
+    }
+
     try {
       setLoading(true)
       setError(null)
       
       const response = await axios.get(`/api/tickets/${ticketId}/history`)
       
-      if (response.data.success) {
+      if (response.data?.success) {
         setHistory(response.data.history || [])
       } else {
         setError('Erro ao carregar histórico')
@@ -98,8 +119,10 @@ export default function TicketHistory({ ticketId, className = '' }: TicketHistor
       console.error('Erro ao buscar histórico:', error)
       if (error.response?.status === 403) {
         setError('Você não tem permissão para visualizar o histórico')
+      } else if (error.response?.status === 404) {
+        setError('Histórico não encontrado')
       } else {
-        setError('Erro ao carregar histórico')
+        setError('Serviço de histórico indisponível')
       }
     } finally {
       setLoading(false)
@@ -162,94 +185,111 @@ export default function TicketHistory({ ticketId, className = '' }: TicketHistor
     )
   }
 
-  if (loading) {
-    return (
-      <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 ${className}`}>
-        <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4"></div>
-          <div className="space-y-3">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="flex items-center space-x-3">
-                <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
-                <div className="flex-1">
-                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-1"></div>
-                  <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 ${className}`}>
-        <div className="text-center">
-          <Activity className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-          <p className="text-sm text-gray-500 dark:text-gray-400">{error}</p>
-        </div>
-      </div>
-    )
-  }
-
-  const visibleHistory = expanded ? history : history.slice(0, 5)
+  const visibleHistory = expanded ? history : history.slice(0, 3)
 
   return (
     <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 ${className}`}>
-      {/* Cabeçalho */}
-      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      {/* Cabeçalho Clicável */}
+      <div 
+        className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+        onClick={toggleCollapse}
+      >
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
-            <Activity className="h-5 w-5 mr-2" />
+            <History className="h-5 w-5 mr-2" />
             Histórico do Ticket
+            {collapsed ? (
+              <ChevronRight className="h-4 w-4 ml-2 transition-transform" />
+            ) : (
+              <ChevronDown className="h-4 w-4 ml-2 transition-transform" />
+            )}
           </h3>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            {history.length} {history.length === 1 ? 'entrada' : 'entradas'}
-          </span>
+          <div className="flex items-center space-x-2">
+            {!collapsed && (
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                {loading ? 'Carregando...' : `${history.length} ${history.length === 1 ? 'entrada' : 'entradas'}`}
+              </span>
+            )}
+            {collapsed && (
+              <Eye className="h-4 w-4 text-gray-400" />
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Conteúdo */}
-      <div className="p-6">
-        {history.length === 0 ? (
-          <div className="text-center py-8">
-            <Activity className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Nenhum histórico encontrado para este ticket
-            </p>
-          </div>
-        ) : (
-          <>
-            <div className="space-y-0">
-              {visibleHistory.map(renderHistoryEntry)}
+      {/* Conteúdo Colapsável */}
+      {!collapsed && (
+        <div className="p-6">
+          {loading ? (
+            <div className="animate-pulse space-y-3">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="flex items-center space-x-3">
+                  <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                  <div className="flex-1">
+                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-1"></div>
+                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                  </div>
+                </div>
+              ))}
             </div>
+          ) : error ? (
+            <div className="text-center py-8">
+              <AlertCircle className="h-8 w-8 text-red-400 mx-auto mb-2" />
+              <p className="text-sm text-red-600 dark:text-red-400 mb-2">{error}</p>
+              <button
+                onClick={fetchHistory}
+                className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                Tentar novamente
+              </button>
+            </div>
+          ) : history.length === 0 ? (
+            <div className="text-center py-8">
+              <History className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Nenhum histórico encontrado para este ticket
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="space-y-0 max-h-96 overflow-y-auto">
+                {visibleHistory.map(renderHistoryEntry)}
+              </div>
 
-            {/* Botão para expandir/recolher */}
-            {history.length > 5 && (
-              <div className="mt-4 text-center">
+              {/* Controles de Visualização */}
+              <div className="mt-4 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
+                {history.length > 3 && (
+                  <button
+                    onClick={() => setExpanded(!expanded)}
+                    className="inline-flex items-center px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                  >
+                    {expanded ? (
+                      <>
+                        <ChevronUp className="h-4 w-4 mr-1" />
+                        Mostrar menos
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="h-4 w-4 mr-1" />
+                        Mostrar mais {history.length - 3} entradas
+                      </>
+                    )}
+                  </button>
+                )}
+                
                 <button
-                  onClick={() => setExpanded(!expanded)}
+                  onClick={fetchHistory}
                   className="inline-flex items-center px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                  disabled={loading}
                 >
-                  {expanded ? (
-                    <>
-                      <ChevronUp className="h-4 w-4 mr-1" />
-                      Mostrar menos
-                    </>
-                  ) : (
-                    <>
-                      <ChevronDown className="h-4 w-4 mr-1" />
-                      Mostrar mais {history.length - 5} entradas
-                    </>
-                  )}
+                  <RefreshCw className={`h-4 w-4 mr-1 ${loading ? 'animate-spin' : ''}`} />
+                  Atualizar
                 </button>
               </div>
-            )}
-          </>
-        )}
-      </div>
+            </>
+          )}
+        </div>
+      )}
     </div>
   )
 }
