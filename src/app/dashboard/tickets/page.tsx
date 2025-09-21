@@ -95,6 +95,36 @@ const defaultStatusConfig = {
     color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
     icon: XCircle,
   },
+  'aguardando-cliente': {
+    label: 'Aguardando Cliente',
+    color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
+    icon: Clock,
+  },
+  'ag-deploy-em-producao': {
+    label: 'Ag. Deploy em Produção',
+    color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+    icon: Clock,
+  },
+  'em-progresso': {
+    label: 'Em Progresso',
+    color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+    icon: Clock,
+  },
+  'aberto': {
+    label: 'Aberto',
+    color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+    icon: AlertCircle,
+  },
+  'resolvido': {
+    label: 'Resolvido',
+    color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+    icon: CheckCircle,
+  },
+  'fechado': {
+    label: 'Fechado',
+    color: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
+    icon: XCircle,
+  },
 }
 
 // Helper to get icon based on status characteristics
@@ -160,13 +190,42 @@ export default function TicketsPage() {
   const [priorityFilter, setPriorityFilter] = useState('all')
   const [showFilters, setShowFilters] = useState(false)
 
+  // Mapeamento de status para compatibilidade
+  const statusMapping: Record<string, string> = {
+    'aberto': 'open',
+    'em-progresso': 'in_progress', 
+    'aguardando-cliente': 'aguardando-cliente',
+    'ag-deploy-em-producao': 'ag-deploy-em-producao',
+    'resolvido': 'resolved',
+    'fechado': 'closed'
+  }
+
+  // Mapeamento reverso para exibição
+  const statusDisplayMapping: Record<string, string> = {
+    'open': 'Aberto',
+    'in_progress': 'Em Progresso',
+    'resolved': 'Resolvido', 
+    'closed': 'Fechado',
+    'cancelled': 'Cancelado',
+    'aguardando-cliente': 'Aguardando Cliente',
+    'ag-deploy-em-producao': 'Ag. Deploy em Produção',
+    'em-progresso': 'Em Progresso',
+    'aberto': 'Aberto',
+    'resolvido': 'Resolvido',
+    'fechado': 'Fechado'
+  }
+
   const fetchTickets = async (showLoader = true) => {
     if (showLoader) setLoading(true)
     else setRefreshing(true)
 
     try {
       const params = new URLSearchParams()
-      if (statusFilter !== 'all') params.append('status', statusFilter)
+      if (statusFilter !== 'all') {
+        // Usar mapeamento para converter status
+        const mappedStatus = statusMapping[statusFilter] || statusFilter
+        params.append('status', mappedStatus)
+      }
       if (priorityFilter !== 'all') params.append('priority', priorityFilter)
 
       const response = await axios.get(`/api/tickets?${params.toString()}`)
