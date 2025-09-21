@@ -417,14 +417,14 @@ export default function DashboardPage() {
       
       // Build PDF HTML with A4 dimensions and margins
       // A4: 210mm x 297mm
-      // Margins: 15mm all sides (20mm bottom for safety)
-      // Usable area: 180mm x 250mm (conservative to respect margins)
+      // Margins: 15mm all sides (uniform padding)
+      // Usable area: 180mm x 267mm (297mm - 30mm margins)
       let pdfHTML = `
         <div style="width: 210mm; background: white; font-family: Arial, sans-serif; box-sizing: border-box; margin: 0;">
           
           <!-- PAGE 1 -->
-          <div style="page-break-after: always; padding: 15mm; padding-bottom: 20mm; min-height: 297mm; box-sizing: border-box; position: relative;">
-            <div style="width: 180mm; min-height: 250mm; max-height: 250mm; position: relative; overflow: hidden;">
+          <div style="page-break-after: always; padding: 15mm; min-height: 297mm; box-sizing: border-box; position: relative;">
+            <div style="width: 180mm; min-height: 267mm; max-height: 252mm; position: relative; overflow: hidden;">
             
             <!-- Header (15mm) -->
             <div style="text-align: center; margin-bottom: 8mm; padding-bottom: 2mm; border-bottom: 2px solid #3b82f6;">
@@ -478,14 +478,14 @@ export default function DashboardPage() {
       // Calculate dynamic space allocation
       const categories = categoryStats?.categorias || []
       
-      // Calculate dynamic heights (A4 usable area: 250mm - respecting bottom margin)
+      // Calculate dynamic heights (A4 usable area: 252mm - with footer reserved at bottom)
       const headerHeight = 15      // Header section
       const summaryHeight = 20     // Summary box  
-      const statusHeight = Math.min(35, Math.ceil(statusCount / 4) * 15 + 15) // Dynamic based on status count (reduced max)
-      const footerHeight = 12      // Footer space
-      const marginHeight = 20      // Various margins and gaps (reduced)
+      const statusHeight = Math.min(35, Math.ceil(statusCount / 4) * 15 + 15) // Dynamic based on status count
+      const footerHeight = 15      // Footer space (fixed at bottom)
+      const marginHeight = 20      // Various margins and gaps
       
-      const availableHeight = 250 - headerHeight - summaryHeight - statusHeight - footerHeight - marginHeight
+      const availableHeight = 252 - headerHeight - summaryHeight - statusHeight - footerHeight - marginHeight
       const maxCategoryHeight = Math.floor(availableHeight / 2) // 2 rows of categories
       
       // Adjust category card height dynamically
@@ -555,15 +555,13 @@ export default function DashboardPage() {
       // Close categories section and first page
       pdfHTML += `
             </div>
-            <!-- Page number for page 1 (moved to top right) -->
-            <div style="position: absolute; top: 0; right: 0; font-size: 9px; color: #6b7280; background: rgba(255,255,255,0.8); padding: 2mm; border-radius: 3px;">Página 1${secondPageCategories.length > 0 ? ' de 2' : ''}</div>
-            
             ${!secondPageCategories.length ? `
             <!-- Footer for single page -->
-            <div style="position: absolute; bottom: 12mm; left: 0; text-align: center; border-top: 1px solid #3b82f6; padding-top: 2mm; width: 180mm;">
+            <div style="position: absolute; bottom: 0; left: 0; text-align: center; border-top: 1px solid #3b82f6; padding-top: 2mm; width: 180mm;">
               <p style="margin: 1px 0; font-size: 9px; color: #374151; font-weight: 600;">RELATÓRIO GERADO EM: ${formattedDateTime.toUpperCase()}</p>
               <p style="margin: 1px 0; font-size: 8px; color: #6b7280;">Dashboard gerado automaticamente pelo sistema de suporte técnico</p>
               <p style="margin: 1px 0; font-size: 7px; color: #9ca3af;">© 2025 - Sistema de Gestão de Tickets</p>
+              <p style="margin: 2px 0 0 0; font-size: 8px; color: #6b7280; text-align: right;">Página 1${secondPageCategories.length > 0 ? ' de 2' : ''}</p>
             </div>
             ` : ''}
             </div>
@@ -571,8 +569,18 @@ export default function DashboardPage() {
           
           ${secondPageCategories.length > 0 ? `
           <!-- PAGE 2 -->
-          <div style="page-break-before: always; padding: 15mm; padding-bottom: 20mm; min-height: 297mm; box-sizing: border-box; position: relative;">
-            <div style="width: 180mm; min-height: 250mm; max-height: 250mm; position: relative; overflow: hidden;">
+          <div style="page-break-before: always; padding: 15mm; min-height: 297mm; box-sizing: border-box; position: relative;">
+            <div style="width: 180mm; min-height: 267mm; max-height: 252mm; position: relative; overflow: hidden;">
+            
+            <!-- Header for Page 2 -->
+            <div style="text-align: center; margin-bottom: 8mm; padding-bottom: 2mm; border-bottom: 2px solid #3b82f6;">
+              <h1 style="margin: 0; font-size: 20px; color: #111827; font-weight: bold;">RELATÓRIO DE TICKETS</h1>
+              <h2 style="margin: 3px 0 0 0; font-size: 16px; color: #3b82f6; font-weight: 600;">DASHBOARD</h2>
+              <p style="margin: 5px 0 2px 0; font-size: 11px; color: #6b7280;">
+                <strong>Período:</strong> ${formatDateShort(periodFilter.start_date)} até ${formatDateShort(periodFilter.end_date)}
+              </p>
+              ${myTicketsOnly ? `<p style="margin: 2px 0; font-size: 10px; color: #3b82f6; font-weight: 500;"><strong>Filtrado por:</strong> Tickets de ${session?.user?.name}</p>` : ''}
+            </div>
             
             ${(() => {
               let page2HTML = ''
@@ -625,14 +633,12 @@ export default function DashboardPage() {
               return page2HTML
             })()}
             
-            <!-- Page number for page 2 (moved to top right) -->
-            <div style="position: absolute; top: 0; right: 0; font-size: 9px; color: #6b7280; background: rgba(255,255,255,0.8); padding: 2mm; border-radius: 3px;">Página 2 de 2</div>
-            
             <!-- Footer for page 2 -->
-            <div style="position: absolute; bottom: 12mm; left: 0; text-align: center; border-top: 1px solid #3b82f6; padding-top: 2mm; width: 180mm;">
+            <div style="position: absolute; bottom: 0; left: 0; text-align: center; border-top: 1px solid #3b82f6; padding-top: 2mm; width: 180mm;">
               <p style="margin: 1px 0; font-size: 9px; color: #374151; font-weight: 600;">RELATÓRIO GERADO EM: ${formattedDateTime.toUpperCase()}</p>
               <p style="margin: 1px 0; font-size: 8px; color: #6b7280;">Dashboard gerado automaticamente pelo sistema de suporte técnico</p>
               <p style="margin: 1px 0; font-size: 7px; color: #9ca3af;">© 2025 - Sistema de Gestão de Tickets</p>
+              <p style="margin: 2px 0 0 0; font-size: 8px; color: #6b7280; text-align: right;">Página 2 de 2</p>
             </div>
             </div>
           </div> <!-- End of Page 2 -->
