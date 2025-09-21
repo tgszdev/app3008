@@ -420,8 +420,8 @@ export default function DashboardPage() {
         <div style="width: 210mm; background: white; font-family: Arial, sans-serif; box-sizing: border-box; margin: 0;">
           
           <!-- PAGE 1 -->
-          <div style="page-break-after: always; padding: 15mm; min-height: 297mm; box-sizing: border-box; position: relative;">
-            <div style="width: 180mm; min-height: 267mm; position: relative;">
+          <div style="page-break-after: always; padding: 15mm; padding-bottom: 20mm; min-height: 297mm; box-sizing: border-box; position: relative;">
+            <div style="width: 180mm; min-height: 262mm; position: relative;">
             
             <!-- Header (20mm) -->
             <div style="text-align: center; margin-bottom: 10mm; padding-bottom: 3mm; border-bottom: 2px solid #3b82f6;">
@@ -536,15 +536,24 @@ export default function DashboardPage() {
       // Close categories section and first page
       pdfHTML += `
             </div>
-            <!-- Page number -->
-            <div style="position: absolute; bottom: 0; right: 0; font-size: 9px; color: #6b7280;">Página 1${secondPageCategories.length > 0 ? ' de 2' : ''}</div>
+            <!-- Page number and footer for page 1 -->
+            <div style="position: absolute; bottom: 5mm; right: 0; font-size: 9px; color: #6b7280;">Página 1${secondPageCategories.length > 0 ? ' de 2' : ''}</div>
+            
+            ${!secondPageCategories.length ? `
+            <!-- Footer for single page -->
+            <div style="position: absolute; bottom: 5mm; left: 0; right: 30mm; text-align: center; border-top: 1px solid #3b82f6; padding-top: 3mm; width: 180mm;">
+              <p style="margin: 1px 0; font-size: 9px; color: #374151; font-weight: 600;">RELATÓRIO GERADO EM: ${formattedDateTime.toUpperCase()}</p>
+              <p style="margin: 1px 0; font-size: 8px; color: #6b7280;">Dashboard gerado automaticamente pelo sistema de suporte técnico</p>
+              <p style="margin: 1px 0; font-size: 7px; color: #9ca3af;">© 2025 - Sistema de Gestão de Tickets</p>
+            </div>
+            ` : ''}
             </div>
           </div> <!-- End of Page 1 -->
           
           ${secondPageCategories.length > 0 ? `
           <!-- PAGE 2 -->
-          <div style="page-break-before: always; padding: 15mm; min-height: 297mm; box-sizing: border-box; position: relative;">
-            <div style="width: 180mm; min-height: 267mm; position: relative;">
+          <div style="page-break-before: always; padding: 15mm; padding-bottom: 20mm; min-height: 297mm; box-sizing: border-box; position: relative;">
+            <div style="width: 180mm; min-height: 262mm; position: relative;">
             
             ${(() => {
               let page2HTML = ''
@@ -597,22 +606,26 @@ export default function DashboardPage() {
               return page2HTML
             })()}
             
-            <!-- Page number -->
-            <div style="position: absolute; bottom: 0; right: 0; font-size: 9px; color: #6b7280;">Página 2 de 2</div>
+            <!-- Page number and footer for page 2 -->
+            <div style="position: absolute; bottom: 5mm; right: 0; font-size: 9px; color: #6b7280;">Página 2 de 2</div>
+            
+            <!-- Footer for page 2 -->
+            <div style="position: absolute; bottom: 5mm; left: 0; right: 30mm; text-align: center; border-top: 1px solid #3b82f6; padding-top: 3mm; width: 180mm;">
+              <p style="margin: 1px 0; font-size: 9px; color: #374151; font-weight: 600;">RELATÓRIO GERADO EM: ${formattedDateTime.toUpperCase()}</p>
+              <p style="margin: 1px 0; font-size: 8px; color: #6b7280;">Dashboard gerado automaticamente pelo sistema de suporte técnico</p>
+              <p style="margin: 1px 0; font-size: 7px; color: #9ca3af;">© 2025 - Sistema de Gestão de Tickets</p>
+            </div>
             </div>
           </div> <!-- End of Page 2 -->
           ` : ''}
-          
-          <!-- Footer (positioned in last page content area) -->
-          <div style="${secondPageCategories.length > 0 ? 'position: absolute; bottom: 15mm; left: 15mm; right: 15mm;' : 'position: absolute; bottom: 15mm; left: 15mm; right: 15mm;'} text-align: center; border-top: 1px solid #3b82f6; padding-top: 3mm; width: 180mm;">
-            <p style="margin: 2px 0; font-size: 10px; color: #374151; font-weight: 600;">RELATÓRIO GERADO EM: ${formattedDateTime.toUpperCase()}</p>
-            <p style="margin: 2px 0; font-size: 9px; color: #6b7280;">Dashboard gerado automaticamente pelo sistema de suporte técnico</p>
-            <p style="margin: 2px 0; font-size: 8px; color: #9ca3af;">© 2025 - Sistema de Gestão de Tickets</p>
-          </div>
         </div>
       `
       
       pdfContainer.innerHTML = pdfHTML
+      
+      // Wait for layout to stabilize
+      await new Promise(resolve => setTimeout(resolve, 500))
+      pdfContainer.offsetHeight // Force reflow
       
       // Generate canvas from the container
       const canvas = await html2canvas(pdfContainer, {
