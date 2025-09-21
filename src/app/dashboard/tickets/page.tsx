@@ -95,36 +95,6 @@ const defaultStatusConfig = {
     color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
     icon: XCircle,
   },
-  'aguardando-cliente': {
-    label: 'Aguardando Cliente',
-    color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
-    icon: Clock,
-  },
-  'ag-deploy-em-producao': {
-    label: 'Ag. Deploy em Produção',
-    color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
-    icon: Clock,
-  },
-  'em-progresso': {
-    label: 'Em Progresso',
-    color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-    icon: Clock,
-  },
-  'aberto': {
-    label: 'Aberto',
-    color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-    icon: AlertCircle,
-  },
-  'resolvido': {
-    label: 'Resolvido',
-    color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-    icon: CheckCircle,
-  },
-  'fechado': {
-    label: 'Fechado',
-    color: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
-    icon: XCircle,
-  },
 }
 
 // Helper to get icon based on status characteristics
@@ -190,42 +160,13 @@ export default function TicketsPage() {
   const [priorityFilter, setPriorityFilter] = useState('all')
   const [showFilters, setShowFilters] = useState(false)
 
-  // Mapeamento de status para compatibilidade
-  const statusMapping: Record<string, string> = {
-    'aberto': 'open',
-    'em-progresso': 'in_progress', 
-    'aguardando-cliente': 'aguardando-cliente',
-    'ag-deploy-em-producao': 'ag-deploy-em-producao',
-    'resolvido': 'resolved',
-    'fechado': 'closed'
-  }
-
-  // Mapeamento reverso para exibição
-  const statusDisplayMapping: Record<string, string> = {
-    'open': 'Aberto',
-    'in_progress': 'Em Progresso',
-    'resolved': 'Resolvido', 
-    'closed': 'Fechado',
-    'cancelled': 'Cancelado',
-    'aguardando-cliente': 'Aguardando Cliente',
-    'ag-deploy-em-producao': 'Ag. Deploy em Produção',
-    'em-progresso': 'Em Progresso',
-    'aberto': 'Aberto',
-    'resolvido': 'Resolvido',
-    'fechado': 'Fechado'
-  }
-
   const fetchTickets = async (showLoader = true) => {
     if (showLoader) setLoading(true)
     else setRefreshing(true)
 
     try {
       const params = new URLSearchParams()
-      if (statusFilter !== 'all') {
-        // Usar mapeamento para converter status
-        const mappedStatus = statusMapping[statusFilter] || statusFilter
-        params.append('status', mappedStatus)
-      }
+      if (statusFilter !== 'all') params.append('status', statusFilter)
       if (priorityFilter !== 'all') params.append('priority', priorityFilter)
 
       const response = await axios.get(`/api/tickets?${params.toString()}`)
@@ -627,34 +568,31 @@ export default function TicketsPage() {
         )}
       </div>
 
-      {/* Desktop Table View - Hidden on small screens */}
+      {/* Desktop Table View - Optimized for UX */}
       <div className="hidden lg:block bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full table-fixed">
             <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="w-16 px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   #
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Título / Solicitante
+                <th className="w-80 px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Chamado
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="w-28 px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Prioridade
+                <th className="w-24 px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Prior.
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Categoria
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="w-32 px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Responsável
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="w-20 px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Criado
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="w-16 px-3 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Ações
                 </th>
               </tr>
@@ -662,7 +600,7 @@ export default function TicketsPage() {
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {filteredTickets.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center">
+                  <td colSpan={7} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center">
                       <AlertCircle className="h-12 w-12 text-gray-400 mb-3" />
                       <p className="text-gray-500 dark:text-gray-400">
@@ -695,116 +633,104 @@ export default function TicketsPage() {
 
                   return (
                     <tr key={ticket.id} className="hover:bg-gray-50 dark:hover:bg-gray-900">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm font-mono text-gray-600 dark:text-gray-400">
+                      <td className="px-3 py-3 whitespace-nowrap">
+                        <span className="text-xs font-mono text-gray-600 dark:text-gray-400 font-medium">
                           #{ticket.ticket_number}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <div>
+                      <td className="px-4 py-3">
+                        <div className="space-y-1">
                           <Link
                             href={`/dashboard/tickets/${ticket.id}`}
-                            className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
+                            className="block text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 truncate"
+                            title={ticket.title}
                           >
-                            {ticket.title.toUpperCase()}
+                            {ticket.title}
                           </Link>
-                          <div className="flex items-center mt-1 text-xs text-gray-500 dark:text-gray-400">
-                            <User className="h-3 w-3 mr-1" />
-                            {ticket.created_by_user?.name || 'Desconhecido'}
-                            {(ticket.comment_count ?? 0) > 0 && (
-                              <>
-                                <span className="mx-2">•</span>
-                                <MessageSquare className="h-3 w-3 mr-1" />
-                                {ticket.comment_count ?? 0} {(ticket.comment_count ?? 0) === 1 ? 'comentário' : 'comentários'}
-                              </>
-                            )}
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-gray-500 dark:text-gray-400 truncate" title={ticket.created_by_user?.name}>
+                              {ticket.created_by_user?.name || 'Desconhecido'}
+                            </span>
+                            <div className="flex items-center space-x-2">
+                              {(ticket.comment_count ?? 0) > 0 && (
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                  <MessageSquare className="h-2.5 w-2.5 mr-0.5" />
+                                  {ticket.comment_count}
+                                </span>
+                              )}
+                              {(() => {
+                                const categoryInfo = getCategoryInfo(ticket)
+                                const Icon = categoryInfo.IconComponent
+                                return (
+                                  <span 
+                                    className="inline-flex items-center px-1.5 py-0.5 text-xs rounded"
+                                    style={{ 
+                                      backgroundColor: categoryInfo.color + '15', 
+                                      color: categoryInfo.color 
+                                    }}
+                                    title={categoryInfo.name}
+                                  >
+                                    <Icon className="h-2.5 w-2.5" />
+                                  </span>
+                                )
+                              })()}
+                            </div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         <span className={cn(
                           "inline-flex items-center px-2 py-1 text-xs font-medium rounded-full",
                           status.color
                         )}>
-                          <StatusIcon className="h-3 w-3 mr-1" />
-                          {status.label}
+                          <StatusIcon className="h-2.5 w-2.5 mr-1" />
+                          <span className="hidden xl:inline">{status.label}</span>
+                          <span className="xl:hidden">{status.label.substring(0, 3)}</span>
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         <span className={cn(
                           "inline-flex items-center px-2 py-1 text-xs font-medium rounded-full",
                           priority.color
-                        )}>
-                          {priority.label}
+                        )} title={priority.label}>
+                          {priority.label === 'Crítica' ? 'C' : 
+                           priority.label === 'Alta' ? 'A' : 
+                           priority.label === 'Média' ? 'M' : 'B'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {(() => {
-                          const categoryInfo = getCategoryInfo(ticket)
-                          const Icon = categoryInfo.IconComponent
-                          return (
-                            <span 
-                              className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full"
-                              style={{ 
-                                backgroundColor: categoryInfo.color + '20', 
-                                color: categoryInfo.color 
-                              }}
-                            >
-                              <Icon className="h-3 w-3 mr-1" />
-                              {categoryInfo.name}
-                            </span>
-                          )
-                        })()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900 dark:text-white">
+                      <td className="px-3 py-3 whitespace-nowrap">
+                        <div className="text-xs text-gray-900 dark:text-white">
                           {ticket.assigned_to_user ? (
                             <div className="flex items-center">
-                              <User className="h-3 w-3 mr-1 text-gray-400" />
-                              {ticket.assigned_to_user.name}
+                              <div className="w-5 h-5 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mr-1.5">
+                                <span className="text-blue-600 dark:text-blue-300 font-medium text-xs">
+                                  {ticket.assigned_to_user.name.substring(0, 1).toUpperCase()}
+                                </span>
+                              </div>
+                              <span className="truncate text-xs" title={ticket.assigned_to_user.name}>
+                                {ticket.assigned_to_user.name}
+                              </span>
                             </div>
                           ) : (
-                            <span className="text-gray-500 dark:text-gray-400">
-                              Não atribuído
+                            <span className="text-gray-500 dark:text-gray-400 text-xs">
+                              —
                             </span>
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          <div className="flex items-center">
-                            <Calendar className="h-3 w-3 mr-1" />
-                            {ticket.created_at ? getTimeAgo(ticket.created_at) : 'Data não disponível'}
-                          </div>
+                      <td className="px-3 py-3 whitespace-nowrap">
+                        <div className="text-xs text-gray-500 dark:text-gray-400" title={ticket.created_at ? formatBrazilDateTime(ticket.created_at) : 'Data não disponível'}>
+                          {ticket.created_at ? getTimeAgo(ticket.created_at) : '—'}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex items-center justify-end gap-2">
-                          <Link
-                            href={`/dashboard/tickets/${ticket.id}`}
-                            className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
-                            title="Visualizar"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Link>
-                          <button
-                            onClick={() => router.push(`/dashboard/tickets/${ticket.id}`)}
-                            className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
-                            title="Editar"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </button>
-                          {/* Apenas admin pode excluir tickets */}
-                          {(hasPermission('tickets_delete') || (session?.user as any)?.role === 'admin') && (
-                            <button
-                              onClick={() => handleDeleteTicket(ticket.id)}
-                              className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-                              title="Excluir"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          )}
-                        </div>
+                      <td className="px-3 py-3 whitespace-nowrap text-right">
+                        <Link
+                          href={`/dashboard/tickets/${ticket.id}`}
+                          className="inline-flex items-center justify-center w-8 h-8 text-gray-600 hover:text-blue-600 hover:bg-blue-50 dark:text-gray-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 transition-colors rounded-lg"
+                          title="Visualizar ticket"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Link>
                       </td>
                     </tr>
                   )
