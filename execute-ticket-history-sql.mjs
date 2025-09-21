@@ -24,7 +24,7 @@ async function executeSQL() {
     console.log('🚀 Iniciando execução do SQL para criação da tabela de histórico...')
     
     // Ler o arquivo SQL
-    const sqlFilePath = join(__dirname, 'sql', 'create_ticket_history_table.sql')
+    const sqlFilePath = join(__dirname, 'sql', 'create_ticket_history_simple.sql')
     const sqlContent = readFileSync(sqlFilePath, 'utf8')
     
     console.log('📄 SQL carregado do arquivo:', sqlFilePath)

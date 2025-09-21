@@ -14,15 +14,15 @@ CREATE TABLE IF NOT EXISTS ticket_history (
   new_value TEXT, -- Novo valor (se aplicável)
   description TEXT, -- Descrição da mudança
   metadata JSONB, -- Dados extras (como detalhes da escalação, etc.)
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
-  -- Índices para performance
-  INDEX idx_ticket_history_ticket_id (ticket_id),
-  INDEX idx_ticket_history_user_id (user_id),
-  INDEX idx_ticket_history_action_type (action_type),
-  INDEX idx_ticket_history_created_at (created_at),
-  INDEX idx_ticket_history_field_changed (field_changed)
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Criar índices separadamente
+CREATE INDEX IF NOT EXISTS idx_ticket_history_ticket_id ON ticket_history (ticket_id);
+CREATE INDEX IF NOT EXISTS idx_ticket_history_user_id ON ticket_history (user_id);
+CREATE INDEX IF NOT EXISTS idx_ticket_history_action_type ON ticket_history (action_type);
+CREATE INDEX IF NOT EXISTS idx_ticket_history_created_at ON ticket_history (created_at);
+CREATE INDEX IF NOT EXISTS idx_ticket_history_field_changed ON ticket_history (field_changed);
 
 -- Habilitar RLS
 ALTER TABLE ticket_history ENABLE ROW LEVEL SECURITY;
