@@ -465,7 +465,7 @@ export default function DashboardPage() {
           const borderColor = category.color || '#d1d5db'
         
             pdfHTML += `
-              <div style="flex: 1; position: relative; overflow: hidden; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%), linear-gradient(135deg, ${category.color || '#6b7280'}08 0%, ${category.color || '#6b7280'}05 100%); border-left: 5px solid ${category.color || '#6b7280'}; padding: 12px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.12), 0 3px 8px rgba(0,0,0,0.08); border: 1px solid ${category.color || '#6b7280'}40; position: relative; min-height: 70mm; max-width: 86mm;">
+              <div style="flex: 1; position: relative; overflow: hidden; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%), linear-gradient(135deg, ${category.color || '#6b7280'}15 0%, ${category.color || '#6b7280'}10 100%); border-left: 5px solid ${category.color || '#6b7280'}; padding: 12px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.12), 0 3px 8px rgba(0,0,0,0.08); border: 1px solid ${category.color || '#6b7280'}40; position: relative; min-height: 70mm; max-width: 86mm;">
                 <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
                   <h3 style="margin: 0; font-size: 14px; color: #111827; font-weight: 700; text-transform: uppercase; flex: 1; padding-right: 10px;">${category.nome}</h3>
                   <div style="text-align: right; flex-shrink: 0;">
@@ -482,7 +482,7 @@ export default function DashboardPage() {
                     <div style="background: linear-gradient(90deg, ${category.color || '#6b7280'}, ${category.color || '#6b7280'}dd); height: 100%; width: ${category.percentual}%; border-radius: 3px;"></div>
                   </div>
                 </div>
-                <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.8) 100%); border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid ${category.color || '#6b7280'}20; backdrop-filter: blur(10px);">
+                <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.8) 100%); border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid ${category.color || '#6b7280'}30; backdrop-filter: blur(10px);">
                   <div style="font-size: 11px; color: #374151; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">Distribuição por Status:</div>
                   <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 11px;">
                     <div style="display: flex; align-items: center;"><span style="color: #d97706; font-size: 14px; margin-right: 4px;">●</span> <span style="font-weight: 600; color: #374151;">Abertos:</span> <span style="font-weight: 700; color: #111827; margin-left: 4px;">${category.status_breakdown.open}</span></div>
@@ -531,7 +531,7 @@ export default function DashboardPage() {
                   
                   pair.forEach(category => {
                     page2HTML += `
-                      <div style="flex: 1; position: relative; overflow: hidden; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%), linear-gradient(135deg, ${category.color || '#6b7280'}08 0%, ${category.color || '#6b7280'}05 100%); border-left: 5px solid ${category.color || '#6b7280'}; padding: 12px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.12), 0 3px 8px rgba(0,0,0,0.08); border: 1px solid ${category.color || '#6b7280'}40; position: relative; min-height: 70mm; max-width: 86mm;">
+                      <div style="flex: 1; position: relative; overflow: hidden; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%), linear-gradient(135deg, ${category.color || '#6b7280'}15 0%, ${category.color || '#6b7280'}10 100%); border-left: 5px solid ${category.color || '#6b7280'}; padding: 12px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.12), 0 3px 8px rgba(0,0,0,0.08); border: 1px solid ${category.color || '#6b7280'}40; position: relative; min-height: 70mm; max-width: 86mm;">
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
                           <h3 style="margin: 0; font-size: 14px; color: #111827; font-weight: 700; text-transform: uppercase; flex: 1; padding-right: 10px;">${category.nome}</h3>
                           <div style="text-align: right; flex-shrink: 0;">
@@ -548,7 +548,7 @@ export default function DashboardPage() {
                             <div style="background: linear-gradient(90deg, ${category.color || '#6b7280'}, ${category.color || '#6b7280'}dd); height: 100%; width: ${category.percentual}%; border-radius: 3px;"></div>
                           </div>
                         </div>
-                        <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.8) 100%); border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid ${category.color || '#6b7280'}20; backdrop-filter: blur(10px);">
+                        <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.8) 100%); border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid ${category.color || '#6b7280'}30; backdrop-filter: blur(10px);">
                           <div style="font-size: 11px; color: #374151; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">Distribuição por Status:</div>
                           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 11px;">
                             <div style="display: flex; align-items: center;"><span style="color: #d97706; font-size: 14px; margin-right: 4px;">●</span> <span style="font-weight: 600; color: #374151;">Abertos:</span> <span style="font-weight: 700; color: #111827; margin-left: 4px;">${category.status_breakdown.open}</span></div>
