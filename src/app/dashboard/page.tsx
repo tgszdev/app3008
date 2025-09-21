@@ -176,34 +176,27 @@ const CategoryCard = ({ category }: { category: CategoryStat }) => {
           })}
         </div>
         
-        {/* Minimalist Status breakdown */}
-        <div className="mt-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {category.status_breakdown_detailed
-              .filter(status => status.count > 0)
-              .map((status) => (
-                <div 
-                  key={status.slug} 
-                  className="flex items-center justify-center p-2 rounded-lg border transition-all duration-200"
-                  style={{ 
-                    backgroundColor: `${status.color}08`,
-                    borderColor: `${status.color}30`
-                  }}
-                >
+        {/* Status breakdown with improved presentation */}
+        <div className="mt-3 space-y-1">
+          {category.status_breakdown_detailed
+            .filter(status => status.count > 0)
+            .map((status) => (
+              <div key={status.slug} className="flex items-center justify-between text-xs">
+                <div className="flex items-center">
                   <div 
                     className="w-2 h-2 rounded-full mr-2 flex-shrink-0"
                     style={{ backgroundColor: status.color }}
                   />
-                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate mr-1">
+                  <span className="text-gray-600 dark:text-gray-400 truncate">
                     {status.name}
                   </span>
-                  <span className="text-xs font-bold text-gray-900 dark:text-white">
-                    {status.count}
-                  </span>
                 </div>
-              ))
-            }
-          </div>
+                <span className="font-medium text-gray-900 dark:text-white ml-2">
+                  {status.count}
+                </span>
+              </div>
+            ))
+          }
         </div>
       </div>
     </div>
@@ -495,11 +488,7 @@ export default function DashboardPage() {
                   <div style="font-size: 11px; color: #374151; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">Distribuição por Status:</div>
                   <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 11px;">
                     ${category.status_breakdown_detailed.filter(s => s.count > 0).map(status => 
-                      `<div style="display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; background: ${status.color}08; border: 1px solid ${status.color}30;">
-                        <span style="color: ${status.color}; font-size: 12px; margin-right: 4px;">●</span> 
-                        <span style="font-weight: 600; color: #374151; margin-right: 4px;">${status.name}</span> 
-                        <span style="font-weight: 700; color: #111827;">${status.count}</span>
-                      </div>`
+                      `<div style="display: flex; align-items: center;"><span style="color: ${status.color}; font-size: 14px; margin-right: 4px;">●</span> <span style="font-weight: 600; color: #374151;">${status.name}:</span> <span style="font-weight: 700; color: #111827; margin-left: 4px;">${status.count}</span></div>`
                     ).join('')}
                   </div>
                 </div>
@@ -564,11 +553,7 @@ export default function DashboardPage() {
                           <div style="font-size: 11px; color: #374151; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">Distribuição por Status:</div>
                           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 11px;">
                             ${category.status_breakdown_detailed.filter(s => s.count > 0).map(status => 
-                              `<div style="display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; background: ${status.color}08; border: 1px solid ${status.color}30;">
-                                <span style="color: ${status.color}; font-size: 12px; margin-right: 4px;">●</span> 
-                                <span style="font-weight: 600; color: #374151; margin-right: 4px;">${status.name}</span> 
-                                <span style="font-weight: 700; color: #111827;">${status.count}</span>
-                              </div>`
+                              `<div style="display: flex; align-items: center;"><span style="color: ${status.color}; font-size: 14px; margin-right: 4px;">●</span> <span style="font-weight: 600; color: #374151;">${status.name}:</span> <span style="font-weight: 700; color: #111827; margin-left: 4px;">${status.count}</span></div>`
                             ).join('')}
                           </div>
                         </div>
