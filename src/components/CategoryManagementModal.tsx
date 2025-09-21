@@ -120,7 +120,6 @@ import {
   Shield,
   Lock,
   Key,
-  FileTransfer,
   HardDrive,
   Disc,
   // Expansão completa de ícones
@@ -151,7 +150,6 @@ import {
   FileJson,
   FileX,
   Merge,
-  PullRequest,
   TableProperties,
   BarChart2,
   LineChart,
@@ -179,12 +177,9 @@ import {
   Shuffle,
   GitMerge,
   TruckIcon,
-  ClipboardCheck,
   FileCheck,
   CheckSquare,
   ShieldCheck,
-  Send,
-  ClockIcon,
   ListChecks,
   Calculator,
   FileSpreadsheet,
@@ -508,7 +503,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
         { value: 'package-search', label: 'Localizar', icon: 'PackageSearch' },
         { value: 'map-pin', label: 'Destino', icon: 'MapPin' },
         { value: 'calendar', label: 'Agendar', icon: 'Calendar' },
-        { value: 'clock-icon', label: 'Prazo', icon: 'ClockIcon' },
+        { value: 'clock', label: 'Prazo', icon: 'Clock' },
         { value: 'truck', label: 'Transporte', icon: 'Truck' }
       ]
     },
@@ -545,7 +540,6 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
       color: 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800',
       icons: [
         { value: 'forklift', label: 'Empilhadeira', icon: 'Forklift' },
-        { value: 'containers', label: 'Containers', icon: 'Containers' },
         { value: 'route', label: 'Rota', icon: 'Route' },
         { value: 'navigation', label: 'GPS', icon: 'Navigation' },
         { value: 'plane', label: 'Avião', icon: 'Plane' },
@@ -572,7 +566,6 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
         { value: 'wifi', label: 'WiFi', icon: 'Wifi' },
         { value: 'router', label: 'Roteador', icon: 'Router' },
         { value: 'cable', label: 'Cabo', icon: 'Cable' },
-        { value: 'ethernet', label: 'Ethernet', icon: 'Ethernet' },
         { value: 'mouse-pointer', label: 'Mouse', icon: 'MousePointer' },
         { value: 'keyboard', label: 'Teclado', icon: 'Keyboard' },
         { value: 'smartphone', label: 'Celular', icon: 'Smartphone' },

@@ -172,7 +172,6 @@ import {
   BarChart3,
   Terminal,
   GitBranch,
-  FileTransfer,
   HardDrive,
   Disc,
   Building,
@@ -188,7 +187,6 @@ import {
   Percent as Discount,
   // Logistics & Transport
   Forklift,
-  Containers,
   PlaneTakeoff,
   ShipWheel,
   CarFront,
@@ -204,7 +202,6 @@ import {
   MemoryStick,
   Router,
   Cable,
-  Ethernet,
   MousePointer,
   Keyboard,
   // Development
@@ -215,7 +212,6 @@ import {
   FileJson,
   FileX,
   Merge,
-  PullRequest,
   // Database & Analytics
   TableProperties,
   BarChart2,
@@ -253,20 +249,11 @@ import {
   GitMerge,
   // Recebimento de mercadoria
   TruckIcon,
-  PackageCheck,
-  ClipboardCheck,
   FileCheck,
   CheckSquare,
   ShieldCheck,
   // Expedição
-  Send,
-  PackageSearch,
-  MapPin,
-  Calendar,
-  ClockIcon,
   // Inventário
-  ListChecks,
-  Calculator,
   FileSpreadsheet,
   BarChart4,
   PlusSquare,
@@ -468,7 +455,6 @@ export const iconMap: Record<string, LucideIcon> = {
   
   // LOGISTICS & TRANSPORT (TMS)
   'forklift': Forklift,
-  'containers': Containers,
   'plane-takeoff': PlaneTakeoff,
   'ship-wheel': ShipWheel,
   'car-front': CarFront,
@@ -485,7 +471,6 @@ export const iconMap: Record<string, LucideIcon> = {
   'memory-stick': MemoryStick,
   'router': Router,
   'cable': Cable,
-  'ethernet': Ethernet,
   'mouse-pointer': MousePointer,
   'keyboard': Keyboard,
   
@@ -497,7 +482,6 @@ export const iconMap: Record<string, LucideIcon> = {
   'file-json': FileJson,
   'file-x': FileX,
   'merge': Merge,
-  'pull-request': PullRequest,
   'git-branch': GitBranch,
   'terminal': Terminal,
   
@@ -534,7 +518,6 @@ export const iconMap: Record<string, LucideIcon> = {
   'qr-code-icon': QrCodeIcon,
   
   // FTP & FILE TRANSFER
-  'file-transfer': FileTransfer,
   'building': Building,
   
   // INTEGRAÇÃO ENTRE SISTEMAS
@@ -549,22 +532,13 @@ export const iconMap: Record<string, LucideIcon> = {
   
   // RECEBIMENTO DE MERCADORIA
   'truck-icon': TruckIcon,
-  'package-check': PackageCheck,
-  'clipboard-check': ClipboardCheck,
   'file-check': FileCheck,
   'check-square': CheckSquare,
   'shield-check': ShieldCheck,
   
   // EXPEDIÇÃO
-  'send': Send,
-  'package-search': PackageSearch,
-  'map-pin': MapPin,
-  'calendar': Calendar,
-  'clock-icon': ClockIcon,
   
   // INVENTÁRIO
-  'list-checks': ListChecks,
-  'calculator': Calculator,
   'file-spreadsheet': FileSpreadsheet,
   'bar-chart-4': BarChart4,
   'plus-square': PlusSquare,
