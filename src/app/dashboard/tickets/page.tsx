@@ -160,6 +160,31 @@ export default function TicketsPage() {
   const [priorityFilter, setPriorityFilter] = useState('all')
   const [showFilters, setShowFilters] = useState(false)
 
+  // Mapeamento de status para compatibilidade
+  const statusMapping: Record<string, string> = {
+    'aberto': 'open',
+    'em-progresso': 'in_progress', 
+    'aguardando-cliente': 'aguardando-cliente',
+    'ag-deploy-em-producao': 'ag-deploy-em-producao',
+    'resolvido': 'resolved',
+    'fechado': 'closed'
+  }
+
+  // Mapeamento reverso para exibição
+  const statusDisplayMapping: Record<string, string> = {
+    'open': 'Aberto',
+    'in_progress': 'Em Progresso',
+    'resolved': 'Resolvido', 
+    'closed': 'Fechado',
+    'cancelled': 'Cancelado',
+    'aguardando-cliente': 'Aguardando Cliente',
+    'ag-deploy-em-producao': 'Ag. Deploy em Produção',
+    'em-progresso': 'Em Progresso',
+    'aberto': 'Aberto',
+    'resolvido': 'Resolvido',
+    'fechado': 'Fechado'
+  }
+
   // Função para extrair iniciais do nome completo
   const getInitials = (name: string) => {
     return name
@@ -175,7 +200,11 @@ export default function TicketsPage() {
 
     try {
       const params = new URLSearchParams()
-      if (statusFilter !== 'all') params.append('status', statusFilter)
+      if (statusFilter !== 'all') {
+        // Usar mapeamento para converter status
+        const mappedStatus = statusMapping[statusFilter] || statusFilter
+        params.append('status', mappedStatus)
+      }
       if (priorityFilter !== 'all') params.append('priority', priorityFilter)
 
       const response = await axios.get(`/api/tickets?${params.toString()}`)
