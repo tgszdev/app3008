@@ -416,16 +416,17 @@ export default function TicketsPage() {
       </div>
 
       {/* Stats - Dynamic with zero filtering */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-6">
         {/* Total Card - Always visible */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3">
-          <div className="flex items-center justify-between">
+        <div className="group relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 dark:border-gray-700/50 p-4 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent dark:from-blue-900/10 dark:to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="relative flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-600 dark:text-gray-400">Total</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{allTickets.length}</p>
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{allTickets.length}</p>
             </div>
-            <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-              <AlertCircle className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+            <div className="p-3 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-2xl shadow-inner">
+              <AlertCircle className="h-6 w-6 text-gray-600 dark:text-gray-300" />
             </div>
           </div>
         </div>
@@ -439,33 +440,59 @@ export default function TicketsPage() {
           .map((status) => {
             const count = allTickets.filter(t => t.status === status.slug).length
             
-            // Map status slugs to appropriate icons and colors
+            // Map status slugs to appropriate icons and colors with gradients
             const getStatusDisplay = (slug: string) => {
               if (slug.includes('aberto') || slug.includes('open')) 
-                return { icon: AlertCircle, bg: 'bg-blue-100 dark:bg-blue-900', text: 'text-blue-600 dark:text-blue-400' }
+                return { 
+                  icon: AlertCircle, 
+                  bg: 'bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/50 dark:to-blue-800/50', 
+                  text: 'text-blue-600 dark:text-blue-400',
+                  hoverBg: 'from-blue-50/30 to-transparent dark:from-blue-900/20 dark:to-transparent'
+                }
               if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) 
-                return { icon: Clock, bg: 'bg-yellow-100 dark:bg-yellow-900', text: 'text-yellow-600 dark:text-yellow-400' }
+                return { 
+                  icon: Clock, 
+                  bg: 'bg-gradient-to-br from-yellow-100 to-amber-200 dark:from-yellow-900/50 dark:to-amber-800/50', 
+                  text: 'text-yellow-600 dark:text-yellow-400',
+                  hoverBg: 'from-yellow-50/30 to-transparent dark:from-yellow-900/20 dark:to-transparent'
+                }
               if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) 
-                return { icon: CheckCircle, bg: 'bg-green-100 dark:bg-green-900', text: 'text-green-600 dark:text-green-400' }
+                return { 
+                  icon: CheckCircle, 
+                  bg: 'bg-gradient-to-br from-green-100 to-emerald-200 dark:from-green-900/50 dark:to-emerald-800/50', 
+                  text: 'text-green-600 dark:text-green-400',
+                  hoverBg: 'from-green-50/30 to-transparent dark:from-green-900/20 dark:to-transparent'
+                }
               if (slug.includes('cancelled') || slug.includes('cancelado')) 
-                return { icon: XCircle, bg: 'bg-red-100 dark:bg-red-900', text: 'text-red-600 dark:text-red-400' }
-              return { icon: AlertCircle, bg: 'bg-gray-100 dark:bg-gray-700', text: 'text-gray-600 dark:text-gray-400' }
+                return { 
+                  icon: XCircle, 
+                  bg: 'bg-gradient-to-br from-red-100 to-rose-200 dark:from-red-900/50 dark:to-rose-800/50', 
+                  text: 'text-red-600 dark:text-red-400',
+                  hoverBg: 'from-red-50/30 to-transparent dark:from-red-900/20 dark:to-transparent'
+                }
+              return { 
+                icon: AlertCircle, 
+                bg: 'bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700/50 dark:to-gray-800/50', 
+                text: 'text-gray-600 dark:text-gray-400',
+                hoverBg: 'from-gray-50/30 to-transparent dark:from-gray-900/20 dark:to-transparent'
+              }
             }
             
             const display = getStatusDisplay(status.slug)
             const StatusIcon = display.icon
             
             return (
-              <div key={status.slug} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3">
-                <div className="flex items-center justify-between">
+              <div key={status.slug} className="group relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200/50 dark:border-gray-700/50 p-4 overflow-hidden">
+                <div className={`absolute inset-0 bg-gradient-to-br ${display.hoverBg} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+                <div className="relative flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">{status.name}</p>
-                    <p className={`text-xl font-bold ${display.text}`}>
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{status.name}</p>
+                    <p className={`text-2xl font-bold ${display.text} mt-1`}>
                       {count}
                     </p>
                   </div>
-                  <div className={`p-2 ${display.bg} rounded-lg`}>
-                    <StatusIcon className={`h-5 w-5 ${display.text}`} />
+                  <div className={`p-3 ${display.bg} rounded-2xl shadow-inner`}>
+                    <StatusIcon className={`h-6 w-6 ${display.text}`} />
                   </div>
                 </div>
               </div>
