@@ -158,6 +158,7 @@ export default function TicketsPage() {
   const { statuses: statusesWithCount } = useStatusesWithCount()
   const { priorities: prioritiesWithCount } = usePrioritiesWithCount()
   const [tickets, setTickets] = useState<Ticket[]>([])
+  const [allTickets, setAllTickets] = useState<Ticket[]>([]) // Para contagem nos cards
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -165,30 +166,8 @@ export default function TicketsPage() {
   const [priorityFilter, setPriorityFilter] = useState('all')
   const [showFilters, setShowFilters] = useState(false)
 
-  // Mapeamento de status para compatibilidade
-  const statusMapping: Record<string, string> = {
-    'aberto': 'open',
-    'em-progresso': 'in_progress', 
-    'aguardando-cliente': 'aguardando-cliente',
-    'ag-deploy-em-producao': 'ag-deploy-em-producao',
-    'resolvido': 'resolved',
-    'fechado': 'closed'
-  }
-
-  // Mapeamento reverso para exibição
-  const statusDisplayMapping: Record<string, string> = {
-    'open': 'Aberto',
-    'in_progress': 'Em Progresso',
-    'resolved': 'Resolvido', 
-    'closed': 'Fechado',
-    'cancelled': 'Cancelado',
-    'aguardando-cliente': 'Aguardando Cliente',
-    'ag-deploy-em-producao': 'Ag. Deploy em Produção',
-    'em-progresso': 'Em Progresso',
-    'aberto': 'Aberto',
-    'resolvido': 'Resolvido',
-    'fechado': 'Fechado'
-  }
+  // Mapeamento removido - agora usa slugs direto do banco de dados
+  // Os status no dropdown já vêm com os slugs corretos do banco
 
   // Função para extrair iniciais do nome completo
   const getInitials = (name: string) => {
@@ -206,13 +185,18 @@ export default function TicketsPage() {
     try {
       const params = new URLSearchParams()
       if (statusFilter !== 'all') {
-        // Usar mapeamento para converter status
-        const mappedStatus = statusMapping[statusFilter] || statusFilter
-        params.append('status', mappedStatus)
+        // Usar slug direto do banco de dados
+        params.append('status', statusFilter)
       }
       if (priorityFilter !== 'all') params.append('priority', priorityFilter)
 
-      const response = await axios.get(`/api/tickets?${params.toString()}`)
+      const url = `/api/tickets?${params.toString()}`
+      console.log('🔍 Fetching tickets with URL:', url)
+      console.log('🔍 Status filter:', statusFilter)
+      console.log('🔍 Priority filter:', priorityFilter)
+
+      const response = await axios.get(url)
+      console.log('✅ Tickets received:', response.data.length)
       setTickets(response.data)
     } catch (error: any) {
       console.error('Erro ao buscar tickets:', error)
@@ -223,8 +207,20 @@ export default function TicketsPage() {
     }
   }
 
+  // Buscar todos os tickets para contagem nos cards
+  const fetchAllTickets = async () => {
+    try {
+      const response = await axios.get('/api/tickets')
+      console.log('📊 All tickets for cards:', response.data.length)
+      setAllTickets(response.data)
+    } catch (error: any) {
+      console.error('Erro ao buscar todos os tickets:', error)
+    }
+  }
+
   useEffect(() => {
     fetchTickets()
+    fetchAllTickets() // Buscar todos para os cards
   }, [statusFilter, priorityFilter])
 
   const handleDeleteTicket = async (ticketId: string) => {
@@ -426,7 +422,7 @@ export default function TicketsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-600 dark:text-gray-400">Total</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">{tickets.length}</p>
+              <p className="text-xl font-bold text-gray-900 dark:text-white">{allTickets.length}</p>
             </div>
             <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
               <AlertCircle className="h-5 w-5 text-gray-600 dark:text-gray-400" />
@@ -437,11 +433,11 @@ export default function TicketsPage() {
         {/* Dynamic Status Cards - Only show if count > 0 */}
         {statusesWithCount
           .filter(status => {
-            const count = tickets.filter(t => t.status === status.slug).length
+            const count = allTickets.filter(t => t.status === status.slug).length
             return count > 0
           })
           .map((status) => {
-            const count = tickets.filter(t => t.status === status.slug).length
+            const count = allTickets.filter(t => t.status === status.slug).length
             
             // Map status slugs to appropriate icons and colors
             const getStatusDisplay = (slug: string) => {
