@@ -160,6 +160,15 @@ export default function TicketsPage() {
   const [priorityFilter, setPriorityFilter] = useState('all')
   const [showFilters, setShowFilters] = useState(false)
 
+  // Função para extrair iniciais do nome completo
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase())
+      .join('')
+      .substring(0, 3) // Máximo 3 iniciais
+  }
+
   const fetchTickets = async (showLoader = true) => {
     if (showLoader) setLoading(true)
     else setRefreshing(true)
@@ -574,31 +583,31 @@ export default function TicketsPage() {
           <table className="w-full table-fixed">
             <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
-                <th className="w-20 px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="w-16 px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   #
                 </th>
-                <th className="w-80 px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="w-96 px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Título
                 </th>
-                <th className="w-40 px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="w-32 px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="w-32 px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="w-28 px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Prioridade
                 </th>
-                <th className="w-40 px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="w-32 px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Categoria
                 </th>
-                <th className="w-48 px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Responsável
+                <th className="w-16 px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Resp.
                 </th>
-                <th className="w-48 px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Solicitante
+                <th className="w-16 px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Solic.
                 </th>
-                <th className="w-28 px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="w-20 px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Criado
                 </th>
-                <th className="w-20 px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <th className="w-16 px-3 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Ações
                 </th>
               </tr>
@@ -639,12 +648,12 @@ export default function TicketsPage() {
 
                   return (
                     <tr key={ticket.id} className="hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
-                      <td className="px-4 py-4 whitespace-nowrap">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         <span className="text-sm font-mono text-gray-600 dark:text-gray-400 font-medium">
                           #{ticket.ticket_number}
                         </span>
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-3 py-3">
                         <Link
                           href={`/dashboard/tickets/${ticket.id}`}
                           className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors block truncate"
@@ -653,87 +662,75 @@ export default function TicketsPage() {
                           {ticket.title}
                         </Link>
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         <span className={cn(
-                          "inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-full",
+                          "inline-flex items-center px-2 py-1 text-xs font-medium rounded-full",
                           status.color
                         )}>
-                          <StatusIcon className="h-3 w-3 mr-2" />
+                          <StatusIcon className="h-3 w-3 mr-1" />
                           {status.label}
                         </span>
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         <span className={cn(
-                          "inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-full",
+                          "inline-flex items-center px-2 py-1 text-xs font-medium rounded-full",
                           priority.color
                         )}>
                           {priority.label}
                         </span>
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         {(() => {
                           const categoryInfo = getCategoryInfo(ticket)
                           const Icon = categoryInfo.IconComponent
                           return (
                             <span 
-                              className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-full"
+                              className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full"
                               style={{ 
                                 backgroundColor: categoryInfo.color + '20', 
                                 color: categoryInfo.color 
                               }}
                             >
-                              <Icon className="h-3 w-3 mr-2" />
+                              <Icon className="h-3 w-3 mr-1" />
                               {categoryInfo.name}
                             </span>
                           )
                         })()}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900 dark:text-white">
-                          {ticket.assigned_to_user ? (
-                            <div className="flex items-center">
-                              <div className="w-7 h-7 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                                <span className="text-blue-600 dark:text-blue-300 font-medium text-xs">
-                                  {ticket.assigned_to_user.name.substring(0, 1).toUpperCase()}
-                                </span>
-                              </div>
-                              <span className="truncate" title={ticket.assigned_to_user.name}>
-                                {ticket.assigned_to_user.name}
-                              </span>
-                            </div>
-                          ) : (
-                            <span className="text-gray-500 dark:text-gray-400">
-                              Não atribuído
+                      <td className="px-3 py-3 whitespace-nowrap text-center">
+                        {ticket.assigned_to_user ? (
+                          <div 
+                            className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto cursor-help"
+                            title={ticket.assigned_to_user.name}
+                          >
+                            <span className="text-blue-600 dark:text-blue-300 font-medium text-xs">
+                              {getInitials(ticket.assigned_to_user.name)}
                             </span>
-                          )}
-                        </div>
+                          </div>
+                        ) : (
+                          <span className="text-gray-500 dark:text-gray-400 text-xs">—</span>
+                        )}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {ticket.created_by_user ? (
-                            <div className="flex items-center">
-                              <div className="w-7 h-7 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                                <span className="text-gray-600 dark:text-gray-300 font-medium text-xs">
-                                  {ticket.created_by_user.name.substring(0, 1).toUpperCase()}
-                                </span>
-                              </div>
-                              <span className="truncate" title={ticket.created_by_user.name}>
-                                {ticket.created_by_user.name}
-                              </span>
-                            </div>
-                          ) : (
-                            <span className="text-gray-500 dark:text-gray-400">
-                              Desconhecido
+                      <td className="px-3 py-3 whitespace-nowrap text-center">
+                        {ticket.created_by_user ? (
+                          <div 
+                            className="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto cursor-help"
+                            title={ticket.created_by_user.name}
+                          >
+                            <span className="text-gray-600 dark:text-gray-300 font-medium text-xs">
+                              {getInitials(ticket.created_by_user.name)}
                             </span>
-                          )}
-                        </div>
+                          </div>
+                        ) : (
+                          <span className="text-gray-500 dark:text-gray-400 text-xs">—</span>
+                        )}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         <div className="text-sm text-gray-500 dark:text-gray-400" title={ticket.created_at ? formatBrazilDateTime(ticket.created_at) : 'Data não disponível'}>
-                          {ticket.created_at ? getTimeAgo(ticket.created_at) : '—'}
+                          {ticket.created_at ? formatRelativeTime(ticket.created_at) : '—'}
                         </div>
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-right">
+                      <td className="px-3 py-3 whitespace-nowrap text-right">
                         <Link
                           href={`/dashboard/tickets/${ticket.id}`}
                           className="inline-flex items-center justify-center w-8 h-8 text-gray-600 hover:text-blue-600 hover:bg-blue-50 dark:text-gray-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 transition-all duration-200 rounded-lg"
