@@ -257,7 +257,22 @@ import {
   FileSpreadsheet,
   BarChart4,
   PlusSquare,
-  MinusSquare
+  MinusSquare,
+  // Novos ícones específicos (sem duplicatas)
+  BluetoothIcon,
+  WifiIcon,
+  UsbIcon,
+  AppWindow,
+  LayoutDashboard,
+  LayoutList,
+  FileCode2,
+  FileImage,
+  MicOff,
+  VolumeX as VolumeOff,
+  Crown,
+  Gem,
+  Building2 as Office,
+  Factory
 } from 'lucide-react'
 import { LucideIcon } from 'lucide-react'
 
@@ -543,6 +558,22 @@ export const iconMap: Record<string, LucideIcon> = {
   'bar-chart-4': BarChart4,
   'plus-square': PlusSquare,
   'minus-square': MinusSquare,
+  
+  // NOVOS ÍCONES ESPECÍFICOS
+  'bluetooth': BluetoothIcon,
+  'wifi': WifiIcon,
+  'usb': UsbIcon,
+  'app-window': AppWindow,
+  'layout-dashboard': LayoutDashboard,
+  'layout-list': LayoutList,
+  'file-code-2': FileCode2,
+  'file-image': FileImage,
+  'mic-off': MicOff,
+  'volume-off': VolumeOff,
+  'crown': Crown,
+  'gem': Gem,
+  'office': Office,
+  'factory': Factory,
 }
 
 // Função helper para obter o ícone correto

@@ -446,195 +446,43 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
     category.description?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  // Categorias organizadas para melhor UX
-  const iconCategories = [
-    {
-      name: '💼 E-commerce & Vendas',
-      color: 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800',
-      icons: [
-        { value: 'store', label: 'Loja', icon: 'Store' },
-        { value: 'shopping-cart', label: 'Carrinho', icon: 'ShoppingCart' },
-        { value: 'shopping-bag', label: 'Sacola', icon: 'ShoppingBag' },
-        { value: 'credit-card', label: 'Cartão', icon: 'CreditCard' },
-        { value: 'dollar-sign', label: 'Dinheiro', icon: 'DollarSign' },
-        { value: 'badge-dollar-sign', label: 'Badge $', icon: 'BadgeDollarSign' },
-        { value: 'receipt', label: 'Recibo', icon: 'Receipt' },
-        { value: 'wallet', label: 'Carteira', icon: 'Wallet' },
-        { value: 'banknote', label: 'Nota', icon: 'Banknote' },
-        { value: 'gift', label: 'Presente', icon: 'Gift' },
-        { value: 'percent', label: 'Desconto', icon: 'Percent' }
-      ]
-    },
-    {
-      name: '📦 WMS & Armazém',
-      color: 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800',
-      icons: [
-        { value: 'warehouse', label: 'Armazém', icon: 'Warehouse' },
-        { value: 'package', label: 'Pacote', icon: 'Package' },
-        { value: 'package-2', label: 'Pacote 2', icon: 'Package2' },
-        { value: 'package-open', label: 'Pacote Aberto', icon: 'PackageOpen' },
-        { value: 'boxes', label: 'Caixas', icon: 'Boxes' },
-        { value: 'archive', label: 'Arquivo', icon: 'Archive' },
-        { value: 'archive-restore', label: 'Restaurar', icon: 'ArchiveRestore' },
-        { value: 'scan', label: 'Scanner', icon: 'Scan' },
-        { value: 'scan-barcode', label: 'Código Barras', icon: 'ScanBarcode' },
-        { value: 'qr-code', label: 'QR Code', icon: 'QrCode' }
-      ]
-    },
-    {
-      name: '📥 Recebimento',
-      color: 'bg-purple-50 border-purple-200 dark:bg-purple-900/20 dark:border-purple-800',
-      icons: [
-        { value: 'truck-icon', label: 'Entrega', icon: 'TruckIcon' },
-        { value: 'package-check', label: 'Conferir', icon: 'PackageCheck' },
-        { value: 'clipboard-check', label: 'Checklist', icon: 'ClipboardCheck' },
-        { value: 'file-check', label: 'Verificar', icon: 'FileCheck' },
-        { value: 'check-square', label: 'Aprovar', icon: 'CheckSquare' },
-        { value: 'shield-check', label: 'Validar', icon: 'ShieldCheck' }
-      ]
-    },
-    {
-      name: '📤 Expedição',
-      color: 'bg-orange-50 border-orange-200 dark:bg-orange-900/20 dark:border-orange-800',
-      icons: [
-        { value: 'send', label: 'Enviar', icon: 'Send' },
-        { value: 'package-search', label: 'Localizar', icon: 'PackageSearch' },
-        { value: 'map-pin', label: 'Destino', icon: 'MapPin' },
-        { value: 'calendar', label: 'Agendar', icon: 'Calendar' },
-        { value: 'clock', label: 'Prazo', icon: 'Clock' },
-        { value: 'truck', label: 'Transporte', icon: 'Truck' }
-      ]
-    },
-    {
-      name: '📊 Inventário',
-      color: 'bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800',
-      icons: [
-        { value: 'list-checks', label: 'Contagem', icon: 'ListChecks' },
-        { value: 'calculator', label: 'Calcular', icon: 'Calculator' },
-        { value: 'file-spreadsheet', label: 'Planilha', icon: 'FileSpreadsheet' },
-        { value: 'bar-chart-4', label: 'Relatório', icon: 'BarChart4' },
-        { value: 'plus-square', label: 'Adicionar', icon: 'PlusSquare' },
-        { value: 'minus-square', label: 'Remover', icon: 'MinusSquare' },
-        { value: 'clipboard', label: 'Inventário', icon: 'Clipboard' },
-        { value: 'clipboard-pen', label: 'Ajustar', icon: 'ClipboardPen' }
-      ]
-    },
-    {
-      name: '🔗 Integração',
-      color: 'bg-teal-50 border-teal-200 dark:bg-teal-900/20 dark:border-teal-800',
-      icons: [
-        { value: 'workflow', label: 'Fluxo', icon: 'Workflow' },
-        { value: 'network', label: 'Rede', icon: 'Network' },
-        { value: 'share-2', label: 'Sincronizar', icon: 'Share2' },
-        { value: 'refresh-ccw', label: 'Atualizar', icon: 'RefreshCcw' },
-        { value: 'arrow-left-right', label: 'Trocar', icon: 'ArrowLeftRight' },
-        { value: 'repeat', label: 'Repetir', icon: 'Repeat' },
-        { value: 'shuffle', label: 'Reorganizar', icon: 'Shuffle' },
-        { value: 'git-merge', label: 'Unificar', icon: 'GitMerge' }
-      ]
-    },
-    {
-      name: '🚛 Logística & TMS',
-      color: 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800',
-      icons: [
-        { value: 'forklift', label: 'Empilhadeira', icon: 'Forklift' },
-        { value: 'route', label: 'Rota', icon: 'Route' },
-        { value: 'navigation', label: 'GPS', icon: 'Navigation' },
-        { value: 'plane', label: 'Avião', icon: 'Plane' },
-        { value: 'plane-takeoff', label: 'Decolagem', icon: 'PlaneTakeoff' },
-        { value: 'ship', label: 'Navio', icon: 'Ship' },
-        { value: 'ship-wheel', label: 'Timão', icon: 'ShipWheel' },
-        { value: 'car', label: 'Carro', icon: 'Car' },
-        { value: 'car-front', label: 'Veículo', icon: 'CarFront' },
-        { value: 'bus-front', label: 'Ônibus', icon: 'BusFront' },
-        { value: 'train', label: 'Trem', icon: 'Train' },
-        { value: 'bike', label: 'Bicicleta', icon: 'Bike' }
-      ]
-    },
-    {
-      name: '💻 Tecnologia',
-      color: 'bg-gray-50 border-gray-200 dark:bg-gray-900/20 dark:border-gray-700',
-      icons: [
-        { value: 'monitor', label: 'Monitor', icon: 'Monitor' },
-        { value: 'cpu', label: 'CPU', icon: 'Cpu' },
-        { value: 'memory-stick', label: 'Memória', icon: 'MemoryStick' },
-        { value: 'circuit-board', label: 'Placa', icon: 'CircuitBoard' },
-        { value: 'server', label: 'Servidor', icon: 'Server' },
-        { value: 'cloud', label: 'Nuvem', icon: 'Cloud' },
-        { value: 'wifi', label: 'WiFi', icon: 'Wifi' },
-        { value: 'router', label: 'Roteador', icon: 'Router' },
-        { value: 'cable', label: 'Cabo', icon: 'Cable' },
-        { value: 'mouse-pointer', label: 'Mouse', icon: 'MousePointer' },
-        { value: 'keyboard', label: 'Teclado', icon: 'Keyboard' },
-        { value: 'smartphone', label: 'Celular', icon: 'Smartphone' },
-        { value: 'settings', label: 'Config', icon: 'Settings' }
-      ]
-    },
-    {
-      name: '📊 Dados & Analytics',
-      color: 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800',
-      icons: [
-        { value: 'database', label: 'Database', icon: 'Database' },
-        { value: 'database-zap', label: 'DB Ativo', icon: 'DatabaseZap' },
-        { value: 'hard-drive', label: 'HD', icon: 'HardDrive' },
-        { value: 'disc', label: 'Disco', icon: 'Disc' },
-        { value: 'table-properties', label: 'Tabela', icon: 'TableProperties' },
-        { value: 'bar-chart', label: 'Gráfico', icon: 'BarChart' },
-        { value: 'bar-chart-2', label: 'Chart 2', icon: 'BarChart2' },
-        { value: 'bar-chart-3', label: 'Chart 3', icon: 'BarChart3' },
-        { value: 'pie-chart', label: 'Pizza', icon: 'PieChart' },
-        { value: 'line-chart', label: 'Linha', icon: 'LineChart' },
-        { value: 'trending-up', label: 'Crescimento', icon: 'TrendingUp' },
-        { value: 'gauge', label: 'Medidor', icon: 'Gauge' },
-        { value: 'binary', label: 'Binário', icon: 'Binary' }
-      ]
-    },
-    {
-      name: '🎧 Suporte',
-      color: 'bg-pink-50 border-pink-200 dark:bg-pink-900/20 dark:border-pink-800',
-      icons: [
-        { value: 'headset', label: 'Suporte', icon: 'Headset' },
-        { value: 'life-buoy', label: 'Ajuda', icon: 'LifeBuoy' },
-        { value: 'help-circle', label: 'Dúvida', icon: 'HelpCircle' },
-        { value: 'phone', label: 'Telefone', icon: 'Phone' },
-        { value: 'phone-outgoing', label: 'Ligar', icon: 'PhoneOutgoing' },
-        { value: 'phone-incoming', label: 'Receber', icon: 'PhoneIncoming' },
-        { value: 'message-square', label: 'Chat', icon: 'MessageSquare' },
-        { value: 'message-circle', label: 'Mensagem', icon: 'MessageCircle' },
-        { value: 'mail', label: 'Email', icon: 'Mail' },
-        { value: 'user-round', label: 'Usuário', icon: 'UserRound' },
-        { value: 'users', label: 'Equipe', icon: 'Users' },
-        { value: 'users-2', label: 'Grupo', icon: 'Users2' },
-        { value: 'user', label: 'Pessoa', icon: 'User' }
-      ]
-    },
-    {
-      name: '🔧 Geral',
-      color: 'bg-slate-50 border-slate-200 dark:bg-slate-900/20 dark:border-slate-700',
-      icons: [
-        { value: 'home', label: 'Início', icon: 'Home' },
-        { value: 'building', label: 'Empresa', icon: 'Building' },
-        { value: 'briefcase', label: 'Negócios', icon: 'Briefcase' },
-        { value: 'target', label: 'Meta', icon: 'Target' },
-        { value: 'star', label: 'Estrela', icon: 'Star' },
-        { value: 'award', label: 'Prêmio', icon: 'Award' },
-        { value: 'flag', label: 'Bandeira', icon: 'Flag' },
-        { value: 'lightbulb', label: 'Ideia', icon: 'Lightbulb' },
-        { value: 'heart', label: 'Coração', icon: 'Heart' },
-        { value: 'globe', label: 'Global', icon: 'Globe' },
-        { value: 'search', label: 'Busca', icon: 'Search' },
-        { value: 'filter', label: 'Filtro', icon: 'Filter' },
-        { value: 'tag', label: 'Tag', icon: 'Tag' },
-        { value: 'hash', label: 'Hash', icon: 'Hash' },
-        { value: 'check-circle', label: 'OK', icon: 'CheckCircle' },
-        { value: 'alert-circle', label: 'Alerta', icon: 'AlertCircle' },
-        { value: 'alert-triangle', label: 'Atenção', icon: 'AlertTriangle' },
-        { value: 'info', label: 'Info', icon: 'Info' },
-        { value: 'bell', label: 'Sino', icon: 'Bell' },
-        { value: 'zap', label: 'Energia', icon: 'Zap' },
-        { value: 'activity', label: 'Atividade', icon: 'Activity' }
-      ]
-    }
+  // Lista minimalista de ícones - organizada de forma simples
+  const allIcons = [
+    // BÁSICOS E ESSENCIAIS
+    'home', 'settings', 'user', 'users', 'folder', 'file-text', 'search', 'bell', 'heart', 'star', 'info', 'help-circle', 'target', 'award', 'flag',
+    
+    // HELP DESK E SUPORTE 
+    'headset', 'life-buoy', 'phone', 'message-square', 'mail', 'chat', 'user-round', 'users-2', 'message-circle', 'phone-call', 'headphones', 'mic',
+    
+    // NEGÓCIOS E VENDAS
+    'shop', 'cart', 'bag', 'money', 'card', 'wallet', 'receipt', 'percent', 'growth', 'decline', 'chart', 'graph', 'analytics', 'trophy', 'crown', 'gem',
+    
+    // WAREHOUSE E LOGÍSTICA
+    'warehouse', 'package', 'package-2', 'boxes', 'archive', 'truck', 'forklift', 'delivery', 'plane', 'ship', 'car', 'train', 'bike', 'route', 'navigation',
+    
+    // RECEBIMENTO E EXPEDIÇÃO
+    'truck-icon', 'package-check', 'clipboard-check', 'file-check', 'check-square', 'shield-check', 'send', 'package-search', 'map-pin', 'calendar', 'clock',
+    
+    // INVENTÁRIO E DADOS
+    'list-checks', 'calculator', 'file-spreadsheet', 'bar-chart-4', 'plus-square', 'minus-square', 'clipboard', 'clipboard-pen', 'database', 'hard-drive',
+    
+    // IMPRESSORAS E EQUIPAMENTOS ZEBRA  
+    'printer', 'scan-line', 'qr-code', 'tag', 'hash', 'radio', 'smartphone', 'tablet', 'bluetooth', 'wifi', 'usb', 'battery', 'power', 'memory-stick',
+    
+    // TECNOLOGIA E SISTEMAS
+    'monitor', 'cpu', 'server', 'cloud', 'router', 'cable', 'keyboard', 'mouse-pointer', 'app-window', 'terminal', 'command', 'layout', 'layout-grid', 'layout-dashboard',
+    
+    // ARQUIVOS E DOCUMENTOS
+    'file-code-2', 'file-image', 'file-spreadsheet', 'file-text', 'folder', 'folder-open', 'archive', 'download', 'upload', 'copy', 'move', 'trash-2',
+    
+    // COMUNICAÇÃO E ALERTAS
+    'warning', 'alert', 'success', 'error', 'bell-off', 'mic-off', 'volume-up', 'volume-off', 'refresh-cw', 'rotate-cw', 'activity', 'zap', 'lightbulb',
+    
+    // INTEGRAÇÃO E WORKFLOW
+    'workflow', 'network', 'share-2', 'refresh-ccw', 'arrow-left-right', 'repeat', 'shuffle', 'git-merge', 'git-branch', 'merge',
+    
+    // EMPRESA E ESCRITÓRIO
+    'building', 'office', 'factory', 'briefcase', 'globe', 'filter', 'code', 'wrench', 'shield', 'lock', 'key', 'eye', 'eye-off'
   ]
 
   if (!isOpen) return null
@@ -908,90 +756,62 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                             </button>
                             
                             {showIconDropdown && (
-                              <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
+                              <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                                 {/* Overlay */}
                                 <div 
-                                  className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm" 
+                                  className="fixed inset-0 bg-black bg-opacity-50" 
                                   onClick={() => setShowIconDropdown(false)}
                                 />
                                 
-                                {/* Modal Responsivo */}
-                                <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-6xl mx-auto overflow-hidden">
-                                  {/* Header Melhorado */}
-                                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800 px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                                    <div className="flex items-center justify-between">
-                                      <div>
-                                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">Selecionar Ícone</h3>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Escolha um ícone para representar esta categoria</p>
-                                      </div>
-                                      <button
-                                        type="button"
-                                        onClick={() => setShowIconDropdown(false)}
-                                        className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                                      >
-                                        <X className="h-6 w-6" />
-                                      </button>
+                                {/* Modal Minimalista */}
+                                <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[80vh] overflow-hidden">
+                                  {/* Header Simples */}
+                                  <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+                                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">Selecionar Ícone</h3>
+                                    <button
+                                      type="button"
+                                      onClick={() => setShowIconDropdown(false)}
+                                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                    >
+                                      <X className="h-5 w-5" />
+                                    </button>
+                                  </div>
+                                  
+                                  {/* Grid Simples de Ícones */}
+                                  <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(80vh - 120px)' }}>
+                                    <div className="grid grid-cols-12 sm:grid-cols-15 md:grid-cols-18 lg:grid-cols-20 gap-2">
+                                      {allIcons.map((iconName) => {
+                                        const IconComponent = getIcon(iconName)
+                                        const isSelected = formData.icon === iconName
+                                        return (
+                                          <button
+                                            key={iconName}
+                                            type="button"
+                                            onClick={() => {
+                                              setFormData({ ...formData, icon: iconName })
+                                              setShowIconDropdown(false)
+                                            }}
+                                            className={`
+                                              flex items-center justify-center w-8 h-8 rounded border transition-colors
+                                              ${isSelected 
+                                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' 
+                                                : 'border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                                              }
+                                            `}
+                                            title={iconName}
+                                          >
+                                            <IconComponent className="w-4 h-4" />
+                                          </button>
+                                        )
+                                      })}
                                     </div>
                                   </div>
                                   
-                                  {/* Conteúdo por Categorias */}
-                                  <div className="max-h-[70vh] overflow-y-auto">
-                                    {iconCategories.map((category, categoryIndex) => (
-                                      <div key={categoryIndex} className="p-4 sm:p-6">
-                                        {/* Título da Categoria */}
-                                        <div className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium mb-4 ${category.color}`}>
-                                          {category.name}
-                                        </div>
-                                        
-                                        {/* Grid de Ícones Responsivo */}
-                                        <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 xl:grid-cols-14 gap-2 sm:gap-3">
-                                          {category.icons.map(icon => {
-                                            const IconComponent = getIcon(icon.value)
-                                            const isSelected = formData.icon === icon.value
-                                            return (
-                                              <button
-                                                key={icon.value}
-                                                type="button"
-                                                onClick={() => {
-                                                  setFormData({ ...formData, icon: icon.value })
-                                                  setShowIconDropdown(false)
-                                                }}
-                                                className={`
-                                                  group relative flex items-center justify-center p-2 sm:p-3 rounded-xl border-2 transition-all duration-200
-                                                  w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14
-                                                  ${isSelected 
-                                                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 shadow-lg scale-105' 
-                                                    : 'border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20'
-                                                  } hover:shadow-lg hover:scale-105 active:scale-95
-                                                `}
-                                              >
-                                                <IconComponent className={`w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 ${isSelected ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400'}`} />
-                                                
-                                                {/* Tooltip */}
-                                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-900 dark:bg-gray-700 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
-                                                  {icon.label}
-                                                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-2 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
-                                                </div>
-                                                
-                                                {/* Indicador de Seleção */}
-                                                {isSelected && (
-                                                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                                                    <CheckCircle className="w-3 h-3 text-white" />
-                                                  </div>
-                                                )}
-                                              </button>
-                                            )
-                                          })}
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                  
-                                  {/* Footer com Info */}
-                                  <div className="bg-gray-50 dark:bg-gray-900 px-4 sm:px-6 py-3 border-t border-gray-200 dark:border-gray-700">
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                                      {iconCategories.reduce((total, cat) => total + cat.icons.length, 0)} ícones disponíveis • Organizados por categoria para facilitar a seleção
-                                    </p>
+                                  {/* Footer com contador */}
+                                  <div className="p-3 border-t border-gray-200 dark:border-gray-700 text-center">
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                                      {allIcons.length} ícones disponíveis
+                                    </span>
                                   </div>
                                 </div>
                               </div>
