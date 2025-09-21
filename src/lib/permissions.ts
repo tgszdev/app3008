@@ -257,11 +257,16 @@ export async function userHasPermission(
  */
 export async function getUsersWithPermission(permission: keyof Permission): Promise<any[]> {
   try {
+    console.log(`[getUsersWithPermission] DEBUG: Buscando usuários com permissão "${permission}"`)
+    
     // Buscar todos os usuários
     const { data: users, error: usersError } = await supabaseClient
       .from('users')
       .select('id, name, email, role, role_name')
       .eq('is_active', true)
+
+    console.log(`[getUsersWithPermission] DEBUG: Usuários encontrados:`, users?.length || 0)
+    console.log(`[getUsersWithPermission] DEBUG: Erro ao buscar usuários:`, usersError)
 
     if (usersError || !users) {
       console.error('Erro ao buscar usuários:', usersError)
@@ -273,6 +278,9 @@ export async function getUsersWithPermission(permission: keyof Permission): Prom
       .from('roles')
       .select('name, permissions')
 
+    console.log(`[getUsersWithPermission] DEBUG: Roles customizadas encontradas:`, customRoles?.length || 0)
+    console.log(`[getUsersWithPermission] DEBUG: Erro ao buscar roles:`, rolesError)
+
     if (rolesError) {
       console.error('Erro ao buscar roles:', rolesError)
     }
@@ -280,18 +288,34 @@ export async function getUsersWithPermission(permission: keyof Permission): Prom
     // Criar mapa de permissões incluindo roles customizadas
     const allPermissions: Record<string, Permission> = { ...defaultSystemPermissions }
     
+    console.log(`[getUsersWithPermission] DEBUG: Roles padrão disponíveis:`, Object.keys(defaultSystemPermissions))
+    
     if (customRoles) {
       customRoles.forEach(role => {
         allPermissions[role.name] = role.permissions
       })
+      console.log(`[getUsersWithPermission] DEBUG: Roles customizadas adicionadas:`, customRoles.map(r => r.name))
     }
+
+    console.log(`[getUsersWithPermission] DEBUG: Total de roles disponíveis:`, Object.keys(allPermissions))
 
     // Filtrar usuários que têm a permissão
     const usersWithPermission = users.filter(user => {
       const userRole = user.role_name || user.role
       const permissions = allPermissions[userRole]
-      return permissions && permissions[permission]
+      const hasPermission = permissions && permissions[permission]
+      
+      console.log(`[getUsersWithPermission] DEBUG: Usuário "${user.name}" (${userRole}):`, {
+        roleFound: !!permissions,
+        hasPermission,
+        permissionValue: permissions?.[permission]
+      })
+      
+      return hasPermission
     })
+
+    console.log(`[getUsersWithPermission] DEBUG: Usuários com permissão "${permission}":`, usersWithPermission.length)
+    console.log(`[getUsersWithPermission] DEBUG: Usuários retornados:`, usersWithPermission.map(u => u.name))
 
     return usersWithPermission
   } catch (error) {
