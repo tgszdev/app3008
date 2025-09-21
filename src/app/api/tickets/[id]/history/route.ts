@@ -93,7 +93,12 @@ export async function GET(
           description: 'Ticket criado',
           metadata: { fallback: true },
           created_at: ticket.created_at,
-          user: null,
+          user: {
+            id: 'system',
+            name: 'Sistema',
+            email: 'sistema@local',
+            avatar_url: null
+          },
           actionIcon: 'plus-circle',
           actionColor: 'green',
           formattedOldValue: '',
@@ -114,7 +119,12 @@ export async function GET(
         description: 'Ticket criado (histórico limitado - tabela não configurada)',
         metadata: { fallback: true },
         created_at: ticket.created_at,
-        user: null,
+        user: {
+          id: 'system',
+          name: 'Sistema',
+          email: 'sistema@local',
+          avatar_url: null
+        },
         actionIcon: 'plus-circle',
         actionColor: 'green',
         formattedOldValue: '',
@@ -124,18 +134,23 @@ export async function GET(
 
     // Processar histórico para melhor apresentação
     const processedHistory = history?.map(entry => ({
-      id: entry.id,
-      action_type: entry.action_type,
-      field_changed: entry.field_changed,
+      id: entry.id || 'unknown',
+      action_type: entry.action_type || 'created',
+      field_changed: entry.field_changed || 'status',
       old_value: entry.old_value,
       new_value: entry.new_value,
-      description: entry.description,
-      metadata: entry.metadata,
-      created_at: entry.created_at,
-      user: entry.user,
+      description: entry.description || 'Ação realizada',
+      metadata: entry.metadata || {},
+      created_at: entry.created_at || new Date().toISOString(),
+      user: entry.user || {
+        id: 'system',
+        name: 'Sistema',
+        email: 'sistema@local',
+        avatar_url: null
+      },
       // Adicionar ícone e cor baseado no tipo de ação
-      actionIcon: getActionIcon(entry.action_type),
-      actionColor: getActionColor(entry.action_type),
+      actionIcon: getActionIcon(entry.action_type || 'created'),
+      actionColor: getActionColor(entry.action_type || 'created'),
       // Formatar valores para melhor apresentação
       formattedOldValue: formatValue(entry.field_changed, entry.old_value),
       formattedNewValue: formatValue(entry.field_changed, entry.new_value)

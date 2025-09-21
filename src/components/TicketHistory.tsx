@@ -133,6 +133,10 @@ export default function TicketHistory({ ticketId, className = '', initiallyColla
     const IconComponent = iconMap[entry.actionIcon] || Activity
     const colorClass = colorMap[entry.actionColor] || colorMap.gray
 
+    // Verificar dados do usuário com fallback
+    const userName = entry.user?.name || 'Sistema'
+    const userEmail = entry.user?.email || 'sistema@local'
+
     return (
       <div key={entry.id} className="flex items-start space-x-3 p-3 border-l-2 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
         {/* Ícone da ação */}
@@ -146,22 +150,22 @@ export default function TicketHistory({ ticketId, className = '', initiallyColla
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-900 dark:text-white">
-                {entry.description}
+                {entry.description || 'Ação realizada'}
               </p>
               <div className="flex items-center mt-1 space-x-2">
                 <div className="flex items-center space-x-1">
                   <User className="h-3 w-3 text-gray-400" />
                   <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {entry.user.name}
+                    {userName}
                   </span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <Clock className="h-3 w-3 text-gray-400" />
                   <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {formatDistanceToNow(new Date(entry.created_at), { 
+                    {entry.created_at ? formatDistanceToNow(new Date(entry.created_at), { 
                       addSuffix: true, 
                       locale: ptBR 
-                    })}
+                    }) : 'Agora'}
                   </span>
                 </div>
               </div>
