@@ -38,6 +38,7 @@ interface Role {
     tickets_delete: boolean
     tickets_assign: boolean
     tickets_close: boolean
+    tickets_change_priority: boolean
     
     // Knowledge Base
     kb_view: boolean
@@ -81,6 +82,7 @@ const defaultPermissions = {
   tickets_delete: false,
   tickets_assign: false,
   tickets_close: false,
+  tickets_change_priority: false,
   kb_view: false,
   kb_create: false,
   kb_edit: false,
@@ -112,6 +114,7 @@ const systemRolesPermissions = {
     tickets_delete: true,
     tickets_assign: true,
     tickets_close: true,
+    tickets_change_priority: true,
     kb_view: true,
     kb_create: true,
     kb_edit: true,
@@ -140,6 +143,7 @@ const systemRolesPermissions = {
     tickets_delete: false,
     tickets_assign: true, // Desenvolvedor pode atribuir tickets
     tickets_close: true,
+    tickets_change_priority: true,
     kb_view: true,
     kb_create: true,
     kb_edit: true,
@@ -167,6 +171,7 @@ const systemRolesPermissions = {
     tickets_edit_all: true,
     tickets_assign: true,
     tickets_close: true,
+    tickets_change_priority: true,
     kb_view: true,
     kb_create: true,
     kb_edit: true,
@@ -501,6 +506,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
       tickets_delete: 'Excluir Tickets',
       tickets_assign: 'Atribuir Tickets',
       tickets_close: 'Fechar Tickets',
+      tickets_change_priority: 'Alterar Criticidade',
       
       // Knowledge Base
       kb_view: 'Visualizar Base de Conhecimento',
@@ -540,6 +546,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
       tickets_delete: 'Permite excluir tickets permanentemente',
       tickets_assign: 'Permite atribuir ou alterar o responsável por tickets',
       tickets_close: 'Permite fechar tickets resolvidos',
+      tickets_change_priority: 'Permite alterar a criticidade (prioridade) de tickets',
       
       // Knowledge Base
       kb_view: 'Permite visualizar artigos da base de conhecimento',
