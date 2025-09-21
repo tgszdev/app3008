@@ -248,6 +248,15 @@ export async function GET(request: Request) {
       }
     }
 
+    // Create compatibility layer for frontend status cards
+    const legacyStatusSummary = {
+      open: statusCounts['aberto'] || 0,
+      in_progress: statusCounts['em-progresso'] || 0, 
+      resolved: statusCounts['resolvido'] || 0,
+      cancelled: statusCounts['cancelado'] || 0,
+      closed: statusCounts['fechado'] || 0
+    }
+
     // Return the exact dates that were used for filtering
     const response = {
       total_tickets: totalTickets,
@@ -256,8 +265,8 @@ export async function GET(request: Request) {
         data_fim: filterEndDate
       },
       categorias: categoriesArray,
-      status_summary: statusCounts,
-      status_summary_detailed: statusCountsDetailed,
+      status_summary: legacyStatusSummary, // Formato antigo para compatibilidade
+      status_summary_detailed: statusCountsDetailed, // Formato novo dinâmico
       available_status: statusList,
       average_resolution_time: averageResolutionTime
     }
