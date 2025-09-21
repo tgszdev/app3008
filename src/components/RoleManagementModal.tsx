@@ -217,6 +217,32 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
     }
   }, [isOpen])
 
+  // Função para migrar perfis existentes com novas permissões
+  const migrateRolesPermissions = (roles: Role[]): Role[] => {
+    return roles.map(role => {
+      // Verificar se já tem a nova permissão
+      if (role.permissions.tickets_change_priority !== undefined) {
+        return role // Já migrado
+      }
+      
+      // Definir valor padrão baseado no tipo de perfil
+      let canChangePriority = false
+      if (['admin', 'developer', 'analyst'].includes(role.name)) {
+        canChangePriority = true
+      }
+      
+      console.log(`🔧 Migrando perfil ${role.display_name}: tickets_change_priority = ${canChangePriority}`)
+      
+      return {
+        ...role,
+        permissions: {
+          ...role.permissions,
+          tickets_change_priority: canChangePriority
+        }
+      }
+    })
+  }
+
   const fetchRoles = async () => {
     try {
       setLoading(true)
@@ -302,6 +328,16 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
             }
             updatedPermissions.timesheets_analytics = true
             updatedPermissions.timesheets_analytics_full = false
+          }
+          
+          // Adicionar tickets_change_priority se não existir
+          if (updatedPermissions.tickets_change_priority === undefined) {
+            // Definir valor padrão baseado no tipo de perfil
+            if (['admin', 'developer', 'dev', 'analyst'].includes(role.name)) {
+              updatedPermissions.tickets_change_priority = true
+            } else {
+              updatedPermissions.tickets_change_priority = false
+            }
           }
           
           return {
