@@ -453,8 +453,8 @@ export default function DashboardPage() {
                   <div style="font-size: 20px; font-weight: 800; color: #111827;">${categoryStats?.total_tickets || 0}</div>
                 </div>
                 
-                <!-- All Status Cards -->
-                ${categoryStats?.status_summary_detailed?.map(status => 
+                <!-- Status Cards - Only show status with tickets (count > 0) -->
+                ${categoryStats?.status_summary_detailed?.filter(status => status.count > 0).map(status => 
                   `<div style="background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px; text-align: center;">
                     <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 4px;">
                       <div style="width: 6px; height: 6px; border-radius: 50%; background: ${status.color};"></div>
@@ -836,29 +836,31 @@ export default function DashboardPage() {
             color="bg-blue-600"
             statusColor="#2563eb"
           />
-          {/* Dynamic Status Cards - Show ALL status without abbreviations */}
-          {categoryStats.status_summary_detailed.map((status) => {
-            // Map status slugs to appropriate icons
-            const getStatusIcon = (slug: string) => {
-              if (slug.includes('aberto') || slug.includes('open')) return AlertCircle
-              if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) return Clock
-              if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) return CheckCircle
-              if (slug.includes('cancelled') || slug.includes('cancelado')) return XCircle
-              return TicketIcon
-            }
-            
-            const Icon = getStatusIcon(status.slug)
-            
-            return (
-              <StatCard
-                key={status.slug}
-                title={status.name}
-                value={status.count}
-                icon={Icon}
-                statusColor={status.color}
-              />
-            )
-          })}
+          {/* Dynamic Status Cards - Only show status with tickets (count > 0) */}
+          {categoryStats.status_summary_detailed
+            .filter(status => status.count > 0)
+            .map((status) => {
+              // Map status slugs to appropriate icons
+              const getStatusIcon = (slug: string) => {
+                if (slug.includes('aberto') || slug.includes('open')) return AlertCircle
+                if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) return Clock
+                if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) return CheckCircle
+                if (slug.includes('cancelled') || slug.includes('cancelado')) return XCircle
+                return TicketIcon
+              }
+              
+              const Icon = getStatusIcon(status.slug)
+              
+              return (
+                <StatCard
+                  key={status.slug}
+                  title={status.name}
+                  value={status.count}
+                  icon={Icon}
+                  statusColor={status.color}
+                />
+              )
+            })}
         </div>
       )}
 
