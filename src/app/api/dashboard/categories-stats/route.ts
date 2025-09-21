@@ -251,9 +251,11 @@ export async function GET(request: Request) {
     // Create compatibility layer for frontend status cards
     const legacyStatusSummary = {
       open: statusCounts['aberto'] || 0,
-      in_progress: statusCounts['em-progresso'] || 0, 
+      in_progress: (statusCounts['em-progresso'] || 0) + 
+                   (statusCounts['aguardando-cliente'] || 0) + 
+                   (statusCounts['ag-deploy-em-producao'] || 0), 
       resolved: statusCounts['resolvido'] || 0,
-      cancelled: statusCounts['cancelled'] || 0, // Corrigido: cancelled em inglês
+      cancelled: statusCounts['cancelled'] || 0,
       closed: statusCounts['fechado'] || 0
     }
 

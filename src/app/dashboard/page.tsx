@@ -63,6 +63,21 @@ interface CategoryStat {
   status_breakdown_detailed: StatusInfo[]
 }
 
+interface DashboardData {
+  total_tickets: number
+  periodo: { data_inicio: string; data_fim: string }
+  categorias: CategoryStat[]
+  status_summary: {
+    open: number
+    in_progress: number
+    resolved: number
+    cancelled: number
+  }
+  status_summary_detailed: StatusInfo[]
+  available_status: StatusInfo[]
+  average_resolution_time: string
+}
+
 interface RecentTicket {
   id: string
   ticket_number: string
@@ -161,44 +176,34 @@ const CategoryCard = ({ category }: { category: CategoryStat }) => {
           })}
         </div>
         
-        {/* Status breakdown - Minimalist design */}
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          {category.status_breakdown_detailed
-            .filter(status => status.count > 0)
-            .map((status) => {
-              // Map status to consistent icons and colors like main cards
-              const statusConfig: Record<string, { icon: string; color: string; bgColor: string }> = {
-                'aberto': { icon: '⚠️', color: '#f59e0b', bgColor: 'bg-yellow-50 border-yellow-200' },
-                'em-progresso': { icon: '🔄', color: '#ea580c', bgColor: 'bg-orange-50 border-orange-200' },
-                'resolvido': { icon: '✅', color: '#16a34a', bgColor: 'bg-green-50 border-green-200' },
-                'cancelled': { icon: '❌', color: '#dc2626', bgColor: 'bg-red-50 border-red-200' },
-                'fechado': { icon: '📋', color: '#64748b', bgColor: 'bg-slate-50 border-slate-200' },
-                'aguardando-cliente': { icon: '⏳', color: '#f59e0b', bgColor: 'bg-yellow-50 border-yellow-200' },
-                'ag-deploy-em-producao': { icon: '🚀', color: '#10b981', bgColor: 'bg-emerald-50 border-emerald-200' }
-              }
-              
-              const config = statusConfig[status.slug] || { 
-                icon: '📊', 
-                color: status.color, 
-                bgColor: 'bg-gray-50 border-gray-200' 
-              }
-              
-              return (
+        {/* Minimalist Status breakdown */}
+        <div className="mt-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {category.status_breakdown_detailed
+              .filter(status => status.count > 0)
+              .map((status) => (
                 <div 
                   key={status.slug} 
-                  className={`${config.bgColor} border rounded-lg p-2 text-center`}
+                  className="flex items-center justify-center p-2 rounded-lg border transition-all duration-200"
+                  style={{ 
+                    backgroundColor: `${status.color}08`,
+                    borderColor: `${status.color}30`
+                  }}
                 >
-                  <div className="text-lg font-bold" style={{ color: config.color }}>
+                  <div 
+                    className="w-2 h-2 rounded-full mr-2 flex-shrink-0"
+                    style={{ backgroundColor: status.color }}
+                  />
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate mr-1">
+                    {status.name}
+                  </span>
+                  <span className="text-xs font-bold text-gray-900 dark:text-white">
                     {status.count}
-                  </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400 mt-1 flex items-center justify-center gap-1">
-                    <span>{config.icon}</span>
-                    <span className="truncate">{status.name}</span>
-                  </div>
+                  </span>
                 </div>
-              )
-            })
-          }
+              ))
+            }
+          </div>
         </div>
       </div>
     </div>
@@ -284,18 +289,7 @@ export default function DashboardPage() {
     ticketsTrend: '+0%'
   })
   
-  const [categoryStats, setCategoryStats] = useState<{
-    total_tickets: number
-    periodo: { data_inicio: string; data_fim: string }
-    categorias: CategoryStat[]
-    status_summary: {
-      open: number
-      in_progress: number
-      resolved: number
-      cancelled: number
-    }
-    average_resolution_time: string
-  } | null>(null)
+  const [categoryStats, setCategoryStats] = useState<DashboardData | null>(null)
   
   const [recentTickets, setRecentTickets] = useState<RecentTicket[]>([])
 
@@ -441,26 +435,16 @@ export default function DashboardPage() {
               </div>
             </div>
             
-            <!-- Status Cards (35mm) -->
+            <!-- Dynamic Status Cards (35mm) -->
             <div style="margin-bottom: 10mm;">
               <h2 style="font-size: 16px; color: #111827; margin-bottom: 8px; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 3px;">TOTAL DE TICKETS POR STATUS</h2>
               <div style="display: flex; gap: 8px; justify-content: space-between;">
-                <div style="flex: 1; background: #fef3c7; padding: 12px 8px; border-radius: 6px; text-align: center; border: 1px solid #fbbf24;">
-                  <div style="font-size: 22px; font-weight: bold; color: #d97706; line-height: 1;">${categoryStats?.status_summary.open || 0}</div>
-                  <div style="font-size: 9px; color: #92400e; margin-top: 3px; font-weight: 600; text-transform: uppercase;">Abertos</div>
-                </div>
-                <div style="flex: 1; background: #fed7aa; padding: 12px 8px; border-radius: 6px; text-align: center; border: 1px solid #fb923c;">
-                  <div style="font-size: 22px; font-weight: bold; color: #ea580c; line-height: 1;">${categoryStats?.status_summary.in_progress || 0}</div>
-                  <div style="font-size: 9px; color: #7c2d12; margin-top: 3px; font-weight: 600; text-transform: uppercase;">Em Progresso</div>
-                </div>
-                <div style="flex: 1; background: #bbf7d0; padding: 12px 8px; border-radius: 6px; text-align: center; border: 1px solid #4ade80;">
-                  <div style="font-size: 22px; font-weight: bold; color: #16a34a; line-height: 1;">${categoryStats?.status_summary.resolved || 0}</div>
-                  <div style="font-size: 9px; color: #14532d; margin-top: 3px; font-weight: 600; text-transform: uppercase;">Resolvidos</div>
-                </div>
-                <div style="flex: 1; background: #fecaca; padding: 12px 8px; border-radius: 6px; text-align: center; border: 1px solid #f87171;">
-                  <div style="font-size: 22px; font-weight: bold; color: #dc2626; line-height: 1;">${categoryStats?.status_summary.cancelled || 0}</div>
-                  <div style="font-size: 9px; color: #7f1d1d; margin-top: 3px; font-weight: 600; text-transform: uppercase;">Cancelados</div>
-                </div>
+                ${categoryStats?.status_summary_detailed?.slice(0, 4).map(status => 
+                  `<div style="flex: 1; background: ${status.color}15; padding: 12px 8px; border-radius: 6px; text-align: center; border: 1px solid ${status.color};">
+                    <div style="font-size: 22px; font-weight: bold; color: ${status.color}; line-height: 1;">${status.count}</div>
+                    <div style="font-size: 9px; color: ${status.color}; margin-top: 3px; font-weight: 600; text-transform: uppercase;">${status.name}</div>
+                  </div>`
+                ).join('') || ''}
               </div>
             </div>
           
@@ -509,23 +493,14 @@ export default function DashboardPage() {
                 </div>
                 <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%); border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid ${category.color || '#6b7280'}40; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);">
                   <div style="font-size: 11px; color: #374151; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">Distribuição por Status:</div>
-                  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 10px;">
-                    ${category.status_breakdown_detailed.filter(s => s.count > 0).map(status => {
-                      const statusIcons: Record<string, string> = {
-                        'aberto': '⚠️',
-                        'em-progresso': '🔄', 
-                        'resolvido': '✅',
-                        'cancelled': '❌',
-                        'fechado': '📋',
-                        'aguardando-cliente': '⏳',
-                        'ag-deploy-em-producao': '🚀'
-                      }
-                      const icon = statusIcons[status.slug] || '📊'
-                      return `<div style="background: ${status.color}10; border: 1px solid ${status.color}30; border-radius: 6px; padding: 8px; text-align: center;">
-                        <div style="font-size: 16px; font-weight: bold; color: ${status.color}; line-height: 1;">${status.count}</div>
-                        <div style="font-size: 9px; color: #374151; margin-top: 2px;">${icon} ${status.name}</div>
+                  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 11px;">
+                    ${category.status_breakdown_detailed.filter(s => s.count > 0).map(status => 
+                      `<div style="display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; background: ${status.color}08; border: 1px solid ${status.color}30;">
+                        <span style="color: ${status.color}; font-size: 12px; margin-right: 4px;">●</span> 
+                        <span style="font-weight: 600; color: #374151; margin-right: 4px;">${status.name}</span> 
+                        <span style="font-weight: 700; color: #111827;">${status.count}</span>
                       </div>`
-                    }).join('')}
+                    ).join('')}
                   </div>
                 </div>
               </div>
@@ -587,23 +562,14 @@ export default function DashboardPage() {
                         </div>
                         <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%); border-radius: 8px; padding: 12px; margin-top: 12px; border: 1px solid ${category.color || '#6b7280'}40; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);">
                           <div style="font-size: 11px; color: #374151; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">Distribuição por Status:</div>
-                          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 10px;">
-                            ${category.status_breakdown_detailed.filter(s => s.count > 0).map(status => {
-                              const statusIcons: Record<string, string> = {
-                                'aberto': '⚠️',
-                                'em-progresso': '🔄', 
-                                'resolvido': '✅',
-                                'cancelled': '❌',
-                                'fechado': '📋',
-                                'aguardando-cliente': '⏳',
-                                'ag-deploy-em-producao': '🚀'
-                              }
-                              const icon = statusIcons[status.slug] || '📊'
-                              return `<div style="background: ${status.color}10; border: 1px solid ${status.color}30; border-radius: 6px; padding: 8px; text-align: center;">
-                                <div style="font-size: 16px; font-weight: bold; color: ${status.color}; line-height: 1;">${status.count}</div>
-                                <div style="font-size: 9px; color: #374151; margin-top: 2px;">${icon} ${status.name}</div>
+                          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 11px;">
+                            ${category.status_breakdown_detailed.filter(s => s.count > 0).map(status => 
+                              `<div style="display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; background: ${status.color}08; border: 1px solid ${status.color}30;">
+                                <span style="color: ${status.color}; font-size: 12px; margin-right: 4px;">●</span> 
+                                <span style="font-weight: 600; color: #374151; margin-right: 4px;">${status.name}</span> 
+                                <span style="font-weight: 700; color: #111827;">${status.count}</span>
                               </div>`
-                            }).join('')}
+                            ).join('')}
                           </div>
                         </div>
                       </div>
@@ -850,8 +816,8 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Status Stats Grid - MOVED TO TOP */}
-      {categoryStats && (
+      {/* Status Stats Grid - Dynamic */}
+      {categoryStats && categoryStats.status_summary_detailed && (
         <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-5">
           <StatCard
             title="Total no Período"
@@ -859,30 +825,22 @@ export default function DashboardPage() {
             icon={TicketIcon}
             color="bg-blue-600"
           />
-          <StatCard
-            title="Abertos"
-            value={categoryStats.status_summary.open}
-            icon={AlertCircle}
-            color="bg-yellow-600"
-          />
-          <StatCard
-            title="Em Progresso"
-            value={categoryStats.status_summary.in_progress}
-            icon={Clock}
-            color="bg-orange-600"
-          />
-          <StatCard
-            title="Resolvidos"
-            value={categoryStats.status_summary.resolved}
-            icon={CheckCircle}
-            color="bg-green-600"
-          />
-          <StatCard
-            title="Cancelados"
-            value={categoryStats.status_summary.cancelled}
-            icon={XCircle}
-            color="bg-red-600"
-          />
+          {/* Dynamic Status Cards */}
+          {categoryStats.status_summary_detailed.slice(0, 4).map((status, index) => {
+            const icons = [AlertCircle, Clock, CheckCircle, XCircle]
+            const colors = ['bg-yellow-600', 'bg-orange-600', 'bg-green-600', 'bg-red-600']
+            const Icon = icons[index] || TicketIcon
+            
+            return (
+              <StatCard
+                key={status.slug}
+                title={status.name}
+                value={status.count}
+                icon={Icon}
+                color={colors[index] || 'bg-gray-600'}
+              />
+            )
+          })}
         </div>
       )}
 
