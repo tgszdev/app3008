@@ -416,12 +416,12 @@ export default function TicketsPage() {
       </div>
 
       {/* Stats - Dynamic with zero filtering */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-4">
         {/* Total Card - Always visible */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow duration-200">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-3 hover:shadow-md transition-shadow duration-200">
           <div className="text-center">
-            <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">{allTickets.length}</p>
+            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Total</p>
+            <p className="text-xl font-bold text-gray-900 dark:text-white">{allTickets.length}</p>
           </div>
         </div>
 
@@ -453,16 +453,16 @@ export default function TicketsPage() {
             return (
               <div 
                 key={status.slug} 
-                className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow duration-200"
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-3 hover:shadow-md transition-shadow duration-200"
                 style={{
                   borderLeftColor: statusColor,
-                  borderLeftWidth: '4px'
+                  borderLeftWidth: '3px'
                 }}
               >
                 <div className="text-center">
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{status.name}</p>
+                  <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{status.name}</p>
                   <p 
-                    className="text-2xl font-bold"
+                    className="text-xl font-bold"
                     style={{ color: statusColor }}
                   >
                     {count}
