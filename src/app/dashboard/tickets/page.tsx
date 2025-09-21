@@ -419,8 +419,9 @@ export default function TicketsPage() {
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      {/* Stats - Dynamic with zero filtering */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        {/* Total Card - Always visible */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3">
           <div className="flex items-center justify-between">
             <div>
@@ -433,61 +434,47 @@ export default function TicketsPage() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-gray-600 dark:text-gray-400">Abertos</p>
-              <p className="text-xl font-bold text-blue-600">
-                {tickets.filter(t => t.status === 'open').length}
-              </p>
-            </div>
-            <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-              <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-gray-600 dark:text-gray-400">Em Andamento</p>
-              <p className="text-xl font-bold text-yellow-600">
-                {tickets.filter(t => t.status === 'in_progress').length}
-              </p>
-            </div>
-            <div className="p-2 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
-              <Clock className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-gray-600 dark:text-gray-400">Resolvidos</p>
-              <p className="text-xl font-bold text-green-600">
-                {tickets.filter(t => t.status === 'resolved').length}
-              </p>
-            </div>
-            <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
-              <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-gray-600 dark:text-gray-400">Cancelados</p>
-              <p className="text-xl font-bold text-red-600">
-                {tickets.filter(t => t.status === 'cancelled').length}
-              </p>
-            </div>
-            <div className="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
-              <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
-            </div>
-          </div>
-        </div>
+        {/* Dynamic Status Cards - Only show if count > 0 */}
+        {statusesWithCount
+          .filter(status => {
+            const count = tickets.filter(t => t.status === status.slug).length
+            return count > 0
+          })
+          .map((status) => {
+            const count = tickets.filter(t => t.status === status.slug).length
+            
+            // Map status slugs to appropriate icons and colors
+            const getStatusDisplay = (slug: string) => {
+              if (slug.includes('aberto') || slug.includes('open')) 
+                return { icon: AlertCircle, bg: 'bg-blue-100 dark:bg-blue-900', text: 'text-blue-600 dark:text-blue-400' }
+              if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) 
+                return { icon: Clock, bg: 'bg-yellow-100 dark:bg-yellow-900', text: 'text-yellow-600 dark:text-yellow-400' }
+              if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) 
+                return { icon: CheckCircle, bg: 'bg-green-100 dark:bg-green-900', text: 'text-green-600 dark:text-green-400' }
+              if (slug.includes('cancelled') || slug.includes('cancelado')) 
+                return { icon: XCircle, bg: 'bg-red-100 dark:bg-red-900', text: 'text-red-600 dark:text-red-400' }
+              return { icon: AlertCircle, bg: 'bg-gray-100 dark:bg-gray-700', text: 'text-gray-600 dark:text-gray-400' }
+            }
+            
+            const display = getStatusDisplay(status.slug)
+            const StatusIcon = display.icon
+            
+            return (
+              <div key={status.slug} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">{status.name}</p>
+                    <p className={`text-xl font-bold ${display.text}`}>
+                      {count}
+                    </p>
+                  </div>
+                  <div className={`p-2 ${display.bg} rounded-lg`}>
+                    <StatusIcon className={`h-5 w-5 ${display.text}`} />
+                  </div>
+                </div>
+              </div>
+            )
+          })}
       </div>
 
       {/* Mobile Cards View - Visible on small screens */}
