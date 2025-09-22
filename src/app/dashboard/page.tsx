@@ -420,7 +420,7 @@ export default function DashboardPage() {
       // Margins: 10mm all sides (uniform padding)
       // Usable area: 190mm x 277mm (297mm - 20mm margins)
       let pdfHTML = `
-        <div style="width: 210mm; background: #e8f5ff; font-family: Arial, sans-serif; box-sizing: border-box; margin: 0;">
+        <div style="width: 210mm; background: white; font-family: Arial, sans-serif; box-sizing: border-box; margin: 0;">
           
           <!-- PAGE 1 -->
           <div style="page-break-after: always; padding: 10mm; min-height: 297mm; box-sizing: border-box; position: relative;">
