@@ -485,14 +485,20 @@ export default function DashboardPage() {
       const footerHeight = 20      // Footer space (fixed at bottom, increased for visibility)
       const marginHeight = 20      // Various margins and gaps
       
-      const availableHeight = 257 - headerHeight - summaryHeight - statusHeight - footerHeight - marginHeight
-      const maxCategoryHeight = Math.floor(availableHeight / 2) // 2 rows of categories
+      // Page 1 available height (with summary and status)
+      const page1AvailableHeight = 257 - headerHeight - summaryHeight - statusHeight - footerHeight - marginHeight
+      const page1MaxCategoryHeight = Math.floor(page1AvailableHeight / 2) // 2 rows of categories
+      
+      // Page 2+ available height (only header, no summary/status)
+      const page2AvailableHeight = 257 - headerHeight - footerHeight - marginHeight
+      const page2MaxCategoryHeight = Math.floor(page2AvailableHeight / 3) // 3 rows of categories for page 2+
       
       // Adjust category card height dynamically
-      const categoryCardHeight = Math.min(60, maxCategoryHeight)
+      const page1CategoryCardHeight = Math.min(60, page1MaxCategoryHeight)
+      const page2CategoryCardHeight = Math.min(45, page2MaxCategoryHeight) // Smaller for page 2+
       
       // Calculate how many categories fit on page 1 based on available space
-      const categoriesPerPage = Math.floor(availableHeight / (categoryCardHeight + 6)) * 2 // 2 columns
+      const categoriesPerPage = Math.floor(page1AvailableHeight / (page1CategoryCardHeight + 6)) * 2 // 2 columns
       const firstPageCategories = categories.slice(0, Math.min(categoriesPerPage, 4))
       const secondPageCategories = categories.slice(firstPageCategories.length)
       
@@ -512,7 +518,7 @@ export default function DashboardPage() {
           const borderColor = category.color || '#d1d5db'
         
             pdfHTML += `
-              <div style="flex: 1; position: relative; overflow: hidden; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%), linear-gradient(135deg, ${category.color || '#6b7280'}15 0%, ${category.color || '#6b7280'}10 100%); border-left: 7.5px solid ${category.color || '#6b7280'}; padding: 8px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8); border: 1.5px solid ${category.color || '#6b7280'}40; position: relative; min-height: ${categoryCardHeight}mm; max-width: 91mm;">
+              <div style="flex: 1; position: relative; overflow: hidden; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%), linear-gradient(135deg, ${category.color || '#6b7280'}15 0%, ${category.color || '#6b7280'}10 100%); border-left: 7.5px solid ${category.color || '#6b7280'}; padding: 8px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8); border: 1.5px solid ${category.color || '#6b7280'}40; position: relative; min-height: ${page1CategoryCardHeight}mm; max-width: 91mm;">
                 <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
                   <h3 style="margin: 0; font-size: 14px; color: #111827; font-weight: 700; text-transform: uppercase; flex: 1; padding-right: 10px;">${category.nome}</h3>
                   <div style="text-align: right; flex-shrink: 0;">
@@ -569,6 +575,7 @@ export default function DashboardPage() {
           <!-- PAGE 2 -->
           <div style="page-break-before: always; padding: 10mm; min-height: 297mm; box-sizing: border-box; position: relative;">
             <div style="width: 190mm; min-height: 277mm; max-height: 257mm; position: relative; overflow: hidden;">
+              <div style="max-height: 200mm; overflow: hidden;">
             
             <!-- Header for Page 2 -->
             <div style="text-align: center; margin-bottom: 4mm; padding-bottom: 1mm; border-bottom: 3px solid #3b82f6;">
@@ -588,11 +595,11 @@ export default function DashboardPage() {
                 if (secondPageCategories[i + 1]) pair.push(secondPageCategories[i + 1])
                 
                 if (pair.length > 0) {
-                  page2HTML += '<div style="display: flex; gap: 8px; margin-bottom: 8px;">'
+                  page2HTML += '<div style="display: flex; gap: 6px; margin-bottom: 6px;">'
                   
                   pair.forEach(category => {
                     page2HTML += `
-                      <div style="flex: 1; position: relative; overflow: hidden; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%), linear-gradient(135deg, ${category.color || '#6b7280'}15 0%, ${category.color || '#6b7280'}10 100%); border-left: 7.5px solid ${category.color || '#6b7280'}; padding: 8px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8); border: 1.5px solid ${category.color || '#6b7280'}40; position: relative; min-height: ${categoryCardHeight}mm; max-width: 91mm;">
+                      <div style="flex: 1; position: relative; overflow: hidden; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%), linear-gradient(135deg, ${category.color || '#6b7280'}15 0%, ${category.color || '#6b7280'}10 100%); border-left: 7.5px solid ${category.color || '#6b7280'}; padding: 8px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8); border: 1.5px solid ${category.color || '#6b7280'}40; position: relative; min-height: ${page2CategoryCardHeight}mm; max-width: 91mm;">
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
                           <h3 style="margin: 0; font-size: 14px; color: #111827; font-weight: 700; text-transform: uppercase; flex: 1; padding-right: 10px;">${category.nome}</h3>
                           <div style="text-align: right; flex-shrink: 0;">
@@ -630,6 +637,7 @@ export default function DashboardPage() {
               }
               return page2HTML
             })()}
+              </div> <!-- End content container -->
             
             <!-- Footer for page 2 -->
             <div style="position: absolute; bottom: 5mm; left: 0; text-align: center; border-top: 1.5px solid #3b82f6; padding-top: 2mm; width: 190mm;">
