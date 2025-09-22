@@ -491,11 +491,11 @@ export default function DashboardPage() {
       
       // Page 2+ available height (only header, no summary/status)
       const page2AvailableHeight = 257 - headerHeight - footerHeight - marginHeight
-      const page2MaxCategoryHeight = Math.floor(page2AvailableHeight / 3) // 3 rows of categories for page 2+
+      const page2MaxCategoryHeight = Math.floor(page2AvailableHeight / 2.5) // 2.5 rows of categories for page 2+
       
       // Adjust category card height dynamically
       const page1CategoryCardHeight = Math.min(60, page1MaxCategoryHeight)
-      const page2CategoryCardHeight = Math.min(45, page2MaxCategoryHeight) // Smaller for page 2+
+      const page2CategoryCardHeight = Math.min(50, page2MaxCategoryHeight) // Slightly larger for page 2+
       
       // Calculate how many categories fit on page 1 based on available space
       const categoriesPerPage = Math.floor(page1AvailableHeight / (page1CategoryCardHeight + 6)) * 2 // 2 columns
@@ -574,8 +574,8 @@ export default function DashboardPage() {
           ${secondPageCategories.length > 0 ? `
           <!-- PAGE 2 -->
           <div style="page-break-before: always; padding: 10mm; min-height: 297mm; box-sizing: border-box; position: relative;">
-            <div style="width: 190mm; min-height: 277mm; max-height: 257mm; position: relative; overflow: hidden;">
-              <div style="max-height: 200mm; overflow: hidden;">
+            <div style="width: 190mm; min-height: 277mm; max-height: 257mm; position: relative;">
+              <div style="max-height: 220mm;">
             
             <!-- Header for Page 2 -->
             <div style="text-align: center; margin-bottom: 4mm; padding-bottom: 1mm; border-bottom: 3px solid #3b82f6;">
