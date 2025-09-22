@@ -514,11 +514,9 @@ export default function DashboardPage() {
           `
         
         pair.forEach(category => {
-          const bgColor = category.color ? `${category.color}10` : '#f9fafb'
-          const borderColor = category.color || '#d1d5db'
         
             pdfHTML += `
-              <div style="flex: 1; position: relative; overflow: hidden; background: #e8f5ff !important; border-left: 7.5px solid ${category.color || '#6b7280'}; padding: 8px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8); border: 1.5px solid ${category.color || '#6b7280'}40; position: relative; min-height: ${page1CategoryCardHeight}mm; max-width: 91mm;">
+              <div style="flex: 1; position: relative; overflow: hidden; background: #e8f5ff !important; border-left: 7.5px solid ${category.color || '#6b7280'}; padding: 8px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border: 1.5px solid ${category.color || '#6b7280'}40; position: relative; min-height: ${page1CategoryCardHeight}mm; max-width: 91mm;">
                 <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
                   <h3 style="margin: 0; font-size: 14px; color: #111827; font-weight: 700; text-transform: uppercase; flex: 1; padding-right: 10px;">${category.nome}</h3>
                   <div style="text-align: right; flex-shrink: 0;">
@@ -599,7 +597,7 @@ export default function DashboardPage() {
                   
                   pair.forEach(category => {
                     page2HTML += `
-                      <div style="flex: 1; position: relative; overflow: hidden; background: #e8f5ff !important; border-left: 7.5px solid ${category.color || '#6b7280'}; padding: 8px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8); border: 1.5px solid ${category.color || '#6b7280'}40; position: relative; min-height: ${page2CategoryCardHeight}mm; max-width: 91mm;">
+                      <div style="flex: 1; position: relative; overflow: hidden; background: #e8f5ff !important; border-left: 7.5px solid ${category.color || '#6b7280'}; padding: 8px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border: 1.5px solid ${category.color || '#6b7280'}40; position: relative; min-height: ${page2CategoryCardHeight}mm; max-width: 91mm;">
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
                           <h3 style="margin: 0; font-size: 14px; color: #111827; font-weight: 700; text-transform: uppercase; flex: 1; padding-right: 10px;">${category.nome}</h3>
                           <div style="text-align: right; flex-shrink: 0;">
