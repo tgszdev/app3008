@@ -535,7 +535,7 @@ export default function DashboardPage() {
                     <div style="background: linear-gradient(90deg, ${category.color || '#6b7280'}, ${category.color || '#6b7280'}dd); height: 100%; width: ${category.percentual}%; border-radius: 3px;"></div>
                   </div>
                 </div>
-                <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%); border-radius: 8px; padding: 8px; margin-top: 12px; border: 1.5px solid ${category.color || '#6b7280'}40; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);">
+                <div style="background: #e8f5ff; border-radius: 8px; padding: 8px; margin-top: 12px; border: 1.5px solid ${category.color || '#6b7280'}40; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
                   <div style="font-size: 11px; color: #374151; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">Distribuição por Status:</div>
                   <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 11px;">
                     ${category.status_breakdown_detailed.filter(s => s.count > 0).map(status => 
@@ -616,7 +616,7 @@ export default function DashboardPage() {
                             <div style="background: linear-gradient(90deg, ${category.color || '#6b7280'}, ${category.color || '#6b7280'}dd); height: 100%; width: ${category.percentual}%; border-radius: 3px;"></div>
                           </div>
                         </div>
-                        <div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%); border-radius: 8px; padding: 8px; margin-top: 12px; border: 1.5px solid ${category.color || '#6b7280'}40; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);">
+                        <div style="background: #e8f5ff; border-radius: 8px; padding: 8px; margin-top: 12px; border: 1.5px solid ${category.color || '#6b7280'}40; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
                           <div style="font-size: 11px; color: #374151; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">Distribuição por Status:</div>
                           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 11px;">
                             ${category.status_breakdown_detailed.filter(s => s.count > 0).map(status => 
