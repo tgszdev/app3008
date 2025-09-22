@@ -427,7 +427,7 @@ export default function DashboardPage() {
             <div style="width: 190mm; min-height: 277mm; max-height: 257mm; position: relative; overflow: hidden;">
             
             <!-- Header (15mm) -->
-            <div style="text-align: center; margin-bottom: 8mm; padding-bottom: 2mm; border-bottom: 3px solid #3b82f6;">
+            <div style="text-align: center; margin-bottom: 4mm; padding-bottom: 1mm; border-bottom: 3px solid #3b82f6;">
               <h1 style="margin: 0; font-size: 20px; color: #111827; font-weight: bold;">RELATÓRIO DE TICKETS</h1>
               <h2 style="margin: 3px 0 0 0; font-size: 16px; color: #3b82f6; font-weight: 600;">DASHBOARD</h2>
               <p style="margin: 5px 0 2px 0; font-size: 11px; color: #6b7280;">
@@ -437,7 +437,7 @@ export default function DashboardPage() {
             </div>
             
             <!-- Summary Box (20mm) -->
-            <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 10px; border-radius: 6px; margin-bottom: 8mm; box-shadow: 0 4px 8px rgba(59, 130, 246, 0.2);">
+            <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 10px; border-radius: 6px; margin-bottom: 6mm; box-shadow: 0 4px 8px rgba(59, 130, 246, 0.2);">
               <div style="text-align: center;">
                 <div style="font-size: 36px; font-weight: bold; line-height: 1;">${categoryStats?.total_tickets || 0}</div>
                 <div style="font-size: 12px; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 500;">TOTAL DE TICKETS</div>
@@ -445,7 +445,7 @@ export default function DashboardPage() {
             </div>
             
             <!-- Clean Status Cards - ALL status without abbreviations -->
-            <div style="margin-bottom: 8mm;">
+            <div style="margin-bottom: 6mm;">
               <h2 style="font-size: 16px; color: #111827; margin-bottom: 8px; font-weight: 700; border-bottom: 1.5px solid #e5e7eb; padding-bottom: 2px;">TICKETS POR STATUS</h2>
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 6px; max-height: 40mm; overflow: hidden;">
                 <!-- Total Card -->
@@ -479,7 +479,7 @@ export default function DashboardPage() {
       const categories = categoryStats?.categorias || []
       
       // Calculate dynamic heights (A4 usable area: 257mm - with header and footer on all pages)
-      const headerHeight = 15      // Header section (on all pages)
+      const headerHeight = 11      // Header section (on all pages) - reduced spacing
       const summaryHeight = 20     // Summary box (only page 1)
       const statusHeight = Math.min(40, Math.ceil(statusCount / 4) * 15 + 15) // Dynamic based on status count (only page 1)
       const footerHeight = 20      // Footer space (fixed at bottom, increased for visibility)
@@ -571,7 +571,7 @@ export default function DashboardPage() {
             <div style="width: 190mm; min-height: 277mm; max-height: 257mm; position: relative; overflow: hidden;">
             
             <!-- Header for Page 2 -->
-            <div style="text-align: center; margin-bottom: 8mm; padding-bottom: 2mm; border-bottom: 3px solid #3b82f6;">
+            <div style="text-align: center; margin-bottom: 4mm; padding-bottom: 1mm; border-bottom: 3px solid #3b82f6;">
               <h1 style="margin: 0; font-size: 20px; color: #111827; font-weight: bold;">RELATÓRIO DE TICKETS</h1>
               <h2 style="margin: 3px 0 0 0; font-size: 16px; color: #3b82f6; font-weight: 600;">DASHBOARD</h2>
               <p style="margin: 5px 0 2px 0; font-size: 11px; color: #6b7280;">
