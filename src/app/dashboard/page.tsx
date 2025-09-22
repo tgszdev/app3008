@@ -555,15 +555,13 @@ export default function DashboardPage() {
       // Close categories section and first page
       pdfHTML += `
             </div>
-            ${!secondPageCategories.length ? `
-            <!-- Footer for single page -->
+            <!-- Footer for page 1 (always present) -->
             <div style="position: absolute; bottom: 5mm; left: 0; text-align: center; border-top: 1px solid #3b82f6; padding-top: 2mm; width: 190mm;">
               <p style="margin: 1px 0; font-size: 9px; color: #374151; font-weight: 600;">RELATÓRIO GERADO EM: ${formattedDateTime.toUpperCase()}</p>
               <p style="margin: 1px 0; font-size: 8px; color: #6b7280;">Dashboard gerado automaticamente pelo sistema de suporte técnico</p>
               <p style="margin: 1px 0; font-size: 7px; color: #9ca3af;">© 2025 - Sistema de Gestão de Tickets</p>
               <p style="margin: 2px 0 0 0; font-size: 8px; color: #6b7280; text-align: right;">Página 1${secondPageCategories.length > 0 ? ' de 2' : ''}</p>
             </div>
-            ` : ''}
             </div>
           </div> <!-- End of Page 1 -->
           
