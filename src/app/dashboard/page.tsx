@@ -420,7 +420,7 @@ export default function DashboardPage() {
       // Margins: 10mm all sides (uniform padding)
       // Usable area: 190mm x 277mm (297mm - 20mm margins)
       let pdfHTML = `
-        <div style="width: 210mm; background: white; font-family: Arial, sans-serif; box-sizing: border-box; margin: 0;">
+        <div style="width: 210mm; background: #e8f5ff; font-family: Arial, sans-serif; box-sizing: border-box; margin: 0;">
           
           <!-- PAGE 1 -->
           <div style="page-break-after: always; padding: 10mm; min-height: 297mm; box-sizing: border-box; position: relative;">
@@ -449,7 +449,7 @@ export default function DashboardPage() {
               <h2 style="font-size: 16px; color: #111827; margin-bottom: 8px; font-weight: 700; border-bottom: 1.5px solid #e5e7eb; padding-bottom: 2px;">TICKETS POR STATUS</h2>
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 6px; max-height: 40mm; overflow: hidden;">
                 <!-- Total Card -->
-                <div style="background: white; border: 1.5px solid #e5e7eb; border-radius: 6px; padding: ${statusCount > 6 ? '6px' : '8px'}; text-align: center;">
+                <div style="background: #e8f5ff; border: 1.5px solid #e5e7eb; border-radius: 6px; padding: ${statusCount > 6 ? '6px' : '8px'}; text-align: center;">
                   <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 4px;">
                     <div style="width: 6px; height: 6px; border-radius: 50%; background: #2563eb;"></div>
                     <div style="font-size: ${statusCount > 6 ? '8px' : '9px'}; color: #6b7280; font-weight: 600;">Total no Período</div>
@@ -459,7 +459,7 @@ export default function DashboardPage() {
                 
                 <!-- Status Cards - Only show status with tickets (count > 0) -->
                 ${categoryStats?.status_summary_detailed?.filter(status => status.count > 0).map(status => 
-                  `<div style="background: white; border: 1.5px solid #e5e7eb; border-radius: 6px; padding: ${statusCount > 6 ? '6px' : '8px'}; text-align: center;">
+                  `<div style="background: #e8f5ff; border: 1.5px solid #e5e7eb; border-radius: 6px; padding: ${statusCount > 6 ? '6px' : '8px'}; text-align: center;">
                     <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 4px;">
                       <div style="width: 6px; height: 6px; border-radius: 50%; background: ${status.color};"></div>
                       <div style="font-size: ${statusCount > 6 ? '8px' : '9px'}; color: #6b7280; font-weight: 600;">${status.name}</div>
@@ -531,7 +531,7 @@ export default function DashboardPage() {
                     <span style="font-size: 11px; color: #6b7280;">Percentual</span>
                     <span style="font-size: 16px; font-weight: bold; color: ${category.color || '#6b7280'};">${category.percentual.toFixed(1)}%</span>
                   </div>
-                  <div style="background: #f3f4f6; border-radius: 4px; height: 12px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);">
+                  <div style="background: #e8f5ff; border-radius: 4px; height: 12px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);">
                     <div style="background: linear-gradient(90deg, ${category.color || '#6b7280'}, ${category.color || '#6b7280'}dd); height: 100%; width: ${category.percentual}%; border-radius: 3px;"></div>
                   </div>
                 </div>
@@ -612,7 +612,7 @@ export default function DashboardPage() {
                             <span style="font-size: 11px; color: #6b7280;">Percentual</span>
                             <span style="font-size: 16px; font-weight: bold; color: ${category.color || '#6b7280'};">${category.percentual.toFixed(1)}%</span>
                           </div>
-                          <div style="background: #f3f4f6; border-radius: 4px; height: 12px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);">
+                          <div style="background: #e8f5ff; border-radius: 4px; height: 12px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);">
                             <div style="background: linear-gradient(90deg, ${category.color || '#6b7280'}, ${category.color || '#6b7280'}dd); height: 100%; width: ${category.percentual}%; border-radius: 3px;"></div>
                           </div>
                         </div>
