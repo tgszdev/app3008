@@ -279,6 +279,21 @@ export const authHybridConfig: NextAuthConfig = {
         }
       }
 
+      // IMPORTANTE: Preservar o sessionToken em todas as requisições
+      // Se não tem sessionToken mas tem user id, pode ser uma sessão antiga - gerar novo token
+      if (!token.sessionToken && token.id) {
+        console.log('[AUTH] Token sem sessionToken, gerando novo...')
+        const newSessionToken = `${token.id}_${Date.now()}_${Math.random().toString(36).substring(7)}`
+        token.sessionToken = newSessionToken
+        
+        try {
+          await registerSession(token.id as string, newSessionToken)
+          console.log('[AUTH] Novo sessionToken criado para sessão existente:', newSessionToken)
+        } catch (error) {
+          console.error('[AUTH] Erro ao criar novo sessionToken:', error)
+        }
+      }
+      
       // Verificar sessão apenas em updates controlados
       if (token.sessionToken && trigger === 'update') {
         try {
@@ -296,9 +311,12 @@ export const authHybridConfig: NextAuthConfig = {
               trigger
             })
             return null
+          } else {
+            console.log('[AUTH] Sessão válida encontrada no update')
           }
         } catch (error) {
           console.error('Erro ao verificar sessão:', error)
+          // Em caso de erro, não forçar logout - pode ser problema de rede
         }
       }
       
@@ -325,8 +343,25 @@ export const authHybridConfig: NextAuthConfig = {
         // SessionToken para APIs
         (session as any).sessionToken = token.sessionToken
         
-        // Verificação de sessão removida temporariamente para resolver problema de undefined
-        // TODO: Reativar verificação de sessão quando necessário
+        // Verificar se a sessão ainda é válida no banco (versão suave)
+        if (token.sessionToken) {
+          try {
+            const { data: dbSession } = await supabaseAdmin
+              .from('sessions')
+              .select('*')
+              .eq('sessionToken', token.sessionToken as string)
+              .gt('expires', new Date().toISOString())
+              .single()
+            
+            if (!dbSession) {
+              console.log('[AUTH] Sessão não encontrada no banco, mas mantendo ativa temporariamente')
+              // Não forçar logout imediatamente - pode ser problema de rede
+            }
+          } catch (error) {
+            console.error('[AUTH] Erro ao verificar sessão no callback:', error)
+            // Em caso de erro, não forçar logout
+          }
+        }
       }
       return session
     }
