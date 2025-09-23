@@ -2,7 +2,9 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { useSession } from 'next-auth/react'
-import { UserType, ContextType } from '@/lib/auth-hybrid'
+// Tipos para multi-tenancy
+export type UserType = 'matrix' | 'context'
+export type ContextType = 'organization' | 'department'
 
 // =====================================================
 // TIPOS E INTERFACES
