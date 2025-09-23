@@ -59,11 +59,16 @@ export async function GET(request: NextRequest) {
 // POST - Criar novo usuário
 export async function POST(request: NextRequest) {
   try {
+    console.log('🚀 [USERS-API] Iniciando criação de usuário')
+    
     const body = await request.json()
     const { name, email, password, role, department, phone } = body
+    
+    console.log('📝 [USERS-API] Dados recebidos:', { name, email, role, department })
 
     // Validação básica
     if (!name || !email || !password) {
+      console.log('❌ [USERS-API] Dados obrigatórios faltando')
       return NextResponse.json(
         { error: 'Nome, email e senha são obrigatórios' },
         { status: 400 }
@@ -71,11 +76,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar se o email já existe
-    const { data: existingUser } = await supabaseAdmin
+    const { data: existingUser, error: checkError } = await supabaseAdmin
       .from('users')
       .select('id')
       .eq('email', email)
-      .single()
+      .maybeSingle()
+
+    if (checkError) {
+      console.error('Erro ao verificar email existente:', checkError)
+      return NextResponse.json(
+        { error: 'Erro ao verificar email' },
+        { status: 500 }
+      )
+    }
 
     if (existingUser) {
       return NextResponse.json(
@@ -85,6 +98,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Hash da senha
+    console.log('🔐 [USERS-API] Gerando hash da senha...')
     const password_hash = await bcrypt.hash(password, 10)
 
     // Mapear roles customizadas para uma role padrão válida no ENUM
@@ -92,28 +106,47 @@ export async function POST(request: NextRequest) {
     const systemRoles = ['admin', 'analyst', 'user']
     const enumRole = systemRoles.includes(role) ? role : 'user'
     
+    console.log('💾 [USERS-API] Criando usuário no banco...')
+    console.log('📋 [USERS-API] Dados para inserção:', { 
+      name, 
+      email, 
+      role: enumRole, 
+      role_name: role,
+      department,
+      phone 
+    })
+    
     // Criar usuário
+    const userData = {
+      name,
+      email,
+      password_hash,
+      role: enumRole, // Usar role válida para o ENUM
+      role_name: role, // Armazenar a role real (customizada ou não)
+      is_active: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+    
+    // Adicionar campos opcionais apenas se fornecidos
+    if (department) userData.department = department
+    if (phone) userData.phone = phone
+    
     const { data: newUser, error } = await supabaseAdmin
       .from('users')
-      .insert({
-        name,
-        email,
-        password_hash,
-        role: enumRole, // Usar role válida para o ENUM
-        role_name: role, // Armazenar a role real (customizada ou não)
-        department,
-        phone,
-        is_active: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
+      .insert(userData)
       .select()
       .single()
 
     if (error) {
-      console.error('Erro ao criar usuário:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      console.error('❌ [USERS-API] Erro ao criar usuário:', error)
+      return NextResponse.json({ 
+        error: 'Erro ao criar usuário',
+        details: error.message 
+      }, { status: 500 })
     }
+    
+    console.log('✅ [USERS-API] Usuário criado com sucesso:', newUser?.id)
 
     // Remover password_hash do resultado e ajustar role
     const { password_hash: _, ...sanitizedUser } = newUser

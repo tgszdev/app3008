@@ -14,9 +14,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
     
-    // Obter role do usuário
+    // Obter role do usuário e contexto
     const userRole = (session.user as any).role || 'user'
     const userId = session.user?.id
+    const userType = (session.user as any).userType
+    const userContextId = (session.user as any).context_id
     
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
@@ -34,14 +36,17 @@ export async function GET(request: NextRequest) {
         comments:ticket_comments(count)
       `)
 
-    // IMPORTANTE: Filtrar tickets internos ANTES de outros filtros
-    if (userRole === 'user' && userId) {
-      // Users só veem:
+    // IMPORTANTE: Filtrar por contexto e tickets internos ANTES de outros filtros
+    if (userType === 'context' && userContextId) {
+      // Usuários de contexto só veem tickets do seu contexto
+      query = query.eq('context_id', userContextId)
+    } else if (userRole === 'user' && userId) {
+      // Users da matriz só veem:
       // 1. Tickets não internos (is_internal = false ou null)
       // 2. OU tickets criados por eles mesmos (mesmo se internos)
       query = query.or(`and(is_internal.eq.false),and(is_internal.is.null),and(created_by.eq.${userId})`)
     }
-    // Admin e analyst veem todos os tickets (não aplicar filtro)
+    // Admin e analyst da matriz veem todos os tickets (não aplicar filtro)
     
     query = query.order('created_at', { ascending: false })
 
@@ -101,6 +106,8 @@ export async function POST(request: NextRequest) {
     }
     
     const userRole = (session.user as any).role || 'user'
+    const userType = (session.user as any).userType
+    const userContextId = (session.user as any).context_id
     
     const body = await request.json()
     const { title, description, priority, category, category_id, created_by, assigned_to, due_date, is_internal } = body
@@ -132,6 +139,7 @@ export async function POST(request: NextRequest) {
       assigned_to,
       due_date,
       is_internal: is_internal || false, // Adicionar campo is_internal
+      context_id: userContextId, // Adicionar contexto do usuário
       // Deixar o Supabase gerenciar as datas automaticamente
     }
 
@@ -289,6 +297,10 @@ async function handleUpdate(request: NextRequest) {
     if (!session) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
+    
+    const userType = (session.user as any).userType
+    const userContextId = (session.user as any).context_id
+    
     const body = await request.json()
     const { id, updated_by, user_id, ...updateData } = body
     
@@ -303,11 +315,20 @@ async function handleUpdate(request: NextRequest) {
     }
 
     // Buscar ticket atual para comparar mudanças
-    const { data: currentTicket } = await supabaseAdmin
+    const { data: currentTicket, error: fetchError } = await supabaseAdmin
       .from('tickets')
       .select('*')
       .eq('id', id)
       .single()
+
+    if (fetchError || !currentTicket) {
+      return NextResponse.json({ error: 'Ticket não encontrado' }, { status: 404 })
+    }
+
+    // Verificar se o usuário tem permissão para editar este ticket
+    if (userType === 'context' && userContextId && currentTicket.context_id !== userContextId) {
+      return NextResponse.json({ error: 'Acesso negado - ticket de outro contexto' }, { status: 403 })
+    }
 
     // Remover campos que não devem ser atualizados diretamente
     delete updateData.id
@@ -528,6 +549,9 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
     
+    const userType = (session.user as any).userType
+    const userContextId = (session.user as any).context_id
+    
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
 
@@ -536,6 +560,22 @@ export async function DELETE(request: NextRequest) {
         { error: 'ID do ticket é obrigatório' },
         { status: 400 }
       )
+    }
+
+    // Verificar se o ticket existe e se o usuário tem permissão para excluí-lo
+    const { data: ticket, error: ticketError } = await supabaseAdmin
+      .from('tickets')
+      .select('context_id')
+      .eq('id', id)
+      .single()
+
+    if (ticketError || !ticket) {
+      return NextResponse.json({ error: 'Ticket não encontrado' }, { status: 404 })
+    }
+
+    // Verificar se o usuário tem permissão para excluir este ticket
+    if (userType === 'context' && userContextId && ticket.context_id !== userContextId) {
+      return NextResponse.json({ error: 'Acesso negado - ticket de outro contexto' }, { status: 403 })
     }
 
     // Verificar se existem apontamentos vinculados (exceto rejeitados)

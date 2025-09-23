@@ -20,7 +20,7 @@ import {
   Calendar,
   Filter,
   PieChart as PieChartIcon,
-  Building2,
+  Building,
   Cpu,
   Wifi,
   Printer,
@@ -468,49 +468,59 @@ export default function HybridDashboard() {
   return (
     <div id="dashboard-content" className="space-y-4 sm:space-y-6">
       {/* Header com Contexto */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-            Dashboard {myTicketsOnly && '- Meus Tickets'}
-          </h1>
-          <p className="mt-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-            Bem-vindo de volta, {session?.user?.name}!
-            {myTicketsOnly 
-              ? ' Visualizando apenas seus tickets.'
-              : ' Aqui está um resumo do sistema.'
-            }
-          </p>
+      <div className="flex flex-col gap-4">
+        {/* Primeira linha: Título e Seletor */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+              Dashboard {myTicketsOnly && '- Meus Tickets'}
+            </h1>
+            <p className="mt-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              Bem-vindo de volta, {session?.user?.name}!
+              {myTicketsOnly 
+                ? ' Visualizando apenas seus tickets.'
+                : ' Aqui está um resumo do sistema.'
+              }
+            </p>
+          </div>
           
-          {/* Informações do contexto */}
-          {currentContext && (
-            <div className="mt-2 flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-blue-600" />
-              <span className="text-sm text-gray-600">
-                {currentContext.type === 'organization' ? 'Organização' : 'Departamento'}: 
-                <span className="font-medium ml-1">{currentContext.name}</span>
+          {/* Seletor de Organização (apenas para matriz) */}
+          {isMatrixUser && currentContext && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {currentContext.type === 'organization' ? 'Organização' : 'Departamento'}:
               </span>
+              <OrganizationSelector variant="compact" />
             </div>
           )}
         </div>
         
-        <div className="flex flex-wrap gap-2">
-          {/* Seletor de Organização (apenas para matriz) */}
-          {isMatrixUser && currentContext && (
-            <OrganizationSelector variant="compact" />
+        {/* Segunda linha: Informações do contexto e botões */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          {/* Informações do contexto */}
+          {currentContext && (
+            <div className="flex items-center gap-2">
+              <Building className="w-4 h-4 text-blue-600" />
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {currentContext.type === 'organization' ? 'Organização' : 'Departamento'}: 
+                <span className="font-medium ml-1 text-gray-900 dark:text-white">{currentContext.name}</span>
+              </span>
+            </div>
           )}
           
-          {/* Botão Meus Tickets */}
-          <button
-            onClick={toggleMyTickets}
-            className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-2 border rounded-lg transition-colors ${
-              myTicketsOnly 
-                ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
-                : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
-            }`}
-          >
-            <User className="h-4 w-4 flex-shrink-0" />
-            <span className="text-xs sm:text-sm">Meus Tickets</span>
-          </button>
+          <div className="flex flex-wrap gap-2">
+            {/* Botão Meus Tickets */}
+            <button
+              onClick={toggleMyTickets}
+              className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-2 border rounded-lg transition-colors ${
+                myTicketsOnly 
+                  ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
+                  : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+              }`}
+            >
+              <User className="h-4 w-4 flex-shrink-0" />
+              <span className="text-xs sm:text-sm">Meus Tickets</span>
+            </button>
           
           {/* Botão Filtro de Data */}
           <button
@@ -543,6 +553,7 @@ export default function HybridDashboard() {
               {isGeneratingPDF ? 'Gerando...' : 'Exportar PDF'}
             </span>
           </button>
+          </div>
         </div>
       </div>
 

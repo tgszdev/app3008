@@ -304,6 +304,13 @@ export const authConfig: NextAuthConfig = {
             department: user.department,
             avatar_url: user.avatar_url,
             permissions: userPermissions,
+            // Dados multi-tenant
+            userType: user.user_type || 'context',
+            contextType: user.context_type,
+            context_id: user.context_id,
+            context_name: user.context_name,
+            context_slug: user.context_slug,
+            availableContexts: user.available_contexts || [],
           }
         } catch (error) {
           console.error('Auth error:', error)
@@ -322,6 +329,13 @@ export const authConfig: NextAuthConfig = {
         token.department = user.department
         token.avatar_url = user.avatar_url
         token.permissions = (user as any).permissions || {}
+        // Dados multi-tenant
+        token.userType = (user as any).userType
+        token.contextType = (user as any).contextType
+        token.context_id = (user as any).context_id
+        token.context_name = (user as any).context_name
+        token.context_slug = (user as any).context_slug
+        token.availableContexts = (user as any).availableContexts || []
         
         // Gerar token de sessão único
         const sessionToken = `${user.id}_${Date.now()}_${Math.random().toString(36).substring(7)}`
@@ -393,6 +407,14 @@ export const authConfig: NextAuthConfig = {
         session.user.department = token.department as string;
         session.user.avatar_url = token.avatar_url as string;
         session.user.permissions = token.permissions as any || {};
+        
+        // Dados multi-tenant
+        (session.user as any).userType = token.userType as string;
+        (session.user as any).contextType = token.contextType as string;
+        (session.user as any).context_id = token.context_id as string;
+        (session.user as any).context_name = token.context_name as string;
+        (session.user as any).context_slug = token.context_slug as string;
+        (session.user as any).availableContexts = token.availableContexts as any[] || [];
         
         // IMPORTANTE: Adicionar sessionToken à sessão para as APIs poderem acessar
         (session as any).sessionToken = token.sessionToken;

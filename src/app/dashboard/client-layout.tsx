@@ -7,6 +7,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import { useProtectedSession } from '@/hooks/useProtectedSession'
 import { OrganizationSelector } from '@/components/OrganizationSelector'
+import { OrganizationDebug } from '@/components/debug/OrganizationDebug'
 import {
   Home,
   Ticket,
@@ -25,7 +26,7 @@ import {
   FileText,
   Loader2,
   BookOpen,
-
+  Building,
   Clock,
   Shield,
   TrendingUp,
@@ -92,6 +93,7 @@ const navigationSections: NavigationSection[] = [
     icon: Settings,
     adminOnly: true,
     items: [
+      { name: 'Organizações', href: '/dashboard/organizations', icon: Building },
       { name: 'Aprovação de Horas', href: '/dashboard/timesheets/admin', icon: CheckCircle },
       { name: 'Usuários', href: '/dashboard/users', icon: Users },
       { name: 'Permissões', href: '/dashboard/timesheets/permissions', icon: Lock },
@@ -382,14 +384,13 @@ export default function DashboardLayout({
         {/* Page content */}
         <main className="py-6">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            {/* Organization Selector for Matrix Users */}
-            <div className="mb-6">
-              <OrganizationSelector variant="compact" />
-            </div>
             {children}
           </div>
         </main>
       </div>
+      
+      {/* Debug Component - apenas em desenvolvimento */}
+      <OrganizationDebug />
     </div>
   )
 }

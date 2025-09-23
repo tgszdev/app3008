@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { useOrganization } from '@/contexts/OrganizationContext'
-import { Building2, Users, ChevronDown, Loader2 } from 'lucide-react'
+import { Building, Users, ChevronDown, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 // =====================================================
@@ -63,7 +63,7 @@ export function OrganizationSelector({
 
   // Função para obter ícone baseado no tipo
   const getContextIcon = (type: string) => {
-    return type === 'organization' ? Building2 : Users
+    return type === 'organization' ? Building : Users
   }
 
   // Função para obter cor baseada no tipo
@@ -74,23 +74,28 @@ export function OrganizationSelector({
   // Variante compacta
   if (variant === 'compact') {
     return (
-      <select 
-        value={currentContext?.id || ''} 
-        onChange={(e) => handleOrganizationChange(e.target.value)}
-        className={cn(
-          "w-[200px] px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-          className
-        )}
-      >
-        {availableContexts.map((context) => {
-          const Icon = getContextIcon(context.type)
-          return (
-            <option key={context.id} value={context.id}>
-              {context.name}
-            </option>
-          )
-        })}
-      </select>
+      <div className={cn("relative", className)}>
+        <select 
+          value={currentContext?.id || ''} 
+          onChange={(e) => handleOrganizationChange(e.target.value)}
+          className={cn(
+            "w-[200px] px-3 py-2 pr-8 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm appearance-none cursor-pointer",
+            "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors"
+          )}
+        >
+          {availableContexts.map((context) => {
+            const Icon = getContextIcon(context.type)
+            return (
+              <option key={context.id} value={context.id}>
+                {context.name}
+              </option>
+            )
+          })}
+        </select>
+        <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+          <ChevronDown className="w-4 h-4 text-gray-400" />
+        </div>
+      </div>
     )
   }
 
@@ -199,7 +204,7 @@ export function OrganizationSelectionScreen({ onContinue }: OrganizationSelectio
       <div className="w-full max-w-2xl">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
           <div className="text-center mb-8">
-            <Building2 className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+            <Building className="w-12 h-12 text-blue-600 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               Selecione uma Organização
             </h1>
@@ -318,5 +323,5 @@ export function ContextBadge({ context, size = 'md', showIcon = true }: ContextB
 // =====================================================
 
 function getContextIcon(type: string) {
-  return type === 'organization' ? Building2 : Users
+  return type === 'organization' ? Building : Users
 }

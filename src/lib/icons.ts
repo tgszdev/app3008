@@ -271,7 +271,7 @@ import {
   VolumeX as VolumeOff,
   Crown,
   Gem,
-  Building2 as Office,
+  Building as Office,
   Factory
 } from 'lucide-react'
 import { LucideIcon } from 'lucide-react'

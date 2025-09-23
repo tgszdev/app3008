@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit, Trash2, UserCheck, UserX, Shield, User as UserIcon, X, Save, Loader2, Key } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, UserCheck, UserX, Shield, User as UserIcon, X, Save, Loader2, Key, Building, Users, Link2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
 import axios from 'axios'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { useOrganization } from '@/contexts/OrganizationContext'
 
 const RoleBadge = ({ role, roles }: { role: string; roles?: Role[] }) => {
   // Obter o display_name da role
@@ -54,6 +55,37 @@ const StatusBadge = ({ isActive }: { isActive: boolean }) => {
     <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
       <UserX className="w-3 h-3 mr-1" />
       Inativo
+    </span>
+  )
+}
+
+const OrganizationBadge = ({ userType, contextName, contextType }: { 
+  userType?: string; 
+  contextName?: string; 
+  contextType?: string 
+}) => {
+  if (userType === 'matrix') {
+    return (
+      <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
+        <Building className="w-3 h-3 mr-1" />
+        Matriz
+      </span>
+    )
+  }
+  
+  if (contextName) {
+    return (
+      <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+        <Users className="w-3 h-3 mr-1" />
+        {contextName}
+      </span>
+    )
+  }
+  
+  return (
+    <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300">
+      <UserIcon className="w-3 h-3 mr-1" />
+      Sem organização
     </span>
   )
 }
@@ -143,11 +175,17 @@ export default function UsersPage() {
   const [statusFilter, setStatusFilter] = useState('all')
   const [showModal, setShowModal] = useState(false)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [showAssociationModal, setShowAssociationModal] = useState(false)
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [passwordChangeUser, setPasswordChangeUser] = useState<User | null>(null)
+  const [associationUser, setAssociationUser] = useState<User | null>(null)
   const [saving, setSaving] = useState(false)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [organizations, setOrganizations] = useState<any[]>([])
+  const [userAssociations, setUserAssociations] = useState<any[]>([])
+  const [availableUsers, setAvailableUsers] = useState<User[]>([])
+  const [selectedContext, setSelectedContext] = useState('')
   const [formData, setFormData] = useState<UserFormData>({
     name: '',
     email: '',
@@ -243,7 +281,43 @@ export default function UsersPage() {
   useEffect(() => {
     fetchRoles()
     fetchUsers()
+    fetchOrganizations()
   }, [])
+
+  // Buscar organizações
+  const fetchOrganizations = async () => {
+    try {
+      const response = await axios.get('/api/organizations')
+      setOrganizations(response.data.organizations || [])
+    } catch (error) {
+      console.error('Erro ao buscar organizações:', error)
+    }
+  }
+
+  // Buscar associações de um usuário
+  const fetchUserAssociations = async (userId: string) => {
+    try {
+      const response = await axios.get(`/api/user-contexts?user_id=${userId}`)
+      setUserAssociations(response.data.associations || [])
+    } catch (error) {
+      console.error('Erro ao buscar associações:', error)
+      setUserAssociations([])
+    }
+  }
+
+  // Buscar usuários disponíveis para associação
+  const fetchAvailableUsers = async (contextId?: string) => {
+    try {
+      const url = contextId 
+        ? `/api/users/available?context_id=${contextId}&exclude_associated=true`
+        : '/api/users/available'
+      const response = await axios.get(url)
+      setAvailableUsers(response.data.users || [])
+    } catch (error) {
+      console.error('Erro ao buscar usuários disponíveis:', error)
+      setAvailableUsers([])
+    }
+  }
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -372,6 +446,50 @@ export default function UsersPage() {
       password: '',
     })
     setShowModal(true)
+  }
+
+  const handleOpenAssociationModal = (user: User) => {
+    setAssociationUser(user)
+    fetchUserAssociations(user.id)
+    setShowAssociationModal(true)
+  }
+
+  const handleAssociateUser = async () => {
+    if (!selectedContext || !associationUser) {
+      toast.error('Selecione uma organização/departamento')
+      return
+    }
+
+    try {
+      await axios.post('/api/user-contexts', {
+        user_id: associationUser.id,
+        context_id: selectedContext
+      })
+      
+      toast.success('Usuário associado com sucesso!')
+      fetchUserAssociations(associationUser.id)
+      setSelectedContext('')
+    } catch (error: any) {
+      console.error('Erro ao associar usuário:', error)
+      toast.error(error.response?.data?.error || 'Erro ao associar usuário')
+    }
+  }
+
+  const handleRemoveAssociation = async (contextId: string) => {
+    if (!associationUser) return
+
+    if (!confirm('Tem certeza que deseja remover esta associação?')) {
+      return
+    }
+
+    try {
+      await axios.delete(`/api/user-contexts?user_id=${associationUser.id}&context_id=${contextId}`)
+      toast.success('Associação removida com sucesso!')
+      fetchUserAssociations(associationUser.id)
+    } catch (error: any) {
+      console.error('Erro ao remover associação:', error)
+      toast.error(error.response?.data?.error || 'Erro ao remover associação')
+    }
   }
 
   const handleSaveUser = async () => {
@@ -590,6 +708,13 @@ export default function UsersPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end gap-2">
+                      <button 
+                        onClick={() => handleOpenAssociationModal(user)}
+                        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                        title="Gerenciar Associações"
+                      >
+                        <Link2 className="h-4 w-4" />
+                      </button>
                       <button 
                         onClick={() => handleToggleStatus(user.id, user.is_active)}
                         className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
@@ -911,6 +1036,117 @@ export default function UsersPage() {
           </div>
         </div>
       ) : null}
+
+      {/* Modal de Gerenciar Associações */}
+      {showAssociationModal && associationUser && (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center p-4"
+          style={{ zIndex: 9999 }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowAssociationModal(false)
+              setAssociationUser(null)
+              setUserAssociations([])
+              setSelectedContext('')
+            }
+          }}
+        >
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl shadow-2xl"
+               onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                Gerenciar Associações - {associationUser.name}
+              </h2>
+              <button
+                onClick={() => {
+                  setShowAssociationModal(false)
+                  setAssociationUser(null)
+                  setUserAssociations([])
+                  setSelectedContext('')
+                }}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Associações Atuais */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Associações Atuais
+                </h3>
+                {userAssociations.length > 0 ? (
+                  <div className="space-y-2">
+                    {userAssociations.map((association) => (
+                      <div key={association.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-lg ${
+                            association.contexts.type === 'organization' 
+                              ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400'
+                              : 'bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400'
+                          }`}>
+                            <Building className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900 dark:text-white">
+                              {association.contexts.name}
+                            </p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              {association.contexts.type === 'organization' ? 'Organização' : 'Departamento'}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleRemoveAssociation(association.context_id)}
+                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                          title="Remover associação"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                    <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>Nenhuma associação encontrada</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Adicionar Nova Associação */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Adicionar Nova Associação
+                </h3>
+                <div className="flex gap-3">
+                  <select
+                    value={selectedContext}
+                    onChange={(e) => setSelectedContext(e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Selecione uma organização/departamento</option>
+                    {organizations.map(org => (
+                      <option key={org.id} value={org.id}>
+                        {org.name} ({org.type === 'organization' ? 'Organização' : 'Departamento'})
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={handleAssociateUser}
+                    disabled={!selectedContext}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center gap-2"
+                  >
+                    <Link2 className="h-4 w-4" />
+                    Associar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
