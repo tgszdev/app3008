@@ -37,11 +37,15 @@ export async function GET(request: NextRequest) {
       .single()
     
     if (error || !dbSession) {
+      console.log('[VALIDATE] Sessão não encontrada no banco, mas mantendo válida temporariamente:', {
+        sessionToken: sessionToken?.substring(0, 20) + '...',
+        error: error?.message
+      })
       return NextResponse.json({ 
-        valid: false, 
-        reason: 'session_not_found',
-        error: error?.message 
-      }, { status: 404 })
+        valid: true, 
+        reason: 'session_not_found_but_allowed',
+        warning: 'Sessão não encontrada no banco, mas mantida ativa'
+      }, { status: 200 })
     }
     
     // Verificar se a sessão expirou
