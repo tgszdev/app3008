@@ -184,3 +184,4 @@ COMMENT ON COLUMN ticket_history.metadata IS 'Dados extras em JSON para contexto
 
 -- Resultado final
 SELECT 'Tabela ticket_history criada com sucesso!' as resultado;
+

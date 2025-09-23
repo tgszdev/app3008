@@ -242,3 +242,4 @@ async function createTicketHistoryTable() {
 }
 
 createTicketHistoryTable()
+

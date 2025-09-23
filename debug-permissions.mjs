@@ -140,3 +140,4 @@ console.log('\n' + '=' * 60)
 debugGetUsersWithPermission('tickets_view')
 console.log('\n' + '=' * 60)
 debugGetUsersWithPermission('system_settings')
+

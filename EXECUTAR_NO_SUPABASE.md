@@ -223,3 +223,4 @@ Agora o sistema de histórico está ativo e funcionando:
 - 📱 **Interface** já está implementada no frontend
 
 **Teste alterando um ticket para ver o histórico funcionando!**
+
