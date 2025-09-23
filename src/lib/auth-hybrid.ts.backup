@@ -1,0 +1,557 @@
+import type { NextAuthConfig } from 'next-auth'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import { supabaseAdmin } from '@/lib/supabase'
+
+// =====================================================
+// TIPOS PARA MULTI-TENANT HÍBRIDO
+// =====================================================
+
+export type UserType = 'matrix' | 'context'
+export type ContextType = 'organization' | 'department'
+
+export interface HybridUser {
+  id: string
+  email: string
+  name: string
+  role: string
+  role_name?: string
+  department?: string
+  avatar_url?: string
+  permissions: Record<string, boolean>
+  
+  // Novos campos para multi-tenancy
+  userType: UserType
+  contextType?: ContextType
+  context_id?: string
+  context_slug?: string
+  context_name?: string
+}
+
+// =====================================================
+// FUNÇÃO PARA OBTER PERMISSÕES PADRÃO
+// =====================================================
+
+function getDefaultPermissions(role: string) {
+  const defaultPermissions: Record<string, any> = {
+    admin: {
+      tickets_view: true,
+      tickets_create: true,
+      tickets_edit_own: true,
+      tickets_edit_all: true,
+      tickets_delete: true,
+      tickets_assign: true,
+      tickets_close: true,
+      kb_view: true,
+      kb_create: true,
+      kb_edit: true,
+      kb_delete: true,
+      kb_manage_categories: true,
+      timesheets_view_own: true,
+      timesheets_view_all: true,
+      timesheets_create: true,
+      timesheets_edit_own: true,
+      timesheets_edit_all: true,
+      timesheets_approve: true,
+      timesheets_analytics: true,
+      timesheets_analytics_full: true,
+      system_settings: true,
+      system_users: true,
+      system_roles: true,
+      system_backup: true,
+      system_logs: true,
+      
+      // Novas permissões multi-tenant
+      context_management: true,
+      cross_context_view: true,
+      cross_context_assign: true,
+      global_analytics: true
+    },
+    developer: {
+      tickets_view: true,
+      tickets_create: true,
+      tickets_edit_own: true,
+      tickets_edit_all: true,
+      tickets_delete: false,
+      tickets_assign: true,
+      tickets_close: true,
+      kb_view: true,
+      kb_create: true,
+      kb_edit: true,
+      kb_delete: false,
+      kb_manage_categories: false,
+      timesheets_view_own: true,
+      timesheets_view_all: true,
+      timesheets_create: true,
+      timesheets_edit_own: true,
+      timesheets_edit_all: false,
+      timesheets_approve: false,
+      timesheets_analytics: true,
+      timesheets_analytics_full: false,
+      system_settings: false,
+      system_users: false,
+      system_roles: false,
+      system_backup: false,
+      system_logs: false,
+      
+      // Permissões multi-tenant para developer
+      context_management: false,
+      cross_context_view: true,
+      cross_context_assign: true,
+      global_analytics: false
+    },
+    analyst: {
+      tickets_view: true,
+      tickets_create: true,
+      tickets_edit_own: true,
+      tickets_edit_all: true,
+      tickets_assign: true,
+      tickets_close: true,
+      kb_view: true,
+      kb_create: true,
+      kb_edit: true,
+      kb_delete: false,
+      kb_manage_categories: false,
+      timesheets_view_own: true,
+      timesheets_view_all: true,
+      timesheets_create: true,
+      timesheets_edit_own: true,
+      timesheets_edit_all: false,
+      timesheets_approve: true,
+      timesheets_analytics: true,
+      timesheets_analytics_full: false,
+      system_settings: false,
+      system_users: false,
+      system_roles: false,
+      system_backup: false,
+      system_logs: false,
+      
+      // Permissões multi-tenant para analyst
+      context_management: false,
+      cross_context_view: true,
+      cross_context_assign: true,
+      global_analytics: false
+    },
+    user: {
+      tickets_view: true,
+      tickets_create: true,
+      tickets_edit_own: true,
+      tickets_edit_all: false,
+      tickets_delete: false,
+      tickets_assign: false,
+      tickets_close: false,
+      kb_view: true,
+      kb_create: false,
+      kb_edit: false,
+      kb_delete: false,
+      kb_manage_categories: false,
+      timesheets_view_own: true,
+      timesheets_view_all: false,
+      timesheets_create: true,
+      timesheets_edit_own: true,
+      timesheets_edit_all: false,
+      timesheets_approve: false,
+      timesheets_analytics: false,
+      timesheets_analytics_full: false,
+      system_settings: false,
+      system_users: false,
+      system_roles: false,
+      system_backup: false,
+      system_logs: false,
+      
+      // Permissões multi-tenant para user
+      context_management: false,
+      cross_context_view: false,
+      cross_context_assign: false,
+      global_analytics: false
+    }
+  }
+  
+  return defaultPermissions[role] || defaultPermissions['user']
+}
+
+// =====================================================
+// FUNÇÃO PARA VERIFICAR SENHA
+// =====================================================
+
+async function verifyPassword(password: string, hashedPassword: string) {
+  // Verificação de hash para compatibilidade
+  const ADMIN_PASSWORD_HASH = '$2a$10$qVPQejPGUNnzBOX1Gut4buUVLXauhbR6QY.sDk9SHV7Rg1sepaive'
+  
+  // Para o usuário admin, verificar diretamente
+  if (hashedPassword === ADMIN_PASSWORD_HASH && password === 'admin123') {
+    return true
+  }
+  
+  // Tentar usar a API route se disponível
+  try {
+    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+    const response = await fetch(`${baseUrl}/api/auth/verify-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password, hashedPassword }),
+    })
+    
+    if (response.ok) {
+      const { valid } = await response.json()
+      return valid
+    }
+  } catch (error) {
+    console.error('Error calling verify-password API:', error)
+  }
+  
+  // Fallback de verificação
+  return false
+}
+
+// =====================================================
+// FUNÇÃO PARA REGISTRAR SESSÃO
+// =====================================================
+
+async function registerSession(userId: string, sessionToken: string, userType: UserType) {
+  try {
+    // Primeiro, invalidar sessões antigas
+    await supabaseAdmin
+      .from('sessions')
+      .update({ expires: new Date(Date.now() - 1000).toISOString() })
+      .eq('userId', userId)
+      .gt('expires', new Date().toISOString())
+    
+    // Criar nova sessão
+    const { data, error } = await supabaseAdmin
+      .from('sessions')
+      .upsert({
+        id: sessionToken,
+        sessionToken: sessionToken,
+        userId: userId,
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'sessionToken'
+      })
+    
+    if (error) {
+      console.error('Erro ao registrar sessão:', error)
+    } else {
+      console.log(`Nova sessão registrada para ${userType}:`, userId)
+    }
+  } catch (error) {
+    console.error('Erro ao registrar sessão:', error)
+  }
+}
+
+// =====================================================
+// CONFIGURAÇÃO NEXT AUTH HÍBRIDA
+// =====================================================
+
+export const authHybridConfig: NextAuthConfig = {
+  providers: [
+    CredentialsProvider({
+      name: 'credentials',
+      credentials: {
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
+        userType: { label: 'Tipo de Usuário', type: 'text' } // Opcional
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          console.log('Missing credentials')
+          return null
+        }
+
+        try {
+          // =====================================================
+          // 1. TENTAR LOGIN COMO USUÁRIO DA MATRIZ
+          // =====================================================
+          
+          const { data: matrixUser, error: matrixError } = await supabaseAdmin
+            .from('matrix_users')
+            .select('*')
+            .eq('email', credentials.email)
+            .eq('is_active', true)
+            .single()
+
+          if (!matrixError && matrixUser) {
+            const isValidPassword = await verifyPassword(
+              credentials.password as string,
+              matrixUser.password_hash
+            )
+
+            if (isValidPassword) {
+              // Update last login
+              await supabaseAdmin
+                .from('matrix_users')
+                .update({ last_login: new Date().toISOString() })
+                .eq('id', matrixUser.id)
+
+              // Buscar contextos disponíveis para este usuário da matriz
+              const { data: userContexts } = await supabaseAdmin
+                .from('matrix_user_contexts')
+                .select(`
+                  context_id,
+                  can_manage,
+                  contexts (
+                    id,
+                    name,
+                    slug,
+                    type,
+                    settings
+                  )
+                `)
+                .eq('matrix_user_id', matrixUser.id)
+
+              const availableContexts = userContexts?.map(uc => ({
+                id: uc.contexts.id,
+                name: uc.contexts.name,
+                slug: uc.contexts.slug,
+                type: uc.contexts.type,
+                can_manage: uc.can_manage
+              })) || []
+
+              console.log('Login matrix successful:', credentials.email)
+
+              return {
+                id: matrixUser.id,
+                email: matrixUser.email,
+                name: matrixUser.name,
+                role: matrixUser.role,
+                role_name: matrixUser.role,
+                department: matrixUser.department,
+                avatar_url: matrixUser.avatar_url,
+                permissions: getDefaultPermissions(matrixUser.role),
+                userType: 'matrix' as UserType,
+                availableContexts
+              }
+            }
+          }
+
+          // =====================================================
+          // 2. TENTAR LOGIN COMO USUÁRIO DE CONTEXTO
+          // =====================================================
+          
+          const { data: contextUser, error: contextError } = await supabaseAdmin
+            .from('context_users')
+            .select(`
+              *,
+              contexts (
+                id,
+                name,
+                slug,
+                type,
+                settings
+              )
+            `)
+            .eq('email', credentials.email)
+            .eq('is_active', true)
+            .single()
+
+          if (!contextError && contextUser) {
+            const isValidPassword = await verifyPassword(
+              credentials.password as string,
+              contextUser.password_hash
+            )
+
+            if (isValidPassword) {
+              // Update last login
+              await supabaseAdmin
+                .from('context_users')
+                .update({ last_login: new Date().toISOString() })
+                .eq('id', contextUser.id)
+
+              console.log('Login context successful:', credentials.email)
+
+              return {
+                id: contextUser.id,
+                email: contextUser.email,
+                name: contextUser.name,
+                role: contextUser.role,
+                role_name: contextUser.role,
+                department: contextUser.department,
+                avatar_url: contextUser.avatar_url,
+                permissions: getDefaultPermissions(contextUser.role),
+                userType: 'context' as UserType,
+                contextType: contextUser.contexts.type as ContextType,
+                context_id: contextUser.context_id,
+                context_slug: contextUser.contexts.slug,
+                context_name: contextUser.contexts.name
+              }
+            }
+          }
+
+          // =====================================================
+          // 3. FALLBACK: TENTAR USUÁRIOS LEGACY (COMPATIBILIDADE)
+          // =====================================================
+          
+          const { data: legacyUser, error: legacyError } = await supabaseAdmin
+            .from('users')
+            .select('*')
+            .eq('email', credentials.email)
+            .eq('is_active', true)
+            .single()
+
+          if (!legacyError && legacyUser) {
+            const isValidPassword = await verifyPassword(
+              credentials.password as string,
+              legacyUser.password_hash
+            )
+
+            if (isValidPassword) {
+              // Update last login
+              await supabaseAdmin
+                .from('users')
+                .update({ last_login: new Date().toISOString() })
+                .eq('id', legacyUser.id)
+
+              console.log('Login legacy successful:', credentials.email)
+
+              // Para usuários legacy, assumir que são context users do sistema atual
+              return {
+                id: legacyUser.id,
+                email: legacyUser.email,
+                name: legacyUser.name,
+                role: legacyUser.role_name || legacyUser.role,
+                role_name: legacyUser.role_name,
+                department: legacyUser.department,
+                avatar_url: legacyUser.avatar_url,
+                permissions: getDefaultPermissions(legacyUser.role_name || legacyUser.role),
+                userType: 'context' as UserType,
+                contextType: 'department' as ContextType,
+                context_slug: 'sistema-atual', // Contexto padrão
+                context_name: 'Sistema Atual'
+              }
+            }
+          }
+
+          console.log('Login failed for:', credentials.email)
+          return null
+
+        } catch (error) {
+          console.error('Auth error:', error)
+          return null
+        }
+      }
+    })
+  ],
+  callbacks: {
+    async jwt({ token, user, trigger }) {
+      // Primeiro login - criar sessão
+      if (user) {
+        token.id = user.id
+        token.role = user.role
+        token.role_name = (user as any).role_name
+        token.department = user.department
+        token.avatar_url = user.avatar_url
+        token.permissions = (user as any).permissions || {}
+        
+        // Novos campos multi-tenant
+        token.userType = (user as any).userType
+        token.contextType = (user as any).contextType
+        token.context_id = (user as any).context_id
+        token.context_slug = (user as any).context_slug
+        token.context_name = (user as any).context_name
+        token.availableContexts = (user as any).availableContexts || []
+        
+        // Gerar token de sessão único
+        const sessionToken = `${user.id}_${Date.now()}_${Math.random().toString(36).substring(7)}`
+        token.sessionToken = sessionToken
+        
+        // Registrar sessão no banco
+        try {
+          await registerSession(user.id as string, sessionToken, (user as any).userType)
+          console.log('SessionToken criado e salvo:', sessionToken)
+        } catch (error) {
+          console.error('Erro ao registrar sessão:', error)
+        }
+      }
+      
+      // Preservar sessionToken em todas as requisições
+      if (!token.sessionToken && token.id) {
+        console.log('[AUTH] Token sem sessionToken, gerando novo...')
+        const newSessionToken = `${token.id}_${Date.now()}_${Math.random().toString(36).substring(7)}`
+        token.sessionToken = newSessionToken
+        
+        try {
+          await registerSession(token.id as string, newSessionToken, token.userType as UserType)
+          console.log('[AUTH] Novo sessionToken criado para sessão existente:', newSessionToken)
+        } catch (error) {
+          console.error('[AUTH] Erro ao criar novo sessionToken:', error)
+        }
+      }
+      
+      // Verificar sessão apenas em updates controlados
+      if (token.sessionToken && trigger === 'update') {
+        try {
+          const { data: session } = await supabaseAdmin
+            .from('sessions')
+            .select('*')
+            .eq('sessionToken', token.sessionToken as string)
+            .gt('expires', new Date().toISOString())
+            .single()
+          
+          if (!session) {
+            console.log('[AUTH] Sessão não encontrada no banco:', {
+              sessionToken: token.sessionToken,
+              userId: token.id,
+              trigger
+            })
+            return null
+          }
+        } catch (error) {
+          console.error('Erro ao verificar sessão:', error)
+        }
+      }
+      
+      return token
+    },
+    async session({ session, token }) {
+      if (session?.user) {
+        session.user.id = token.id as string
+        session.user.role = token.role as string
+        if (token.role_name) {
+          session.user.role_name = token.role_name as string
+        }
+        session.user.department = token.department as string
+        session.user.avatar_url = token.avatar_url as string
+        session.user.permissions = token.permissions as any || {}
+        
+        // Novos campos multi-tenant
+        session.user.userType = token.userType as any
+        session.user.contextType = token.contextType as any
+        session.user.context_id = token.context_id as string
+        session.user.context_slug = token.context_slug as string
+        session.user.context_name = token.context_name as string
+        session.user.availableContexts = token.availableContexts as any[] || []
+        
+        // SessionToken para APIs
+        (session as any).sessionToken = token.sessionToken
+        
+        // Verificar se a sessão ainda é válida no banco
+        if (token.sessionToken) {
+          const { data: dbSession } = await supabaseAdmin
+            .from('sessions')
+            .select('*')
+            .eq('sessionToken', token.sessionToken as string)
+            .gt('expires', new Date().toISOString())
+            .single()
+          
+          if (!dbSession) {
+            session.user = undefined as any
+            return { expires: new Date(0).toISOString() } as any
+          }
+        }
+      }
+      return session
+    }
+  },
+  pages: {
+    signIn: '/login',
+    error: '/login',
+  },
+  session: {
+    strategy: 'jwt',
+    maxAge: 24 * 60 * 60, // 24 horas
+    updateAge: 60 * 60, // Atualiza a cada 1 hora
+  },
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+  trustHost: true,
+}

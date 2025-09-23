@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import { useProtectedSession } from '@/hooks/useProtectedSession'
+import { OrganizationSelector } from '@/components/OrganizationSelector'
 import {
   Home,
   Ticket,
@@ -381,6 +382,10 @@ export default function DashboardLayout({
         {/* Page content */}
         <main className="py-6">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            {/* Organization Selector for Matrix Users */}
+            <div className="mb-6">
+              <OrganizationSelector variant="compact" />
+            </div>
             {children}
           </div>
         </main>

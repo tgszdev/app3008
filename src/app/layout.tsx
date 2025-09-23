@@ -4,6 +4,7 @@ import './globals.css'
 import { Toaster } from 'react-hot-toast'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { AuthProvider } from '@/components/providers/auth-provider'
+import { OrganizationProvider } from '@/contexts/OrganizationContext'
 // AppInitializer removido - não funciona no Vercel
 
 const inter = Inter({ subsets: ['latin'] })
@@ -61,7 +62,8 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            {children}
+            <OrganizationProvider>
+              {children}
             <Toaster
               position="top-center"
               reverseOrder={false}
@@ -103,6 +105,7 @@ export default function RootLayout({
                 },
               }}
             />
+            </OrganizationProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>
