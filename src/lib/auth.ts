@@ -1,4 +1,4 @@
 import NextAuth from 'next-auth'
-import { authConfig } from './auth-config'
+import { authHybridConfig } from './auth-hybrid'
 
-export const { auth, handlers, signIn, signOut } = NextAuth(authConfig)
+export const { auth, handlers, signIn, signOut } = NextAuth(authHybridConfig)
