@@ -10,8 +10,24 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
     
-    // Obter role do usuário
-    const userRole = (session.user as any).role || 'user'
+    // Obter dados do usuário e contexto multi-tenant
+    const { data: userData, error: userError } = await supabaseAdmin
+      .from('users')
+      .select('id, role, user_type, context_id, context_name, context_type')
+      .eq('email', session.user.email)
+      .single()
+
+    if (userError || !userData) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      )
+    }
+
+    const currentUserId = userData.id
+    const userRole = userData.role || 'user'
+    const userType = userData.user_type
+    const userContextId = userData.context_id
 
     // Extrair parâmetros de query
     const searchParams = request.nextUrl.searchParams
@@ -43,7 +59,8 @@ export async function GET(request: NextRequest) {
           title,
           status,
           priority,
-          is_internal
+          is_internal,
+          context_id
         )
       `, { count: 'exact' })
 
@@ -92,20 +109,30 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Filtrar comentários manualmente para usuários comuns
+    // Filtrar comentários manualmente para multi-tenant e usuários comuns
     let filteredComments = comments || []
+    
+    // Aplicar filtro multi-tenant
+    if (userType === 'context' && userContextId) {
+      // Usuários de contexto só veem comentários de tickets do seu contexto
+      filteredComments = filteredComments.filter((comment: any) => {
+        return comment.ticket?.context_id === userContextId
+      })
+    } else if (userType === 'matrix' && userRole === 'user') {
+      // Users da matriz só veem comentários de tickets não internos ou criados por eles
+      filteredComments = filteredComments.filter((comment: any) => {
+        const ticket = comment.ticket
+        return (
+          !ticket?.is_internal || 
+          ticket?.is_internal === null || 
+          ticket?.created_by === currentUserId
+        )
+      })
+    }
+    // Admin e analyst da matriz veem todos os comentários (não aplicar filtro)
     
     // Se é um usuário comum, filtrar comentários internos
     if (userRole === 'user') {
-      // Obter o ID do usuário atual
-      const { data: currentUser } = await supabaseAdmin
-        .from('users')
-        .select('id')
-        .eq('email', session.user.email)
-        .single()
-      
-      const currentUserId = currentUser?.id
-
       filteredComments = filteredComments.filter((comment: any) => {
         // Usuários só podem ver:
         // 1. Comentários não internos

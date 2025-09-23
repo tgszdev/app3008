@@ -10,6 +10,25 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Obter dados do usuário e contexto multi-tenant
+    const { data: userData, error: userError } = await supabaseAdmin
+      .from('users')
+      .select('id, role, user_type, context_id, context_name, context_type')
+      .eq('email', session.user.email)
+      .single()
+
+    if (userError || !userData) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      )
+    }
+
+    const currentUserId = userData.id
+    const userRole = userData.role || 'user'
+    const userType = userData.user_type
+    const userContextId = userData.context_id
+
     const { searchParams } = new URL(request.url)
     const range = searchParams.get('range') || '30days'
     
@@ -35,7 +54,7 @@ export async function GET(request: Request) {
     }
 
     // Get all tickets in date range with all relations
-    const { data: tickets, error: ticketsError } = await supabaseAdmin
+    let ticketsQuery = supabaseAdmin
       .from('tickets')
       .select(`
         *,
@@ -57,6 +76,18 @@ export async function GET(request: Request) {
       `)
       .gte('created_at', startDate.toISOString())
       .lte('created_at', endDate.toISOString())
+
+    // Apply multi-tenant filter
+    if (userType === 'context' && userContextId) {
+      // Usuários de contexto só veem tickets do seu contexto
+      ticketsQuery = ticketsQuery.eq('context_id', userContextId)
+    } else if (userType === 'matrix' && userRole === 'user') {
+      // Users da matriz só veem tickets não internos ou criados por eles
+      ticketsQuery = ticketsQuery.or(`and(is_internal.eq.false),and(is_internal.is.null),and(created_by.eq.${currentUserId})`)
+    }
+    // Admin e analyst da matriz veem todos os tickets (não aplicar filtro)
+
+    const { data: tickets, error: ticketsError } = await ticketsQuery
 
     if (ticketsError) {
       console.error('Error fetching tickets:', ticketsError)
@@ -82,11 +113,20 @@ export async function GET(request: Request) {
     const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
     previousStartDate.setDate(previousStartDate.getDate() - daysDiff)
 
-    const { data: previousTickets } = await supabaseAdmin
+    // Apply same multi-tenant filter to previous period tickets
+    let previousTicketsQuery = supabaseAdmin
       .from('tickets')
       .select('*')
       .gte('created_at', previousStartDate.toISOString())
       .lte('created_at', previousEndDate.toISOString())
+
+    if (userType === 'context' && userContextId) {
+      previousTicketsQuery = previousTicketsQuery.eq('context_id', userContextId)
+    } else if (userType === 'matrix' && userRole === 'user') {
+      previousTicketsQuery = previousTicketsQuery.or(`and(is_internal.eq.false),and(is_internal.is.null),and(created_by.eq.${currentUserId})`)
+    }
+
+    const { data: previousTickets } = await previousTicketsQuery
 
     const { data: previousRatings } = await supabaseAdmin
       .from('ticket_ratings')

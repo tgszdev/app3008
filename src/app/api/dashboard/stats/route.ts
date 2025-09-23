@@ -10,10 +10,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Obter dados do usuário e role
+    // Obter dados do usuário e contexto multi-tenant
     const { data: userData, error: userError } = await supabaseAdmin
       .from('users')
-      .select('id, role')
+      .select('id, role, user_type, context_id, context_name, context_type')
       .eq('email', session.user.email)
       .single()
 
@@ -26,6 +26,8 @@ export async function GET(request: NextRequest) {
 
     const currentUserId = userData.id
     const userRole = userData.role || 'user'
+    const userType = userData.user_type
+    const userContextId = userData.context_id
 
     const searchParams = request.nextUrl.searchParams
     const userId = searchParams.get('user_id')
@@ -40,12 +42,22 @@ export async function GET(request: NextRequest) {
     // Get ticket statistics
     let query = supabaseAdmin
       .from('tickets')
-      .select('id, status, created_at, updated_at, created_by, is_internal')
+      .select('id, status, created_at, updated_at, created_by, is_internal, context_id')
     
     // Apply date filter
     query = query
       .gte('created_at', `${defaultStartDate}T00:00:00`)
       .lte('created_at', `${defaultEndDate}T23:59:59`)
+    
+    // Apply multi-tenant filter
+    if (userType === 'context' && userContextId) {
+      // Usuários de contexto só veem tickets do seu contexto
+      query = query.eq('context_id', userContextId)
+    } else if (userRole === 'user' && userId) {
+      // Users da matriz só veem tickets não internos ou criados por eles
+      query = query.or(`and(is_internal.eq.false),and(is_internal.is.null),and(created_by.eq.${userId})`)
+    }
+    // Admin e analyst da matriz veem todos os tickets (não aplicar filtro)
     
     // Apply user filter if provided
     if (userId) {
