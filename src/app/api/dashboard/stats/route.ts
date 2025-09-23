@@ -123,6 +123,7 @@ export async function GET(request: NextRequest) {
         created_at,
         created_by,
         is_internal,
+        context_id,
         created_by_user:users!tickets_created_by_fkey(
           id,
           name,
@@ -132,6 +133,16 @@ export async function GET(request: NextRequest) {
       .gte('created_at', `${defaultStartDate}T00:00:00`)
       .lte('created_at', `${defaultEndDate}T23:59:59`)
       .order('created_at', { ascending: false })
+    
+    // Apply multi-tenant filter to recent tickets
+    if (userType === 'context' && userContextId) {
+      // Usuários de contexto só veem tickets do seu contexto
+      recentQuery = recentQuery.eq('context_id', userContextId)
+    } else if (userRole === 'user' && currentUserId) {
+      // Users da matriz só veem tickets não internos ou criados por eles
+      recentQuery = recentQuery.or(`and(is_internal.eq.false),and(is_internal.is.null),and(created_by.eq.${currentUserId})`)
+    }
+    // Admin e analyst da matriz veem todos os tickets (não aplicar filtro)
     
     // Apply user filter to recent tickets as well
     if (userId) {
