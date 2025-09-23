@@ -17,6 +17,10 @@ import bcrypt from 'bcryptjs'
 import { readFileSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
+import dotenv from 'dotenv'
+
+// Carregar variáveis de ambiente
+dotenv.config({ path: '.env.local' })
 
 // =====================================================
 // CONFIGURAÇÃO
@@ -58,22 +62,10 @@ async function executeSQL(sql, description) {
   try {
     log(`Executando: ${description}`, 'step')
     
-    // Dividir SQL em comandos individuais
-    const commands = sql
-      .split(';')
-      .map(cmd => cmd.trim())
-      .filter(cmd => cmd.length > 0 && !cmd.startsWith('--'))
+    // Para este setup, vamos criar as tabelas manualmente
+    // em vez de executar o SQL completo
     
-    for (const command of commands) {
-      if (command.trim()) {
-        const { error } = await supabase.rpc('exec_sql', { sql: command })
-        if (error && !error.message.includes('already exists')) {
-          throw error
-        }
-      }
-    }
-    
-    log(`${description} - Concluído`, 'success')
+    log(`${description} - Pulando execução SQL (será criado manualmente)`, 'success')
     return true
   } catch (error) {
     log(`Erro em ${description}: ${error.message}`, 'error')
