@@ -44,10 +44,17 @@ export async function GET(request: NextRequest) {
             .single()
           
           if (error || !currentSession) {
-            // Sessão não existe mais, mas manter conexão ativa
-            console.log(`[SSE] Sessão não encontrada para usuário ${userId}, mas mantendo conexão ativa`)
-            // Não invalidar a sessão - manter conexão ativa
-            return true
+            // Sessão não existe mais
+            console.log(`[SSE] Sessão não encontrada para usuário ${userId}`)
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ 
+                type: 'session_invalidated',
+                reason: 'session_not_found',
+                timestamp: new Date().toISOString()
+              })}\n\n`)
+            )
+            controller.close()
+            return false
           }
           
           // Verificar se foi invalidada
