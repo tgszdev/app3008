@@ -120,14 +120,38 @@ export async function PUT(
       }
     }
 
-    // Preparar dados para atualização
+    // Preparar dados para atualização - filtrar campos vazios
     const updateData = {
       ...body,
-      context_id: body.is_global ? null : (body.context_id || null),
-      parent_category_id: body.parent_category_id || null,
       updated_at: new Date().toISOString(),
       updated_by: session.user.id
     }
+    
+    // Tratar campos UUID vazios
+    if (body.is_global) {
+      updateData.context_id = null
+    } else if (body.context_id && body.context_id !== '') {
+      updateData.context_id = body.context_id
+    } else {
+      delete updateData.context_id // Não incluir se vazio
+    }
+    
+    if (body.parent_category_id && body.parent_category_id !== '') {
+      updateData.parent_category_id = body.parent_category_id
+    } else {
+      updateData.parent_category_id = null
+    }
+    
+    // Remover campos vazios que podem causar erro
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === '' || updateData[key] === undefined) {
+        if (key === 'context_id' || key === 'parent_category_id') {
+          updateData[key] = null
+        } else {
+          delete updateData[key]
+        }
+      }
+    })
 
     // Atualizar categoria
     const { data: category, error } = await supabaseAdmin
