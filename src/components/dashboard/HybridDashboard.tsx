@@ -306,9 +306,6 @@ export default function HybridDashboard() {
   const [myTicketsOnly, setMyTicketsOnly] = useState(false)
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
   
-  // Estados para seleção múltipla de clientes
-  const [selectedClients, setSelectedClients] = useState<string[]>([])
-  
   // Dados do dashboard
   const [stats, setStats] = useState<Stats>({
     totalTickets: 0,
@@ -352,11 +349,8 @@ export default function HybridDashboard() {
         end_date: periodFilter.end_date
       })
       
-      // Se tem clientes selecionados, usar API multi-client
-      if (selectedClients.length > 0) {
-        apiUrl = '/api/dashboard/multi-client-stats'
-        params.append('context_ids', selectedClients.join(','))
-      } else if (currentContext) {
+      // Se tem contexto atual, usar API normal
+      if (currentContext) {
         // Se não tem seleção múltipla, usar contexto atual
         params.append('context_id', currentContext.id)
       } else {
@@ -432,6 +426,44 @@ export default function HybridDashboard() {
     }
   }
 
+  const fetchMultiClientData = async (selectedIds: string[]) => {
+    try {
+      setLoading(true)
+      
+      // Usar API multi-client para múltiplas seleções
+      const apiUrl = '/api/dashboard/multi-client-stats'
+      const params = new URLSearchParams({
+        start_date: periodFilter.start_date,
+        end_date: periodFilter.end_date,
+        context_ids: selectedIds.join(',')
+      })
+      
+      // Adicionar filtro de usuário se ativo
+      if (myTicketsOnly && session?.user?.id) {
+        params.append('user_id', session.user.id)
+      }
+      
+      const response = await axios.get(`${apiUrl}?${params}`)
+      
+      if (response.data) {
+        setStats(response.data.stats || {
+          totalTickets: response.data.total_tickets || 0,
+          openTickets: response.data.open_tickets || 0,
+          inProgressTickets: response.data.in_progress_tickets || 0,
+          resolvedTickets: response.data.resolved_tickets || 0,
+          cancelledTickets: response.data.cancelled_tickets || 0,
+          ticketsTrend: response.data.tickets_trend || '+0%'
+        })
+        setRecentTickets(response.data.recentTickets || response.data.recent_tickets || [])
+      }
+    } catch (error: any) {
+      console.error('Erro ao buscar dados multi-client:', error)
+      toast.error('Erro ao carregar dados dos clientes selecionados')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // =====================================================
   // FUNÇÕES DE HANDLERS
   // =====================================================
@@ -463,24 +495,28 @@ export default function HybridDashboard() {
   const handleClientSelectionChange = (selectedIds: string[]) => {
     try {
       console.log('🔄 Mudança de seleção de clientes:', selectedIds)
-      setSelectedClients(selectedIds)
       
       // Recarregar dados com os clientes selecionados
       if (selectedIds.length > 0) {
-        fetchDashboardData()
+        fetchMultiClientData(selectedIds)
         fetchCategoryStats()
       } else {
-        // Se não há seleção, limpar dados
-        setStats({
-          totalTickets: 0,
-          openTickets: 0,
-          inProgressTickets: 0,
-          resolvedTickets: 0,
-          cancelledTickets: 0,
-          ticketsTrend: '+0%'
-        })
-        setRecentTickets([])
-        setCategoryStats(null)
+        // Se não há seleção, usar contexto atual ou limpar dados
+        if (currentContext) {
+          fetchDashboardData()
+          fetchCategoryStats()
+        } else {
+          setStats({
+            totalTickets: 0,
+            openTickets: 0,
+            inProgressTickets: 0,
+            resolvedTickets: 0,
+            cancelledTickets: 0,
+            ticketsTrend: '+0%'
+          })
+          setRecentTickets([])
+          setCategoryStats(null)
+        }
       }
     } catch (error) {
       console.error('Erro ao processar mudança de seleção:', error)
@@ -488,14 +524,15 @@ export default function HybridDashboard() {
   }
 
   const handleRemoveClient = (clientId: string) => {
-    const newSelection = selectedClients.filter(id => id !== clientId)
-    setSelectedClients(newSelection)
-    handleClientSelectionChange(newSelection)
+    // Esta função será chamada pelo MultiClientSelector
+    // Não precisamos fazer nada aqui pois o MultiClientSelector gerencia seu próprio estado
+    console.log('🔄 Removendo cliente:', clientId)
   }
 
   const handleClearAllClients = () => {
-    setSelectedClients([])
-    handleClientSelectionChange([])
+    // Esta função será chamada pelo MultiClientSelector
+    // Não precisamos fazer nada aqui pois o MultiClientSelector gerencia seu próprio estado
+    console.log('🔄 Limpando todos os clientes')
   }
 
 
@@ -567,15 +604,7 @@ export default function HybridDashboard() {
                 className="w-full"
               />
               
-              {/* Tags dos clientes selecionados */}
-              {selectedClients.length > 0 && (
-                <SelectedClientsTags
-                  selectedIds={selectedClients}
-                  availableContexts={availableContexts}
-                  onRemove={handleRemoveClient}
-                  onClearAll={handleClearAllClients}
-                />
-              )}
+              {/* Tags dos clientes selecionados serão gerenciadas pelo MultiClientSelector */}
             </div>
           )}
         </div>
