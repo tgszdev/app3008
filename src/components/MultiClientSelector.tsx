@@ -56,6 +56,7 @@ export function MultiClientSelector({
   useEffect(() => {
     if (availableContexts && availableContexts.length > 0) {
       console.log('🔄 Inicializando seletor com contextos disponíveis:', availableContexts.length)
+      console.log('🔄 selectedClients atual:', selectedClients)
       // Não resetar selectedClients se já tem seleções
     }
   }, [availableContexts])
@@ -109,6 +110,7 @@ export function MultiClientSelector({
   const handleToggleClient = (clientId: string) => {
     try {
       console.log('🔄 handleToggleClient chamado:', { clientId, selectedClients })
+      console.log('🔄 availableContexts:', availableContexts.length)
       
       let newSelection: string[]
       
@@ -179,20 +181,28 @@ export function MultiClientSelector({
   }
 
   const getSelectedClientsInfo = () => {
+    console.log('🔄 getSelectedClientsInfo chamado:', { selectedClients, availableContexts: availableContexts.length })
+    
     if (selectedClients.length === 0) {
+      console.log('🔄 Retornando: "Selecionar clientes..."')
       return "Selecionar clientes..."
     }
     
     if (selectedClients.length === availableContexts.length) {
+      console.log('🔄 Retornando: "Todos os clientes"')
       return "Todos os clientes"
     }
     
     if (selectedClients.length === 1) {
       const selected = availableContexts.find(c => c.id === selectedClients[0])
-      return selected?.name || "Cliente selecionado"
+      const result = selected?.name || "Cliente selecionado"
+      console.log('🔄 Retornando:', result)
+      return result
     }
     
-    return `${selectedClients.length} clientes selecionados`
+    const result = `${selectedClients.length} clientes selecionados`
+    console.log('🔄 Retornando:', result)
+    return result
   }
 
   const getSelectedClientsNames = () => {

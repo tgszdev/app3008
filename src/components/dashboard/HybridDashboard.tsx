@@ -332,7 +332,7 @@ export default function HybridDashboard() {
       fetchDashboardData()
       fetchCategoryStats()
     }
-  }, [mounted, contextLoading, periodFilter, myTicketsOnly, currentContext])
+  }, [mounted, contextLoading, periodFilter, myTicketsOnly])
 
   // =====================================================
   // FUNÇÕES DE FETCH DE DADOS
