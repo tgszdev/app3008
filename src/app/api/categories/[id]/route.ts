@@ -18,7 +18,11 @@ export async function GET(
 
     const { data: category, error } = await supabaseAdmin
       .from('categories')
-      .select('*')
+      .select(`
+        *,
+        contexts(id, name, type, slug),
+        parent_category:parent_category_id(id, name, slug)
+      `)
       .eq('id', id)
       .single()
 
@@ -33,7 +37,7 @@ export async function GET(
   }
 }
 
-// PUT - Atualizar categoria
+// PUT - Atualizar categoria (com suporte a contexto)
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -58,29 +62,82 @@ export async function PUT(
     delete body.created_at
     delete body.created_by
 
-    // Se está alterando o slug, verificar duplicatas
+    // Validação de contexto
+    if (body.is_global && body.context_id) {
+      return NextResponse.json({ error: 'Global categories cannot have context_id' }, { status: 400 })
+    }
+
+    if (!body.is_global && !body.context_id) {
+      return NextResponse.json({ error: 'Non-global categories must have context_id' }, { status: 400 })
+    }
+
+    // Verificar se o contexto existe (se fornecido)
+    if (body.context_id) {
+      const { data: context, error: contextError } = await supabaseAdmin
+        .from('contexts')
+        .select('id, name, type')
+        .eq('id', body.context_id)
+        .single()
+
+      if (contextError || !context) {
+        return NextResponse.json({ error: 'Context not found' }, { status: 400 })
+      }
+    }
+
+    // Verificar se a categoria pai existe (se fornecida)
+    if (body.parent_category_id) {
+      const { data: parent, error: parentError } = await supabaseAdmin
+        .from('categories')
+        .select('id, name')
+        .eq('id', body.parent_category_id)
+        .single()
+
+      if (parentError || !parent) {
+        return NextResponse.json({ error: 'Parent category not found' }, { status: 400 })
+      }
+    }
+
+    // Se está alterando o slug, verificar duplicatas no mesmo contexto
     if (body.slug) {
-      const { data: existing } = await supabaseAdmin
+      let slugQuery = supabaseAdmin
         .from('categories')
         .select('id')
         .eq('slug', body.slug)
         .neq('id', id)
-        .single()
+
+      if (body.is_global) {
+        slugQuery = slugQuery.eq('is_global', true)
+      } else if (body.context_id) {
+        slugQuery = slugQuery.eq('context_id', body.context_id)
+      }
+
+      const { data: existing } = await slugQuery.single()
 
       if (existing) {
-        return NextResponse.json({ error: 'Category with this slug already exists' }, { status: 400 })
+        return NextResponse.json({ 
+          error: `Category with slug '${body.slug}' already exists in this context` 
+        }, { status: 400 })
       }
+    }
+
+    // Preparar dados para atualização
+    const updateData = {
+      ...body,
+      context_id: body.is_global ? null : body.context_id,
+      updated_at: new Date().toISOString(),
+      updated_by: session.user.id
     }
 
     // Atualizar categoria
     const { data: category, error } = await supabaseAdmin
       .from('categories')
-      .update({
-        ...body,
-        updated_at: new Date().toISOString()
-      })
+      .update(updateData)
       .eq('id', id)
-      .select()
+      .select(`
+        *,
+        contexts(id, name, type, slug),
+        parent_category:parent_category_id(id, name, slug)
+      `)
       .single()
 
     if (error) {
