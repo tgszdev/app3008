@@ -276,6 +276,7 @@ export default function HybridDashboard() {
   const { session } = useAuth()
   const { 
     currentContext, 
+    availableContexts,
     isMatrixUser, 
     isContextUser,
     contextType,
@@ -456,7 +457,7 @@ export default function HybridDashboard() {
       if (selectedIds.length > 0) {
         fetchDashboardData()
         fetchCategoryStats()
-        fetchRecentTickets()
+        // fetchRecentTickets() - removido pois não existe essa função
       } else {
         // Se não há seleção, limpar dados
         setStats({
