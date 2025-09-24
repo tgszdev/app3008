@@ -70,6 +70,7 @@ export function MultiClientSelector({
         slug: context.slug,
         isSelected: selectedClients.includes(context.id)
       }))
+      console.log('🔄 Atualizando opções do seletor:', { selectedClients, options })
       setClientOptions(options)
     }
   }, [availableContexts, selectedClients])
@@ -107,11 +108,14 @@ export function MultiClientSelector({
 
   const handleToggleClient = (clientId: string) => {
     try {
+      console.log('🔄 handleToggleClient chamado:', { clientId, selectedClients })
+      
       let newSelection: string[]
       
       if (selectedClients.includes(clientId)) {
         // Remover da seleção
         newSelection = selectedClients.filter(id => id !== clientId)
+        console.log('🔄 Removendo da seleção:', newSelection)
       } else {
         // Adicionar à seleção (respeitando limite máximo)
         if (selectedClients.length >= maxSelections) {
@@ -119,13 +123,16 @@ export function MultiClientSelector({
           return // Não permitir mais seleções
         }
         newSelection = [...selectedClients, clientId]
+        console.log('🔄 Adicionando à seleção:', newSelection)
       }
       
+      console.log('🔄 Nova seleção:', newSelection)
       setSelectedClients(newSelection)
       
       // Chamar callback com delay para evitar problemas de estado
       setTimeout(() => {
         try {
+          console.log('🔄 Chamando onSelectionChange com:', newSelection)
           onSelectionChange?.(newSelection)
         } catch (error) {
           console.error('Erro no callback onSelectionChange:', error)
@@ -376,11 +383,22 @@ export function MultiClientSelector({
           
           <div className="max-h-80 overflow-y-auto">
             {filteredOptions.map(option => (
-              <label key={option.id} className="flex items-center gap-3 p-4 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0">
+              <label 
+                key={option.id} 
+                className="flex items-center gap-3 p-4 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleToggleClient(option.id)
+                }}
+              >
                 <input
                   type="checkbox"
                   checked={option.isSelected}
-                  onChange={() => handleToggleClient(option.id)}
+                  onChange={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    handleToggleClient(option.id)
+                  }}
                   className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                 />
                 <div className="flex-1 min-w-0">
