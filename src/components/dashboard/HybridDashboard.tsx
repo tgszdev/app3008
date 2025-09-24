@@ -335,7 +335,7 @@ export default function HybridDashboard() {
       fetchDashboardData()
       fetchCategoryStats()
     }
-  }, [mounted, contextLoading, periodFilter, myTicketsOnly, currentContext, selectedClients])
+  }, [mounted, contextLoading, periodFilter, myTicketsOnly, currentContext])
 
   // =====================================================
   // FUNÇÕES DE FETCH DE DADOS
@@ -469,7 +469,6 @@ export default function HybridDashboard() {
       if (selectedIds.length > 0) {
         fetchDashboardData()
         fetchCategoryStats()
-        // fetchRecentTickets() - removido pois não existe essa função
       } else {
         // Se não há seleção, limpar dados
         setStats({
