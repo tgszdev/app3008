@@ -52,13 +52,13 @@ export function MultiClientSelector({
   const [searchTerm, setSearchTerm] = useState('')
   const [clientOptions, setClientOptions] = useState<ClientOption[]>([])
 
-  // Inicializar vazio para permitir seleção livre
+  // Inicializar vazio apenas uma vez quando o componente monta
   useEffect(() => {
-    if (availableContexts && availableContexts.length > 0 && selectedClients.length === 0) {
-      console.log('🔄 Inicializando seletor vazio para seleção livre')
-      setSelectedClients([])
+    if (availableContexts && availableContexts.length > 0) {
+      console.log('🔄 Inicializando seletor com contextos disponíveis:', availableContexts.length)
+      // Não resetar selectedClients se já tem seleções
     }
-  }, [availableContexts, selectedClients.length])
+  }, [availableContexts])
 
   // Converter contextos disponíveis em opções
   useEffect(() => {
