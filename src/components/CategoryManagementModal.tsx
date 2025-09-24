@@ -183,7 +183,8 @@ import {
   FileSpreadsheet,
   BarChart4,
   PlusSquare,
-  MinusSquare
+  MinusSquare,
+  FolderTree
 } from 'lucide-react'
 import { getIcon } from '@/lib/icons'
 
@@ -196,12 +197,26 @@ interface Category {
   color: string
   is_active: boolean
   display_order: number
+  context_id?: string
+  is_global: boolean
+  parent_category_id?: string
   created_at: string
   updated_at: string
   created_by_user?: {
     id: string
     name: string
     email: string
+  }
+  contexts?: {
+    id: string
+    name: string
+    type: string
+    slug: string
+  }
+  parent_category?: {
+    id: string
+    name: string
+    slug: string
   }
 }
 
@@ -212,6 +227,7 @@ interface CategoryManagementModalProps {
 
 export default function CategoryManagementModal({ isOpen, onClose }: CategoryManagementModalProps) {
   const [categories, setCategories] = useState<Category[]>([])
+  const [contexts, setContexts] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [showCategoryModal, setShowCategoryModal] = useState(false)
@@ -225,7 +241,10 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
     icon: '',
     color: '#3B82F6',
     is_active: true,
-    display_order: 0
+    display_order: 0,
+    context_id: '',
+    is_global: false,
+    parent_category_id: ''
   })
 
   useEffect(() => {
@@ -239,42 +258,57 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
   const fetchCategories = async () => {
     setLoading(true)
     try {
-      const response = await fetch('/api/categories', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include'
-      })
+      // Buscar categorias e contextos em paralelo
+      const [categoriesResponse, contextsResponse] = await Promise.all([
+        fetch('/api/categories', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include'
+        }),
+        fetch('/api/contexts/for-categories', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include'
+        })
+      ])
       
-      console.log('Response status:', response.status)
-      
-      if (!response.ok) {
-        const errorData = await response.json()
-        console.error('API Error:', errorData)
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+      // Processar categorias
+      if (!categoriesResponse.ok) {
+        const errorData = await categoriesResponse.json()
+        throw new Error(errorData.error || `HTTP error! status: ${categoriesResponse.status}`)
       }
       
-      const data = await response.json()
-      console.log('Categories data:', data)
+      const categoriesData = await categoriesResponse.json()
+      console.log('Categories data:', categoriesData)
       
-      // Tratar diferentes formatos de resposta
-      if (Array.isArray(data)) {
-        setCategories(data)
-      } else if (data.categories) {
-        setCategories(data.categories)
+      if (Array.isArray(categoriesData)) {
+        setCategories(categoriesData)
+      } else if (categoriesData.categories) {
+        setCategories(categoriesData.categories)
       } else {
         setCategories([])
       }
-    } catch (error: any) {
-      console.error('Erro ao buscar categorias:', error)
       
-      // Se for erro 404 ou similar, ainda mostrar interface vazia
+      // Processar contextos
+      if (contextsResponse.ok) {
+        const contextsData = await contextsResponse.json()
+        console.log('Contexts data:', contextsData)
+        setContexts(contextsData.all || [])
+      } else {
+        console.warn('Erro ao carregar contextos, continuando sem eles')
+        setContexts([])
+      }
+      
+    } catch (error: any) {
+      console.error('Erro ao buscar dados:', error)
+      
       if (error.message.includes('404') || error.message.includes('Not found')) {
         setCategories([])
+        setContexts([])
       } else {
-        toast.error('Erro ao carregar categorias: ' + (error.message || 'Erro desconhecido'))
+        toast.error('Erro ao carregar dados: ' + (error.message || 'Erro desconhecido'))
         setCategories([])
+        setContexts([])
       }
     } finally {
       setLoading(false)
@@ -315,7 +349,10 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
         icon: '',
         color: '#3B82F6',
         is_active: true,
-        display_order: 0
+        display_order: 0,
+        context_id: '',
+        is_global: false,
+        parent_category_id: ''
       })
       fetchCategories()
     } catch (error: any) {
@@ -332,7 +369,10 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
       icon: category.icon || '',
       color: category.color || '#3B82F6',
       is_active: category.is_active,
-      display_order: category.display_order || 0
+      display_order: category.display_order || 0,
+      context_id: category.context_id || '',
+      is_global: category.is_global || false,
+      parent_category_id: category.parent_category_id || ''
     })
     setShowCategoryModal(true)
   }
@@ -590,6 +630,19 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                               <span className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-gray-600 dark:text-gray-400">
                                 {category.slug}
                               </span>
+                              {category.is_global ? (
+                                <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/20 rounded-full text-blue-600 dark:text-blue-400">
+                                  Global
+                                </span>
+                              ) : category.contexts ? (
+                                <span className="text-xs px-2 py-1 bg-green-100 dark:bg-green-900/20 rounded-full text-green-600 dark:text-green-400">
+                                  {category.contexts.name}
+                                </span>
+                              ) : (
+                                <span className="text-xs px-2 py-1 bg-orange-100 dark:bg-orange-900/20 rounded-full text-orange-600 dark:text-orange-400">
+                                  Específica
+                                </span>
+                              )}
                               {!category.is_active && (
                                 <span className="text-xs px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full">
                                   Inativa
@@ -726,6 +779,103 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                           rows={3}
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                         />
+                      </div>
+
+                      {/* Campos de Contexto */}
+                      <div className="border-t border-gray-200 dark:border-gray-600 pt-4">
+                        <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+                          <Building className="inline h-4 w-4 mr-1" />
+                          Contexto da Categoria
+                        </h4>
+                        
+                        <div className="space-y-4">
+                          {/* Tipo de Categoria */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                              Tipo
+                            </label>
+                            <div className="flex space-x-4">
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  name="category_type"
+                                  value="global"
+                                  checked={formData.is_global}
+                                  onChange={(e) => setFormData({ 
+                                    ...formData, 
+                                    is_global: true, 
+                                    context_id: '' 
+                                  })}
+                                  className="mr-2"
+                                />
+                                <span className="text-sm text-gray-700 dark:text-gray-300">
+                                  Global (todas as organizações)
+                                </span>
+                              </label>
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  name="category_type"
+                                  value="specific"
+                                  checked={!formData.is_global}
+                                  onChange={(e) => setFormData({ 
+                                    ...formData, 
+                                    is_global: false 
+                                  })}
+                                  className="mr-2"
+                                />
+                                <span className="text-sm text-gray-700 dark:text-gray-300">
+                                  Específica
+                                </span>
+                              </label>
+                            </div>
+                          </div>
+
+                          {/* Seleção de Contexto (apenas se não for global) */}
+                          {!formData.is_global && (
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <Building className="inline h-4 w-4 mr-1" />
+                                Organização/Departamento
+                              </label>
+                              <select
+                                value={formData.context_id}
+                                onChange={(e) => setFormData({ ...formData, context_id: e.target.value })}
+                                required={!formData.is_global}
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                              >
+                                <option value="">Selecione uma organização/departamento</option>
+                                {contexts.map((context) => (
+                                  <option key={context.id} value={context.id}>
+                                    {context.name} ({context.type === 'organization' ? 'Organização' : 'Departamento'})
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          )}
+
+                          {/* Categoria Pai */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                              <FolderTree className="inline h-4 w-4 mr-1" />
+                              Categoria Pai (opcional)
+                            </label>
+                            <select
+                              value={formData.parent_category_id}
+                              onChange={(e) => setFormData({ ...formData, parent_category_id: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                            >
+                              <option value="">Nenhuma (categoria raiz)</option>
+                              {categories
+                                .filter(cat => cat.id !== editingCategory?.id) // Evitar auto-referência
+                                .map((category) => (
+                                  <option key={category.id} value={category.id}>
+                                    {category.name} {category.contexts ? `(${category.contexts.name})` : category.is_global ? '(Global)' : ''}
+                                  </option>
+                                ))}
+                            </select>
+                          </div>
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
