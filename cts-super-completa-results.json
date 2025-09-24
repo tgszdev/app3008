@@ -1,0 +1,600 @@
+{
+  "total_scenarios": 10,
+  "total_tests": 35,
+  "passed_tests": 20,
+  "failed_tests": 15,
+  "skipped_tests": 0,
+  "total_duration": 2605,
+  "scenarios": [
+    {
+      "scenario_name": "AUTENTICAÇÃO E AUTORIZAÇÃO COMPLETA",
+      "tests": [
+        {
+          "test_name": "1.1 - Verificar usuários existentes",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 303,
+          "details": {
+            "users_found": 10,
+            "users": [
+              {
+                "id": "2a33241e-ed38-48b5-9c84-e8c354ae9606",
+                "name": "Thiago Rodrigues Souza",
+                "email": "rodrigues2205@icloud.com",
+                "role": "admin"
+              },
+              {
+                "id": "c8005da5-3d63-4de2-9956-43c2084d7385",
+                "name": "Lucas Reis Wiser",
+                "email": "lucas.reis@wiser.log.br",
+                "role": "admin"
+              },
+              {
+                "id": "a17bd88a-2385-4539-8b96-4d89f5e5e7f0",
+                "name": "Administrador do Sistema",
+                "email": "admin@example.com",
+                "role": "admin"
+              },
+              {
+                "id": "9b60a03f-35d2-4c7f-820d-277b485f3318",
+                "name": "Matrix Admin",
+                "email": "matrix.admin@example.com",
+                "role": "admin"
+              },
+              {
+                "id": "04dc825f-82f8-4921-9d4a-2e93fd00dad9",
+                "name": "Thiago Wiser",
+                "email": "thiago.souza@wiser.log.br",
+                "role": "user"
+              },
+              {
+                "id": "45a3ebc8-d3f2-4e60-a561-4cf80e5afe45",
+                "name": "Carlos Santos",
+                "email": "analyst2@example.com",
+                "role": "analyst"
+              },
+              {
+                "id": "891b3c82-44c5-4cc9-b247-b88b799c88ec",
+                "name": "Maria Oliveira",
+                "email": "user1@example.com",
+                "role": "user"
+              },
+              {
+                "id": "cb3a7544-8aed-409e-b0b7-98cb3d332396",
+                "name": "Ana Silva",
+                "email": "analyst1@example.com",
+                "role": "analyst"
+              },
+              {
+                "id": "c693343a-ae26-4ac3-98a8-92a69401a9d1",
+                "name": "João Pereira",
+                "email": "user2@example.com",
+                "role": "user"
+              },
+              {
+                "id": "2bcd314e-ee43-4d2e-98aa-62c25d85deb7",
+                "name": "Fernanda Costa",
+                "email": "user3@example.com",
+                "role": "analyst"
+              }
+            ]
+          }
+        },
+        {
+          "test_name": "1.2 - Testar login de admin",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 77,
+          "details": {
+            "admin_login": true,
+            "role": "admin",
+            "user_type": "matrix"
+          }
+        },
+        {
+          "test_name": "1.3 - Testar login de usuário de contexto",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 73,
+          "details": {
+            "context_user_login": true,
+            "context_id": "6486088e-72ae-461b-8b03-32ca84918882",
+            "user_type": "context"
+          }
+        },
+        {
+          "test_name": "1.4 - Verificar permissões de admin",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 104,
+          "details": {
+            "admin_permissions": true,
+            "admin_count": 4
+          }
+        },
+        {
+          "test_name": "1.5 - Verificar RLS policies",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 94,
+          "details": {
+            "rls_working": true,
+            "tickets_accessible": 5
+          }
+        }
+      ],
+      "total_tests": 5,
+      "passed_tests": 5,
+      "failed_tests": 0,
+      "skipped_tests": 0,
+      "duration": 651
+    },
+    {
+      "scenario_name": "GESTÃO DE USUÁRIOS E ORGANIZAÇÕES",
+      "tests": [
+        {
+          "test_name": "2.1 - Criar nova organização",
+          "status": "FAIL",
+          "message": "Erro: Erro ao criar organização: Could not find the 'description' column of 'contexts' in the schema cache",
+          "duration": 80,
+          "details": {}
+        },
+        {
+          "test_name": "2.2 - Criar usuário analyst",
+          "status": "FAIL",
+          "message": "Erro: Erro ao criar usuário: null value in column \"password_hash\" of relation \"users\" violates not-null constraint",
+          "duration": 112,
+          "details": {}
+        },
+        {
+          "test_name": "2.3 - Associar usuário à organização",
+          "status": "FAIL",
+          "message": "Erro: Erro ao associar usuário: Could not find the 'is_active' column of 'user_contexts' in the schema cache",
+          "duration": 57,
+          "details": {}
+        },
+        {
+          "test_name": "2.4 - Listar organizações",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 101,
+          "details": {
+            "organizations_listed": true,
+            "count": 3,
+            "organizations": [
+              {
+                "id": "6486088e-72ae-461b-8b03-32ca84918882",
+                "name": "Luft Agro",
+                "type": "organization"
+              },
+              {
+                "id": "a7791594-c44d-47aa-8ddd-97ecfb6cc8ed",
+                "name": "Organização Padrão",
+                "type": "organization"
+              },
+              {
+                "id": "fa4a4a34-f662-4da1-94d8-b77b5c578d6b",
+                "name": "Sistema Atual",
+                "type": "department"
+              }
+            ]
+          }
+        },
+        {
+          "test_name": "2.5 - Listar usuários",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 53,
+          "details": {
+            "users_listed": true,
+            "count": 14,
+            "users": [
+              {
+                "id": "3b855060-50d4-4eef-abf5-4eec96934159",
+                "name": "agro user",
+                "email": "agro@agro.com.br",
+                "role": "user"
+              },
+              {
+                "id": "9b60a03f-35d2-4c7f-820d-277b485f3318",
+                "name": "Matrix Admin",
+                "email": "matrix.admin@example.com",
+                "role": "admin"
+              },
+              {
+                "id": "e9439248-2e56-4766-b7b2-d126c4f42fa4",
+                "name": "Matrix Analyst",
+                "email": "matrix.analyst@example.com",
+                "role": "analyst"
+              },
+              {
+                "id": "4e8b7081-842b-4364-8351-1ada057bf121",
+                "name": "Desenvolvedor",
+                "email": "desenvolvedor@dev.com.br",
+                "role": "user"
+              },
+              {
+                "id": "6ffdda11-9e07-47af-971e-e063d62d0054",
+                "name": "dev",
+                "email": "dev@dev.com.br",
+                "role": "user"
+              },
+              {
+                "id": "c8005da5-3d63-4de2-9956-43c2084d7385",
+                "name": "Lucas Reis Wiser",
+                "email": "lucas.reis@wiser.log.br",
+                "role": "admin"
+              },
+              {
+                "id": "04dc825f-82f8-4921-9d4a-2e93fd00dad9",
+                "name": "Thiago Wiser",
+                "email": "thiago.souza@wiser.log.br",
+                "role": "user"
+              },
+              {
+                "id": "2a33241e-ed38-48b5-9c84-e8c354ae9606",
+                "name": "Thiago Rodrigues Souza",
+                "email": "rodrigues2205@icloud.com",
+                "role": "admin"
+              },
+              {
+                "id": "2bcd314e-ee43-4d2e-98aa-62c25d85deb7",
+                "name": "Fernanda Costa",
+                "email": "user3@example.com",
+                "role": "analyst"
+              },
+              {
+                "id": "c693343a-ae26-4ac3-98a8-92a69401a9d1",
+                "name": "João Pereira",
+                "email": "user2@example.com",
+                "role": "user"
+              },
+              {
+                "id": "891b3c82-44c5-4cc9-b247-b88b799c88ec",
+                "name": "Maria Oliveira",
+                "email": "user1@example.com",
+                "role": "user"
+              },
+              {
+                "id": "45a3ebc8-d3f2-4e60-a561-4cf80e5afe45",
+                "name": "Carlos Santos",
+                "email": "analyst2@example.com",
+                "role": "analyst"
+              },
+              {
+                "id": "cb3a7544-8aed-409e-b0b7-98cb3d332396",
+                "name": "Ana Silva",
+                "email": "analyst1@example.com",
+                "role": "analyst"
+              },
+              {
+                "id": "a17bd88a-2385-4539-8b96-4d89f5e5e7f0",
+                "name": "Administrador do Sistema",
+                "email": "admin@example.com",
+                "role": "admin"
+              }
+            ]
+          }
+        }
+      ],
+      "total_tests": 5,
+      "passed_tests": 2,
+      "failed_tests": 3,
+      "skipped_tests": 0,
+      "duration": 403
+    },
+    {
+      "scenario_name": "SISTEMA DE TICKETS COMPLETO",
+      "tests": [
+        {
+          "test_name": "3.1 - Criar ticket básico",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 214,
+          "details": {
+            "ticket_created": true,
+            "ticket_id": "235bd06f-55ff-40a5-8528-ea8112af6886",
+            "ticket_number": 2025090000
+          }
+        },
+        {
+          "test_name": "3.2 - Criar ticket com alta prioridade",
+          "status": "FAIL",
+          "message": "Erro: Erro ao criar ticket crítico: duplicate key value violates unique constraint \"tickets_ticket_number_key\"",
+          "duration": 94,
+          "details": {}
+        },
+        {
+          "test_name": "3.3 - Atualizar status do ticket",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 145,
+          "details": {
+            "ticket_updated": true,
+            "new_status": "in_progress"
+          }
+        },
+        {
+          "test_name": "3.4 - Buscar tickets por status",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 43,
+          "details": {
+            "open_tickets_found": true,
+            "count": 0
+          }
+        },
+        {
+          "test_name": "3.5 - Buscar tickets por prioridade",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 104,
+          "details": {
+            "critical_tickets_found": true,
+            "count": 25
+          }
+        }
+      ],
+      "total_tests": 5,
+      "passed_tests": 4,
+      "failed_tests": 1,
+      "skipped_tests": 0,
+      "duration": 600
+    },
+    {
+      "scenario_name": "COMENTÁRIOS E ANEXOS",
+      "tests": [
+        {
+          "test_name": "4.1 - Adicionar comentário ao ticket",
+          "status": "FAIL",
+          "message": "Erro: Erro ao criar comentário: Could not find the 'created_by' column of 'comments' in the schema cache",
+          "duration": 36,
+          "details": {}
+        },
+        {
+          "test_name": "4.2 - Adicionar comentário interno",
+          "status": "FAIL",
+          "message": "Erro: Erro ao criar comentário interno: Could not find the 'created_by' column of 'comments' in the schema cache",
+          "duration": 35,
+          "details": {}
+        },
+        {
+          "test_name": "4.3 - Buscar comentários do ticket",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 69,
+          "details": {
+            "comments_found": true,
+            "count": 0,
+            "comments": []
+          }
+        }
+      ],
+      "total_tests": 3,
+      "passed_tests": 1,
+      "failed_tests": 2,
+      "skipped_tests": 0,
+      "duration": 140
+    },
+    {
+      "scenario_name": "KNOWLEDGE BASE",
+      "tests": [
+        {
+          "test_name": "5.1 - Criar categoria da Knowledge Base",
+          "status": "FAIL",
+          "message": "Erro: Erro ao criar categoria: null value in column \"slug\" of relation \"kb_categories\" violates not-null constraint",
+          "duration": 111,
+          "details": {}
+        },
+        {
+          "test_name": "5.2 - Criar artigo da Knowledge Base",
+          "status": "FAIL",
+          "message": "Erro: Erro ao criar artigo: Could not find the 'created_by' column of 'kb_articles' in the schema cache",
+          "duration": 35,
+          "details": {}
+        },
+        {
+          "test_name": "5.3 - Buscar artigos publicados",
+          "status": "FAIL",
+          "message": "Erro: Erro ao buscar artigos: column kb_articles.is_published does not exist",
+          "duration": 59,
+          "details": {}
+        }
+      ],
+      "total_tests": 3,
+      "passed_tests": 0,
+      "failed_tests": 3,
+      "skipped_tests": 0,
+      "duration": 205
+    },
+    {
+      "scenario_name": "TIMESHEETS",
+      "tests": [
+        {
+          "test_name": "6.1 - Criar timesheet",
+          "status": "FAIL",
+          "message": "Erro: Erro ao criar timesheet: Could not find the 'date' column of 'timesheets' in the schema cache",
+          "duration": 26,
+          "details": {}
+        },
+        {
+          "test_name": "6.2 - Aprovar timesheet",
+          "status": "FAIL",
+          "message": "Erro: Erro ao aprovar timesheet: Could not find the 'is_approved' column of 'timesheets' in the schema cache",
+          "duration": 31,
+          "details": {}
+        },
+        {
+          "test_name": "6.3 - Buscar timesheets do usuário",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 52,
+          "details": {
+            "timesheets_found": true,
+            "count": 0
+          }
+        }
+      ],
+      "total_tests": 3,
+      "passed_tests": 1,
+      "failed_tests": 2,
+      "skipped_tests": 0,
+      "duration": 110
+    },
+    {
+      "scenario_name": "RELATÓRIOS E ANALYTICS",
+      "tests": [
+        {
+          "test_name": "7.1 - Gerar estatísticas do dashboard",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 46,
+          "details": {
+            "dashboard_stats": true,
+            "statistics": {
+              "total_tickets": 74,
+              "open_tickets": 0,
+              "in_progress_tickets": 1,
+              "high_priority_tickets": 22,
+              "critical_tickets": 25
+            }
+          }
+        },
+        {
+          "test_name": "7.2 - Gerar relatório de tickets por status",
+          "status": "FAIL",
+          "message": "Erro: supabase.from(...).select(...).group is not a function",
+          "duration": 0,
+          "details": {}
+        },
+        {
+          "test_name": "7.3 - Gerar relatório de tickets por prioridade",
+          "status": "FAIL",
+          "message": "Erro: supabase.from(...).select(...).group is not a function",
+          "duration": 0,
+          "details": {}
+        }
+      ],
+      "total_tests": 3,
+      "passed_tests": 1,
+      "failed_tests": 2,
+      "skipped_tests": 0,
+      "duration": 46
+    },
+    {
+      "scenario_name": "NOTIFICAÇÕES E EMAIL",
+      "tests": [
+        {
+          "test_name": "8.1 - Criar notificação",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 87,
+          "details": {
+            "notification_created": true,
+            "notification_id": "6bae0377-2e43-4958-a705-53a34a2347e6",
+            "title": "CTS - Notificação de Teste"
+          }
+        },
+        {
+          "test_name": "8.2 - Marcar notificação como lida",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 94,
+          "details": {
+            "notification_marked": true,
+            "is_read": true
+          }
+        },
+        {
+          "test_name": "8.3 - Buscar notificações não lidas",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 41,
+          "details": {
+            "unread_notifications": true,
+            "count": 0
+          }
+        }
+      ],
+      "total_tests": 3,
+      "passed_tests": 3,
+      "failed_tests": 0,
+      "skipped_tests": 0,
+      "duration": 223
+    },
+    {
+      "scenario_name": "ESCALAÇÃO AUTOMÁTICA",
+      "tests": [
+        {
+          "test_name": "9.1 - Verificar configurações de escalação",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 36,
+          "details": {
+            "escalation_rules_found": true,
+            "count": 4
+          }
+        },
+        {
+          "test_name": "9.2 - Testar escalação manual",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 63,
+          "details": {
+            "ticket_escalated": true,
+            "new_priority": "high"
+          }
+        }
+      ],
+      "total_tests": 2,
+      "passed_tests": 2,
+      "failed_tests": 0,
+      "skipped_tests": 0,
+      "duration": 99
+    },
+    {
+      "scenario_name": "CONFIGURAÇÕES E SLA",
+      "tests": [
+        {
+          "test_name": "10.1 - Verificar configurações de SLA",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 39,
+          "details": {
+            "sla_configurations_found": true,
+            "count": 5
+          }
+        },
+        {
+          "test_name": "10.2 - Verificar configurações de email",
+          "status": "FAIL",
+          "message": "Erro: Erro ao buscar configurações de email: Could not find the table 'public.email_settings' in the schema cache",
+          "duration": 50,
+          "details": {}
+        },
+        {
+          "test_name": "10.3 - Verificar configurações de notificação",
+          "status": "FAIL",
+          "message": "Erro: Erro ao buscar configurações de notificação: Could not find the table 'public.notification_settings' in the schema cache",
+          "duration": 33,
+          "details": {}
+        }
+      ],
+      "total_tests": 3,
+      "passed_tests": 1,
+      "failed_tests": 2,
+      "skipped_tests": 0,
+      "duration": 122
+    }
+  ],
+  "created_entities": {
+    "tickets": [
+      "235bd06f-55ff-40a5-8528-ea8112af6886"
+    ],
+    "users": [],
+    "organizations": [],
+    "categories": [],
+    "articles": [],
+    "timesheets": []
+  }
+}

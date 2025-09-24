@@ -1,0 +1,156 @@
+{
+  "total_scenarios": 4,
+  "total_tests": 7,
+  "passed_tests": 6,
+  "failed_tests": 1,
+  "skipped_tests": 0,
+  "total_duration": 389,
+  "scenarios": [
+    {
+      "scenario_name": "TESTE DE TICKETS (CORREÇÃO 1)",
+      "tests": [
+        {
+          "test_name": "1.1 - Criar ticket básico (sem duplicata)",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 120,
+          "details": {
+            "ticket_created": true,
+            "ticket_id": "51cb81b4-ebaa-454c-9865-6f374adc618d",
+            "ticket_number": 2025090000
+          }
+        },
+        {
+          "test_name": "1.2 - Criar ticket com prioridade diferente (sem duplicata)",
+          "status": "FAIL",
+          "message": "Erro: Erro ao criar ticket: duplicate key value violates unique constraint \"tickets_ticket_number_key\"",
+          "duration": 46,
+          "details": {}
+        }
+      ],
+      "total_tests": 2,
+      "passed_tests": 1,
+      "failed_tests": 1,
+      "skipped_tests": 0,
+      "duration": 166
+    },
+    {
+      "scenario_name": "TESTE DE KB ARTICLES (CORREÇÃO 2)",
+      "tests": [
+        {
+          "test_name": "2.1 - Criar categoria KB (com slug)",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 40,
+          "details": {
+            "category_created": true,
+            "category_id": "c4a72c06-d5ac-433f-894c-c98a846ea30c",
+            "name": "CTS Corrigida Category",
+            "slug": "cts-corrigida-category"
+          }
+        },
+        {
+          "test_name": "2.2 - Criar artigo KB (com slug)",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 61,
+          "details": {
+            "article_created": true,
+            "article_id": "9ab67095-413d-49f6-bb40-295995b2a521",
+            "title": "CTS Corrigida Article",
+            "slug": "cts-corrigida-article"
+          }
+        }
+      ],
+      "total_tests": 2,
+      "passed_tests": 2,
+      "failed_tests": 0,
+      "skipped_tests": 0,
+      "duration": 102
+    },
+    {
+      "scenario_name": "TESTE DE TIMESHEETS (CORREÇÃO 3)",
+      "tests": [
+        {
+          "test_name": "3.1 - Criar timesheet (com ticket_id e activity_description)",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 46,
+          "details": {
+            "timesheet_created": true,
+            "timesheet_id": "78d1bafa-3ab6-4f8f-938a-5153cd2e2b9e",
+            "ticket_id": "51cb81b4-ebaa-454c-9865-6f374adc618d",
+            "hours": 8,
+            "activity": "CTS Corrigida - Atividade de teste"
+          }
+        }
+      ],
+      "total_tests": 1,
+      "passed_tests": 1,
+      "failed_tests": 0,
+      "skipped_tests": 0,
+      "duration": 46
+    },
+    {
+      "scenario_name": "TESTE DE RELATÓRIOS (CORREÇÃO 4)",
+      "tests": [
+        {
+          "test_name": "4.1 - Relatório de tickets por status (JavaScript)",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 38,
+          "details": {
+            "status_report": true,
+            "data": {
+              "aberto": 20,
+              "ag-deploy-em-producao": 1,
+              "aguardando-cliente": 1,
+              "cancelled": 4,
+              "em-progresso": 11,
+              "open": 1,
+              "resolvido": 36
+            },
+            "total_tickets": 74
+          }
+        },
+        {
+          "test_name": "4.2 - Relatório de tickets por prioridade (JavaScript)",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 34,
+          "details": {
+            "priority_report": true,
+            "data": {
+              "critical": 25,
+              "high": 22,
+              "low": 5,
+              "medium": 22
+            },
+            "total_tickets": 74
+          }
+        }
+      ],
+      "total_tests": 2,
+      "passed_tests": 2,
+      "failed_tests": 0,
+      "skipped_tests": 0,
+      "duration": 73
+    }
+  ],
+  "created_entities": {
+    "tickets": [
+      "51cb81b4-ebaa-454c-9865-6f374adc618d"
+    ],
+    "users": [],
+    "organizations": [],
+    "categories": [
+      "c4a72c06-d5ac-433f-894c-c98a846ea30c"
+    ],
+    "articles": [
+      "9ab67095-413d-49f6-bb40-295995b2a521"
+    ],
+    "timesheets": [
+      "78d1bafa-3ab6-4f8f-938a-5153cd2e2b9e"
+    ]
+  }
+}

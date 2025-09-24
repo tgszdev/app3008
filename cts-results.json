@@ -1,0 +1,898 @@
+{
+  "total_suites": 6,
+  "total_tests": 30,
+  "passed_tests": 23,
+  "failed_tests": 7,
+  "skipped_tests": 0,
+  "total_duration": 3483,
+  "suites": [
+    {
+      "suite_name": "AUTENTICAÇÃO E AUTORIZAÇÃO",
+      "tests": [
+        {
+          "test_name": "Verificar conexão com Supabase",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 276,
+          "details": {
+            "connected": true,
+            "data": [
+              {
+                "count": 14
+              }
+            ]
+          }
+        },
+        {
+          "test_name": "Verificar usuário admin existe",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 84,
+          "details": {
+            "user": {
+              "id": "2a33241e-ed38-48b5-9c84-e8c354ae9606",
+              "email": "rodrigues2205@icloud.com",
+              "password_hash": "$2a$10$pwc6FGSdKeEblxeSkcWQguCbF92tjcCsMqE4ONW/VvAo2K/NUO7m6",
+              "name": "Thiago Rodrigues Souza",
+              "role": "admin",
+              "department": "Consulto",
+              "avatar_url": null,
+              "is_active": true,
+              "last_login": "2025-09-23T23:26:42.917+00:00",
+              "created_at": "2025-08-31T02:04:11.817+00:00",
+              "updated_at": "2025-09-23T23:26:43.000728+00:00",
+              "role_name": "admin",
+              "emailVerified": null,
+              "image": null,
+              "whatsapp_verified": false,
+              "user_type": "matrix",
+              "context_type": null,
+              "context_id": null,
+              "context_name": null,
+              "context_slug": null,
+              "available_contexts": [
+                {
+                  "id": "fa4a4a34-f662-4da1-94d8-b77b5c578d6b",
+                  "name": "Sistema Atual",
+                  "slug": "sistema-atual",
+                  "type": "department",
+                  "can_manage": true
+                },
+                {
+                  "id": "a7791594-c44d-47aa-8ddd-97ecfb6cc8ed",
+                  "name": "Organização Padrão",
+                  "slug": "default-organization",
+                  "type": "organization",
+                  "can_manage": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "test_name": "Verificar usuário de contexto existe",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 51,
+          "details": {
+            "user": {
+              "id": "3b855060-50d4-4eef-abf5-4eec96934159",
+              "email": "agro@agro.com.br",
+              "password_hash": "$2a$10$4ow.lQ/Jm.cRFcjRG/Kw7uGhBfOnpcZixp7r.tiMzEDa1y2AqshUi",
+              "name": "agro user",
+              "role": "user",
+              "department": "agro",
+              "avatar_url": null,
+              "is_active": true,
+              "last_login": "2025-09-23T23:28:51.61+00:00",
+              "created_at": "2025-09-23T18:15:29.676+00:00",
+              "updated_at": "2025-09-23T23:28:51.693074+00:00",
+              "role_name": "user",
+              "emailVerified": null,
+              "image": null,
+              "whatsapp_verified": false,
+              "user_type": "context",
+              "context_type": "organization",
+              "context_id": "6486088e-72ae-461b-8b03-32ca84918882",
+              "context_name": "Luft Agro",
+              "context_slug": "luft-agro",
+              "available_contexts": []
+            }
+          }
+        },
+        {
+          "test_name": "Verificar estrutura da tabela users",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 68,
+          "details": {
+            "structure": "OK",
+            "fields": [
+              "id",
+              "email",
+              "password_hash",
+              "name",
+              "role",
+              "department",
+              "avatar_url",
+              "is_active",
+              "last_login",
+              "created_at",
+              "updated_at",
+              "role_name",
+              "emailVerified",
+              "image",
+              "whatsapp_verified",
+              "user_type",
+              "context_type",
+              "context_id",
+              "context_name",
+              "context_slug",
+              "available_contexts"
+            ]
+          }
+        },
+        {
+          "test_name": "Verificar RLS policies na tabela users",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 66,
+          "details": {
+            "rls_status": "OK",
+            "records_found": 14
+          }
+        }
+      ],
+      "total_tests": 5,
+      "passed_tests": 5,
+      "failed_tests": 0,
+      "skipped_tests": 0,
+      "duration": 546
+    },
+    {
+      "suite_name": "SISTEMA MULTI-TENANT",
+      "tests": [
+        {
+          "test_name": "Verificar tabela contexts existe",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 78,
+          "details": {
+            "contexts_table": "OK",
+            "sample": {
+              "id": "fa4a4a34-f662-4da1-94d8-b77b5c578d6b",
+              "name": "Sistema Atual",
+              "slug": "sistema-atual",
+              "type": "department",
+              "parent_context_id": null,
+              "settings": {},
+              "sla_hours": 24,
+              "contact_email": null,
+              "contact_phone": null,
+              "is_active": true,
+              "created_at": "2025-09-23T04:06:21.035417+00:00",
+              "updated_at": "2025-09-23T04:06:21.035417+00:00"
+            }
+          }
+        },
+        {
+          "test_name": "Verificar tabela user_contexts existe",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 53,
+          "details": {
+            "user_contexts_table": "OK",
+            "sample": {
+              "id": "609bc8bb-9d3d-4609-b959-57cb974b639a",
+              "user_id": "2a33241e-ed38-48b5-9c84-e8c354ae9606",
+              "context_id": "fa4a4a34-f662-4da1-94d8-b77b5c578d6b",
+              "can_manage": true,
+              "created_at": "2025-09-23T15:20:10.461028+00:00",
+              "updated_at": "2025-09-23T15:20:10.461028+00:00"
+            }
+          }
+        },
+        {
+          "test_name": "Verificar organização Luft Agro existe",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 45,
+          "details": {
+            "organization": {
+              "id": "6486088e-72ae-461b-8b03-32ca84918882",
+              "name": "Luft Agro",
+              "slug": "luft-agro",
+              "type": "organization",
+              "parent_context_id": null,
+              "settings": {},
+              "sla_hours": 24,
+              "contact_email": null,
+              "contact_phone": null,
+              "is_active": true,
+              "created_at": "2025-09-23T17:45:44.295+00:00",
+              "updated_at": "2025-09-23T17:45:44.295+00:00"
+            }
+          }
+        },
+        {
+          "test_name": "Verificar associação usuário-organização",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 49,
+          "details": {
+            "association": {
+              "id": "28668e1d-304f-48b2-b703-07d4e8a5aba1",
+              "user_id": "3b855060-50d4-4eef-abf5-4eec96934159",
+              "context_id": "6486088e-72ae-461b-8b03-32ca84918882",
+              "can_manage": false,
+              "created_at": "2025-09-23T18:19:31.948+00:00",
+              "updated_at": "2025-09-23T18:19:32.036218+00:00"
+            }
+          }
+        },
+        {
+          "test_name": "Verificar RLS policies em user_contexts",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 65,
+          "details": {
+            "rls_status": "OK",
+            "records_found": 18
+          }
+        }
+      ],
+      "total_tests": 5,
+      "passed_tests": 5,
+      "failed_tests": 0,
+      "skipped_tests": 0,
+      "duration": 291
+    },
+    {
+      "suite_name": "GESTÃO DE TICKETS",
+      "tests": [
+        {
+          "test_name": "Verificar estrutura da tabela tickets",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 66,
+          "details": {
+            "structure": "OK",
+            "fields": [
+              "id",
+              "ticket_number",
+              "title",
+              "description",
+              "status",
+              "priority",
+              "category",
+              "created_by",
+              "assigned_to",
+              "resolution_notes",
+              "due_date",
+              "resolved_at",
+              "closed_at",
+              "created_at",
+              "updated_at",
+              "category_id",
+              "is_internal",
+              "updated_by",
+              "first_response_at",
+              "satisfaction_rating",
+              "rated_at",
+              "context_id",
+              "assigned_to_matrix_user",
+              "requester_context_user_id"
+            ]
+          }
+        },
+        {
+          "test_name": "Testar criação de ticket mínimo",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 269,
+          "details": {
+            "ticket_created": true,
+            "ticket_id": "7d8c386a-12dd-4ad9-872d-5b4170e0fadd",
+            "ticket_number": 2025090000
+          }
+        },
+        {
+          "test_name": "Testar criação de ticket com context_id",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 183,
+          "details": {
+            "ticket_created": true,
+            "ticket_id": "2625f451-492d-4d2e-8c63-d6fc4b556126",
+            "context_id": "6486088e-72ae-461b-8b03-32ca84918882"
+          }
+        },
+        {
+          "test_name": "Testar criação de ticket com status e priority",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 118,
+          "details": {
+            "ticket_created": true,
+            "status": "open",
+            "priority": "medium"
+          }
+        },
+        {
+          "test_name": "Verificar função generate_contextual_ticket_number",
+          "status": "FAIL",
+          "message": "Erro: Função não funciona: Could not find the function public.generate_contextual_ticket_number without parameters in the schema cache",
+          "duration": 93,
+          "details": {}
+        },
+        {
+          "test_name": "Verificar RLS policies em tickets",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 63,
+          "details": {
+            "rls_status": "OK",
+            "records_found": 5
+          }
+        }
+      ],
+      "total_tests": 6,
+      "passed_tests": 5,
+      "failed_tests": 1,
+      "skipped_tests": 0,
+      "duration": 792
+    },
+    {
+      "suite_name": "APIS E ENDPOINTS",
+      "tests": [
+        {
+          "test_name": "Testar API /api/tickets (GET)",
+          "status": "FAIL",
+          "message": "Erro: API retornou status 401: Unauthorized",
+          "duration": 208,
+          "details": {}
+        },
+        {
+          "test_name": "Testar API /api/dashboard/stats",
+          "status": "FAIL",
+          "message": "Erro: API retornou status 401: Unauthorized",
+          "duration": 562,
+          "details": {}
+        },
+        {
+          "test_name": "Testar API /api/organizations",
+          "status": "FAIL",
+          "message": "Erro: API retornou status 401: Unauthorized",
+          "duration": 145,
+          "details": {}
+        },
+        {
+          "test_name": "Testar API /api/users",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 329,
+          "details": {
+            "api_status": "OK",
+            "response_status": 200,
+            "users": [
+              {
+                "id": "3b855060-50d4-4eef-abf5-4eec96934159",
+                "email": "agro@agro.com.br",
+                "name": "agro user",
+                "role": "user",
+                "department": "agro",
+                "avatar_url": null,
+                "is_active": true,
+                "last_login": "2025-09-23T23:28:51.61+00:00",
+                "created_at": "2025-09-23T18:15:29.676+00:00",
+                "updated_at": "2025-09-23T23:28:51.693074+00:00",
+                "role_name": "user",
+                "emailVerified": null,
+                "image": null,
+                "whatsapp_verified": false,
+                "user_type": "context",
+                "context_type": "organization",
+                "context_id": "6486088e-72ae-461b-8b03-32ca84918882",
+                "context_name": "Luft Agro",
+                "context_slug": "luft-agro",
+                "available_contexts": []
+              },
+              {
+                "id": "9b60a03f-35d2-4c7f-820d-277b485f3318",
+                "email": "matrix.admin@example.com",
+                "name": "Matrix Admin",
+                "role": "admin",
+                "department": "Management",
+                "avatar_url": null,
+                "is_active": true,
+                "last_login": "2025-09-23T04:03:00.599+00:00",
+                "created_at": "2025-09-23T04:01:41.14844+00:00",
+                "updated_at": "2025-09-23T15:20:10.461028+00:00",
+                "role_name": null,
+                "emailVerified": null,
+                "image": null,
+                "whatsapp_verified": false,
+                "user_type": "matrix",
+                "context_type": null,
+                "context_id": null,
+                "context_name": null,
+                "context_slug": null,
+                "available_contexts": [
+                  {
+                    "id": "fa4a4a34-f662-4da1-94d8-b77b5c578d6b",
+                    "name": "Sistema Atual",
+                    "slug": "sistema-atual",
+                    "type": "department",
+                    "can_manage": true
+                  },
+                  {
+                    "id": "a7791594-c44d-47aa-8ddd-97ecfb6cc8ed",
+                    "name": "Organização Padrão",
+                    "slug": "default-organization",
+                    "type": "organization",
+                    "can_manage": true
+                  }
+                ]
+              },
+              {
+                "id": "e9439248-2e56-4766-b7b2-d126c4f42fa4",
+                "email": "matrix.analyst@example.com",
+                "name": "Matrix Analyst",
+                "role": "analyst",
+                "department": "Support",
+                "avatar_url": null,
+                "is_active": true,
+                "last_login": "2025-09-23T04:02:24.681+00:00",
+                "created_at": "2025-09-23T04:01:41.000854+00:00",
+                "updated_at": "2025-09-23T15:20:10.461028+00:00",
+                "role_name": null,
+                "emailVerified": null,
+                "image": null,
+                "whatsapp_verified": false,
+                "user_type": "context",
+                "context_type": "department",
+                "context_id": "fa4a4a34-f662-4da1-94d8-b77b5c578d6b",
+                "context_name": "Sistema Atual",
+                "context_slug": "sistema-atual",
+                "available_contexts": []
+              },
+              {
+                "id": "4e8b7081-842b-4364-8351-1ada057bf121",
+                "email": "desenvolvedor@dev.com.br",
+                "name": "Desenvolvedor",
+                "role": "dev",
+                "department": "",
+                "avatar_url": null,
+                "is_active": true,
+                "last_login": "2025-09-21T06:09:58.57+00:00",
+                "created_at": "2025-09-12T15:18:51.996+00:00",
+                "updated_at": "2025-09-23T15:20:10.461028+00:00",
+                "role_name": "dev",
+                "emailVerified": null,
+                "image": null,
+                "whatsapp_verified": false,
+                "user_type": "context",
+                "context_type": "department",
+                "context_id": "fa4a4a34-f662-4da1-94d8-b77b5c578d6b",
+                "context_name": "Sistema Atual",
+                "context_slug": "sistema-atual",
+                "available_contexts": []
+              },
+              {
+                "id": "6ffdda11-9e07-47af-971e-e063d62d0054",
+                "email": "dev@dev.com.br",
+                "name": "dev",
+                "role": "n2",
+                "department": "",
+                "avatar_url": null,
+                "is_active": false,
+                "last_login": "2025-09-12T15:12:04.675+00:00",
+                "created_at": "2025-09-10T20:48:21.164+00:00",
+                "updated_at": "2025-09-23T15:20:10.461028+00:00",
+                "role_name": "n2",
+                "emailVerified": null,
+                "image": null,
+                "whatsapp_verified": false,
+                "user_type": "context",
+                "context_type": "department",
+                "context_id": "fa4a4a34-f662-4da1-94d8-b77b5c578d6b",
+                "context_name": "Sistema Atual",
+                "context_slug": "sistema-atual",
+                "available_contexts": []
+              },
+              {
+                "id": "c8005da5-3d63-4de2-9956-43c2084d7385",
+                "email": "lucas.reis@wiser.log.br",
+                "name": "Lucas Reis Wiser",
+                "role": "admin",
+                "department": "Gerente Sustentação",
+                "avatar_url": null,
+                "is_active": true,
+                "last_login": "2025-09-05T12:40:07.314+00:00",
+                "created_at": "2025-09-05T12:33:39.275+00:00",
+                "updated_at": "2025-09-23T15:20:10.461028+00:00",
+                "role_name": "admin",
+                "emailVerified": null,
+                "image": null,
+                "whatsapp_verified": false,
+                "user_type": "matrix",
+                "context_type": null,
+                "context_id": null,
+                "context_name": null,
+                "context_slug": null,
+                "available_contexts": [
+                  {
+                    "id": "fa4a4a34-f662-4da1-94d8-b77b5c578d6b",
+                    "name": "Sistema Atual",
+                    "slug": "sistema-atual",
+                    "type": "department",
+                    "can_manage": true
+                  },
+                  {
+                    "id": "a7791594-c44d-47aa-8ddd-97ecfb6cc8ed",
+                    "name": "Organização Padrão",
+                    "slug": "default-organization",
+                    "type": "organization",
+                    "can_manage": true
+                  }
+                ]
+              },
+              {
+                "id": "04dc825f-82f8-4921-9d4a-2e93fd00dad9",
+                "email": "thiago.souza@wiser.log.br",
+                "name": "Thiago Wiser",
+                "role": "user",
+                "department": "",
+                "avatar_url": null,
+                "is_active": true,
+                "last_login": null,
+                "created_at": "2025-09-03T13:54:41.028+00:00",
+                "updated_at": "2025-09-23T15:20:10.461028+00:00",
+                "role_name": "user",
+                "emailVerified": null,
+                "image": null,
+                "whatsapp_verified": false,
+                "user_type": "context",
+                "context_type": "department",
+                "context_id": "fa4a4a34-f662-4da1-94d8-b77b5c578d6b",
+                "context_name": "Sistema Atual",
+                "context_slug": "sistema-atual",
+                "available_contexts": []
+              },
+              {
+                "id": "2a33241e-ed38-48b5-9c84-e8c354ae9606",
+                "email": "rodrigues2205@icloud.com",
+                "name": "Thiago Rodrigues Souza",
+                "role": "admin",
+                "department": "Consulto",
+                "avatar_url": null,
+                "is_active": true,
+                "last_login": "2025-09-23T23:26:42.917+00:00",
+                "created_at": "2025-08-31T02:04:11.817+00:00",
+                "updated_at": "2025-09-23T23:26:43.000728+00:00",
+                "role_name": "admin",
+                "emailVerified": null,
+                "image": null,
+                "whatsapp_verified": false,
+                "user_type": "matrix",
+                "context_type": null,
+                "context_id": null,
+                "context_name": null,
+                "context_slug": null,
+                "available_contexts": [
+                  {
+                    "id": "fa4a4a34-f662-4da1-94d8-b77b5c578d6b",
+                    "name": "Sistema Atual",
+                    "slug": "sistema-atual",
+                    "type": "department",
+                    "can_manage": true
+                  },
+                  {
+                    "id": "a7791594-c44d-47aa-8ddd-97ecfb6cc8ed",
+                    "name": "Organização Padrão",
+                    "slug": "default-organization",
+                    "type": "organization",
+                    "can_manage": true
+                  }
+                ]
+              },
+              {
+                "id": "2bcd314e-ee43-4d2e-98aa-62c25d85deb7",
+                "email": "user3@example.com",
+                "name": "Fernanda Costa",
+                "role": "analyst",
+                "department": "Recursos Humanos",
+                "avatar_url": null,
+                "is_active": true,
+                "last_login": "2025-09-09T01:29:32.491+00:00",
+                "created_at": "2025-08-31T00:20:27.182+00:00",
+                "updated_at": "2025-09-23T15:20:10.461028+00:00",
+                "role_name": "analyst",
+                "emailVerified": null,
+                "image": null,
+                "whatsapp_verified": false,
+                "user_type": "context",
+                "context_type": "department",
+                "context_id": "fa4a4a34-f662-4da1-94d8-b77b5c578d6b",
+                "context_name": "Sistema Atual",
+                "context_slug": "sistema-atual",
+                "available_contexts": []
+              },
+              {
+                "id": "c693343a-ae26-4ac3-98a8-92a69401a9d1",
+                "email": "user2@example.com",
+                "name": "João Pereira",
+                "role": "user",
+                "department": "Marketing",
+                "avatar_url": null,
+                "is_active": true,
+                "last_login": "2025-09-09T01:28:00.762+00:00",
+                "created_at": "2025-08-31T00:20:26.551+00:00",
+                "updated_at": "2025-09-23T15:20:10.461028+00:00",
+                "role_name": "user",
+                "emailVerified": null,
+                "image": null,
+                "whatsapp_verified": false,
+                "user_type": "context",
+                "context_type": "department",
+                "context_id": "fa4a4a34-f662-4da1-94d8-b77b5c578d6b",
+                "context_name": "Sistema Atual",
+                "context_slug": "sistema-atual",
+                "available_contexts": []
+              },
+              {
+                "id": "891b3c82-44c5-4cc9-b247-b88b799c88ec",
+                "email": "user1@example.com",
+                "name": "Maria Oliveira",
+                "role": "user",
+                "department": "Vendas",
+                "avatar_url": null,
+                "is_active": true,
+                "last_login": null,
+                "created_at": "2025-08-31T00:20:25.555+00:00",
+                "updated_at": "2025-09-23T15:20:10.461028+00:00",
+                "role_name": "user",
+                "emailVerified": null,
+                "image": null,
+                "whatsapp_verified": false,
+                "user_type": "context",
+                "context_type": "department",
+                "context_id": "fa4a4a34-f662-4da1-94d8-b77b5c578d6b",
+                "context_name": "Sistema Atual",
+                "context_slug": "sistema-atual",
+                "available_contexts": []
+              },
+              {
+                "id": "45a3ebc8-d3f2-4e60-a561-4cf80e5afe45",
+                "email": "analyst2@example.com",
+                "name": "Carlos Santos",
+                "role": "analyst",
+                "department": "Infraestrutura",
+                "avatar_url": null,
+                "is_active": true,
+                "last_login": null,
+                "created_at": "2025-08-31T00:20:24.541+00:00",
+                "updated_at": "2025-09-23T15:20:10.461028+00:00",
+                "role_name": "analyst",
+                "emailVerified": null,
+                "image": null,
+                "whatsapp_verified": false,
+                "user_type": "context",
+                "context_type": "department",
+                "context_id": "fa4a4a34-f662-4da1-94d8-b77b5c578d6b",
+                "context_name": "Sistema Atual",
+                "context_slug": "sistema-atual",
+                "available_contexts": []
+              },
+              {
+                "id": "cb3a7544-8aed-409e-b0b7-98cb3d332396",
+                "email": "analyst1@example.com",
+                "name": "Ana Silva",
+                "role": "analyst",
+                "department": "Suporte Técnico",
+                "avatar_url": null,
+                "is_active": true,
+                "last_login": "2025-08-31T13:39:00.263+00:00",
+                "created_at": "2025-08-31T00:20:22.981+00:00",
+                "updated_at": "2025-09-23T15:20:10.461028+00:00",
+                "role_name": "analyst",
+                "emailVerified": null,
+                "image": null,
+                "whatsapp_verified": false,
+                "user_type": "context",
+                "context_type": "department",
+                "context_id": "fa4a4a34-f662-4da1-94d8-b77b5c578d6b",
+                "context_name": "Sistema Atual",
+                "context_slug": "sistema-atual",
+                "available_contexts": []
+              },
+              {
+                "id": "a17bd88a-2385-4539-8b96-4d89f5e5e7f0",
+                "email": "admin@example.com",
+                "name": "Administrador do Sistema",
+                "role": "admin",
+                "department": "Tecnologia da Informaçã",
+                "avatar_url": null,
+                "is_active": true,
+                "last_login": "2025-09-03T23:57:39.283+00:00",
+                "created_at": "2025-08-30T20:55:00.020269+00:00",
+                "updated_at": "2025-09-23T15:20:10.461028+00:00",
+                "role_name": "admin",
+                "emailVerified": null,
+                "image": null,
+                "whatsapp_verified": false,
+                "user_type": "matrix",
+                "context_type": null,
+                "context_id": null,
+                "context_name": null,
+                "context_slug": null,
+                "available_contexts": [
+                  {
+                    "id": "fa4a4a34-f662-4da1-94d8-b77b5c578d6b",
+                    "name": "Sistema Atual",
+                    "slug": "sistema-atual",
+                    "type": "department",
+                    "can_manage": true
+                  },
+                  {
+                    "id": "a7791594-c44d-47aa-8ddd-97ecfb6cc8ed",
+                    "name": "Organização Padrão",
+                    "slug": "default-organization",
+                    "type": "organization",
+                    "can_manage": true
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "test_name": "Testar API /api/comments",
+          "status": "FAIL",
+          "message": "Erro: API retornou status 401: Unauthorized",
+          "duration": 142,
+          "details": {}
+        }
+      ],
+      "total_tests": 5,
+      "passed_tests": 1,
+      "failed_tests": 4,
+      "skipped_tests": 0,
+      "duration": 1387
+    },
+    {
+      "suite_name": "FUNCIONALIDADES AVANÇADAS",
+      "tests": [
+        {
+          "test_name": "Verificar tabela categories",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 53,
+          "details": {
+            "categories_found": 5,
+            "sample": {
+              "id": "19aeb83e-2d1f-40ef-a61b-37901d6d701e",
+              "name": "integração",
+              "slug": "integração",
+              "description": "Problemas com impressoras e scanners",
+              "icon": "arrow-left-right",
+              "color": "#ddf75f",
+              "is_active": true,
+              "display_order": 0,
+              "created_at": "2025-08-31T22:23:26.034603+00:00",
+              "updated_at": "2025-09-21T17:22:37.64584+00:00",
+              "created_by": null,
+              "updated_by": null
+            }
+          }
+        },
+        {
+          "test_name": "Verificar tabela statuses",
+          "status": "FAIL",
+          "message": "Erro: Erro ao verificar statuses: Could not find the table 'public.statuses' in the schema cache",
+          "duration": 52,
+          "details": {}
+        },
+        {
+          "test_name": "Verificar tabela priorities",
+          "status": "FAIL",
+          "message": "Erro: Erro ao verificar priorities: Could not find the table 'public.priorities' in the schema cache",
+          "duration": 40,
+          "details": {}
+        },
+        {
+          "test_name": "Verificar tabela timesheets",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 52,
+          "details": {
+            "timesheets_found": 5,
+            "sample": {
+              "id": "bec26148-49f7-4b04-b850-a2f9e6a32ae8",
+              "ticket_id": "46878aaf-d4e8-4bdc-b900-9f338f6aea81",
+              "user_id": "2a33241e-ed38-48b5-9c84-e8c354ae9606",
+              "activity_description": "15515 - complemento automático",
+              "hours_worked": 1,
+              "work_date": "2025-09-07",
+              "status": "approved",
+              "rejection_reason": null,
+              "approved_by": "2a33241e-ed38-48b5-9c84-e8c354ae9606",
+              "approved_at": "2025-09-07T05:07:47.492+00:00",
+              "created_at": "2025-09-07T04:41:53.139103+00:00",
+              "updated_at": "2025-09-09T02:12:42.931656+00:00",
+              "description": "Descrição não informada",
+              "approval_date": null
+            }
+          }
+        },
+        {
+          "test_name": "Verificar tabela comments",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 38,
+          "details": {
+            "comments_found": 0
+          }
+        }
+      ],
+      "total_tests": 5,
+      "passed_tests": 3,
+      "failed_tests": 2,
+      "skipped_tests": 0,
+      "duration": 237
+    },
+    {
+      "suite_name": "PERFORMANCE E SEGURANÇA",
+      "tests": [
+        {
+          "test_name": "Testar performance de consulta de tickets",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 63,
+          "details": {
+            "performance": "OK",
+            "duration": 63,
+            "records": 73
+          }
+        },
+        {
+          "test_name": "Testar performance de consulta de usuários",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 40,
+          "details": {
+            "performance": "OK",
+            "duration": 40,
+            "records": 14
+          }
+        },
+        {
+          "test_name": "Verificar integridade dos dados",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 83,
+          "details": {
+            "data_integrity": "OK",
+            "orphan_tickets": 0,
+            "orphan_users": 0
+          }
+        },
+        {
+          "test_name": "Verificar consistência de tipos de dados",
+          "status": "PASS",
+          "message": "Teste executado com sucesso",
+          "duration": 36,
+          "details": {
+            "data_types": "OK",
+            "checked_records": 10
+          }
+        }
+      ],
+      "total_tests": 4,
+      "passed_tests": 4,
+      "failed_tests": 0,
+      "skipped_tests": 0,
+      "duration": 223
+    }
+  ]
+}
