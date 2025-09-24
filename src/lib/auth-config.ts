@@ -273,6 +273,26 @@ export const authConfig: NextAuthConfig = {
             .update({ last_login: new Date().toISOString() })
             .eq('id', user.id)
 
+          // Buscar contextos associados ao usuário
+          let availableContexts = []
+          if (user.user_type === 'matrix') {
+            const { data: userContexts, error: contextsError } = await supabaseAdmin
+              .from('user_contexts')
+              .select('context_id, contexts(id, name, slug, type)')
+              .eq('user_id', user.id)
+            
+            if (!contextsError && userContexts) {
+              availableContexts = userContexts
+                .filter(uc => uc.contexts) // Filtrar contextos válidos
+                .map(uc => ({
+                  id: uc.contexts.id,
+                  name: uc.contexts.name,
+                  slug: uc.contexts.slug,
+                  type: uc.contexts.type
+                }))
+            }
+          }
+
           // Buscar permissões do perfil do usuário
           let userPermissions = {}
           if (user.role_name) {
@@ -310,7 +330,7 @@ export const authConfig: NextAuthConfig = {
             context_id: user.context_id,
             context_name: user.context_name,
             context_slug: user.context_slug,
-            availableContexts: user.available_contexts || [],
+            availableContexts: availableContexts,
           }
         } catch (error) {
           console.error('Auth error:', error)

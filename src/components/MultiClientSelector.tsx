@@ -342,26 +342,23 @@ export function MultiClientSelector({
         />
       )}
       
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors w-full"
-      >
-        {showIcon && <Building className="w-5 h-5 text-blue-600" />}
-        <div className="flex-1 text-left">
-          <div className="text-sm font-medium text-gray-900">
+      <div className="flex flex-col">
+        <label className="text-xs font-medium text-gray-600 mb-1">
+          Clientes Selecionados
+        </label>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-[250px] px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-left flex items-center justify-between"
+        >
+          <span className="truncate">
             {getSelectedClientsInfo()}
-          </div>
-          {selectedClients.length > 0 && selectedClients.length < availableContexts.length && (
-            <div className="text-xs text-gray-500 truncate">
-              {getSelectedClientsNames()}
-            </div>
-          )}
-        </div>
-        <ChevronDown className="w-5 h-5 text-gray-400" />
-      </button>
+          </span>
+          <ChevronDown className="w-4 h-4 text-gray-400" />
+        </button>
+      </div>
       
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-hidden">
+        <div className="absolute top-full left-0 w-[300px] mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-80 overflow-hidden">
           <div className="p-4 border-b border-gray-100">
             <div className="flex items-center gap-2 mb-3">
               <Filter className="w-4 h-4 text-blue-600" />
