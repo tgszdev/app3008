@@ -118,18 +118,23 @@ export async function GET(request: NextRequest) {
       filteredComments = filteredComments.filter((comment: any) => {
         return comment.ticket?.context_id === userContextId
       })
-    } else if (userType === 'matrix' && userRole === 'user') {
-      // Users da matriz só veem comentários de tickets não internos ou criados por eles
-      filteredComments = filteredComments.filter((comment: any) => {
-        const ticket = comment.ticket
-        return (
-          !ticket?.is_internal || 
-          ticket?.is_internal === null || 
-          ticket?.created_by === currentUserId
-        )
-      })
+    } else if (userType === 'matrix') {
+      // Para usuários matrix, buscar contextos associados
+      const { data: userContexts, error: contextsError } = await supabaseAdmin
+        .from('user_contexts')
+        .select('context_id')
+        .eq('user_id', currentUserId)
+      
+      if (!contextsError && userContexts && userContexts.length > 0) {
+        const associatedContextIds = userContexts.map(uc => uc.context_id)
+        filteredComments = filteredComments.filter((comment: any) => {
+          return associatedContextIds.includes(comment.ticket?.context_id)
+        })
+      } else {
+        // Se não tem contextos associados, não mostrar nenhum comentário
+        filteredComments = []
+      }
     }
-    // Admin e analyst da matriz veem todos os comentários (não aplicar filtro)
     
     // Se é um usuário comum, filtrar comentários internos
     if (userRole === 'user') {

@@ -67,7 +67,7 @@ export default function OrganizationsPage() {
 
     try {
       await axios.delete(`/api/organizations/${id}`)
-      toast.success('Organização excluída com sucesso')
+      toast.success('Cliente excluído com sucesso')
       fetchOrganizations()
     } catch (error: any) {
       console.error('Erro ao excluir organização:', error)
@@ -99,11 +99,11 @@ export default function OrganizationsPage() {
       if (editingOrg) {
         // Atualizar organização existente
         await axios.put(`/api/organizations/${editingOrg.id}`, formData)
-        toast.success('Organização atualizada com sucesso')
+        toast.success('Cliente atualizado com sucesso')
       } else {
         // Criar nova organização
         await axios.post('/api/organizations', formData)
-        toast.success('Organização criada com sucesso')
+        toast.success('Cliente criado com sucesso')
       }
       
       setShowCreateModal(false)
@@ -164,7 +164,7 @@ export default function OrganizationsPage() {
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           <Plus className="h-4 w-4" />
-          Nova Organização
+          Novo Cliente
         </button>
       </div>
 
@@ -189,7 +189,7 @@ export default function OrganizationsPage() {
                     {org.name}
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {org.type === 'organization' ? 'Organização' : 'Departamento'}
+                    {org.type === 'organization' ? 'Cliente' : 'Departamento'}
                   </p>
                 </div>
               </div>
@@ -252,7 +252,7 @@ export default function OrganizationsPage() {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {editingOrg ? 'Editar Organização' : 'Nova Organização'}
+                {editingOrg ? 'Editar Cliente' : 'Novo Cliente'}
               </h2>
               <button
                 onClick={handleCloseModal}
@@ -287,7 +287,7 @@ export default function OrganizationsPage() {
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 >
-                  <option value="organization">Organização</option>
+                  <option value="organization">Cliente</option>
                   <option value="department">Departamento</option>
                 </select>
               </div>

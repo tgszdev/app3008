@@ -488,7 +488,7 @@ export default function HybridDashboard() {
           {isMatrixUser && currentContext && (
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {currentContext.type === 'organization' ? 'Organização' : 'Departamento'}:
+                {currentContext.type === 'organization' ? 'Cliente' : 'Departamento'}:
               </span>
               <OrganizationSelector variant="compact" />
             </div>
@@ -502,7 +502,7 @@ export default function HybridDashboard() {
             <div className="flex items-center gap-2">
               <Building className="w-4 h-4 text-blue-600" />
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                {currentContext.type === 'organization' ? 'Organização' : 'Departamento'}: 
+                {currentContext.type === 'organization' ? 'Cliente' : 'Departamento'}: 
                 <span className="font-medium ml-1 text-gray-900 dark:text-white">{currentContext.name}</span>
               </span>
             </div>

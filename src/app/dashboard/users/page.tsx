@@ -1093,7 +1093,7 @@ export default function UsersPage() {
                               {association.contexts.name}
                             </p>
                             <p className="text-sm text-gray-500 dark:text-gray-400">
-                              {association.contexts.type === 'organization' ? 'Organização' : 'Departamento'}
+                              {association.contexts.type === 'organization' ? 'Cliente' : 'Departamento'}
                             </p>
                           </div>
                         </div>
@@ -1129,7 +1129,7 @@ export default function UsersPage() {
                     <option value="">Selecione uma organização/departamento</option>
                     {organizations.map(org => (
                       <option key={org.id} value={org.id}>
-                        {org.name} ({org.type === 'organization' ? 'Organização' : 'Departamento'})
+                        {org.name} ({org.type === 'organization' ? 'Cliente' : 'Departamento'})
                       </option>
                     ))}
                   </select>

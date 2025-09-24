@@ -135,7 +135,7 @@ export function OrganizationSelector({
       
       <div className="flex flex-col">
         <label className="text-xs font-medium text-gray-600 mb-1">
-          {currentContext?.type === 'organization' ? 'Organização' : 'Departamento'}
+          {currentContext?.type === 'organization' ? 'Cliente' : 'Departamento'}
         </label>
         <select 
           value={currentContext?.id || ''} 
@@ -206,7 +206,7 @@ export function OrganizationSelectionScreen({ onContinue }: OrganizationSelectio
           <div className="text-center mb-8">
             <Building className="w-12 h-12 text-blue-600 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Selecione uma Organização
+              Selecione um Cliente
             </h1>
             <p className="text-gray-600">
               Escolha qual organização você gostaria de acessar
@@ -244,7 +244,7 @@ export function OrganizationSelectionScreen({ onContinue }: OrganizationSelectio
                         {context.name}
                       </h3>
                       <p className="text-sm text-gray-600">
-                        {context.type === 'organization' ? 'Organização Cliente' : 'Departamento Interno'}
+                        {context.type === 'organization' ? 'Cliente' : 'Departamento Interno'}
                       </p>
                     </div>
                     

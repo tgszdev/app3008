@@ -115,11 +115,21 @@ export async function GET(request: Request) {
     if (userType === 'context' && userContextId) {
       // Usuários de contexto só veem tickets do seu contexto
       query = query.eq('context_id', userContextId)
-    } else if (userRole === 'user' && currentUserId) {
-      // Users da matriz só veem tickets não internos ou criados por eles
-      query = query.or(`and(is_internal.eq.false),and(is_internal.is.null),and(created_by.eq.${currentUserId})`)
+    } else if (userType === 'matrix') {
+      // Para usuários matrix, buscar contextos associados
+      const { data: userContexts, error: contextsError } = await supabaseAdmin
+        .from('user_contexts')
+        .select('context_id')
+        .eq('user_id', currentUserId)
+      
+      if (!contextsError && userContexts && userContexts.length > 0) {
+        const associatedContextIds = userContexts.map(uc => uc.context_id)
+        query = query.in('context_id', associatedContextIds)
+      } else {
+        // Se não tem contextos associados, não mostrar nenhum ticket
+        query = query.eq('context_id', '00000000-0000-0000-0000-000000000000')
+      }
     }
-    // Admin e analyst da matriz veem todos os tickets (não aplicar filtro)
     
     // Apply user filter if provided
     if (userId) {
