@@ -96,6 +96,7 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
         
         if (isMatrixUser) {
           // Usuário da matriz: usar contextos da sessão
+          console.log('🔄 Carregando contextos para usuário matrix:', sessionContexts.length)
           setAvailableContexts(sessionContexts)
           
           // Se tem contextos disponíveis, selecionar o primeiro por padrão
