@@ -35,6 +35,7 @@ import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import { getIcon } from '@/lib/icons'
 import { OrganizationSelector } from '@/components/OrganizationSelector'
+import { MultiClientSelector, SelectedClientsTags } from '@/components/MultiClientSelector'
 
 // =====================================================
 // TIPOS E INTERFACES
@@ -304,6 +305,10 @@ export default function HybridDashboard() {
   const [myTicketsOnly, setMyTicketsOnly] = useState(false)
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
   
+  // Estados para seleção múltipla de clientes
+  const [selectedClients, setSelectedClients] = useState<string[]>([])
+  const [showMultiClientSelector, setShowMultiClientSelector] = useState(false)
+  
   // Dados do dashboard
   const [stats, setStats] = useState<Stats>({
     totalTickets: 0,
@@ -330,7 +335,7 @@ export default function HybridDashboard() {
       fetchDashboardData()
       fetchCategoryStats()
     }
-  }, [mounted, contextLoading, periodFilter, myTicketsOnly, currentContext])
+  }, [mounted, contextLoading, periodFilter, myTicketsOnly, currentContext, showMultiClientSelector, selectedClients])
 
   // =====================================================
   // FUNÇÕES DE FETCH DE DADOS
@@ -340,13 +345,19 @@ export default function HybridDashboard() {
     try {
       setLoading(true)
       
+      // Escolher API baseada no modo de seleção
+      let apiUrl = '/api/dashboard/stats'
       const params = new URLSearchParams({
         start_date: periodFilter.start_date,
         end_date: periodFilter.end_date
       })
       
-      // Adicionar contexto se disponível
-      if (currentContext) {
+      // Se está no modo de seleção múltipla e tem clientes selecionados
+      if (showMultiClientSelector && selectedClients.length > 0) {
+        apiUrl = '/api/dashboard/multi-client-stats'
+        params.append('context_ids', selectedClients.join(','))
+      } else if (currentContext) {
+        // Modo simples - usar contexto atual
         params.append('context_id', currentContext.id)
       }
       
@@ -355,11 +366,18 @@ export default function HybridDashboard() {
         params.append('user_id', session.user.id)
       }
       
-      const response = await axios.get(`/api/dashboard/stats?${params}`)
+      const response = await axios.get(`${apiUrl}?${params}`)
       
       if (response.data) {
-        setStats(response.data.stats)
-        setRecentTickets(response.data.recentTickets)
+        setStats(response.data.stats || {
+          totalTickets: response.data.total_tickets || 0,
+          openTickets: response.data.open_tickets || 0,
+          inProgressTickets: response.data.in_progress_tickets || 0,
+          resolvedTickets: response.data.resolved_tickets || 0,
+          cancelledTickets: response.data.cancelled_tickets || 0,
+          ticketsTrend: response.data.tickets_trend || '+0%'
+        })
+        setRecentTickets(response.data.recentTickets || response.data.recent_tickets || [])
       }
     } catch (error: any) {
       console.error('Error fetching dashboard data:', error)
@@ -426,6 +444,33 @@ export default function HybridDashboard() {
   }
 
   // =====================================================
+  // FUNÇÕES PARA SELEÇÃO MÚLTIPLA DE CLIENTES
+  // =====================================================
+
+  const handleClientSelectionChange = (selectedIds: string[]) => {
+    setSelectedClients(selectedIds)
+    // Recarregar dados com os clientes selecionados
+    fetchDashboardData()
+    fetchCategoryStats()
+    fetchRecentTickets()
+  }
+
+  const handleRemoveClient = (clientId: string) => {
+    const newSelection = selectedClients.filter(id => id !== clientId)
+    setSelectedClients(newSelection)
+    handleClientSelectionChange(newSelection)
+  }
+
+  const handleClearAllClients = () => {
+    setSelectedClients([])
+    handleClientSelectionChange([])
+  }
+
+  const toggleMultiClientSelector = () => {
+    setShowMultiClientSelector(!showMultiClientSelector)
+  }
+
+  // =====================================================
   // FUNÇÃO DE EXPORT PDF (SIMPLIFICADA)
   // =====================================================
 
@@ -484,13 +529,50 @@ export default function HybridDashboard() {
             </p>
           </div>
           
-          {/* Seletor de Organização (apenas para matriz) */}
-          {isMatrixUser && currentContext && (
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {currentContext.type === 'organization' ? 'Cliente' : 'Departamento'}:
-              </span>
-              <OrganizationSelector variant="compact" />
+          {/* Seletor de Clientes (apenas para matriz) */}
+          {isMatrixUser && (
+            <div className="flex flex-col gap-3">
+              {/* Botão para alternar entre seletor simples e múltiplo */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={toggleMultiClientSelector}
+                  className="flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-sm"
+                >
+                  <Building className="w-4 h-4" />
+                  {showMultiClientSelector ? 'Seleção Simples' : 'Seleção Múltipla'}
+                </button>
+                {currentContext && !showMultiClientSelector && (
+                  <span className="text-sm text-gray-600">
+                    {currentContext.type === 'organization' ? 'Cliente' : 'Departamento'}: {currentContext.name}
+                  </span>
+                )}
+              </div>
+              
+              {/* Seletor simples (atual) */}
+              {!showMultiClientSelector && currentContext && (
+                <OrganizationSelector variant="compact" />
+              )}
+              
+              {/* Seletor múltiplo */}
+              {showMultiClientSelector && (
+                <div className="space-y-3">
+                  <MultiClientSelector
+                    variant="default"
+                    onSelectionChange={handleClientSelectionChange}
+                    className="w-full"
+                  />
+                  
+                  {/* Tags dos clientes selecionados */}
+                  {selectedClients.length > 0 && (
+                    <SelectedClientsTags
+                      selectedIds={selectedClients}
+                      availableContexts={availableContexts}
+                      onRemove={handleRemoveClient}
+                      onClearAll={handleClearAllClients}
+                    />
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
