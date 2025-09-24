@@ -448,11 +448,31 @@ export default function HybridDashboard() {
   // =====================================================
 
   const handleClientSelectionChange = (selectedIds: string[]) => {
-    setSelectedClients(selectedIds)
-    // Recarregar dados com os clientes selecionados
-    fetchDashboardData()
-    fetchCategoryStats()
-    fetchRecentTickets()
+    try {
+      console.log('🔄 Mudança de seleção de clientes:', selectedIds)
+      setSelectedClients(selectedIds)
+      
+      // Recarregar dados com os clientes selecionados
+      if (selectedIds.length > 0) {
+        fetchDashboardData()
+        fetchCategoryStats()
+        fetchRecentTickets()
+      } else {
+        // Se não há seleção, limpar dados
+        setStats({
+          totalTickets: 0,
+          openTickets: 0,
+          inProgressTickets: 0,
+          resolvedTickets: 0,
+          cancelledTickets: 0,
+          ticketsTrend: '+0%'
+        })
+        setRecentTickets([])
+        setCategoryStats(null)
+      }
+    } catch (error) {
+      console.error('Erro ao processar mudança de seleção:', error)
+    }
   }
 
   const handleRemoveClient = (clientId: string) => {

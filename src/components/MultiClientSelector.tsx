@@ -105,33 +105,69 @@ export function MultiClientSelector({
   }
 
   const handleToggleClient = (clientId: string) => {
-    let newSelection: string[]
-    
-    if (selectedClients.includes(clientId)) {
-      // Remover da seleção
-      newSelection = selectedClients.filter(id => id !== clientId)
-    } else {
-      // Adicionar à seleção (respeitando limite máximo)
-      if (selectedClients.length >= maxSelections) {
-        return // Não permitir mais seleções
+    try {
+      let newSelection: string[]
+      
+      if (selectedClients.includes(clientId)) {
+        // Remover da seleção
+        newSelection = selectedClients.filter(id => id !== clientId)
+      } else {
+        // Adicionar à seleção (respeitando limite máximo)
+        if (selectedClients.length >= maxSelections) {
+          console.warn(`Limite máximo de ${maxSelections} seleções atingido`)
+          return // Não permitir mais seleções
+        }
+        newSelection = [...selectedClients, clientId]
       }
-      newSelection = [...selectedClients, clientId]
+      
+      setSelectedClients(newSelection)
+      
+      // Chamar callback com delay para evitar problemas de estado
+      setTimeout(() => {
+        try {
+          onSelectionChange?.(newSelection)
+        } catch (error) {
+          console.error('Erro no callback onSelectionChange:', error)
+        }
+      }, 0)
+      
+    } catch (error) {
+      console.error('Erro ao alternar cliente:', error)
     }
-    
-    setSelectedClients(newSelection)
-    onSelectionChange?.(newSelection)
   }
 
   const handleSelectAll = () => {
-    const allIds = availableContexts.map(context => context.id)
-    const newSelection = allIds.slice(0, maxSelections) // Respeitar limite
-    setSelectedClients(newSelection)
-    onSelectionChange?.(newSelection)
+    try {
+      const allIds = availableContexts.map(context => context.id)
+      const newSelection = allIds.slice(0, maxSelections) // Respeitar limite
+      setSelectedClients(newSelection)
+      
+      setTimeout(() => {
+        try {
+          onSelectionChange?.(newSelection)
+        } catch (error) {
+          console.error('Erro no callback onSelectionChange (selectAll):', error)
+        }
+      }, 0)
+    } catch (error) {
+      console.error('Erro ao selecionar todos:', error)
+    }
   }
 
   const handleClearAll = () => {
-    setSelectedClients([])
-    onSelectionChange?.([])
+    try {
+      setSelectedClients([])
+      
+      setTimeout(() => {
+        try {
+          onSelectionChange?.([])
+        } catch (error) {
+          console.error('Erro no callback onSelectionChange (clearAll):', error)
+        }
+      }, 0)
+    } catch (error) {
+      console.error('Erro ao limpar seleção:', error)
+    }
   }
 
   const getSelectedClientsInfo = () => {
@@ -172,7 +208,7 @@ export function MultiClientSelector({
         </button>
         
         {isOpen && (
-          <div className="absolute top-full right-0 mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-hidden">
             <div className="p-3 border-b border-gray-100">
               <input
                 type="text"
@@ -241,7 +277,7 @@ export function MultiClientSelector({
         </button>
         
         {isOpen && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-hidden">
             <div className="p-3 border-b border-gray-100">
               <input
                 type="text"
@@ -298,6 +334,14 @@ export function MultiClientSelector({
   // Variante padrão (default)
   return (
     <div className={cn("relative", className)}>
+      {/* Overlay para fechar modal */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 z-40" 
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+      
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors w-full"
@@ -317,7 +361,7 @@ export function MultiClientSelector({
       </button>
       
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-hidden">
           <div className="p-4 border-b border-gray-100">
             <div className="flex items-center gap-2 mb-3">
               <Filter className="w-4 h-4 text-blue-600" />
