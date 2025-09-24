@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useOrganization } from '@/contexts/OrganizationContext'
 import { Building, Users, ChevronDown, Check, X, Filter, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -51,12 +51,17 @@ export function MultiClientSelector({
   const [selectedClients, setSelectedClients] = useState<string[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [clientOptions, setClientOptions] = useState<ClientOption[]>([])
+  
+  // Usar useRef para manter o estado persistente entre re-renders
+  const selectedClientsRef = useRef<string[]>([])
+  const isInitializedRef = useRef(false)
 
-  // Inicializar vazio apenas uma vez quando o componente monta
+  // Inicializar apenas uma vez quando o componente monta
   useEffect(() => {
-    if (availableContexts && availableContexts.length > 0) {
+    if (availableContexts && availableContexts.length > 0 && !isInitializedRef.current) {
       console.log('🔄 Inicializando seletor com contextos disponíveis:', availableContexts.length)
       console.log('🔄 selectedClients atual:', selectedClients)
+      isInitializedRef.current = true
       // Não resetar selectedClients se já tem seleções
     }
   }, [availableContexts])
@@ -69,9 +74,9 @@ export function MultiClientSelector({
         name: context.name,
         type: context.type,
         slug: context.slug,
-        isSelected: selectedClients.includes(context.id)
+        isSelected: selectedClientsRef.current.includes(context.id)
       }))
-      console.log('🔄 Atualizando opções do seletor:', { selectedClients, options })
+      console.log('🔄 Atualizando opções do seletor:', { selectedClients: selectedClientsRef.current, options })
       setClientOptions(options)
     }
   }, [availableContexts, selectedClients])
@@ -109,26 +114,29 @@ export function MultiClientSelector({
 
   const handleToggleClient = (clientId: string) => {
     try {
-      console.log('🔄 handleToggleClient chamado:', { clientId, selectedClients })
+      console.log('🔄 handleToggleClient chamado:', { clientId, selectedClients: selectedClientsRef.current })
       console.log('🔄 availableContexts:', availableContexts.length)
       
       let newSelection: string[]
       
-      if (selectedClients.includes(clientId)) {
+      if (selectedClientsRef.current.includes(clientId)) {
         // Remover da seleção
-        newSelection = selectedClients.filter(id => id !== clientId)
+        newSelection = selectedClientsRef.current.filter(id => id !== clientId)
         console.log('🔄 Removendo da seleção:', newSelection)
       } else {
         // Adicionar à seleção (respeitando limite máximo)
-        if (selectedClients.length >= maxSelections) {
+        if (selectedClientsRef.current.length >= maxSelections) {
           console.warn(`Limite máximo de ${maxSelections} seleções atingido`)
           return // Não permitir mais seleções
         }
-        newSelection = [...selectedClients, clientId]
+        newSelection = [...selectedClientsRef.current, clientId]
         console.log('🔄 Adicionando à seleção:', newSelection)
       }
       
       console.log('🔄 Nova seleção:', newSelection)
+      
+      // Atualizar ref e state
+      selectedClientsRef.current = newSelection
       setSelectedClients(newSelection)
       
       // Chamar callback com delay para evitar problemas de estado
@@ -150,6 +158,9 @@ export function MultiClientSelector({
     try {
       const allIds = availableContexts.map(context => context.id)
       const newSelection = allIds.slice(0, maxSelections) // Respeitar limite
+      
+      // Atualizar ref e state
+      selectedClientsRef.current = newSelection
       setSelectedClients(newSelection)
       
       setTimeout(() => {
@@ -166,11 +177,15 @@ export function MultiClientSelector({
 
   const handleClearAll = () => {
     try {
-      setSelectedClients([])
+      const newSelection: string[] = []
+      
+      // Atualizar ref e state
+      selectedClientsRef.current = newSelection
+      setSelectedClients(newSelection)
       
       setTimeout(() => {
         try {
-          onSelectionChange?.([])
+          onSelectionChange?.(newSelection)
         } catch (error) {
           console.error('Erro no callback onSelectionChange (clearAll):', error)
         }
@@ -181,26 +196,27 @@ export function MultiClientSelector({
   }
 
   const getSelectedClientsInfo = () => {
-    console.log('🔄 getSelectedClientsInfo chamado:', { selectedClients, availableContexts: availableContexts.length })
+    const currentSelection = selectedClientsRef.current
+    console.log('🔄 getSelectedClientsInfo chamado:', { selectedClients: currentSelection, availableContexts: availableContexts.length })
     
-    if (selectedClients.length === 0) {
+    if (currentSelection.length === 0) {
       console.log('🔄 Retornando: "Selecionar clientes..."')
       return "Selecionar clientes..."
     }
     
-    if (selectedClients.length === availableContexts.length) {
+    if (currentSelection.length === availableContexts.length) {
       console.log('🔄 Retornando: "Todos os clientes"')
       return "Todos os clientes"
     }
     
-    if (selectedClients.length === 1) {
-      const selected = availableContexts.find(c => c.id === selectedClients[0])
+    if (currentSelection.length === 1) {
+      const selected = availableContexts.find(c => c.id === currentSelection[0])
       const result = selected?.name || "Cliente selecionado"
       console.log('🔄 Retornando:', result)
       return result
     }
     
-    const result = `${selectedClients.length} clientes selecionados`
+    const result = `${currentSelection.length} clientes selecionados`
     console.log('🔄 Retornando:', result)
     return result
   }
