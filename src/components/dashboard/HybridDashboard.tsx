@@ -306,6 +306,9 @@ export default function HybridDashboard() {
   const [myTicketsOnly, setMyTicketsOnly] = useState(false)
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
   
+  // Estados para seleção múltipla de clientes (gerenciados pelo pai)
+  const [selectedClients, setSelectedClients] = useState<string[]>([])
+  
   // Dados do dashboard
   const [stats, setStats] = useState<Stats>({
     totalTickets: 0,
@@ -318,6 +321,32 @@ export default function HybridDashboard() {
   
   const [categoryStats, setCategoryStats] = useState<DashboardData | null>(null)
   const [recentTickets, setRecentTickets] = useState<RecentTicket[]>([])
+
+  // Carregar seleções do localStorage na inicialização
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('selectedClients')
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved)
+          if (Array.isArray(parsed)) {
+            setSelectedClients(parsed)
+            console.log('🔄 Carregando seleções do localStorage:', parsed)
+          }
+        } catch (error) {
+          console.error('Erro ao carregar seleções do localStorage:', error)
+        }
+      }
+    }
+  }, [])
+
+  // Salvar seleções no localStorage sempre que mudarem
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('selectedClients', JSON.stringify(selectedClients))
+      console.log('🔄 Salvando seleções no localStorage:', selectedClients)
+    }
+  }, [selectedClients])
 
   // =====================================================
   // EFEITOS
@@ -332,7 +361,7 @@ export default function HybridDashboard() {
       fetchDashboardData()
       fetchCategoryStats()
     }
-  }, [mounted, contextLoading, periodFilter, myTicketsOnly])
+  }, [mounted, contextLoading, periodFilter, myTicketsOnly, selectedClients])
 
   // =====================================================
   // FUNÇÕES DE FETCH DE DADOS
@@ -349,8 +378,11 @@ export default function HybridDashboard() {
         end_date: periodFilter.end_date
       })
       
-      // Se tem contexto atual, usar API normal
-      if (currentContext) {
+      // Se tem clientes selecionados, usar API multi-client
+      if (selectedClients.length > 0) {
+        apiUrl = '/api/dashboard/multi-client-stats'
+        params.append('context_ids', selectedClients.join(','))
+      } else if (currentContext) {
         // Se não tem seleção múltipla, usar contexto atual
         params.append('context_id', currentContext.id)
       } else {
@@ -495,29 +527,8 @@ export default function HybridDashboard() {
   const handleClientSelectionChange = (selectedIds: string[]) => {
     try {
       console.log('🔄 Mudança de seleção de clientes:', selectedIds)
-      
-      // Recarregar dados com os clientes selecionados
-      if (selectedIds.length > 0) {
-        fetchMultiClientData(selectedIds)
-        fetchCategoryStats()
-      } else {
-        // Se não há seleção, usar contexto atual ou limpar dados
-        if (currentContext) {
-          fetchDashboardData()
-          fetchCategoryStats()
-        } else {
-          setStats({
-            totalTickets: 0,
-            openTickets: 0,
-            inProgressTickets: 0,
-            resolvedTickets: 0,
-            cancelledTickets: 0,
-            ticketsTrend: '+0%'
-          })
-          setRecentTickets([])
-          setCategoryStats(null)
-        }
-      }
+      setSelectedClients(selectedIds)
+      // O useEffect vai automaticamente recarregar os dados
     } catch (error) {
       console.error('Erro ao processar mudança de seleção:', error)
     }
@@ -600,6 +611,7 @@ export default function HybridDashboard() {
             <div className="space-y-3">
               <MultiClientSelector
                 variant="default"
+                selectedClients={selectedClients}
                 onSelectionChange={handleClientSelectionChange}
                 className="w-full"
               />
