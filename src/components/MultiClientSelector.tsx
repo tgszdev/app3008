@@ -52,12 +52,13 @@ export function MultiClientSelector({
   const [searchTerm, setSearchTerm] = useState('')
   const [clientOptions, setClientOptions] = useState<ClientOption[]>([])
 
-  // Inicializar com contexto atual se disponível
+  // Inicializar vazio para permitir seleção livre
   useEffect(() => {
-    if (currentContext && !selectedClients.includes(currentContext.id)) {
-      setSelectedClients([currentContext.id])
+    if (availableContexts && availableContexts.length > 0 && selectedClients.length === 0) {
+      console.log('🔄 Inicializando seletor vazio para seleção livre')
+      setSelectedClients([])
     }
-  }, [currentContext])
+  }, [availableContexts, selectedClients.length])
 
   // Converter contextos disponíveis em opções
   useEffect(() => {
@@ -172,7 +173,7 @@ export function MultiClientSelector({
 
   const getSelectedClientsInfo = () => {
     if (selectedClients.length === 0) {
-      return "Nenhum cliente selecionado"
+      return "Selecionar clientes..."
     }
     
     if (selectedClients.length === availableContexts.length) {

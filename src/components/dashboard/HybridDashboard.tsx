@@ -359,6 +359,19 @@ export default function HybridDashboard() {
       } else if (currentContext) {
         // Se não tem seleção múltipla, usar contexto atual
         params.append('context_id', currentContext.id)
+      } else {
+        // Se não tem seleção nem contexto, mostrar dados vazios
+        setStats({
+          totalTickets: 0,
+          openTickets: 0,
+          inProgressTickets: 0,
+          resolvedTickets: 0,
+          cancelledTickets: 0,
+          ticketsTrend: '+0%'
+        })
+        setRecentTickets([])
+        setCategoryStats(null)
+        return
       }
       
       // Adicionar filtro de usuário se ativo
