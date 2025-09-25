@@ -101,6 +101,10 @@ interface User {
   last_login?: string
   created_at: string
   updated_at: string
+  user_type?: string
+  context_id?: string
+  context_name?: string
+  context_type?: string
 }
 
 interface UserFormData {
@@ -110,6 +114,7 @@ interface UserFormData {
   department: string
   phone: string
   password?: string
+  user_type: string
 }
 
 interface Role {
@@ -193,6 +198,7 @@ export default function UsersPage() {
     department: '',
     phone: '',
     password: '',
+    user_type: 'context',
   })
 
   // Verificar se o usuário atual é admin
@@ -379,6 +385,7 @@ export default function UsersPage() {
         role: user.role,
         department: user.department || '',
         phone: user.phone || '',
+        user_type: (user as any).user_type || 'context',
       })
       setShowModal(true)
     }
@@ -392,6 +399,7 @@ export default function UsersPage() {
       role: user.role,
       department: user.department || '',
       phone: user.phone || '',
+      user_type: (user as any).user_type || 'context',
     })
     setShowModal(true)
     setShowPasswordModal(false)
@@ -444,6 +452,7 @@ export default function UsersPage() {
       department: '',
       phone: '',
       password: '',
+      user_type: 'context',
     })
     setShowModal(true)
   }
@@ -530,6 +539,7 @@ export default function UsersPage() {
         department: '',
         phone: '',
         password: '',
+        user_type: 'context',
       })
     } catch (error: any) {
       console.error('Erro ao salvar usuário:', error)
@@ -668,6 +678,9 @@ export default function UsersPage() {
                   Perfil
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Tipo
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Departamento
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -696,6 +709,13 @@ export default function UsersPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <RoleBadge role={user.role} roles={roles} />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <OrganizationBadge 
+                      userType={(user as any).user_type} 
+                      contextName={(user as any).context_name}
+                      contextType={(user as any).context_type}
+                    />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     {user.department || '-'}
@@ -978,6 +998,26 @@ export default function UsersPage() {
                     </>
                   )}
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Tipo de Usuário *
+                </label>
+                <select
+                  value={formData.user_type}
+                  onChange={(e) => setFormData({ ...formData, user_type: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="context">Contexto Específico</option>
+                  <option value="matrix">Matriz (Múltiplos Contextos)</option>
+                </select>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  {formData.user_type === 'context' 
+                    ? 'Usuário acessa apenas um contexto específico' 
+                    : 'Usuário pode acessar múltiplos contextos/organizações'
+                  }
+                </p>
               </div>
 
               <div>
