@@ -30,9 +30,9 @@ export async function GET(request: Request) {
       query = query.eq('is_active', true)
     }
 
-    // TEMPORÁRIO: Mostrar apenas categorias globais + do Luft Agro
+    // TEMPORÁRIO: Para usuários matrix, mostrar todas as categorias ativas
     // TODO: Implementar autenticação real para filtrar por usuário
-    query = query.or('is_global.eq.true,context_id.eq.6486088e-72ae-461b-8b03-32ca84918882')
+    // query = query.or('is_global.eq.true,context_id.eq.6486088e-72ae-461b-8b03-32ca84918882')
 
     query = query.order('display_order', { ascending: true })
 
