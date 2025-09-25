@@ -1,19 +1,12 @@
--- CORREÇÃO DEFINITIVA RLS - EVITAR RECURSÃO INFINITA
+-- Corrigir políticas RLS para categorias
+-- Permitir que usuários context vejam suas categorias específicas + globais
 
--- 1. REMOVER TODAS AS POLÍTICAS EXISTENTES
-DROP POLICY IF EXISTS "Users can view their own data" ON users;
-DROP POLICY IF EXISTS "Users can view users" ON users;
-DROP POLICY IF EXISTS "Users can view their own profile" ON users;
+-- Remover políticas existentes
 DROP POLICY IF EXISTS "Users can view categories" ON categories;
 DROP POLICY IF EXISTS "Users can view their own categories" ON categories;
 DROP POLICY IF EXISTS "Users can view global categories" ON categories;
 
--- 2. CRIAR POLÍTICA SIMPLES PARA USERS (SEM RECURSÃO)
-CREATE POLICY "Users can view their own data" ON users
-FOR SELECT
-USING (id = auth.uid());
-
--- 3. CRIAR POLÍTICA SIMPLES PARA CATEGORIAS
+-- Criar nova política para categorias
 CREATE POLICY "Users can view categories" ON categories
 FOR SELECT
 USING (
@@ -23,15 +16,25 @@ USING (
   -- Categorias específicas são visíveis para usuários do contexto
   (
     context_id IS NOT NULL 
-    AND context_id = (
+    AND context_id IN (
       SELECT context_id 
       FROM users 
       WHERE id = auth.uid()
     )
   )
+  OR
+  -- Usuários matrix podem ver todas as categorias
+  (
+    EXISTS (
+      SELECT 1 
+      FROM users 
+      WHERE id = auth.uid() 
+      AND user_type = 'matrix'
+    )
+  )
 );
 
--- 4. VERIFICAR POLÍTICAS CRIADAS
+-- Verificar se a política foi criada
 SELECT 
   schemaname,
   tablename,
@@ -41,5 +44,4 @@ SELECT
   cmd,
   qual
 FROM pg_policies 
-WHERE tablename IN ('users', 'categories')
-ORDER BY tablename, policyname;
+WHERE tablename = 'categories';

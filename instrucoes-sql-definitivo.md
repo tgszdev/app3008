@@ -1,3 +1,19 @@
+# 🔧 CORREÇÃO DEFINITIVA RLS
+
+## 🎯 **PROBLEMA IDENTIFICADO:**
+```
+infinite recursion detected in policy for relation "users"
+```
+
+## 📋 **SOLUÇÃO:**
+
+### 1. **Acesse o Supabase Dashboard:**
+- URL: https://supabase.com/dashboard
+- Projeto: eyfvvximmeqmwdfqzqov
+
+### 2. **Execute o SQL abaixo no SQL Editor:**
+
+```sql
 -- CORREÇÃO DEFINITIVA RLS - EVITAR RECURSÃO INFINITA
 
 -- 1. REMOVER TODAS AS POLÍTICAS EXISTENTES
@@ -43,3 +59,21 @@ SELECT
 FROM pg_policies 
 WHERE tablename IN ('users', 'categories')
 ORDER BY tablename, policyname;
+```
+
+### 3. **Teste a correção:**
+Após executar o SQL, teste no frontend:
+1. Faça logout
+2. Faça login novamente
+3. Vá para "Novo Chamado"
+4. Verifique se as categorias aparecem
+
+## 🎯 **RESULTADO ESPERADO:**
+O usuário `agro@agro.com.br` deveria ver:
+- **Suporte Agro** (Luft Agro)
+- **Agro Financeiro** (Luft Agro)
+
+## 📋 **SE AINDA NÃO FUNCIONAR:**
+1. Execute o debug: `node debug-completo-categorias.mjs`
+2. Verifique os logs do Vercel
+3. Verifique o console do navegador
