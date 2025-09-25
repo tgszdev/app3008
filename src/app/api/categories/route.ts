@@ -5,27 +5,33 @@ import { supabaseAdmin } from '@/lib/supabase'
 // GET - Listar categorias (com suporte a contexto)
 export async function GET(request: Request) {
   try {
-    // Tentar autenticação, mas com fallback seguro
+    // Tentar autenticação real
     let session = null
     let userId = null
+    let userType = null
     let contextId = null
+    let availableContexts = []
     
     try {
       session = await auth()
       if (session?.user?.id) {
         userId = session.user.id
+        userType = (session.user as any).userType
         contextId = (session.user as any).context_id
+        availableContexts = (session.user as any).availableContexts || []
         console.log('✅ Usuário autenticado:', session.user.email)
+        console.log('🔍 Tipo de usuário:', userType)
+        console.log('🔍 Contextos disponíveis:', availableContexts.length)
       }
     } catch (authError) {
-      console.log('⚠️ Erro na autenticação, usando fallback seguro')
+      console.log('⚠️ Erro na autenticação:', authError.message)
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
     
-    // Fallback seguro: se não conseguir autenticar, usar contexto padrão
-    if (!userId || !contextId) {
-      console.log('🔧 Usando fallback seguro para usuário agro')
-      userId = '3b855060-50d4-4eef-abf5-4eec96934159'
-      contextId = '6486088e-72ae-461b-8b03-32ca84918882'
+    // Verificar se usuário está autenticado
+    if (!userId) {
+      console.log('❌ Usuário não autenticado')
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Parse query parameters
@@ -47,13 +53,28 @@ export async function GET(request: Request) {
       query = query.eq('is_active', true)
     }
 
-    // Filter by context if provided
+    // Filter by context based on user type
     if (queryContextId) {
-      // Se contextId fornecido, buscar categorias globais + específicas do contexto
+      // Se contextId fornecido na query, buscar categorias globais + específicas do contexto
       query = query.or(`is_global.eq.true,context_id.eq.${queryContextId}`)
-    } else {
-      // Usar contexto do usuário autenticado ou fallback
+    } else if (userType === 'matrix') {
+      // Usuário matrix: buscar todas as categorias dos contextos associados
+      console.log('🔍 Usuário matrix: buscando categorias de todos os contextos')
+      if (availableContexts.length > 0) {
+        const contextIds = availableContexts.map(ctx => ctx.id)
+        query = query.or(`is_global.eq.true,context_id.in.(${contextIds.join(',')})`)
+      } else {
+        // Se não tem contextos associados, buscar apenas globais
+        query = query.eq('is_global', true)
+      }
+    } else if (userType === 'context' && contextId) {
+      // Usuário context: buscar categorias globais + do seu contexto
+      console.log('🔍 Usuário context: buscando categorias globais + específicas')
       query = query.or(`is_global.eq.true,context_id.eq.${contextId}`)
+    } else {
+      // Fallback: apenas categorias globais
+      console.log('🔍 Fallback: apenas categorias globais')
+      query = query.eq('is_global', true)
     }
 
     // Order by display_order
@@ -66,26 +87,36 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Failed to fetch categories' }, { status: 500 })
     }
 
-    // Buscar contexto separadamente se necessário (RLS bloqueando join)
-    let contextData = null
+    // Buscar dados dos contextos para enriquecer as categorias
+    let contextDataMap = new Map()
     if (categories && categories.length > 0) {
-      // Usar contexto do usuário autenticado ou fallback
-      const { data: context } = await supabaseAdmin
-        .from('contexts')
-        .select('id, name, type, slug')
-        .eq('id', contextId)
-        .single()
+      // Buscar dados de todos os contextos únicos das categorias
+      const uniqueContextIds = [...new Set(categories.map(cat => cat.context_id).filter(id => id))]
       
-      contextData = context
+      if (uniqueContextIds.length > 0) {
+        const { data: contexts, error: contextsError } = await supabaseAdmin
+          .from('contexts')
+          .select('id, name, type, slug')
+          .in('id', uniqueContextIds)
+        
+        if (!contextsError && contexts) {
+          contexts.forEach(ctx => {
+            contextDataMap.set(ctx.id, ctx)
+          })
+        }
+      }
     }
 
     // Montar resposta final com dados do contexto
-    const finalCategories = categories?.map(cat => ({
-      ...cat,
-      context_name: cat.context_id === contextData?.id ? contextData.name : 'Global',
-      context_slug: cat.context_id === contextData?.id ? contextData.slug : 'global',
-      context_type: cat.context_id === contextData?.id ? contextData.type : 'global'
-    })) || []
+    const finalCategories = categories?.map(cat => {
+      const contextData = contextDataMap.get(cat.context_id)
+      return {
+        ...cat,
+        context_name: cat.is_global ? 'Global' : (contextData?.name || 'N/A'),
+        context_slug: cat.is_global ? 'global' : (contextData?.slug || 'n-a'),
+        context_type: cat.is_global ? 'global' : (contextData?.type || 'n-a')
+      }
+    }) || []
 
     return NextResponse.json(finalCategories)
   } catch (error) {
