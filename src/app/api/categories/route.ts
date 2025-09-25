@@ -5,39 +5,16 @@ import { supabaseAdmin } from '@/lib/supabase'
 // GET - Listar categorias (com suporte a contexto)
 export async function GET(request: Request) {
   try {
-    // Tentar autenticação real
-    let session = null
-    let userId = null
-    let userType = null
-    let contextId = null
-    let availableContexts = []
+    const session = await auth()
     
-    try {
-      session = await auth()
-      if (session?.user?.id) {
-        userId = session.user.id
-        userType = (session.user as any).userType
-        contextId = (session.user as any).context_id
-        availableContexts = (session.user as any).availableContexts || []
-        console.log('✅ Usuário autenticado:', session.user.email)
-        console.log('🔍 Tipo de usuário:', userType)
-        console.log('🔍 Contextos disponíveis:', availableContexts.length)
-      }
-    } catch (authError) {
-      console.log('⚠️ Erro na autenticação:', authError.message)
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-    
-    // TEMPORÁRIO: Permitir acesso sem autenticação para debug
-    if (!userId) {
-      console.log('⚠️ Usuário não autenticado - usando fallback temporário')
-      // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Parse query parameters
     const { searchParams } = new URL(request.url)
     const activeOnly = searchParams.get('active_only') === 'true'
-    const queryContextId = searchParams.get('context_id')
+    const contextId = searchParams.get('context_id')
     const includeGlobal = searchParams.get('include_global') !== 'false' // Default true
 
     // Build query - REMOVENDO JOIN COM CONTEXTS (RLS bloqueando)
@@ -53,32 +30,22 @@ export async function GET(request: Request) {
       query = query.eq('is_active', true)
     }
 
-    // TEMPORÁRIO: Se não há usuário autenticado, mostrar todas as categorias ativas
-    if (!userId) {
-      console.log('⚠️ Usando fallback: mostrando todas as categorias ativas')
-      // Não aplicar filtros de contexto - mostrar todas
+    // Filter by context if provided
+    if (contextId) {
+      // Se contextId fornecido, buscar categorias globais + específicas do contexto
+      query = query.or(`is_global.eq.true,context_id.eq.${contextId}`)
     } else {
-      // Filter by context based on user type
-      if (queryContextId) {
-        // Se contextId fornecido na query, buscar categorias globais + específicas do contexto
-        query = query.or(`is_global.eq.true,context_id.eq.${queryContextId}`)
-      } else if (userType === 'matrix') {
-        // Usuário matrix: buscar todas as categorias dos contextos associados
-        console.log('🔍 Usuário matrix: buscando categorias de todos os contextos')
-        if (availableContexts.length > 0) {
-          const contextIds = availableContexts.map(ctx => ctx.id)
-          query = query.or(`is_global.eq.true,context_id.in.(${contextIds.join(',')})`)
-        } else {
-          // Se não tem contextos associados, buscar apenas globais
-          query = query.eq('is_global', true)
-        }
-      } else if (userType === 'context' && contextId) {
-        // Usuário context: buscar categorias globais + do seu contexto
-        console.log('🔍 Usuário context: buscando categorias globais + específicas')
-        query = query.or(`is_global.eq.true,context_id.eq.${contextId}`)
+      // Se não fornecido, usar lógica baseada no tipo de usuário
+      const user = session.user as any
+      
+      if (user.userType === 'matrix') {
+        // Usuários matrix veem todas as categorias
+        // Não adicionar filtro
+      } else if (user.userType === 'context' && user.contextId) {
+        // Usuários context veem categorias globais + do seu contexto
+        query = query.or(`is_global.eq.true,context_id.eq.${user.contextId}`)
       } else {
         // Fallback: apenas categorias globais
-        console.log('🔍 Fallback: apenas categorias globais')
         query = query.eq('is_global', true)
       }
     }
@@ -93,36 +60,28 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Failed to fetch categories' }, { status: 500 })
     }
 
-    // Buscar dados dos contextos para enriquecer as categorias
-    let contextDataMap = new Map()
+    // Buscar contexto separadamente se necessário (RLS bloqueando join)
+    let contextData = null
     if (categories && categories.length > 0) {
-      // Buscar dados de todos os contextos únicos das categorias
-      const uniqueContextIds = [...new Set(categories.map(cat => cat.context_id).filter(id => id))]
-      
-      if (uniqueContextIds.length > 0) {
-        const { data: contexts, error: contextsError } = await supabaseAdmin
+      const user = session.user as any
+      if (user.userType === 'context' && user.contextId) {
+        const { data: context } = await supabaseAdmin
           .from('contexts')
           .select('id, name, type, slug')
-          .in('id', uniqueContextIds)
+          .eq('id', user.contextId)
+          .single()
         
-        if (!contextsError && contexts) {
-          contexts.forEach(ctx => {
-            contextDataMap.set(ctx.id, ctx)
-          })
-        }
+        contextData = context
       }
     }
 
     // Montar resposta final com dados do contexto
-    const finalCategories = categories?.map(cat => {
-      const contextData = contextDataMap.get(cat.context_id)
-      return {
-        ...cat,
-        context_name: cat.is_global ? 'Global' : (contextData?.name || 'N/A'),
-        context_slug: cat.is_global ? 'global' : (contextData?.slug || 'n-a'),
-        context_type: cat.is_global ? 'global' : (contextData?.type || 'n-a')
-      }
-    }) || []
+    const finalCategories = categories?.map(cat => ({
+      ...cat,
+      context_name: cat.context_id === contextData?.id ? contextData.name : 'Global',
+      context_slug: cat.context_id === contextData?.id ? contextData.slug : 'global',
+      context_type: cat.context_id === contextData?.id ? contextData.type : 'global'
+    })) || []
 
     return NextResponse.json(finalCategories)
   } catch (error) {
