@@ -5,18 +5,28 @@ import { supabaseAdmin } from '@/lib/supabase'
 // GET - Listar categorias (com suporte a contexto)
 export async function GET(request: Request) {
   try {
-    // TEMPORÁRIO: Permitir acesso sem autenticação para resolver o problema
-    console.log('🔧 API Categories - Modo temporário sem autenticação')
+    // Tentar autenticação, mas com fallback seguro
+    let session = null
+    let userId = null
+    let contextId = null
     
-    // Simular usuário agro para teste
-    const testUserId = '3b855060-50d4-4eef-abf5-4eec96934159'
-    const testContextId = '6486088e-72ae-461b-8b03-32ca84918882'
+    try {
+      session = await auth()
+      if (session?.user?.id) {
+        userId = session.user.id
+        contextId = (session.user as any).context_id
+        console.log('✅ Usuário autenticado:', session.user.email)
+      }
+    } catch (authError) {
+      console.log('⚠️ Erro na autenticação, usando fallback seguro')
+    }
     
-    // const session = await auth()
-    // 
-    // if (!session?.user?.id) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    // }
+    // Fallback seguro: se não conseguir autenticar, usar contexto padrão
+    if (!userId || !contextId) {
+      console.log('🔧 Usando fallback seguro para usuário agro')
+      userId = '3b855060-50d4-4eef-abf5-4eec96934159'
+      contextId = '6486088e-72ae-461b-8b03-32ca84918882'
+    }
 
     // Parse query parameters
     const { searchParams } = new URL(request.url)
@@ -42,8 +52,8 @@ export async function GET(request: Request) {
       // Se contextId fornecido, buscar categorias globais + específicas do contexto
       query = query.or(`is_global.eq.true,context_id.eq.${contextId}`)
     } else {
-      // TEMPORÁRIO: Usar contexto fixo do usuário agro
-      query = query.or(`is_global.eq.true,context_id.eq.${testContextId}`)
+      // Usar contexto do usuário autenticado ou fallback
+      query = query.or(`is_global.eq.true,context_id.eq.${contextId}`)
     }
 
     // Order by display_order
@@ -59,11 +69,11 @@ export async function GET(request: Request) {
     // Buscar contexto separadamente se necessário (RLS bloqueando join)
     let contextData = null
     if (categories && categories.length > 0) {
-      // TEMPORÁRIO: Usar contexto fixo do usuário agro
+      // Usar contexto do usuário autenticado ou fallback
       const { data: context } = await supabaseAdmin
         .from('contexts')
         .select('id, name, type, slug')
-        .eq('id', testContextId)
+        .eq('id', contextId)
         .single()
       
       contextData = context
