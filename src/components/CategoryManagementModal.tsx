@@ -160,7 +160,6 @@ import {
   LifeBuoy,
   UserRound,
   Users2,
-  Package2,
   ClipboardPen,
   ScanBarcode,
   // Novos ícones específicos
