@@ -68,7 +68,7 @@ const OrganizationBadge = ({ userType, contextName, contextType }: {
     return (
       <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
         <Building className="w-3 h-3 mr-1" />
-        🏢 Multi-Cliente
+        🏢 Multi-Clientes
       </span>
     )
   }
@@ -1002,7 +1002,7 @@ export default function UsersPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Tipo de Usuário *
+                  Nível de Atendimento *
                 </label>
                 <select
                   value={formData.user_type}
@@ -1010,7 +1010,7 @@ export default function UsersPage() {
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="context">👤 Cliente Único</option>
-                  <option value="matrix">🏢 Multi-Cliente</option>
+                  <option value="matrix">🏢 Multi-Clientes</option>
                 </select>
                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   {formData.user_type === 'context' 
