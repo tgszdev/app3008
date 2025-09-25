@@ -95,7 +95,7 @@ export default function NewTicketPage() {
   const fetchCategories = async () => {
     try {
       setLoadingCategories(true)
-      const response = await axios.get('/api/categories/public?active_only=true')
+      const response = await axios.get('/api/categories/dynamic?active_only=true')
       setCategories(response.data)
       
       if (response.data.length > 0 && !formData.category_id) {
