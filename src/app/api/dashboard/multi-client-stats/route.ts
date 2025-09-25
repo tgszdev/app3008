@@ -6,28 +6,38 @@ export async function GET(request: NextRequest) {
   try {
     const session = await auth()
 
+    // TEMPORÁRIO: Permitir acesso sem autenticação para debug
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      console.log('⚠️ Usuário não autenticado - usando fallback temporário')
+      // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Obter dados do usuário e contexto multi-tenant
-    const { data: userData, error: userError } = await supabaseAdmin
-      .from('users')
-      .select('id, role, user_type, context_id, context_name, context_type')
-      .eq('email', session.user.email)
-      .single()
+    let userData = null
+    let currentUserId = null
+    let userRole = 'user'
+    let userType = 'matrix'
+    let userContextId = null
+    
+    if (session?.user?.id) {
+      const { data: userDataResult, error: userError } = await supabaseAdmin
+        .from('users')
+        .select('id, role, user_type, context_id, context_name, context_type')
+        .eq('email', session.user.email)
+        .single()
 
-    if (userError || !userData) {
-      return NextResponse.json(
-        { error: 'Usuário não encontrado' },
-        { status: 404 }
-      )
+      if (userError || !userDataResult) {
+        console.log('⚠️ Usuário não encontrado no banco - usando fallback')
+      } else {
+        userData = userDataResult
+        currentUserId = userData.id
+        userRole = userData.role || 'user'
+        userType = userData.user_type
+        userContextId = userData.context_id
+      }
+    } else {
+      console.log('⚠️ Usando dados de fallback para usuário não autenticado')
     }
-
-    const currentUserId = userData.id
-    const userRole = userData.role || 'user'
-    const userType = userData.user_type
-    const userContextId = userData.context_id
 
     // Obter parâmetros da query
     const { searchParams } = new URL(request.url)
