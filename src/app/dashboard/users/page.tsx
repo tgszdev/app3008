@@ -68,7 +68,7 @@ const OrganizationBadge = ({ userType, contextName, contextType }: {
     return (
       <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
         <Building className="w-3 h-3 mr-1" />
-        🏢 Multi-Org
+        🏢 Multi-Cliente
       </span>
     )
   }
@@ -77,7 +77,7 @@ const OrganizationBadge = ({ userType, contextName, contextType }: {
     return (
       <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
         <Users className="w-3 h-3 mr-1" />
-        👤 {contextName}
+        👤 Cliente Único
       </span>
     )
   }
@@ -85,7 +85,7 @@ const OrganizationBadge = ({ userType, contextName, contextType }: {
   return (
     <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300">
       <UserIcon className="w-3 h-3 mr-1" />
-      👤 Padrão
+      👤 Cliente Único
     </span>
   )
 }
@@ -1009,13 +1009,13 @@ export default function UsersPage() {
                   onChange={(e) => setFormData({ ...formData, user_type: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value="context">👤 Usuário Padrão</option>
-                  <option value="matrix">🏢 Administrador Multi-Organização</option>
+                  <option value="context">👤 Cliente Único</option>
+                  <option value="matrix">🏢 Multi-Cliente</option>
                 </select>
                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   {formData.user_type === 'context' 
-                    ? '👤 Acessa apenas uma organização/departamento específico' 
-                    : '🏢 Pode acessar múltiplas organizações e departamentos'
+                    ? '👤 Atende um cliente específico' 
+                    : '🏢 Gerencia múltiplos clientes'
                   }
                 </p>
               </div>
