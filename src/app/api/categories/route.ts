@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     // Parse query parameters
     const { searchParams } = new URL(request.url)
     const activeOnly = searchParams.get('active_only') === 'true'
-    const contextId = searchParams.get('context_id')
+    const queryContextId = searchParams.get('context_id')
     const includeGlobal = searchParams.get('include_global') !== 'false' // Default true
 
     // Build query - REMOVENDO JOIN COM CONTEXTS (RLS bloqueando)
@@ -48,9 +48,9 @@ export async function GET(request: Request) {
     }
 
     // Filter by context if provided
-    if (contextId) {
+    if (queryContextId) {
       // Se contextId fornecido, buscar categorias globais + específicas do contexto
-      query = query.or(`is_global.eq.true,context_id.eq.${contextId}`)
+      query = query.or(`is_global.eq.true,context_id.eq.${queryContextId}`)
     } else {
       // Usar contexto do usuário autenticado ou fallback
       query = query.or(`is_global.eq.true,context_id.eq.${contextId}`)
