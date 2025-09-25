@@ -397,9 +397,9 @@ export default function MultiClientDashboard() {
   
   // Filtros de período
   const getCurrentMonthDates = () => {
-    const now = new Date()
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+    // Usar 2025 para pegar os dados que existem no banco
+    const firstDay = new Date(2025, 8, 1) // Setembro 2025
+    const lastDay = new Date(2025, 11, 31) // Dezembro 2025
     
     return {
       start_date: firstDay.toISOString().split('T')[0],
@@ -440,8 +440,11 @@ export default function MultiClientDashboard() {
   }, [])
 
   useEffect(() => {
-    if (mounted && !contextLoading && selectedClients.length > 0) {
-      fetchMultiClientData()
+    if (mounted && !contextLoading) {
+      // Se não tem clientes selecionados, não buscar dados ainda
+      if (selectedClients.length > 0) {
+        fetchMultiClientData()
+      }
     }
   }, [mounted, contextLoading, selectedClients, periodFilter])
 
