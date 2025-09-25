@@ -161,7 +161,6 @@ import {
   UserRound,
   Users2,
   Package2,
-  ArchiveRestore,
   ClipboardPen,
   ScanBarcode,
   // Novos ícones específicos
