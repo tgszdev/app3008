@@ -340,7 +340,7 @@ export const authConfig: NextAuthConfig = {
     })
   ],
   callbacks: {
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user }) {
       // Primeiro login - criar sessão
       if (user) {
         token.id = user.id
@@ -370,51 +370,6 @@ export const authConfig: NextAuthConfig = {
         }
       }
       
-      // IMPORTANTE: Preservar o sessionToken em todas as requisições
-      // Se não tem sessionToken mas tem user id, pode ser uma sessão antiga - gerar novo token
-      if (!token.sessionToken && token.id) {
-        console.log('[AUTH] Token sem sessionToken, gerando novo...')
-        const newSessionToken = `${token.id}_${Date.now()}_${Math.random().toString(36).substring(7)}`
-        token.sessionToken = newSessionToken
-        
-        try {
-          await registerSession(token.id as string, newSessionToken)
-          console.log('[AUTH] Novo sessionToken criado para sessão existente:', newSessionToken)
-        } catch (error) {
-          console.error('[AUTH] Erro ao criar novo sessionToken:', error)
-        }
-      }
-      
-      // Verificar sessão apenas em updates controlados
-      if (token.sessionToken) {
-        // Verificar apenas em updates controlados, não aleatoriamente
-        // Removida verificação aleatória que causava logouts inesperados
-        if (trigger === 'update') { // Apenas em updates, sem Math.random()
-          try {
-            const { data: session } = await supabaseAdmin
-              .from('sessions')
-              .select('*')
-              .eq('sessionToken', token.sessionToken as string)
-              .gt('expires', new Date().toISOString())
-              .single()
-            
-            if (!session) {
-              console.log('[AUTH] Sessão não encontrada no banco:', {
-                sessionToken: token.sessionToken,
-                userId: token.id,
-                trigger
-              })
-              return null // Isso força o logout
-            } else {
-              console.log('[AUTH] Sessão válida encontrada no update')
-            }
-          } catch (error) {
-            console.error('Erro ao verificar sessão:', error)
-            // Em caso de erro, não forçar logout - pode ser problema de rede
-          }
-        }
-      }
-      
       return token
     },
     async session({ session, token }) {
@@ -438,22 +393,6 @@ export const authConfig: NextAuthConfig = {
         
         // IMPORTANTE: Adicionar sessionToken à sessão para as APIs poderem acessar
         (session as any).sessionToken = token.sessionToken;
-        
-        // Verificar se a sessão ainda é válida no banco
-        if (token.sessionToken) {
-          const { data: dbSession } = await supabaseAdmin
-            .from('sessions')
-            .select('*')
-            .eq('sessionToken', token.sessionToken as string)
-            .gt('expires', new Date().toISOString())
-            .single();
-          
-          if (!dbSession) {
-            // Sessão foi invalidada
-            session.user = undefined as any;
-            return { expires: new Date(0).toISOString() } as any;
-          }
-        }
       }
       return session
     }
