@@ -8,8 +8,7 @@ export async function GET(request: Request) {
     const session = await auth()
     
     if (!session?.user?.id) {
-      console.log('⚠️ Usuário não autenticado - usando fallback temporário')
-      // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Parse query parameters
@@ -97,8 +96,7 @@ export async function POST(request: Request) {
     const session = await auth()
     
     if (!session?.user?.id) {
-      console.log('⚠️ Usuário não autenticado - usando fallback temporário')
-      // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Verificar se é admin
