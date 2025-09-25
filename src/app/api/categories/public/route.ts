@@ -10,7 +10,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const activeOnly = searchParams.get('active_only') === 'true'
 
-    // Buscar categorias ativas
+    // Buscar categorias ativas com filtro por contexto
     let query = supabaseAdmin
       .from('categories')
       .select(`
@@ -29,6 +29,10 @@ export async function GET(request: Request) {
     if (activeOnly) {
       query = query.eq('is_active', true)
     }
+
+    // TEMPORÁRIO: Mostrar apenas categorias globais + do Luft Agro
+    // TODO: Implementar autenticação real para filtrar por usuário
+    query = query.or('is_global.eq.true,context_id.eq.6486088e-72ae-461b-8b03-32ca84918882')
 
     query = query.order('display_order', { ascending: true })
 

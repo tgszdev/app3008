@@ -49,7 +49,7 @@ const testCategoriesAPI = async () => {
   try {
     console.log('\n📡 Testando API de categorias diretamente...')
     
-    const response = await fetch('https://www.ithostbr.tech/api/categories?active_only=true')
+    const response = await fetch('https://www.ithostbr.tech/api/categories/public?active_only=true')
     
     if (response.ok) {
       const data = await response.json()
