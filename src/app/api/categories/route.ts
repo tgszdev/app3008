@@ -17,12 +17,11 @@ export async function GET(request: Request) {
     const contextId = searchParams.get('context_id')
     const includeGlobal = searchParams.get('include_global') !== 'false' // Default true
 
-    // Build query
+    // Build query - REMOVENDO JOIN COM CONTEXTS (RLS bloqueando)
     let query = supabaseAdmin
       .from('categories')
       .select(`
         *,
-        contexts(id, name, type, slug),
         parent_category:parent_category_id(id, name, slug)
       `)
 
@@ -61,7 +60,30 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Failed to fetch categories' }, { status: 500 })
     }
 
-    return NextResponse.json(categories || [])
+    // Buscar contexto separadamente se necessário (RLS bloqueando join)
+    let contextData = null
+    if (categories && categories.length > 0) {
+      const user = session.user as any
+      if (user.userType === 'context' && user.contextId) {
+        const { data: context } = await supabaseAdmin
+          .from('contexts')
+          .select('id, name, type, slug')
+          .eq('id', user.contextId)
+          .single()
+        
+        contextData = context
+      }
+    }
+
+    // Montar resposta final com dados do contexto
+    const finalCategories = categories?.map(cat => ({
+      ...cat,
+      context_name: cat.context_id === contextData?.id ? contextData.name : 'Global',
+      context_slug: cat.context_id === contextData?.id ? contextData.slug : 'global',
+      context_type: cat.context_id === contextData?.id ? contextData.type : 'global'
+    })) || []
+
+    return NextResponse.json(finalCategories)
   } catch (error) {
     console.error('Categories GET error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
