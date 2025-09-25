@@ -104,7 +104,6 @@ import {
   Store,
   ShoppingCart,
   CreditCard,
-  Package,
   Truck,
   Warehouse,
   BarChart3,
