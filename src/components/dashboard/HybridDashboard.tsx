@@ -381,6 +381,10 @@ export default function HybridDashboard() {
       // Se tem clientes selecionados, usar API stats com filtro no frontend
       if (selectedClients.length > 0) {
         apiUrl = '/api/dashboard/stats'
+        // Adicionar contexto selecionado aos parâmetros
+        if (selectedClients.length === 1) {
+          params.append('context_id', selectedClients[0])
+        }
         // O filtro será aplicado no frontend após receber os dados
       } else if (currentContext) {
         // Se não tem seleção múltipla, usar contexto atual
