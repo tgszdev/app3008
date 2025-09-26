@@ -66,7 +66,12 @@ export async function GET(request: NextRequest) {
       .lte('created_at', `${defaultEndDate}T23:59:59`)
     
     // Apply multi-tenant filter
-    if (userType === 'context' && userContextId) {
+    // PRIORIDADE: Usar contexto selecionado via parâmetro se disponível
+    if (selectedContextId) {
+      // Filtrar por contexto específico selecionado
+      query = query.eq('context_id', selectedContextId)
+      console.log(`✅ Query principal filtrada por contexto selecionado: ${selectedContextId}`)
+    } else if (userType === 'context' && userContextId) {
       // Usuários de contexto só veem tickets do seu contexto
       query = query.eq('context_id', userContextId)
     } else if (userType === 'matrix') {
@@ -97,58 +102,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch tickets' }, { status: 500 })
     }
 
-    // FORÇAR FILTROS DE CONTEXTO NAS ESTATÍSTICAS - REMOVER DEPOIS
-    console.log('🔄 Aplicando filtros de contexto nas estatísticas...')
-    
+    // Usar tickets já filtrados pela query principal
     let filteredTicketsForStats = tickets || []
-    
-    // Aplicar filtros de contexto nas estatísticas
-    // PRIORIDADE: Usar contexto selecionado via parâmetro se disponível
-    console.log(`🔍 Verificando filtro: selectedContextId = "${selectedContextId}"`)
-    console.log(`🔍 Tickets antes do filtro: ${filteredTicketsForStats.length}`)
-    
-    if (selectedContextId) {
-      // Filtrar por contexto específico selecionado
-      console.log(`🔄 Aplicando filtro por contexto: ${selectedContextId}`)
-      filteredTicketsForStats = filteredTicketsForStats.filter(ticket => 
-        ticket.context_id === selectedContextId
-      )
-      console.log(`✅ Estatísticas filtradas por contexto selecionado: ${filteredTicketsForStats.length} tickets`)
-      
-      // Debug: mostrar alguns tickets filtrados
-      if (filteredTicketsForStats.length > 0) {
-        console.log('📋 Tickets filtrados:')
-        filteredTicketsForStats.slice(0, 3).forEach(ticket => {
-          console.log(`  - ${ticket.title}: ${ticket.status} (${ticket.context_id})`)
-        })
-      }
-    } else if (userType === 'matrix' && userContextId) {
-      // Para usuários matrix com contexto específico selecionado
-      filteredTicketsForStats = filteredTicketsForStats.filter(ticket => 
-        ticket.context_id === userContextId
-      )
-      console.log(`✅ Estatísticas filtradas por contexto específico: ${filteredTicketsForStats.length} tickets`)
-    } else if (userType === 'context' && userContextId) {
-      // Para usuários de contexto
-      filteredTicketsForStats = filteredTicketsForStats.filter(ticket => 
-        ticket.context_id === userContextId
-      )
-      console.log(`✅ Estatísticas filtradas por contexto: ${filteredTicketsForStats.length} tickets`)
-    } else if (userType === 'matrix') {
-      // Para usuários matrix sem contexto específico, mostrar todos os contextos associados
-      const { data: userContexts, error: contextsError } = await supabaseAdmin
-        .from('user_contexts')
-        .select('context_id')
-        .eq('user_id', currentUserId)
-      
-      if (!contextsError && userContexts && userContexts.length > 0) {
-        const associatedContextIds = userContexts.map(uc => uc.context_id)
-        filteredTicketsForStats = filteredTicketsForStats.filter(ticket => 
-          associatedContextIds.includes(ticket.context_id)
-        )
-        console.log(`✅ Estatísticas filtradas por todos os contextos: ${filteredTicketsForStats.length} tickets`)
-      }
-    }
+    console.log(`✅ Usando tickets já filtrados pela query principal: ${filteredTicketsForStats.length} tickets`)
 
     // Filtrar tickets internos para usuários comuns
     let filteredTickets = tickets || []
