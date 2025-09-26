@@ -46,7 +46,6 @@ export async function GET(request: NextRequest) {
     const userType = userData.user_type
     const userContextId = userData.context_id
 
-    const searchParams = request.nextUrl.searchParams
     const userId = searchParams.get('user_id')
     const startDate = searchParams.get('start_date')
     const endDate = searchParams.get('end_date')
