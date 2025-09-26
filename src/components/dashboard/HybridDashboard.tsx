@@ -378,10 +378,10 @@ export default function HybridDashboard() {
         end_date: periodFilter.end_date
       })
       
-      // Se tem clientes selecionados, usar API multi-client
+      // Se tem clientes selecionados, usar API stats com filtro no frontend
       if (selectedClients.length > 0) {
-        apiUrl = '/api/dashboard/multi-client-stats'
-        params.append('context_ids', selectedClients.join(','))
+        apiUrl = '/api/dashboard/stats'
+        // O filtro será aplicado no frontend após receber os dados
       } else if (currentContext) {
         // Se não tem seleção múltipla, usar contexto atual
         params.append('context_id', currentContext.id)
@@ -408,15 +408,40 @@ export default function HybridDashboard() {
       const response = await axios.get(`${apiUrl}?${params}`)
       
       if (response.data) {
-        setStats(response.data.stats || {
+        let statsData = response.data.stats || {
           totalTickets: response.data.total_tickets || 0,
           openTickets: response.data.open_tickets || 0,
           inProgressTickets: response.data.in_progress_tickets || 0,
           resolvedTickets: response.data.resolved_tickets || 0,
           cancelledTickets: response.data.cancelled_tickets || 0,
           ticketsTrend: response.data.tickets_trend || '+0%'
-        })
-        setRecentTickets(response.data.recentTickets || response.data.recent_tickets || [])
+        }
+        
+        let recentTicketsData = response.data.recentTickets || response.data.recent_tickets || []
+        
+        // Aplicar filtro de clientes selecionados no frontend
+        if (selectedClients.length > 0) {
+          console.log('🔄 Aplicando filtro de clientes no frontend:', selectedClients)
+          
+          // Filtrar tickets recentes por contexto
+          recentTicketsData = recentTicketsData.filter((ticket: any) => {
+            return selectedClients.includes(ticket.context_id)
+          })
+          
+          // Ajustar estatísticas baseado nos tickets filtrados
+          statsData = {
+            totalTickets: recentTicketsData.length,
+            openTickets: recentTicketsData.filter((t: any) => t.status === 'open').length,
+            inProgressTickets: recentTicketsData.filter((t: any) => t.status === 'in_progress').length,
+            resolvedTickets: recentTicketsData.filter((t: any) => t.status === 'resolved').length,
+            cancelledTickets: recentTicketsData.filter((t: any) => t.status === 'cancelled').length,
+            ticketsTrend: '+0%'
+          }
+        }
+        
+        setStats(statsData)
+        setRecentTickets(recentTicketsData)
+      }
       }
     } catch (error: any) {
       console.error('Error fetching dashboard data:', error)
