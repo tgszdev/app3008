@@ -135,14 +135,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // GERAR TICKET_NUMBER ÚNICO GLOBALMENTE - TIMESTAMP + RANDOM (ATÔMICO)
-    // Usar timestamp + random para garantir unicidade sem race conditions
+    // GERAR TICKET_NUMBER ÚNICO GLOBALMENTE - TIMESTAMP SIMPLES (ATÔMICO)
+    // Usar apenas timestamp para garantir unicidade sem race conditions
     const timestamp = Date.now()
-    const random = Math.floor(Math.random() * 1000)
-    const ticketNumber = `${timestamp}${random.toString().padStart(3, '0')}`
+    const ticketNumber = timestamp.toString()
     
     console.log(`🎫 Gerando ticket_number único: ${ticketNumber}`)
-    console.log(`🎫 Timestamp: ${timestamp}, Random: ${random}`)
+    console.log(`🎫 Timestamp: ${timestamp}`)
 
     // Criar ticket com suporte para category_id
     const ticketData: any = {
