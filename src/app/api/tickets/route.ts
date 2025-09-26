@@ -128,13 +128,33 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // GERAR TICKET_NUMBER ÚNICO GLOBALMENTE - ABORDAGEM SIMPLES
-    // Usar UUID + timestamp para garantir unicidade absoluta
-    const timestamp = Date.now()
-    const random = Math.floor(Math.random() * 10000)
-    const ticketNumber = `T${timestamp}${random.toString().padStart(4, '0')}`
+    // GERAR TICKET_NUMBER ÚNICO GLOBALMENTE - NUMERAÇÃO SEQUENCIAL SIMPLES
+    // Buscar o último ticket_number e incrementar
+    const { data: lastTicket, error: lastTicketError } = await supabaseAdmin
+      .from('tickets')
+      .select('ticket_number')
+      .order('ticket_number', { ascending: false })
+      .limit(1)
+      .single()
     
-    console.log(`🎫 Gerando ticket_number único: ${ticketNumber}`)
+    if (lastTicketError && lastTicketError.code !== 'PGRST116') {
+      console.error('Erro ao buscar último ticket:', lastTicketError)
+      return NextResponse.json({ error: 'Erro ao gerar número do ticket' }, { status: 500 })
+    }
+    
+    // Se não há tickets, começar do 1
+    let ticketNumber: string
+    if (!lastTicket || !lastTicket.ticket_number) {
+      ticketNumber = '1'
+      console.log(`🎫 Primeiro ticket, começando do 1`)
+    } else {
+      // Extrair número sequencial e incrementar
+      const lastNumber = parseInt(String(lastTicket.ticket_number).replace(/\D/g, '')) || 0
+      ticketNumber = (lastNumber + 1).toString()
+      console.log(`🎫 Último ticket: ${lastTicket.ticket_number}, próximo: ${ticketNumber}`)
+    }
+    
+    console.log(`🎫 Gerando ticket_number: ${ticketNumber}`)
 
     // Criar ticket com suporte para category_id
     const ticketData: any = {
