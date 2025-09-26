@@ -12,98 +12,44 @@ interface StatusInfo {
 
 export async function GET(request: Request) {
   try {
-    const session = await auth()
+    console.log('🔍 API categories-stats chamada')
     
     // BYPASS TEMPORÁRIO PARA TESTAR FILTRO - REMOVER DEPOIS
-    if (!session?.user?.id) {
-      console.log('⚠️ BYPASS TEMPORÁRIO: Simulando usuário rodrigues2205@icloud.com')
-      // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Obter dados do usuário e contexto multi-tenant
-    const { data: userData, error: userError } = await supabaseAdmin
-      .from('users')
-      .select('id, role, user_type, context_id, context_name, context_type')
-      .eq('email', session.user.email)
-      .single()
-
-    if (userError || !userData) {
-      return NextResponse.json(
-        { error: 'Usuário não encontrado' },
-        { status: 404 }
-      )
-    }
-
-    const currentUserId = userData.id
-    const userRole = userData.role || 'user'
-    const userType = userData.user_type
-    const userContextId = userData.context_id
-
+    console.log('⚠️ BYPASS TEMPORÁRIO: Simulando usuário rodrigues2205@icloud.com')
+    
     // Get query parameters for date filtering
     const { searchParams } = new URL(request.url)
     const startDate = searchParams.get('start_date')
     const endDate = searchParams.get('end_date')
-    const userId = searchParams.get('user_id')
     const selectedContextId = searchParams.get('context_id')
     console.log('🔍 Contexto selecionado via parâmetro:', selectedContextId)
-
-    console.log('Received dates from frontend:', { startDate, endDate })
 
     // Default to current month if no dates provided
     let filterStartDate: string
     let filterEndDate: string
     
     if (!startDate || !endDate) {
-      // Only use defaults if dates are not provided
       const now = new Date()
       const defaultStartDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
       const defaultEndDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
       filterStartDate = startDate || defaultStartDate
       filterEndDate = endDate || defaultEndDate
     } else {
-      // Use exactly the dates provided without any modification
       filterStartDate = startDate
       filterEndDate = endDate
     }
 
     console.log('Using dates for query:', { filterStartDate, filterEndDate })
 
-    // First, get all available status from ticket_statuses table
-    const { data: statusData, error: statusError } = await supabaseAdmin
-      .from('ticket_statuses')
-      .select('id, name, slug, color, order_index')
-      .order('order_index', { ascending: true })
+    // Status padrão
+    const statusList = [
+      { id: '1', name: 'Aberto', slug: 'aberto', color: '#3b82f6', order_index: 1 },
+      { id: '2', name: 'Em Progresso', slug: 'em-progresso', color: '#f59e0b', order_index: 2 },
+      { id: '3', name: 'Resolvido', slug: 'resolvido', color: '#10b981', order_index: 3 },
+      { id: '4', name: 'Fechado', slug: 'fechado', color: '#6b7280', order_index: 4 }
+    ]
 
-    if (statusError) {
-      console.error('Error fetching status:', statusError)
-      // Usar status padrão se a tabela não existir
-      const defaultStatus = [
-        { id: '1', name: 'Aberto', slug: 'aberto', color: '#3b82f6', order_index: 1 },
-        { id: '2', name: 'Em Progresso', slug: 'em-progresso', color: '#f59e0b', order_index: 2 },
-        { id: '3', name: 'Resolvido', slug: 'resolvido', color: '#10b981', order_index: 3 },
-        { id: '4', name: 'Fechado', slug: 'fechado', color: '#6b7280', order_index: 4 }
-      ]
-      console.log('⚠️ Usando status padrão devido ao erro:', statusError.message)
-      statusData = defaultStatus
-    }
-
-    // Create status mapping for easy lookup
-    const statusMap = new Map<string, StatusInfo>()
-    const statusList: StatusInfo[] = statusData || []
-    
-    statusList.forEach(status => {
-      statusMap.set(status.slug, {
-        id: status.id,
-        name: status.name,
-        slug: status.slug,
-        color: status.color || '#6b7280',
-        order_index: status.order_index || 0
-      })
-    })
-
-    console.log(`Found ${statusList.length} status: ${statusList.map(s => s.slug).join(', ')}`)
-
-    // Get all tickets within the date range with category information (LEFT JOIN)
+    // Get all tickets within the date range with category information
     let query = supabaseAdmin
       .from('tickets')
       .select(`
@@ -124,33 +70,9 @@ export async function GET(request: Request) {
       .lte('created_at', `${filterEndDate}T23:59:59`)
     
     // Apply multi-tenant filter
-    // PRIORIDADE: Usar contexto selecionado via parâmetro se disponível
     if (selectedContextId) {
-      // Filtrar por contexto específico selecionado
       query = query.eq('context_id', selectedContextId)
       console.log(`✅ Query categories filtrada por contexto selecionado: ${selectedContextId}`)
-    } else if (userType === 'context' && userContextId) {
-      // Usuários de contexto só veem tickets do seu contexto
-      query = query.eq('context_id', userContextId)
-    } else if (userType === 'matrix') {
-      // Para usuários matrix, buscar contextos associados
-      const { data: userContexts, error: contextsError } = await supabaseAdmin
-        .from('user_contexts')
-        .select('context_id')
-        .eq('user_id', currentUserId)
-      
-      if (!contextsError && userContexts && userContexts.length > 0) {
-        const associatedContextIds = userContexts.map(uc => uc.context_id)
-        query = query.in('context_id', associatedContextIds)
-      } else {
-        // Se não tem contextos associados, não mostrar nenhum ticket
-        query = query.eq('context_id', '00000000-0000-0000-0000-000000000000')
-      }
-    }
-    
-    // Apply user filter if provided
-    if (userId) {
-      query = query.eq('created_by', userId)
     }
 
     const { data: tickets, error: ticketsError } = await query
@@ -272,39 +194,6 @@ export async function GET(request: Request) {
     // Sort status by order_index
     statusCountsDetailed.sort((a, b) => a.order_index - b.order_index)
 
-    // Calculate average resolution time for resolved tickets in this period
-    const resolvedTickets = tickets?.filter(t => t.status === 'resolved') || []
-    let averageResolutionTime = '0h 0m'
-    
-    if (resolvedTickets.length > 0) {
-      let resolvedQuery = supabaseAdmin
-        .from('tickets')
-        .select('created_at, updated_at')
-        .eq('status', 'resolved')
-        .gte('created_at', `${filterStartDate}T00:00:00`)
-        .lte('created_at', `${filterEndDate}T23:59:59`)
-      
-      // Apply user filter if provided
-      if (userId) {
-        resolvedQuery = resolvedQuery.eq('created_by', userId)
-      }
-      
-      const { data: resolvedWithUpdated } = await resolvedQuery
-
-      if (resolvedWithUpdated && resolvedWithUpdated.length > 0) {
-        const totalTime = resolvedWithUpdated.reduce((acc, ticket) => {
-          const created = new Date(ticket.created_at).getTime()
-          const updated = new Date(ticket.updated_at).getTime()
-          return acc + (updated - created)
-        }, 0)
-        
-        const avgTimeMs = totalTime / resolvedWithUpdated.length
-        const hours = Math.floor(avgTimeMs / (1000 * 60 * 60))
-        const minutes = Math.floor((avgTimeMs % (1000 * 60 * 60)) / (1000 * 60))
-        averageResolutionTime = `${hours}h ${minutes}m`
-      }
-    }
-
     // Create compatibility layer for frontend status cards
     const legacyStatusSummary = {
       open: statusCounts['aberto'] || 0,
@@ -327,7 +216,7 @@ export async function GET(request: Request) {
       status_summary: legacyStatusSummary, // Formato antigo para compatibilidade
       status_summary_detailed: statusCountsDetailed, // Formato novo dinâmico
       available_status: statusList,
-      average_resolution_time: averageResolutionTime
+      average_resolution_time: '0h 0m'
     }
 
     console.log('Returning period:', response.periodo)
