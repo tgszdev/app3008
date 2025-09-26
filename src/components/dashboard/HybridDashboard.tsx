@@ -442,7 +442,6 @@ export default function HybridDashboard() {
         setStats(statsData)
         setRecentTickets(recentTicketsData)
       }
-      }
     } catch (error: any) {
       console.error('Error fetching dashboard data:', error)
       toast.error('Erro ao carregar dados do dashboard')
