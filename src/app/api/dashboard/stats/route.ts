@@ -197,7 +197,7 @@ export async function GET(request: NextRequest) {
     const { data: recentTicketsList, error: recentError } = await recentQuery
 
     // FORÇAR FALLBACK PARA TESTE - REMOVER DEPOIS
-    const forceFallback = true
+    const forceFallback = false
     
     if (recentError || forceFallback) {
       console.error('Error fetching recent tickets:', recentError)
