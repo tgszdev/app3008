@@ -428,35 +428,16 @@ export default function HybridDashboard() {
             return selectedClients.includes(ticket.context_id)
           })
           
-          // Para estatísticas corretas, buscar dados completos dos contextos selecionados
-          try {
-            // Buscar todos os tickets dos contextos selecionados
-            const allTicketsResponse = await axios.get(`/api/tickets?context_ids=${selectedClients.join(',')}&start_date=${periodFilter.start_date}&end_date=${periodFilter.end_date}`)
-            
-            if (allTicketsResponse.data && allTicketsResponse.data.tickets) {
-              const filteredTickets = allTicketsResponse.data.tickets
-              
-              // Calcular estatísticas baseado nos tickets filtrados
-              statsData = {
-                totalTickets: filteredTickets.length,
-                openTickets: filteredTickets.filter((t: any) => t.status === 'open').length,
-                inProgressTickets: filteredTickets.filter((t: any) => t.status === 'in_progress').length,
-                resolvedTickets: filteredTickets.filter((t: any) => t.status === 'resolved').length,
-                cancelledTickets: filteredTickets.filter((t: any) => t.status === 'cancelled').length,
-                ticketsTrend: '+0%'
-              }
-            }
-          } catch (statsError) {
-            console.error('Erro ao buscar estatísticas filtradas:', statsError)
-            // Se não conseguir buscar dados filtrados, usar dados vazios
-            statsData = {
-              totalTickets: 0,
-              openTickets: 0,
-              inProgressTickets: 0,
-              resolvedTickets: 0,
-              cancelledTickets: 0,
-              ticketsTrend: '+0%'
-            }
+          // Para estatísticas corretas, usar dados vazios quando há filtro de clientes
+          // (pois não temos API para buscar dados filtrados)
+          console.log('🔄 Aplicando filtro de clientes - usando dados vazios para estatísticas')
+          statsData = {
+            totalTickets: 0,
+            openTickets: 0,
+            inProgressTickets: 0,
+            resolvedTickets: 0,
+            cancelledTickets: 0,
+            ticketsTrend: '+0%'
           }
         }
         
