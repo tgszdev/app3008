@@ -151,9 +151,15 @@ export async function POST(request: NextRequest) {
       if (!lastTicket || !lastTicket.ticket_number) {
         ticketNumber = '1'
       } else {
-        // Extrair número sequencial e incrementar
-        const lastNumber = parseInt(lastTicket.ticket_number.replace(/\D/g, '')) || 0
-        ticketNumber = (lastNumber + 1).toString()
+        // Verificar se ticket_number é string e extrair número sequencial
+        const ticketNumberStr = String(lastTicket.ticket_number || '')
+        if (ticketNumberStr && typeof ticketNumberStr === 'string') {
+          const lastNumber = parseInt(ticketNumberStr.replace(/\D/g, '')) || 0
+          ticketNumber = (lastNumber + 1).toString()
+        } else {
+          // Se ticket_number não é string válida, começar do 1
+          ticketNumber = '1'
+        }
       }
       
       // Verificar se o número já existe (proteção contra race conditions)
@@ -185,6 +191,8 @@ export async function POST(request: NextRequest) {
     } while (attempts < maxAttempts)
     
     console.log(`🎫 Gerando ticket_number: ${ticketNumber}`)
+    console.log(`🔍 Debug - lastTicket:`, lastTicket)
+    console.log(`🔍 Debug - ticketNumberStr:`, String(lastTicket?.ticket_number || ''))
 
     // Criar ticket com suporte para category_id
     const ticketData: any = {
