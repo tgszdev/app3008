@@ -128,45 +128,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // GERAR TICKET_NUMBER ÚNICO GLOBALMENTE
+    // GERAR TICKET_NUMBER ÚNICO GLOBALMENTE COM LOCK
     let ticketNumber: string
     let attempts = 0
     const maxAttempts = 10
     
     do {
-      // Buscar o último ticket_number para gerar o próximo
-      const { data: lastTicket, error: lastTicketError } = await supabaseAdmin
-        .from('tickets')
-        .select('ticket_number')
-        .order('ticket_number', { ascending: false })
-        .limit(1)
-        .single()
+      // Usar timestamp + random para evitar race conditions
+      const timestamp = Date.now()
+      const random = Math.floor(Math.random() * 1000)
+      ticketNumber = `${timestamp}${random.toString().padStart(3, '0')}`
       
-      if (lastTicketError && lastTicketError.code !== 'PGRST116') {
-        console.error('Erro ao buscar último ticket:', lastTicketError)
-        return NextResponse.json({ error: 'Erro ao gerar número do ticket' }, { status: 500 })
-      }
-      
-      // Se não há tickets, começar do 1
-      if (!lastTicket || !lastTicket.ticket_number) {
-        ticketNumber = '1'
-        console.log(`🔍 Debug - Primeiro ticket, começando do 1`)
-      } else {
-        // Verificar se ticket_number é string e extrair número sequencial
-        const ticketNumberStr = String(lastTicket.ticket_number || '')
-        console.log(`🔍 Debug - lastTicket:`, lastTicket)
-        console.log(`🔍 Debug - ticketNumberStr:`, ticketNumberStr)
-        
-        if (ticketNumberStr && typeof ticketNumberStr === 'string') {
-          const lastNumber = parseInt(ticketNumberStr.replace(/\D/g, '')) || 0
-          ticketNumber = (lastNumber + 1).toString()
-          console.log(`🔍 Debug - lastNumber: ${lastNumber}, nextNumber: ${ticketNumber}`)
-        } else {
-          // Se ticket_number não é string válida, começar do 1
-          ticketNumber = '1'
-          console.log(`🔍 Debug - ticket_number inválido, começando do 1`)
-        }
-      }
+      console.log(`🎫 Gerando ticket_number único: ${ticketNumber}`)
       
       // Verificar se o número já existe (proteção contra race conditions)
       const { data: existingTicket, error: checkError } = await supabaseAdmin
@@ -197,11 +170,11 @@ export async function POST(request: NextRequest) {
       }
       
       // Aguardar um pouco antes de tentar novamente
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, 50))
       
     } while (attempts < maxAttempts)
     
-    console.log(`🎫 Gerando ticket_number: ${ticketNumber}`)
+    console.log(`🎫 Ticket_number final: ${ticketNumber}`)
 
     // Criar ticket com suporte para category_id
     const ticketData: any = {
