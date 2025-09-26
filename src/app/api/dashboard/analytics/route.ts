@@ -12,13 +12,13 @@ export async function GET(request: Request) {
       // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
     
-    // SIMULAR USUÁRIO PARA TESTE
-    const mockSession = session || {
-      user: {
-        id: '2a33241e-ed38-48b5-9c84-e354ae9606',
-        email: 'rodrigues2205@icloud.com'
+      // SIMULAR USUÁRIO PARA TESTE
+      const mockSession = session || {
+        user: {
+          id: '2a33241e-ed38-48b5-9c84-e8c354ae9606',
+          email: 'rodrigues2205@icloud.com'
+        }
       }
-    }
     
     const effectiveSession = session || mockSession
 
