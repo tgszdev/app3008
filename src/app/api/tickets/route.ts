@@ -135,47 +135,108 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // GERAR TICKET_NUMBER ÚNICO GLOBALMENTE - TIMESTAMP SIMPLES (ATÔMICO)
-    // Usar apenas timestamp para garantir unicidade sem race conditions
-    const timestamp = Date.now()
-    const ticketNumber = timestamp.toString()
-    
-    console.log(`🎫 Gerando ticket_number único: ${ticketNumber}`)
-    console.log(`🎫 Timestamp: ${timestamp}`)
-
-    // Criar ticket com suporte para category_id
-    const ticketData: any = {
-      title,
-      description,
-      status: 'open',
-      priority: priority || 'medium',
-      category: category || 'general', // Manter compatibilidade
-      created_by,
-      assigned_to,
-      due_date,
-      is_internal: is_internal || false, // Adicionar campo is_internal
-      context_id: userContextId, // Adicionar contexto do usuário
-      ticket_number: ticketNumber, // ADICIONAR TICKET_NUMBER GERADO
-      // Deixar o Supabase gerenciar as datas automaticamente
-    }
-
-    // Adicionar category_id se fornecido
-    if (category_id) {
-      ticketData.category_id = category_id
-    }
-
-    const { data: newTicket, error } = await supabaseAdmin
+    // GERAR TICKET_NUMBER ÚNICO GLOBALMENTE - NUMERAÇÃO SEQUENCIAL SIMPLES
+    // Buscar o último ticket_number e incrementar
+    const { data: lastTicket, error: lastTicketError } = await supabaseAdmin
       .from('tickets')
-      .insert(ticketData)
-      .select(`
-        *,
-        created_by_user:users!tickets_created_by_fkey(id, name, email),
-        assigned_to_user:users!tickets_assigned_to_fkey(id, name, email)
-      `)
+      .select('ticket_number')
+      .order('ticket_number', { ascending: false })
+      .limit(1)
       .single()
+    
+    if (lastTicketError && lastTicketError.code !== 'PGRST116') {
+      console.error('Erro ao buscar último ticket:', lastTicketError)
+      return NextResponse.json({ error: 'Erro ao gerar número do ticket' }, { status: 500 })
+    }
+    
+    // Se não há tickets, começar do 1
+    let ticketNumber: string
+    if (!lastTicket || !lastTicket.ticket_number) {
+      ticketNumber = '1'
+      console.log(`🎫 Primeiro ticket, começando do 1`)
+    } else {
+      // Extrair número sequencial e incrementar
+      const lastNumber = parseInt(String(lastTicket.ticket_number).replace(/\D/g, '')) || 0
+      ticketNumber = (lastNumber + 1).toString()
+      console.log(`🎫 Último ticket: ${lastTicket.ticket_number}, próximo: ${ticketNumber}`)
+    }
+    
+    console.log(`🎫 Gerando ticket_number: ${ticketNumber}`)
+
+    // RETRY COM DELAY PARA EVITAR RACE CONDITIONS
+    const maxAttempts = 3
+    let attempt = 0
+    let newTicket: any = null
+    let error: any = null
+
+    while (attempt < maxAttempts && !newTicket) {
+      attempt++
+      console.log(`🔄 Tentativa ${attempt}/${maxAttempts} de criação do ticket`)
+      
+      // Criar ticket com suporte para category_id
+      const ticketData: any = {
+        title,
+        description,
+        status: 'open',
+        priority: priority || 'medium',
+        category: category || 'general', // Manter compatibilidade
+        created_by,
+        assigned_to,
+        due_date,
+        is_internal: is_internal || false, // Adicionar campo is_internal
+        context_id: userContextId, // Adicionar contexto do usuário
+        ticket_number: ticketNumber, // ADICIONAR TICKET_NUMBER GERADO
+        // Deixar o Supabase gerenciar as datas automaticamente
+      }
+
+      // Adicionar category_id se fornecido
+      if (category_id) {
+        ticketData.category_id = category_id
+      }
+
+      const { data: ticketResult, error: ticketError } = await supabaseAdmin
+        .from('tickets')
+        .insert(ticketData)
+        .select(`
+          *,
+          created_by_user:users!tickets_created_by_fkey(id, name, email),
+          assigned_to_user:users!tickets_assigned_to_fkey(id, name, email)
+        `)
+        .single()
+
+      if (ticketError) {
+        error = ticketError
+        console.error(`❌ Tentativa ${attempt} falhou:`, ticketError.message)
+        
+        // Se for erro de duplicata, tentar novamente com novo número
+        if (ticketError.code === '23505' && attempt < maxAttempts) {
+          console.log(`🔄 Erro de duplicata, gerando novo número...`)
+          
+          // Buscar último ticket novamente e incrementar
+          const { data: newLastTicket, error: newLastError } = await supabaseAdmin
+            .from('tickets')
+            .select('ticket_number')
+            .order('ticket_number', { ascending: false })
+            .limit(1)
+            .single()
+          
+          if (!newLastError && newLastTicket) {
+            const newLastNumber = parseInt(String(newLastTicket.ticket_number).replace(/\D/g, '')) || 0
+            ticketNumber = (newLastNumber + 1).toString()
+            console.log(`🎫 Novo ticket_number: ${ticketNumber}`)
+          }
+          
+          // Aguardar um pouco antes da próxima tentativa
+          await new Promise(resolve => setTimeout(resolve, 100))
+        }
+      } else {
+        newTicket = ticketResult
+        console.log(`✅ Ticket criado com sucesso na tentativa ${attempt}`)
+      }
+    }
 
     if (error) {
-      console.error('Erro ao criar ticket:', error)
+      console.error('Erro ao criar ticket após todas as tentativas:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
