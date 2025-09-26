@@ -317,14 +317,14 @@ export async function GET(request: NextRequest) {
     }) || []
 
     return NextResponse.json({
-      stats: {
-        totalTickets,
-        openTickets,
-        inProgressTickets,
-        resolvedTickets,
-        cancelledTickets,
-        ticketsTrend: ticketsTrend.startsWith('-') ? ticketsTrend : `+${ticketsTrend}`
-      },
+      totalTickets,
+      openTickets,
+      inProgressTickets,
+      resolvedTickets,
+      cancelledTickets,
+      closedTickets: resolvedTickets + cancelledTickets,
+      internalTickets: filteredTicketsForStats?.filter((t: any) => t.is_internal).length || 0,
+      ticketsTrend: ticketsTrend.startsWith('-') ? ticketsTrend : `+${ticketsTrend}`,
       recentTickets: formattedRecentTickets
     })
   } catch (error) {
