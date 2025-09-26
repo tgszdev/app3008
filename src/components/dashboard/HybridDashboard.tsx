@@ -423,27 +423,12 @@ export default function HybridDashboard() {
         
         let recentTicketsData = response.data.recentTickets || response.data.recent_tickets || []
         
-        // Aplicar filtro de clientes selecionados no frontend
-        if (selectedClients.length > 0) {
-          console.log('🔄 Aplicando filtro de clientes no frontend:', selectedClients)
-          
-          // Filtrar tickets recentes por contexto
-          recentTicketsData = recentTicketsData.filter((ticket: any) => {
-            return selectedClients.includes(ticket.context_id)
-          })
-          
-          // Para estatísticas corretas, usar dados vazios quando há filtro de clientes
-          // (pois não temos API para buscar dados filtrados)
-          console.log('🔄 Aplicando filtro de clientes - usando dados vazios para estatísticas')
-          statsData = {
-            totalTickets: 0,
-            openTickets: 0,
-            inProgressTickets: 0,
-            resolvedTickets: 0,
-            cancelledTickets: 0,
-            ticketsTrend: '+0%'
-          }
-        }
+        // A API já retorna dados filtrados quando context_id é enviado
+        // Não precisamos aplicar filtros adicionais no frontend
+        console.log('✅ Usando dados filtrados da API:', {
+          totalTickets: statsData.totalTickets,
+          recentTickets: recentTicketsData.length
+        })
         
         setStats(statsData)
         setRecentTickets(recentTicketsData)
@@ -467,8 +452,11 @@ export default function HybridDashboard() {
         end_date: periodFilter.end_date
       })
       
-      // Adicionar contexto se disponível
-      if (currentContext) {
+      // Adicionar contexto selecionado se disponível
+      if (selectedClients.length > 0) {
+        // Para múltiplos clientes, usar o primeiro (ou implementar lógica específica)
+        params.append('context_id', selectedClients[0])
+      } else if (currentContext) {
         params.append('context_id', currentContext.id)
       }
       
