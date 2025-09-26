@@ -428,14 +428,23 @@ export default function HybridDashboard() {
             return selectedClients.includes(ticket.context_id)
           })
           
-          // Ajustar estatísticas baseado nos tickets filtrados
-          statsData = {
-            totalTickets: recentTicketsData.length,
-            openTickets: recentTicketsData.filter((t: any) => t.status === 'open').length,
-            inProgressTickets: recentTicketsData.filter((t: any) => t.status === 'in_progress').length,
-            resolvedTickets: recentTicketsData.filter((t: any) => t.status === 'resolved').length,
-            cancelledTickets: recentTicketsData.filter((t: any) => t.status === 'cancelled').length,
-            ticketsTrend: '+0%'
+          // Para estatísticas corretas, buscar dados completos dos contextos selecionados
+          try {
+            const statsResponse = await axios.get(`/api/dashboard/stats?start_date=${periodFilter.start_date}&end_date=${periodFilter.end_date}&context_ids=${selectedClients.join(',')}`)
+            
+            if (statsResponse.data) {
+              statsData = statsResponse.data.stats || {
+                totalTickets: statsResponse.data.total_tickets || 0,
+                openTickets: statsResponse.data.open_tickets || 0,
+                inProgressTickets: statsResponse.data.in_progress_tickets || 0,
+                resolvedTickets: statsResponse.data.resolved_tickets || 0,
+                cancelledTickets: statsResponse.data.cancelled_tickets || 0,
+                ticketsTrend: statsResponse.data.tickets_trend || '+0%'
+              }
+            }
+          } catch (statsError) {
+            console.error('Erro ao buscar estatísticas filtradas:', statsError)
+            // Manter dados originais se houver erro
           }
         }
         
