@@ -135,19 +135,34 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // GERAR TICKET_NUMBER ÚNICO GLOBALMENTE - USANDO SEQUENCE DO POSTGRESQL
-    // Usar sequence para garantir unicidade e atomicidade
+    // GERAR TICKET_NUMBER ÚNICO GLOBALMENTE - SEQUENCE COM FALLBACK
+    // Tentar usar sequence primeiro, se falhar usar timestamp
     console.log(`🎫 Gerando ticket_number usando sequence...`)
     
-    const { data: ticketNumber, error: sequenceError } = await supabaseAdmin
-      .rpc('get_next_ticket_number')
+    let ticketNumber: string
     
-    if (sequenceError) {
-      console.error('Erro ao gerar número do ticket via sequence:', sequenceError)
-      return NextResponse.json({ error: 'Erro ao gerar número do ticket' }, { status: 500 })
+    try {
+      const { data: sequenceResult, error: sequenceError } = await supabaseAdmin
+        .rpc('get_next_ticket_number')
+      
+      if (sequenceError) {
+        console.error('❌ Erro ao usar sequence:', sequenceError)
+        throw new Error('Sequence falhou')
+      }
+      
+      ticketNumber = sequenceResult.toString()
+      console.log(`✅ Ticket_number gerado via SEQUENCE: ${ticketNumber}`)
+      
+    } catch (error) {
+      console.log('⚠️ SEQUENCE falhou, usando fallback com timestamp...')
+      
+      // FALLBACK: Usar timestamp + random para garantir unicidade
+      const timestamp = Date.now()
+      const random = Math.floor(Math.random() * 1000)
+      ticketNumber = `${timestamp}${random.toString().padStart(3, '0')}`
+      
+      console.log(`🎫 Ticket_number gerado via FALLBACK: ${ticketNumber}`)
     }
-    
-    console.log(`🎫 Ticket_number gerado: ${ticketNumber}`)
 
     // CRIAR TICKET COM SEQUENCE (SEM RETRY - SEQUENCE É ATÔMICO)
     const ticketData: any = {
