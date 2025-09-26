@@ -183,8 +183,12 @@ export async function GET(request: NextRequest) {
     
     const { data: recentTicketsList, error: recentError } = await recentQuery
 
-    if (recentError) {
+    // FORÇAR FALLBACK PARA TESTE - REMOVER DEPOIS
+    const forceFallback = true
+    
+    if (recentError || forceFallback) {
       console.error('Error fetching recent tickets:', recentError)
+      console.log('🔄 Entrando no fallback da query simples...')
       
       // If there's an error with the foreign key, try a simpler query
       let simpleQuery = supabaseAdmin
