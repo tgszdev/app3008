@@ -128,6 +128,64 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // GERAR TICKET_NUMBER ÚNICO GLOBALMENTE
+    let ticketNumber: string
+    let attempts = 0
+    const maxAttempts = 10
+    
+    do {
+      // Buscar o último ticket_number para gerar o próximo
+      const { data: lastTicket, error: lastTicketError } = await supabaseAdmin
+        .from('tickets')
+        .select('ticket_number')
+        .order('ticket_number', { ascending: false })
+        .limit(1)
+        .single()
+      
+      if (lastTicketError && lastTicketError.code !== 'PGRST116') {
+        console.error('Erro ao buscar último ticket:', lastTicketError)
+        return NextResponse.json({ error: 'Erro ao gerar número do ticket' }, { status: 500 })
+      }
+      
+      // Se não há tickets, começar do 1
+      if (!lastTicket || !lastTicket.ticket_number) {
+        ticketNumber = '1'
+      } else {
+        // Extrair número sequencial e incrementar
+        const lastNumber = parseInt(lastTicket.ticket_number.replace(/\D/g, '')) || 0
+        ticketNumber = (lastNumber + 1).toString()
+      }
+      
+      // Verificar se o número já existe (proteção contra race conditions)
+      const { data: existingTicket, error: checkError } = await supabaseAdmin
+        .from('tickets')
+        .select('id')
+        .eq('ticket_number', ticketNumber)
+        .limit(1)
+        .single()
+      
+      if (checkError && checkError.code !== 'PGRST116') {
+        console.error('Erro ao verificar ticket_number existente:', checkError)
+        return NextResponse.json({ error: 'Erro ao verificar número do ticket' }, { status: 500 })
+      }
+      
+      // Se não existe, podemos usar este número
+      if (!existingTicket) {
+        break
+      }
+      
+      attempts++
+      if (attempts >= maxAttempts) {
+        return NextResponse.json({ error: 'Não foi possível gerar número único para o ticket' }, { status: 500 })
+      }
+      
+      // Aguardar um pouco antes de tentar novamente
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
+    } while (attempts < maxAttempts)
+    
+    console.log(`🎫 Gerando ticket_number: ${ticketNumber}`)
+
     // Criar ticket com suporte para category_id
     const ticketData: any = {
       title,
@@ -140,6 +198,7 @@ export async function POST(request: NextRequest) {
       due_date,
       is_internal: is_internal || false, // Adicionar campo is_internal
       context_id: userContextId, // Adicionar contexto do usuário
+      ticket_number: ticketNumber, // ADICIONAR TICKET_NUMBER GERADO
       // Deixar o Supabase gerenciar as datas automaticamente
     }
 
