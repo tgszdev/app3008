@@ -181,9 +181,14 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Erro ao verificar número do ticket' }, { status: 500 })
       }
       
+      console.log(`🔍 Verificando duplicata para ${ticketNumber}:`, existingTicket ? 'EXISTE' : 'NÃO EXISTE')
+      
       // Se não existe, podemos usar este número
       if (!existingTicket) {
+        console.log(`✅ Número ${ticketNumber} disponível, usando...`)
         break
+      } else {
+        console.log(`❌ Número ${ticketNumber} já existe, tentando próximo...`)
       }
       
       attempts++
