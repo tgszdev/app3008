@@ -95,7 +95,7 @@ export async function GET(request: Request) {
 
     console.log(`Found ${statusList.length} status: ${statusList.map(s => s.slug).join(', ')}`)
 
-    // Get all tickets within the date range with category information (INNER JOIN)
+    // Get all tickets within the date range with category information (LEFT JOIN)
     let query = supabaseAdmin
       .from('tickets')
       .select(`
@@ -105,7 +105,7 @@ export async function GET(request: Request) {
         created_by,
         category_id,
         context_id,
-        categories!inner (
+        categories (
           id,
           name,
           icon,
