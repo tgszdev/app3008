@@ -93,6 +93,32 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch tickets' }, { status: 500 })
     }
 
+    // FORÇAR FILTROS DE CONTEXTO NAS ESTATÍSTICAS - REMOVER DEPOIS
+    console.log('🔄 Aplicando filtros de contexto nas estatísticas...')
+    
+    let filteredTicketsForStats = tickets || []
+    
+    // Aplicar filtros de contexto nas estatísticas
+    if (userType === 'matrix') {
+      const { data: userContexts, error: contextsError } = await supabaseAdmin
+        .from('user_contexts')
+        .select('context_id')
+        .eq('user_id', currentUserId)
+      
+      if (!contextsError && userContexts && userContexts.length > 0) {
+        const associatedContextIds = userContexts.map(uc => uc.context_id)
+        filteredTicketsForStats = filteredTicketsForStats.filter(ticket => 
+          associatedContextIds.includes(ticket.context_id)
+        )
+        console.log(`✅ Estatísticas filtradas: ${filteredTicketsForStats.length} tickets`)
+      }
+    } else if (userType === 'context' && userContextId) {
+      filteredTicketsForStats = filteredTicketsForStats.filter(ticket => 
+        ticket.context_id === userContextId
+      )
+      console.log(`✅ Estatísticas filtradas: ${filteredTicketsForStats.length} tickets`)
+    }
+
     // Filtrar tickets internos para usuários comuns
     let filteredTickets = tickets || []
     if (userRole === 'user') {
@@ -102,12 +128,12 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Calculate statistics (usando filteredTickets em vez de tickets)
-    const totalTickets = filteredTickets?.length || 0
-    const openTickets = filteredTickets?.filter((t: any) => t.status === 'open').length || 0
-    const inProgressTickets = filteredTickets?.filter((t: any) => t.status === 'in_progress').length || 0
-    const resolvedTickets = filteredTickets?.filter((t: any) => t.status === 'resolved').length || 0
-    const cancelledTickets = filteredTickets?.filter((t: any) => t.status === 'cancelled').length || 0
+    // Calculate statistics using filtered tickets for stats
+    const totalTickets = filteredTicketsForStats?.length || 0
+    const openTickets = filteredTicketsForStats?.filter((t: any) => t.status === 'open').length || 0
+    const inProgressTickets = filteredTicketsForStats?.filter((t: any) => t.status === 'in_progress').length || 0
+    const resolvedTickets = filteredTicketsForStats?.filter((t: any) => t.status === 'resolved').length || 0
+    const cancelledTickets = filteredTicketsForStats?.filter((t: any) => t.status === 'cancelled').length || 0
 
     // Removed average resolution time calculation - not needed anymore
 
