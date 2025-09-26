@@ -135,16 +135,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // GERAR TICKET_NUMBER ÚNICO GLOBALMENTE - SOLUÇÃO DEFINITIVA
-    // Usar timestamp + random para garantir unicidade absoluta
-    console.log(`🎫 Gerando ticket_number único...`)
+    // GERAR TICKET_NUMBER ÚNICO GLOBALMENTE - USANDO SEQUENCE
+    // Usar sequence do PostgreSQL para garantir unicidade e atomicidade
+    console.log(`🎫 Gerando ticket_number usando SEQUENCE...`)
     
-    const timestamp = Date.now()
-    const random = Math.floor(Math.random() * 10000)
-    const ticketNumber = `${timestamp}${random.toString().padStart(4, '0')}`
+    const { data: ticketNumber, error: sequenceError } = await supabaseAdmin
+      .rpc('get_next_ticket_number')
     
-    console.log(`🎫 Ticket_number gerado: ${ticketNumber}`)
-    console.log(`🎫 Timestamp: ${timestamp}, Random: ${random}`)
+    if (sequenceError) {
+      console.error('❌ Erro ao gerar número do ticket via sequence:', sequenceError)
+      return NextResponse.json({ error: 'Erro ao gerar número do ticket' }, { status: 500 })
+    }
+    
+    console.log(`✅ Ticket_number gerado via SEQUENCE: ${ticketNumber}`)
 
     // CRIAR TICKET COM SEQUENCE (SEM RETRY - SEQUENCE É ATÔMICO)
     const ticketData: any = {
