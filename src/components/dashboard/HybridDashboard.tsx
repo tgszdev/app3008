@@ -430,21 +430,33 @@ export default function HybridDashboard() {
           
           // Para estatísticas corretas, buscar dados completos dos contextos selecionados
           try {
-            const statsResponse = await axios.get(`/api/dashboard/stats?start_date=${periodFilter.start_date}&end_date=${periodFilter.end_date}&context_ids=${selectedClients.join(',')}`)
+            // Buscar todos os tickets dos contextos selecionados
+            const allTicketsResponse = await axios.get(`/api/tickets?context_ids=${selectedClients.join(',')}&start_date=${periodFilter.start_date}&end_date=${periodFilter.end_date}`)
             
-            if (statsResponse.data) {
-              statsData = statsResponse.data.stats || {
-                totalTickets: statsResponse.data.total_tickets || 0,
-                openTickets: statsResponse.data.open_tickets || 0,
-                inProgressTickets: statsResponse.data.in_progress_tickets || 0,
-                resolvedTickets: statsResponse.data.resolved_tickets || 0,
-                cancelledTickets: statsResponse.data.cancelled_tickets || 0,
-                ticketsTrend: statsResponse.data.tickets_trend || '+0%'
+            if (allTicketsResponse.data && allTicketsResponse.data.tickets) {
+              const filteredTickets = allTicketsResponse.data.tickets
+              
+              // Calcular estatísticas baseado nos tickets filtrados
+              statsData = {
+                totalTickets: filteredTickets.length,
+                openTickets: filteredTickets.filter((t: any) => t.status === 'open').length,
+                inProgressTickets: filteredTickets.filter((t: any) => t.status === 'in_progress').length,
+                resolvedTickets: filteredTickets.filter((t: any) => t.status === 'resolved').length,
+                cancelledTickets: filteredTickets.filter((t: any) => t.status === 'cancelled').length,
+                ticketsTrend: '+0%'
               }
             }
           } catch (statsError) {
             console.error('Erro ao buscar estatísticas filtradas:', statsError)
-            // Manter dados originais se houver erro
+            // Se não conseguir buscar dados filtrados, usar dados vazios
+            statsData = {
+              totalTickets: 0,
+              openTickets: 0,
+              inProgressTickets: 0,
+              resolvedTickets: 0,
+              cancelledTickets: 0,
+              ticketsTrend: '+0%'
+            }
           }
         }
         
