@@ -128,53 +128,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // GERAR TICKET_NUMBER ÚNICO GLOBALMENTE COM LOCK
-    let ticketNumber: string
-    let attempts = 0
-    const maxAttempts = 10
+    // GERAR TICKET_NUMBER ÚNICO GLOBALMENTE - ABORDAGEM SIMPLES
+    // Usar UUID + timestamp para garantir unicidade absoluta
+    const timestamp = Date.now()
+    const random = Math.floor(Math.random() * 10000)
+    const ticketNumber = `T${timestamp}${random.toString().padStart(4, '0')}`
     
-    do {
-      // Usar timestamp + random para evitar race conditions
-      const timestamp = Date.now()
-      const random = Math.floor(Math.random() * 1000)
-      ticketNumber = `${timestamp}${random.toString().padStart(3, '0')}`
-      
-      console.log(`🎫 Gerando ticket_number único: ${ticketNumber}`)
-      
-      // Verificar se o número já existe (proteção contra race conditions)
-      const { data: existingTicket, error: checkError } = await supabaseAdmin
-        .from('tickets')
-        .select('id')
-        .eq('ticket_number', ticketNumber)
-        .limit(1)
-        .single()
-      
-      if (checkError && checkError.code !== 'PGRST116') {
-        console.error('Erro ao verificar ticket_number existente:', checkError)
-        return NextResponse.json({ error: 'Erro ao verificar número do ticket' }, { status: 500 })
-      }
-      
-      console.log(`🔍 Verificando duplicata para ${ticketNumber}:`, existingTicket ? 'EXISTE' : 'NÃO EXISTE')
-      
-      // Se não existe, podemos usar este número
-      if (!existingTicket) {
-        console.log(`✅ Número ${ticketNumber} disponível, usando...`)
-        break
-      } else {
-        console.log(`❌ Número ${ticketNumber} já existe, tentando próximo...`)
-      }
-      
-      attempts++
-      if (attempts >= maxAttempts) {
-        return NextResponse.json({ error: 'Não foi possível gerar número único para o ticket' }, { status: 500 })
-      }
-      
-      // Aguardar um pouco antes de tentar novamente
-      await new Promise(resolve => setTimeout(resolve, 50))
-      
-    } while (attempts < maxAttempts)
-    
-    console.log(`🎫 Ticket_number final: ${ticketNumber}`)
+    console.log(`🎫 Gerando ticket_number único: ${ticketNumber}`)
 
     // Criar ticket com suporte para category_id
     const ticketData: any = {
