@@ -256,7 +256,12 @@ export async function GET(request: NextRequest) {
         .order('created_at', { ascending: false })
       
       // Apply multi-tenant filter to simple query
-      if (userType === 'context' && userContextId) {
+      // PRIORIDADE: Usar contexto selecionado via parâmetro se disponível
+      if (selectedContextId) {
+        // Filtrar por contexto específico selecionado
+        simpleQuery = simpleQuery.eq('context_id', selectedContextId)
+        console.log(`✅ Query simples filtrada por contexto selecionado: ${selectedContextId}`)
+      } else if (userType === 'context' && userContextId) {
         simpleQuery = simpleQuery.eq('context_id', userContextId)
       } else if (userType === 'matrix') {
         // Para usuários matrix, buscar contextos associados
