@@ -227,7 +227,8 @@ export async function GET(request: NextRequest) {
           priority: ticket.priority,
           requester: usersMap.get(ticket.created_by)?.name || 'Desconhecido',
           created_at: ticket.created_at,
-          is_internal: ticket.is_internal || false
+          is_internal: ticket.is_internal || false,
+          context_id: ticket.context_id
         }))
         
         return NextResponse.json({
