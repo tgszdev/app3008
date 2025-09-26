@@ -12,6 +12,11 @@ export async function GET(request: NextRequest) {
       // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
     
+    // Obter contexto selecionado dos parâmetros da URL
+    const { searchParams } = new URL(request.url)
+    const selectedContextId = searchParams.get('context_id')
+    console.log('🔍 Contexto selecionado via parâmetro:', selectedContextId)
+    
       // SIMULAR USUÁRIO PARA TESTE
       const mockSession = session || {
         user: {
@@ -99,8 +104,26 @@ export async function GET(request: NextRequest) {
     let filteredTicketsForStats = tickets || []
     
     // Aplicar filtros de contexto nas estatísticas
-    // Se há contexto específico selecionado, filtrar apenas por ele
-    if (userType === 'matrix' && userContextId) {
+    // PRIORIDADE: Usar contexto selecionado via parâmetro se disponível
+    console.log(`🔍 Verificando filtro: selectedContextId = "${selectedContextId}"`)
+    console.log(`🔍 Tickets antes do filtro: ${filteredTicketsForStats.length}`)
+    
+    if (selectedContextId) {
+      // Filtrar por contexto específico selecionado
+      console.log(`🔄 Aplicando filtro por contexto: ${selectedContextId}`)
+      filteredTicketsForStats = filteredTicketsForStats.filter(ticket => 
+        ticket.context_id === selectedContextId
+      )
+      console.log(`✅ Estatísticas filtradas por contexto selecionado: ${filteredTicketsForStats.length} tickets`)
+      
+      // Debug: mostrar alguns tickets filtrados
+      if (filteredTicketsForStats.length > 0) {
+        console.log('📋 Tickets filtrados:')
+        filteredTicketsForStats.slice(0, 3).forEach(ticket => {
+          console.log(`  - ${ticket.title}: ${ticket.status} (${ticket.context_id})`)
+        })
+      }
+    } else if (userType === 'matrix' && userContextId) {
       // Para usuários matrix com contexto específico selecionado
       filteredTicketsForStats = filteredTicketsForStats.filter(ticket => 
         ticket.context_id === userContextId
