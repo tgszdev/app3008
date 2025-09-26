@@ -99,7 +99,21 @@ export async function GET(request: NextRequest) {
     let filteredTicketsForStats = tickets || []
     
     // Aplicar filtros de contexto nas estatísticas
-    if (userType === 'matrix') {
+    // Se há contexto específico selecionado, filtrar apenas por ele
+    if (userType === 'matrix' && userContextId) {
+      // Para usuários matrix com contexto específico selecionado
+      filteredTicketsForStats = filteredTicketsForStats.filter(ticket => 
+        ticket.context_id === userContextId
+      )
+      console.log(`✅ Estatísticas filtradas por contexto específico: ${filteredTicketsForStats.length} tickets`)
+    } else if (userType === 'context' && userContextId) {
+      // Para usuários de contexto
+      filteredTicketsForStats = filteredTicketsForStats.filter(ticket => 
+        ticket.context_id === userContextId
+      )
+      console.log(`✅ Estatísticas filtradas por contexto: ${filteredTicketsForStats.length} tickets`)
+    } else if (userType === 'matrix') {
+      // Para usuários matrix sem contexto específico, mostrar todos os contextos associados
       const { data: userContexts, error: contextsError } = await supabaseAdmin
         .from('user_contexts')
         .select('context_id')
@@ -110,13 +124,8 @@ export async function GET(request: NextRequest) {
         filteredTicketsForStats = filteredTicketsForStats.filter(ticket => 
           associatedContextIds.includes(ticket.context_id)
         )
-        console.log(`✅ Estatísticas filtradas: ${filteredTicketsForStats.length} tickets`)
+        console.log(`✅ Estatísticas filtradas por todos os contextos: ${filteredTicketsForStats.length} tickets`)
       }
-    } else if (userType === 'context' && userContextId) {
-      filteredTicketsForStats = filteredTicketsForStats.filter(ticket => 
-        ticket.context_id === userContextId
-      )
-      console.log(`✅ Estatísticas filtradas: ${filteredTicketsForStats.length} tickets`)
     }
 
     // Filtrar tickets internos para usuários comuns
