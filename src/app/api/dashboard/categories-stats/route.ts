@@ -76,7 +76,15 @@ export async function GET(request: Request) {
 
     if (statusError) {
       console.error('Error fetching status:', statusError)
-      return NextResponse.json({ error: 'Failed to fetch status' }, { status: 500 })
+      // Usar status padrão se a tabela não existir
+      const defaultStatus = [
+        { id: '1', name: 'Aberto', slug: 'aberto', color: '#3b82f6', order_index: 1 },
+        { id: '2', name: 'Em Progresso', slug: 'em-progresso', color: '#f59e0b', order_index: 2 },
+        { id: '3', name: 'Resolvido', slug: 'resolvido', color: '#10b981', order_index: 3 },
+        { id: '4', name: 'Fechado', slug: 'fechado', color: '#6b7280', order_index: 4 }
+      ]
+      console.log('⚠️ Usando status padrão devido ao erro:', statusError.message)
+      statusData = defaultStatus
     }
 
     // Create status mapping for easy lookup
