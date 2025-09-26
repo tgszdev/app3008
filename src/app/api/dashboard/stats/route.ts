@@ -190,7 +190,25 @@ export async function GET(request: NextRequest) {
       let simpleQuery = supabaseAdmin
         .from('tickets')
         .select('*')
+        .gte('created_at', `${defaultStartDate}T00:00:00`)
+        .lte('created_at', `${defaultEndDate}T23:59:59`)
         .order('created_at', { ascending: false })
+      
+      // Apply multi-tenant filter to simple query
+      if (userType === 'context' && userContextId) {
+        simpleQuery = simpleQuery.eq('context_id', userContextId)
+      } else if (userType === 'matrix') {
+        // Para usuários matrix, buscar contextos associados
+        const { data: userContexts, error: contextsError } = await supabaseAdmin
+          .from('user_contexts')
+          .select('context_id')
+          .eq('user_id', currentUserId)
+        
+        if (!contextsError && userContexts && userContexts.length > 0) {
+          const contextIds = userContexts.map(uc => uc.context_id)
+          simpleQuery = simpleQuery.in('context_id', contextIds)
+        }
+      }
       
       if (userId) {
         simpleQuery = simpleQuery.eq('created_by', userId)
