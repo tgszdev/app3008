@@ -370,6 +370,7 @@ export default function HybridDashboard() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true)
+      console.log('🔄 fetchDashboardData chamado com selectedClients:', selectedClients)
       
       // Escolher API baseada na seleção de clientes
       let apiUrl = '/api/dashboard/stats'
@@ -384,13 +385,18 @@ export default function HybridDashboard() {
         // Adicionar contexto selecionado aos parâmetros
         if (selectedClients.length === 1) {
           params.append('context_id', selectedClients[0])
+          console.log('✅ Adicionando context_id único:', selectedClients[0])
+        } else {
+          console.log('⚠️ Múltiplos clientes selecionados, não enviando context_id')
         }
         // O filtro será aplicado no frontend após receber os dados
       } else if (currentContext) {
         // Se não tem seleção múltipla, usar contexto atual
         params.append('context_id', currentContext.id)
+        console.log('✅ Usando contexto atual:', currentContext.id)
       } else {
         // Se não tem seleção nem contexto, mostrar dados vazios
+        console.log('⚠️ Nenhum contexto selecionado, mostrando dados vazios')
         setStats({
           totalTickets: 0,
           openTickets: 0,
@@ -447,6 +453,8 @@ export default function HybridDashboard() {
 
   const fetchCategoryStats = async () => {
     try {
+      console.log('🔄 fetchCategoryStats chamado com selectedClients:', selectedClients)
+      
       const params = new URLSearchParams({
         start_date: periodFilter.start_date,
         end_date: periodFilter.end_date
@@ -456,8 +464,10 @@ export default function HybridDashboard() {
       if (selectedClients.length > 0) {
         // Para múltiplos clientes, usar o primeiro (ou implementar lógica específica)
         params.append('context_id', selectedClients[0])
+        console.log('✅ Adicionando context_id para categories:', selectedClients[0])
       } else if (currentContext) {
         params.append('context_id', currentContext.id)
+        console.log('✅ Usando contexto atual para categories:', currentContext.id)
       }
       
       // Adicionar filtro de usuário se ativo
@@ -545,7 +555,9 @@ export default function HybridDashboard() {
   const handleClientSelectionChange = (selectedIds: string[]) => {
     try {
       console.log('🔄 Mudança de seleção de clientes:', selectedIds)
+      console.log('🔄 selectedClients antes:', selectedClients)
       setSelectedClients(selectedIds)
+      console.log('🔄 selectedClients depois:', selectedIds)
       // O useEffect vai automaticamente recarregar os dados
     } catch (error) {
       console.error('Erro ao processar mudança de seleção:', error)
