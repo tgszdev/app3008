@@ -24,6 +24,9 @@ export async function GET(request: Request) {
       userId,
       userEmail: session.user.email
     })
+    
+    console.log('🔍 Context IDs recebidos:', contextIds)
+    console.log('🔍 Context IDs length:', contextIds.length)
 
     if (!startDate || !endDate) {
       return NextResponse.json({ error: 'start_date and end_date are required' }, { status: 400 })
@@ -49,6 +52,8 @@ export async function GET(request: Request) {
           console.error(`❌ Erro ao buscar contexto ${contextId}:`, contextError)
           continue
         }
+        
+        console.log(`✅ Contexto encontrado: ${context.name} (${contextId})`)
 
         // Buscar tickets do contexto no período
         let ticketsQuery = supabaseAdmin
@@ -83,6 +88,11 @@ export async function GET(request: Request) {
         if (userId) {
           ticketsQuery = ticketsQuery.or(`created_by.eq.${userId},assigned_to.eq.${userId}`)
         }
+        
+        console.log(`🔍 Query para contexto ${context.name}:`)
+        console.log(`  - Context ID: ${contextId}`)
+        console.log(`  - Período: ${startDate} até ${endDate}`)
+        console.log(`  - User ID: ${userId || 'não especificado'}`)
 
         const { data: tickets, error: ticketsError } = await ticketsQuery
 
@@ -92,6 +102,12 @@ export async function GET(request: Request) {
         }
 
         console.log(`✅ Contexto ${context.name}: ${tickets?.length || 0} tickets encontrados`)
+        
+        if (tickets && tickets.length > 0) {
+          tickets.forEach(ticket => {
+            console.log(`  - Ticket #${ticket.ticket_number}: ${ticket.title} (status: ${ticket.status})`)
+          })
+        }
 
         // Buscar status disponíveis com contagem
         const { data: statuses, error: statusError } = await supabaseAdmin
