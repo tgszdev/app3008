@@ -151,6 +151,8 @@ export async function GET(request: NextRequest) {
           tickets.forEach(ticket => {
             console.log(`  - Ticket #${ticket.ticket_number}: ${ticket.title} (status: ${ticket.status})`)
           })
+        } else {
+          console.log(`⚠️ Nenhum ticket encontrado para o contexto ${context.name}`)
         }
 
         // Buscar status disponíveis com contagem
@@ -289,6 +291,12 @@ export async function GET(request: NextRequest) {
           tickets: tickets?.slice(0, 10) || [] // Últimos 10 tickets
         }
 
+        console.log(`📊 Dados do cliente ${context.name}:`, {
+          totalTickets: clientInfo.summary.total_tickets,
+          statusStats: statusStats.length,
+          categoryStats: categoryStats.length
+        })
+
         clientData.push(clientInfo)
 
         console.log(`✅ Dados do contexto ${context.name}:`, {
@@ -305,6 +313,15 @@ export async function GET(request: NextRequest) {
 
     // Calcular dados consolidados
     const totalTickets = clientData.reduce((sum, client) => sum + client.summary.total_tickets, 0)
+    
+    console.log(`📊 Dados consolidados:`, {
+      totalClients: clientData.length,
+      totalTickets: totalTickets,
+      clientData: clientData.map(c => ({
+        name: c.context.name,
+        tickets: c.summary.total_tickets
+      }))
+    })
     
     // Consolidar status de todos os clientes
     const consolidatedStatusMap = new Map()
