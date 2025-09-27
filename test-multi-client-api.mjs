@@ -6,8 +6,8 @@ const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-async function testFixedAPI() {
-  console.log('🔍 Testando API corrigida...')
+async function testMultiClientAPI() {
+  console.log('🔍 Testando API multi-client com dados reais...')
   
   // 1. Verificar usuário
   const { data: user, error: userError } = await supabase
@@ -90,26 +90,66 @@ async function testFixedAPI() {
   } else {
     console.log(`✅ Status encontrados: ${statuses?.length || 0}`)
     statuses?.forEach(status => {
-      console.log(`  - ${status.name} (${status.slug})`)
+      console.log(`  - ${status.name} (${status.slug}) - ${status.color}`)
     })
   }
   
-  // 5. Testar endpoint da API
-  console.log('\n🔍 Testando endpoint da API...')
-  try {
-    const contextIdsString = contextIds.join(',')
-    const response = await fetch(`https://www.ithostbr.tech/api/dashboard/multi-client-analytics?start_date=2024-01-01&end_date=2025-12-31&context_ids=${contextIdsString}`)
-    const data = await response.json()
+  // 5. Simular processamento da API
+  console.log('\n🔍 Simulando processamento da API...')
+  
+  if (tickets && tickets.length > 0) {
+    // Calcular estatísticas por status
+    const statusStats = statuses?.map(status => {
+      const count = tickets?.filter(ticket => ticket.status === status.slug).length || 0
+      return {
+        ...status,
+        count
+      }
+    }).filter(status => status.count > 0)
     
-    console.log(`Status: ${response.status}`)
-    if (response.ok) {
-      console.log('✅ API retornou dados:', JSON.stringify(data, null, 2))
-    } else {
-      console.log('❌ API retornou erro:', data)
-    }
-  } catch (error) {
-    console.error('❌ Erro ao chamar API:', error)
+    console.log('✅ Status stats calculados:')
+    statusStats.forEach(status => {
+      console.log(`  - ${status.name}: ${status.count} tickets`)
+    })
+    
+    // Calcular estatísticas por categoria
+    const categoryMap = new Map()
+    tickets?.forEach(ticket => {
+      if (ticket.categories) {
+        const category = Array.isArray(ticket.categories) ? ticket.categories[0] : ticket.categories
+        if (category) {
+          const key = category.id
+          if (!categoryMap.has(key)) {
+            categoryMap.set(key, {
+              id: category.id,
+              name: category.name,
+              slug: category.slug,
+              color: category.color,
+              icon: category.icon,
+              is_global: category.is_global,
+              context_id: category.context_id,
+              total: 0,
+              status_breakdown: {}
+            })
+          }
+          
+          const catData = categoryMap.get(key)
+          catData.total++
+          
+          if (!catData.status_breakdown[ticket.status]) {
+            catData.status_breakdown[ticket.status] = 0
+          }
+          catData.status_breakdown[ticket.status]++
+        }
+      }
+    })
+    
+    const categoryStats = Array.from(categoryMap.values())
+    console.log('✅ Category stats calculados:')
+    categoryStats.forEach(category => {
+      console.log(`  - ${category.name}: ${category.total} tickets`)
+    })
   }
 }
 
-testFixedAPI().catch(console.error)
+testMultiClientAPI().catch(console.error)

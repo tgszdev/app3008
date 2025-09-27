@@ -169,11 +169,14 @@ export async function GET(request: NextRequest) {
         // Calcular estatísticas por status
         const statusStats = statuses.map(status => {
           const count = tickets?.filter(ticket => ticket.status === status.slug).length || 0
+          console.log(`📊 Status ${status.name} (${status.slug}): ${count} tickets`)
           return {
             ...status,
             count
           }
         }).filter(status => status.count > 0)
+        
+        console.log(`📊 Status stats finais para ${context.name}:`, statusStats.map(s => `${s.name}: ${s.count}`))
 
         // Calcular estatísticas por categoria
         const categoryMap = new Map()
@@ -242,13 +245,17 @@ export async function GET(request: NextRequest) {
             count: category.status_breakdown[status.slug] || 0,
             order_index: status.order_index
           })).filter(status => status.count > 0)
-
+          
+          console.log(`📊 Categoria ${category.name}: ${total} tickets (${percentage.toFixed(2)}%)`)
+          
           return {
             ...category,
             percentage: Math.round(percentage * 100) / 100,
             status_breakdown_detailed: statusBreakdownDetailed
           }
         }).sort((a, b) => b.total - a.total)
+        
+        console.log(`📊 Category stats finais para ${context.name}:`, categoryStats.map(c => `${c.name}: ${c.total}`))
 
         // Calcular tempo médio de resolução
         const resolvedTickets = tickets?.filter(ticket => 
