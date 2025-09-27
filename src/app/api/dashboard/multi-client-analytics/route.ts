@@ -157,9 +157,8 @@ export async function GET(request: NextRequest) {
 
         // Buscar status disponíveis com contagem
         const { data: statuses, error: statusError } = await supabaseAdmin
-          .from('statuses')
+          .from('ticket_statuses')
           .select('id, name, slug, color, order_index')
-          .eq('is_active', true)
           .order('order_index', { ascending: true })
 
         if (statusError) {

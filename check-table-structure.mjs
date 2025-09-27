@@ -1,54 +1,53 @@
 import { createClient } from '@supabase/supabase-js'
 
+// Configuração do Supabase
 const supabaseUrl = 'https://eyfvvximmeqmwdfqzqov.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5ZnZ2eGltbWVxbXdkZnF6cW92Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjU4NTE4NiwiZXhwIjoyMDcyMTYxMTg2fQ.uSItau5HKn79j6-dyFE_kyHEbGk7wrq64zrIVYxsVkw'
+const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5ZnZ2eGltbWVxbXdkZnF6cW92Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjU4NTE4NiwiZXhwIjoyMDcyMTYxMTg2fQ.uSItau5HKn79j6-dyFE_kyHEbGk7wrq64zrIVYxsVkw'
 
-const supabaseAdmin = createClient(supabaseUrl, supabaseKey)
+const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 async function checkTableStructure() {
-  console.log('🔍 VERIFICANDO ESTRUTURA DA TABELA TICKETS...')
+  console.log('🔍 Verificando estrutura da tabela ticket_statuses...')
   
-  try {
-    // Verificar se há DEFAULT na coluna ticket_number
-    const { data: columns, error } = await supabaseAdmin
-      .rpc('exec_sql', {
-        sql: `
-          SELECT column_name, column_default, data_type, is_nullable
-          FROM information_schema.columns 
-          WHERE table_name = 'tickets' 
-          AND column_name = 'ticket_number'
-        `
+  // Tentar buscar com select * para ver todas as colunas
+  const { data: statuses, error: statusError } = await supabase
+    .from('ticket_statuses')
+    .select('*')
+    .limit(1)
+  
+  if (statusError) {
+    console.error('❌ Erro ao buscar estrutura:', statusError)
+    return
+  }
+  
+  console.log('✅ Estrutura da tabela ticket_statuses:')
+  if (statuses && statuses.length > 0) {
+    console.log('Colunas encontradas:', Object.keys(statuses[0]))
+  } else {
+    console.log('⚠️ Tabela vazia, tentando inserir dados básicos...')
+    
+    // Tentar inserir sem is_active
+    const basicStatuses = [
+      { name: 'Aberto', slug: 'open', color: '#3b82f6', order_index: 1 },
+      { name: 'Em Progresso', slug: 'in_progress', color: '#f59e0b', order_index: 2 },
+      { name: 'Resolvido', slug: 'resolved', color: '#10b981', order_index: 3 },
+      { name: 'Fechado', slug: 'closed', color: '#6b7280', order_index: 4 }
+    ]
+    
+    const { data: newStatuses, error: insertError } = await supabase
+      .from('ticket_statuses')
+      .insert(basicStatuses)
+      .select()
+    
+    if (insertError) {
+      console.error('❌ Erro ao criar status básicos:', insertError)
+    } else {
+      console.log('✅ Status básicos criados com sucesso!')
+      newStatuses?.forEach(status => {
+        console.log(`  - ${status.name} (${status.slug})`)
       })
-    
-    if (error) {
-      console.error('❌ Erro ao verificar colunas:', error)
-      return
     }
-    
-    console.log('📋 Estrutura da coluna ticket_number:')
-    console.log(JSON.stringify(columns, null, 2))
-    
-    // Verificar se há TRIGGERS
-    const { data: triggers, error: triggerError } = await supabaseAdmin
-      .rpc('exec_sql', {
-        sql: `
-          SELECT trigger_name, event_manipulation, action_statement
-          FROM information_schema.triggers 
-          WHERE event_object_table = 'tickets'
-        `
-      })
-    
-    if (triggerError) {
-      console.error('❌ Erro ao verificar triggers:', triggerError)
-      return
-    }
-    
-    console.log('🔧 Triggers na tabela tickets:')
-    console.log(JSON.stringify(triggers, null, 2))
-    
-  } catch (error) {
-    console.error('❌ Erro geral:', error)
   }
 }
 
-checkTableStructure()
+checkTableStructure().catch(console.error)
