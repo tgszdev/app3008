@@ -190,9 +190,12 @@ export async function GET(request: Request) {
       order_index: number
     }> = []
     
+    console.log(`🔍 Processando ${tickets?.length || 0} tickets para status stats`)
+    
     statusList.forEach(status => {
       const count = tickets?.filter(t => t.status === status.slug).length || 0
       statusCounts[status.slug] = count
+      console.log(`📊 Status ${status.name} (${status.slug}): ${count} tickets`)
       statusCountsDetailed.push({
         slug: status.slug,
         name: status.name,
@@ -201,6 +204,9 @@ export async function GET(request: Request) {
         order_index: status.order_index
       })
     })
+    
+    console.log(`📊 Status counts finais:`, statusCounts)
+    console.log(`📊 Status detailed finais:`, statusCountsDetailed.map(s => `${s.name}: ${s.count}`))
     
     // Sort status by order_index
     statusCountsDetailed.sort((a, b) => a.order_index - b.order_index)
