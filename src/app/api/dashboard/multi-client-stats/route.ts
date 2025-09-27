@@ -4,15 +4,31 @@ import { supabaseAdmin } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
   try {
-    // BYPASS TEMPORÁRIO PARA TESTAR FILTRO - REMOVER DEPOIS
-    console.log('⚠️ BYPASS TEMPORÁRIO: Simulando usuário rodrigues2205@icloud.com')
+    const session = await auth()
     
-    // SIMULAR USUÁRIO PARA TESTE
-    const mockUser = {
-      id: '2a33241e-ed38-48b5-9c84-e8c354ae9606',
-      email: 'rodrigues2205@icloud.com',
-      user_type: 'matrix',
-      role: 'admin'
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Obter dados do usuário
+    const { data: userData, error: userError } = await supabaseAdmin
+      .from('users')
+      .select('id, role, user_type, context_id')
+      .eq('email', session.user.email)
+      .single()
+
+    if (userError || !userData) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      )
+    }
+
+    const currentUser = {
+      id: userData.id,
+      email: session.user.email,
+      user_type: userData.user_type,
+      role: userData.role
     }
 
     // Obter parâmetros da query
@@ -31,6 +47,7 @@ export async function GET(request: NextRequest) {
     let targetContextIds: string[] = []
     if (contextIds) {
       targetContextIds = contextIds.split(',').filter(id => id.trim())
+      console.log('🎯 API Multi-client recebeu context_ids:', targetContextIds)
     }
 
     // Se não foram fornecidos context_ids, buscar contextos associados ao usuário
@@ -38,7 +55,7 @@ export async function GET(request: NextRequest) {
       const { data: userContexts, error: contextsError } = await supabaseAdmin
         .from('user_contexts')
         .select('context_id')
-        .eq('user_id', mockUser.id)
+        .eq('user_id', currentUser.id)
       
       if (!contextsError && userContexts) {
         targetContextIds = userContexts.map(uc => uc.context_id)
@@ -56,15 +73,18 @@ export async function GET(request: NextRequest) {
       .lte('created_at', `${defaultEndDate}T23:59:59`)
     
     // Aplicar filtro multi-tenant
-    if (mockUser.user_type === 'matrix') {
+    if (currentUser.user_type === 'matrix') {
       // Para usuários matrix, usar contextos fornecidos ou associados
       if (targetContextIds.length > 0) {
+        console.log('🎯 Aplicando filtro para contextos:', targetContextIds)
         query = query.in('context_id', targetContextIds)
       } else {
+        console.log('⚠️ Nenhum contexto fornecido, buscando contextos do usuário')
         // Se não tem contextos, não mostrar nenhum ticket
         query = query.eq('context_id', '00000000-0000-0000-0000-000000000000')
       }
     } else {
+      console.log('⚠️ Usuário não é matrix, não mostrando tickets')
       // Fallback: não mostrar nenhum ticket
       query = query.eq('context_id', '00000000-0000-0000-0000-000000000000')
     }
@@ -83,9 +103,9 @@ export async function GET(request: NextRequest) {
 
     // Filtrar tickets internos para usuários comuns
     let filteredTickets = tickets || []
-    if (mockUser.role === 'user') {
+    if (currentUser.role === 'user') {
       filteredTickets = filteredTickets.filter((ticket: any) => {
-        return !ticket.is_internal || ticket.created_by === mockUser.id
+        return !ticket.is_internal || ticket.created_by === currentUser.id
       })
     }
 
@@ -141,13 +161,17 @@ export async function GET(request: NextRequest) {
       .limit(5)
     
     // Aplicar mesmo filtro multi-tenant para tickets recentes
-    if (mockUser.user_type === 'matrix') {
+    if (currentUser.user_type === 'matrix') {
       if (targetContextIds.length > 0) {
+        console.log('🎯 Aplicando filtro para tickets recentes:', targetContextIds)
         recentQuery = recentQuery.in('context_id', targetContextIds)
       } else {
+        console.log('⚠️ Nenhum contexto selecionado - não mostrando tickets recentes')
+        // Quando nenhum cliente está selecionado, não mostrar tickets recentes
         recentQuery = recentQuery.eq('context_id', '00000000-0000-0000-0000-000000000000')
       }
     } else {
+      console.log('⚠️ Usuário não é matrix para tickets recentes, não mostrando')
       // Fallback: não mostrar nenhum ticket
       recentQuery = recentQuery.eq('context_id', '00000000-0000-0000-0000-000000000000')
     }
@@ -164,11 +188,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch recent tickets' }, { status: 500 })
     }
 
+    console.log('🎯 Tickets recentes encontrados:', recentTicketsList?.length || 0)
+
     // Filtrar tickets recentes para usuários comuns
     let filteredRecentTickets = recentTicketsList || []
-    if (mockUser.role === 'user') {
+    if (currentUser.role === 'user') {
       filteredRecentTickets = filteredRecentTickets.filter((ticket: any) => {
-        return !ticket.is_internal || ticket.created_by === mockUser.id
+        return !ticket.is_internal || ticket.created_by === currentUser.id
       })
     }
 
@@ -196,7 +222,7 @@ export async function GET(request: NextRequest) {
       },
       selected_contexts: targetContextIds,
       user_info: {
-        user_type: mockUser.user_type,
+        user_type: currentUser.user_type,
         context_id: null,
         context_name: null,
         context_type: null

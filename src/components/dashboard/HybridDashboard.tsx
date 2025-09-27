@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useOrganization } from '@/contexts/OrganizationContext'
 import { useRouter } from 'next/navigation'
@@ -28,6 +28,9 @@ import {
   Mail,
   Shield,
   Phone,
+  ChevronDown,
+  Check,
+  X,
   User,
   FileDown
 } from 'lucide-react'
@@ -36,6 +39,7 @@ import jsPDF from 'jspdf'
 import { getIcon } from '@/lib/icons'
 import { OrganizationSelector } from '@/components/OrganizationSelector'
 import { MultiClientSelector, SelectedClientsTags } from '@/components/MultiClientSelector'
+import { ModernClientSelector } from '@/components/ModernClientSelector'
 
 // =====================================================
 // TIPOS E INTERFACES
@@ -153,7 +157,7 @@ const CategoryCard = ({ category }: { category: CategoryStat }) => {
       <div className="flex items-start justify-between mb-3 sm:mb-4">
         <div className="flex items-center flex-1 min-w-0">
           <div 
-            className="p-1.5 sm:p-2 rounded-lg mr-2 sm:mr-3 flex-shrink-0"
+            className="p-1.5 sm:p-2 rounded-xl mr-2 sm:mr-3 flex-shrink-0"
             style={{ backgroundColor, color: borderColor }}
           >
             <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -240,7 +244,7 @@ const StatusBadge = ({ status }: { status: string }) => {
   }
   
   return (
-    <span className={`px-2 py-1 text-xs font-medium rounded-full ${colors[status] || colors.open}`}>
+    <span className={`px-3 py-1.5 text-xs font-medium rounded-xl ${colors[status] || colors.open}`}>
       {labels[status] || status}
     </span>
   )
@@ -262,7 +266,7 @@ const PriorityBadge = ({ priority }: { priority: string }) => {
   }
   
   return (
-    <span className={`px-2 py-1 text-xs font-medium rounded-full ${colors[priority] || colors.medium}`}>
+    <span className={`px-3 py-1.5 text-xs font-medium rounded-xl ${colors[priority] || colors.medium}`}>
       {labels[priority] || priority}
     </span>
   )
@@ -305,6 +309,8 @@ export default function HybridDashboard() {
   const [tempFilter, setTempFilter] = useState<PeriodFilter>(getCurrentMonthDates())
   const [myTicketsOnly, setMyTicketsOnly] = useState(false)
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
+  const [showClientPopup, setShowClientPopup] = useState(false)
+  const popupRef = useRef<HTMLDivElement>(null)
   
   // Estados para seleção múltipla de clientes (gerenciados pelo pai)
   const [selectedClients, setSelectedClients] = useState<string[]>([])
@@ -356,6 +362,23 @@ export default function HybridDashboard() {
     setMounted(true)
   }, [])
 
+  // Fechar popup ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
+        setShowClientPopup(false)
+      }
+    }
+
+    if (showClientPopup) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showClientPopup])
+
   useEffect(() => {
     if (mounted && !contextLoading) {
       fetchDashboardData()
@@ -372,6 +395,9 @@ export default function HybridDashboard() {
       setLoading(true)
       console.log('🔄 fetchDashboardData chamado com selectedClients:', selectedClients)
       
+      // Log do tipo de usuário para debug
+      console.log('🔄 Tipo de usuário:', isMatrixUser ? 'matrix' : 'context')
+      
       // Escolher API baseada na seleção de clientes
       let apiUrl = '/api/dashboard/stats'
       const params = new URLSearchParams({
@@ -379,35 +405,21 @@ export default function HybridDashboard() {
         end_date: periodFilter.end_date
       })
       
-      // Se tem clientes selecionados, usar API stats com filtro no frontend
+      // Se tem clientes selecionados, usar API multi-client
       if (selectedClients.length > 0) {
-        apiUrl = '/api/dashboard/stats'
-        // Adicionar contexto selecionado aos parâmetros
-        if (selectedClients.length === 1) {
-          params.append('context_id', selectedClients[0])
-          console.log('✅ Adicionando context_id único:', selectedClients[0])
-        } else {
-          console.log('⚠️ Múltiplos clientes selecionados, não enviando context_id')
-        }
-        // O filtro será aplicado no frontend após receber os dados
-      } else if (currentContext) {
-        // Se não tem seleção múltipla, usar contexto atual
-        params.append('context_id', currentContext.id)
-        console.log('✅ Usando contexto atual:', currentContext.id)
+        apiUrl = '/api/dashboard/multi-client-stats'
+        params.append('context_ids', selectedClients.join(','))
+        console.log('✅ Usando API multi-client para contextos:', selectedClients)
+        console.log('✅ Parâmetros enviados:', params.toString())
       } else {
-        // Se não tem seleção nem contexto, mostrar dados vazios
-        console.log('⚠️ Nenhum contexto selecionado, mostrando dados vazios')
-        setStats({
-          totalTickets: 0,
-          openTickets: 0,
-          inProgressTickets: 0,
-          resolvedTickets: 0,
-          cancelledTickets: 0,
-          ticketsTrend: '+0%'
-        })
-        setRecentTickets([])
-        setCategoryStats(null)
-        return
+        // Se não tem seleção de clientes, usar API padrão com currentContext
+        apiUrl = '/api/dashboard/stats'
+        if (currentContext?.id) {
+          params.append('context_id', currentContext.id)
+          console.log('✅ Usando API padrão com currentContext:', currentContext.id)
+        } else {
+          console.log('⚠️ Nenhum contexto disponível - carregando dados globais')
+        }
       }
       
       // Adicionar filtro de usuário se ativo
@@ -430,11 +442,12 @@ export default function HybridDashboard() {
         let recentTicketsData = response.data.recentTickets || response.data.recent_tickets || []
         
         // A API já retorna dados filtrados quando context_id é enviado
-        // Não precisamos aplicar filtros adicionais no frontend
         console.log('✅ Usando dados filtrados da API:', {
           totalTickets: statsData.totalTickets,
-          recentTickets: recentTicketsData.length
+          recentTickets: recentTicketsData.length,
+          apiUrl: apiUrl
         })
+        console.log('🎯 Tickets recentes recebidos:', recentTicketsData)
         
         setStats(statsData)
         setRecentTickets(recentTicketsData)
@@ -455,6 +468,9 @@ export default function HybridDashboard() {
     try {
       console.log('🔄 fetchCategoryStats chamado com selectedClients:', selectedClients)
       
+      // Log do tipo de usuário para debug
+      console.log('🔄 fetchCategoryStats - Tipo de usuário:', isMatrixUser ? 'matrix' : 'context')
+      
       const params = new URLSearchParams({
         start_date: periodFilter.start_date,
         end_date: periodFilter.end_date
@@ -462,12 +478,23 @@ export default function HybridDashboard() {
       
       // Adicionar contexto selecionado se disponível
       if (selectedClients.length > 0) {
-        // Para múltiplos clientes, usar o primeiro (ou implementar lógica específica)
-        params.append('context_id', selectedClients[0])
-        console.log('✅ Adicionando context_id para categories:', selectedClients[0])
-      } else if (currentContext) {
-        params.append('context_id', currentContext.id)
-        console.log('✅ Usando contexto atual para categories:', currentContext.id)
+        if (selectedClients.length === 1) {
+          // Cliente único - usar context_id
+          params.append('context_id', selectedClients[0])
+          console.log('✅ Adicionando context_id único para categories:', selectedClients[0])
+        } else {
+          // Múltiplos clientes - usar context_ids
+          params.append('context_ids', selectedClients.join(','))
+          console.log('✅ Adicionando context_ids para categories:', selectedClients)
+        }
+      } else {
+        // Se não tem seleção de clientes, usar currentContext
+        if (currentContext?.id) {
+          params.append('context_id', currentContext.id)
+          console.log('✅ Usando currentContext para categories:', currentContext.id)
+        } else {
+          console.log('⚠️ Nenhum contexto disponível - carregando categorias globais')
+        }
       }
       
       // Adicionar filtro de usuário se ativo
@@ -636,86 +663,168 @@ export default function HybridDashboard() {
             </p>
           </div>
           
-          {/* Seletor Múltiplo de Clientes (apenas para matriz) */}
+          {/* Layout em Popup - Seletor Múltiplo de Clientes (apenas para matriz) */}
           {isMatrixUser && (
-            <div className="space-y-3">
-              <MultiClientSelector
-                variant="default"
-                selectedClients={selectedClients}
-                onSelectionChange={handleClientSelectionChange}
-                className="w-full"
-              />
+            <div className="relative">
+              {/* Botões principais */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setShowClientPopup(!showClientPopup)}
+                  className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+                >
+                  <Building className="w-4 h-4" />
+                  <span className="text-xs font-medium">
+                    {selectedClients.length === 0 
+                      ? 'Selecionar Clientes' 
+                      : selectedClients.length === 1 
+                        ? availableContexts.find(c => c.id === selectedClients[0])?.name || 'Cliente'
+                        : `${selectedClients.length} clientes`
+                    }
+                  </span>
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+                
+                <button
+                  onClick={toggleMyTickets}
+                  className={`px-3 py-2 border rounded-xl transition-colors flex items-center gap-2 ${
+                    myTicketsOnly 
+                      ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
+                      : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <User className="w-4 h-4" />
+                  <span className="text-xs font-medium">Meus Tickets</span>
+                </button>
+                
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+                >
+                  <Calendar className="w-4 h-4" />
+                  <span className="text-xs font-medium truncate">
+                    {periodFilter.start_date === getCurrentMonthDates().start_date && 
+                     periodFilter.end_date === getCurrentMonthDates().end_date
+                      ? 'Mês Atual'
+                      : `${formatDateShort(periodFilter.start_date)} - ${formatDateShort(periodFilter.end_date)}`
+                    }
+                  </span>
+                  <Filter className="w-4 h-4" />
+                </button>
+                
+                <button
+                  onClick={handleExportPDF}
+                  disabled={isGeneratingPDF}
+                  className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {isGeneratingPDF ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <FileDown className="w-4 h-4" />
+                  )}
+                  <span className="text-xs font-medium">
+                    {isGeneratingPDF ? 'Gerando...' : 'Exportar PDF'}
+                  </span>
+                </button>
+              </div>
               
-              {/* Tags dos clientes selecionados serão gerenciadas pelo MultiClientSelector */}
+              {/* Popup de seleção de clientes */}
+              {showClientPopup && (
+                <div 
+                  ref={popupRef}
+                  className="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-4 z-50"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Building className="w-4 h-4 text-blue-600" />
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">Seleção Rápida</span>
+                    </div>
+                    <button
+                      onClick={() => setShowClientPopup(false)}
+                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  
+                  
+                  <div className="space-y-2 mb-4">
+                    {availableContexts.map((context) => (
+                      <label
+                        key={context.id}
+                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors rounded-lg"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedClients.includes(context.id)}
+                          onChange={() => {
+                            if (selectedClients.includes(context.id)) {
+                              handleClientSelectionChange(selectedClients.filter(id => id !== context.id))
+                            } else {
+                              handleClientSelectionChange([...selectedClients, context.id])
+                            }
+                          }}
+                          className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">
+                              {context.name}
+                            </span>
+                            <span className={`px-2 py-1 text-xs rounded-xl font-medium ${
+                              context.type === 'organization' 
+                                ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300" 
+                                : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300"
+                            }`}>
+                              {context.type === 'organization' ? 'Cliente' : 'Dept'}
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {context.slug}
+                          </div>
+                        </div>
+                        {selectedClients.includes(context.id) && (
+                          <Check className="w-4 h-4 text-blue-600" />
+                        )}
+                      </label>
+                    ))}
+                  </div>
+                  
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {selectedClients.length} de {availableContexts.length} selecionados
+                    </span>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleClientSelectionChange(availableContexts.map(c => c.id))}
+                        className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
+                      >
+                        Todos
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleClientSelectionChange([])
+                          localStorage.removeItem('selectedClients')
+                        }}
+                        className="text-xs text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300 font-medium transition-colors"
+                      >
+                        Limpar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
         
-        {/* Segunda linha: Informações do contexto e botões */}
+        {/* Segunda linha: Informações do contexto */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          {/* Informações do contexto */}
-          {currentContext && (
-            <div className="flex items-center gap-2">
-              <Building className="w-4 h-4 text-blue-600" />
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                {currentContext.type === 'organization' ? 'Cliente' : 'Departamento'}: 
-                <span className="font-medium ml-1 text-gray-900 dark:text-white">{currentContext.name}</span>
-              </span>
-            </div>
-          )}
-          
-          <div className="flex flex-wrap gap-2">
-            {/* Botão Meus Tickets */}
-            <button
-              onClick={toggleMyTickets}
-              className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-2 border rounded-lg transition-colors ${
-                myTicketsOnly 
-                  ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
-                  : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
-              }`}
-            >
-              <User className="h-4 w-4 flex-shrink-0" />
-              <span className="text-xs sm:text-sm">Meus Tickets</span>
-            </button>
-          
-          {/* Botão Filtro de Data */}
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-          >
-            <Calendar className="h-4 w-4 flex-shrink-0" />
-            <span className="text-xs sm:text-sm truncate">
-              {periodFilter.start_date === getCurrentMonthDates().start_date && 
-               periodFilter.end_date === getCurrentMonthDates().end_date
-                ? 'Mês Atual'
-                : `${formatDateShort(periodFilter.start_date)} - ${formatDateShort(periodFilter.end_date)}`
-              }
-            </span>
-            <Filter className="h-4 w-4 flex-shrink-0" />
-          </button>
-          
-          {/* Botão Export PDF */}
-          <button
-            onClick={handleExportPDF}
-            disabled={isGeneratingPDF}
-            className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isGeneratingPDF ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <FileDown className="h-4 w-4 flex-shrink-0" />
-            )}
-            <span className="text-xs sm:text-sm">
-              {isGeneratingPDF ? 'Gerando...' : 'Exportar PDF'}
-            </span>
-          </button>
-          </div>
         </div>
       </div>
 
       {/* Filtros de Período */}
       {showFilters && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
             Filtrar por Período
           </h3>
@@ -728,7 +837,7 @@ export default function HybridDashboard() {
                 type="date"
                 value={tempFilter.start_date}
                 onChange={(e) => setTempFilter({ ...tempFilter, start_date: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
             <div>
@@ -739,20 +848,20 @@ export default function HybridDashboard() {
                 type="date"
                 value={tempFilter.end_date}
                 onChange={(e) => setTempFilter({ ...tempFilter, end_date: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 mt-4">
             <button
               onClick={handleApplyFilter}
-              className="flex-1 sm:flex-initial px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium"
+              className="flex-1 sm:flex-initial px-4 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium"
             >
               Aplicar Filtro
             </button>
             <button
               onClick={handleResetFilter}
-              className="flex-1 sm:flex-initial px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 active:bg-gray-400 dark:active:bg-gray-800 transition-colors text-sm font-medium"
+              className="flex-1 sm:flex-initial px-4 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 active:bg-gray-400 dark:active:bg-gray-800 transition-colors text-sm font-medium"
             >
               Limpar Filtro
             </button>
@@ -762,7 +871,7 @@ export default function HybridDashboard() {
 
       {/* Informações do Período */}
       {categoryStats && (
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3">
           <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-300">
             <span className="font-medium block sm:inline">Período analisado:</span>
             <span className="block sm:inline sm:ml-1">
@@ -832,7 +941,7 @@ export default function HybridDashboard() {
       )}
 
       {/* Tickets Recentes */}
-      <div id="recent-tickets-section" className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+      <div id="recent-tickets-section" className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
             {myTicketsOnly ? 'Meus Chamados Recentes' : 'Chamados Recentes'}
@@ -891,7 +1000,7 @@ export default function HybridDashboard() {
                         <PriorityBadge priority={ticket.priority} />
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                        {ticket.requester}
+                        {ticket.created_by_user?.email || ticket.created_by || 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         {formatDateShort(ticket.created_at)}
@@ -926,7 +1035,7 @@ export default function HybridDashboard() {
                     </span>
                   </div>
                   <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-                    Solicitante: {ticket.requester}
+                    Solicitante: {ticket.created_by_user?.email || ticket.created_by || 'N/A'}
                   </div>
                 </div>
               ))}
@@ -935,7 +1044,10 @@ export default function HybridDashboard() {
         ) : (
           <div className="text-center py-8">
             <p className="text-gray-500 dark:text-gray-400">
-              Nenhum chamado encontrado
+              {selectedClients.length === 0 
+                ? 'Selecione um cliente para ver os chamados recentes'
+                : 'Nenhum chamado encontrado'
+              }
             </p>
           </div>
         )}

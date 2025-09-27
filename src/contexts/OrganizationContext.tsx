@@ -80,12 +80,15 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
   // =====================================================
   
   useEffect(() => {
+    console.log('🔄 OrganizationContext useEffect:', { status, hasSession: !!session?.user, userType })
+    
     if (status === 'loading') {
       setIsLoading(true)
       return
     }
     
     if (!session?.user) {
+      console.log('⚠️ Sem sessão - parando loading')
       setIsLoading(false)
       return
     }
@@ -95,20 +98,40 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
         setIsLoading(true)
         
         if (isMatrixUser) {
-          // Usuário da matriz: usar contextos da sessão
-          console.log('🔄 Carregando contextos para usuário matrix:', sessionContexts.length)
-          setAvailableContexts(sessionContexts)
+          // Usuário da matriz: buscar contextos do banco de dados
+          console.log('🔄 Carregando contextos para usuário matrix do banco...')
           
-          // Se tem contextos disponíveis, selecionar o primeiro por padrão
-          if (sessionContexts.length > 0) {
-            const savedContextId = localStorage.getItem('currentContextId')
-            const defaultContext = savedContextId 
-              ? sessionContexts.find(ctx => ctx.id === savedContextId)
-              : sessionContexts[0]
+          try {
+            const response = await fetch('/api/organizations/user-contexts')
+            console.log('📡 Response status:', response.status)
             
-            if (defaultContext) {
-              setCurrentContext(defaultContext)
+            if (response.ok) {
+              const data = await response.json()
+              const contexts = data.organizations || []
+              console.log('✅ Contextos carregados do banco:', contexts.length)
+              setAvailableContexts(contexts)
+              
+              // Se tem contextos disponíveis, selecionar o primeiro por padrão
+              if (contexts.length > 0) {
+                const savedContextId = localStorage.getItem('currentContextId')
+                const defaultContext = savedContextId 
+                  ? contexts.find(ctx => ctx.id === savedContextId)
+                  : contexts[0]
+                
+                if (defaultContext) {
+                  setCurrentContext(defaultContext)
+                }
+              }
+            } else {
+              const errorData = await response.json()
+              console.error('❌ Erro ao carregar contextos do banco:', errorData)
+              // Fallback para contextos da sessão
+              setAvailableContexts(sessionContexts)
             }
+          } catch (error) {
+            console.error('❌ Erro ao buscar contextos:', error)
+            // Fallback para contextos da sessão
+            setAvailableContexts(sessionContexts)
           }
         } else if (isContextUser) {
           // Usuário de contexto: criar contexto baseado na sessão

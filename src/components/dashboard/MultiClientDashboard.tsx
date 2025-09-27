@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useOrganization } from '@/contexts/OrganizationContext'
 import axios from 'axios'
@@ -30,10 +30,11 @@ import {
   User,
   FileDown,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  X,
+  Check
 } from 'lucide-react'
 import { getIcon } from '@/lib/icons'
-import { MultiClientSelector, SelectedClientsTags } from '@/components/MultiClientSelector'
 
 // =====================================================
 // TIPOS E INTERFACES
@@ -394,11 +395,13 @@ export default function MultiClientDashboard() {
   const [selectedClients, setSelectedClients] = useState<string[]>([])
   const [expandedClients, setExpandedClients] = useState<Set<string>>(new Set())
   const [analyticsData, setAnalyticsData] = useState<MultiClientAnalytics | null>(null)
+  const [showClientPopup, setShowClientPopup] = useState(false)
+  const popupRef = useRef<HTMLDivElement>(null)
   
   // Filtros de período
   const getCurrentMonthDates = () => {
-    // Usar 2025 para pegar os dados que existem no banco
-    const firstDay = new Date(2025, 8, 1) // Setembro 2025
+    // Usar período mais amplo para pegar dados existentes
+    const firstDay = new Date(2024, 0, 1) // Janeiro 2024
     const lastDay = new Date(2025, 11, 31) // Dezembro 2025
     
     return {
@@ -439,14 +442,39 @@ export default function MultiClientDashboard() {
     setMounted(true)
   }, [])
 
+  // Fechar popup ao clicar fora
   useEffect(() => {
-    if (mounted && !contextLoading) {
-      // Se não tem clientes selecionados, não buscar dados ainda
-      if (selectedClients.length > 0) {
-        fetchMultiClientData()
+    const handleClickOutside = (event: MouseEvent) => {
+      if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
+        setShowClientPopup(false)
       }
     }
-  }, [mounted, contextLoading, selectedClients, periodFilter])
+
+    if (showClientPopup) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showClientPopup])
+
+  useEffect(() => {
+    if (mounted && !contextLoading) {
+      // Se não tem clientes selecionados, carregar todos os contextos disponíveis
+      if (selectedClients.length > 0) {
+        fetchMultiClientData()
+      } else if (availableContexts.length > 0) {
+        // Se não tem seleção, carregar todos os contextos disponíveis
+        console.log('🔄 Carregando todos os contextos disponíveis:', availableContexts.map(c => c.id))
+        setSelectedClients(availableContexts.map(c => c.id))
+      } else {
+        // Se não tem contextos, parar loading e mostrar estado vazio
+        console.log('⚠️ Nenhum contexto disponível - parando loading')
+        setLoading(false)
+      }
+    }
+  }, [mounted, contextLoading, selectedClients, periodFilter, availableContexts])
 
   const fetchMultiClientData = async () => {
     try {
@@ -458,6 +486,8 @@ export default function MultiClientDashboard() {
         context_ids: selectedClients.join(',')
       })
       
+      console.log('🔄 Buscando dados multi-client com context_ids:', selectedClients)
+      
       const response = await axios.get(`/api/dashboard/multi-client-analytics?${params}`)
       
       if (response.data) {
@@ -466,7 +496,14 @@ export default function MultiClientDashboard() {
       }
     } catch (error: any) {
       console.error('Erro ao buscar dados multi-client:', error)
-      toast.error('Erro ao carregar dados dos clientes selecionados')
+      
+      // Se erro de autenticação, mostrar estado vazio
+      if (error.response?.status === 401) {
+        console.log('⚠️ Usuário não autenticado - mostrando estado vazio')
+        setAnalyticsData(null)
+      } else {
+        toast.error('Erro ao carregar dados dos clientes selecionados')
+      }
     } finally {
       setLoading(false)
     }
@@ -488,7 +525,15 @@ export default function MultiClientDashboard() {
     setExpandedClients(newExpanded)
   }
 
-  if (!mounted || contextLoading) {
+  if (!mounted) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      </div>
+    )
+  }
+
+  if (contextLoading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
         <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
@@ -518,37 +563,131 @@ export default function MultiClientDashboard() {
             </p>
           </div>
           
-          {/* Seletor Múltiplo de Clientes (apenas para matriz) */}
+          {/* Layout em Popup - Seletor Múltiplo de Clientes (apenas para matriz) */}
           {isMatrixUser && (
-            <div className="w-full sm:w-auto">
-              <MultiClientSelector
-                variant="default"
-                selectedClients={selectedClients}
-                onSelectionChange={handleClientSelectionChange}
-                className="w-full"
-              />
+            <div className="relative">
+              {/* Botão principal */}
+              <button
+                onClick={() => setShowClientPopup(!showClientPopup)}
+                className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+              >
+                <Building className="w-4 h-4" />
+                <span className="text-xs font-medium">
+                  {selectedClients.length === 0 
+                    ? 'Selecionar Clientes' 
+                    : selectedClients.length === 1 
+                      ? availableContexts.find(c => c.id === selectedClients[0])?.name || 'Cliente'
+                      : `${selectedClients.length} clientes`
+                  }
+                </span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              
+              {/* Popup de seleção de clientes */}
+              {showClientPopup && (
+                <div 
+                  ref={popupRef}
+                  className="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-4 z-50"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Building className="w-4 h-4 text-blue-600" />
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">Seleção Rápida</span>
+                    </div>
+                    <button
+                      onClick={() => setShowClientPopup(false)}
+                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-2 mb-4">
+                    {availableContexts.map((context) => (
+                      <label
+                        key={context.id}
+                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors rounded-lg"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedClients.includes(context.id)}
+                          onChange={() => {
+                            if (selectedClients.includes(context.id)) {
+                              handleClientSelectionChange(selectedClients.filter(id => id !== context.id))
+                            } else {
+                              handleClientSelectionChange([...selectedClients, context.id])
+                            }
+                          }}
+                          className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">
+                              {context.name}
+                            </span>
+                            <span className={`px-2 py-1 text-xs rounded-xl font-medium ${
+                              context.type === 'organization' 
+                                ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300" 
+                                : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300"
+                            }`}>
+                              {context.type === 'organization' ? 'Cliente' : 'Dept'}
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {context.slug}
+                          </div>
+                        </div>
+                        {selectedClients.includes(context.id) && (
+                          <Check className="w-4 h-4 text-blue-600" />
+                        )}
+                      </label>
+                    ))}
+                  </div>
+                  
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {selectedClients.length} de {availableContexts.length} selecionados
+                    </span>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleClientSelectionChange(availableContexts.map(c => c.id))}
+                        className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
+                      >
+                        Todos
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleClientSelectionChange([])
+                          localStorage.removeItem('selectedClients')
+                        }}
+                        className="text-xs text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300 font-medium transition-colors"
+                      >
+                        Limpar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
       </div>
 
       {/* Informações do Período */}
-      {analyticsData && (
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-          <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-300">
-            <span className="font-medium block sm:inline">Período analisado:</span>
-            <span className="block sm:inline sm:ml-1">
-              {formatDateShort(analyticsData.consolidated.period.start_date)} até {formatDateShort(analyticsData.consolidated.period.end_date)}
-            </span>
-            <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
-              • <strong>{analyticsData.consolidated.total_tickets}</strong> tickets no período
-            </span>
-            <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
-              • <strong>{analyticsData.clients.length}</strong> clientes selecionados
-            </span>
-          </p>
-        </div>
-      )}
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+        <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-300">
+          <span className="font-medium block sm:inline">Período analisado:</span>
+          <span className="block sm:inline sm:ml-1">
+            {formatDateShort(periodFilter.start_date)} até {formatDateShort(periodFilter.end_date)}
+          </span>
+          <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
+            • <strong>{analyticsData?.consolidated.total_tickets || 0}</strong> tickets no período
+          </span>
+          <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
+            • <strong>{selectedClients.length}</strong> clientes selecionados
+          </span>
+        </p>
+      </div>
 
       {/* Resumo Consolidado */}
       {analyticsData && analyticsData.consolidated.status_stats.length > 0 && (
@@ -627,6 +766,22 @@ export default function MultiClientDashboard() {
               Apenas usuários matriz podem selecionar múltiplos clientes
             </p>
           )}
+        </div>
+      )}
+
+      {/* Estado sem dados */}
+      {selectedClients.length > 0 && (!analyticsData || analyticsData.clients.length === 0) && (
+        <div className="text-center py-12">
+          <BarChart className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            Nenhum dado encontrado
+          </h3>
+          <p className="text-gray-500 dark:text-gray-400 mb-4">
+            Não foram encontrados tickets para os clientes selecionados no período
+          </p>
+          <p className="text-sm text-gray-400">
+            Verifique se há tickets criados para estes clientes ou tente um período diferente
+          </p>
         </div>
       )}
     </div>

@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
     }
 
-    // Buscar organizações com contagem de usuários
+    // Buscar TODAS as organizações (para usuários matrix gerenciarem associações)
     const { data: organizations, error } = await supabaseAdmin
       .from('contexts')
       .select(`

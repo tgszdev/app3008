@@ -100,21 +100,17 @@ export async function GET(request: NextRequest) {
 // POST - Criar novo ticket
 export async function POST(request: NextRequest) {
   try {
-    // BYPASS TEMPORÁRIO PARA TESTE - REMOVER DEPOIS
-    console.log('⚠️ BYPASS TEMPORÁRIO: Simulando usuário para teste')
-    
-    // SIMULAR USUÁRIO PARA TESTE
-    const mockUser = {
-      id: '3667610b-e7f0-4e79-85e8-4cecc0ebe5bc',
-      email: 'simas@simas.com.br',
-      user_type: 'context',
-      role: 'user',
-      context_id: '85879bd8-d1d1-416b-ae55-e564687af28b'
+    // Verificar autenticação
+    const session = await auth()
+    if (!session) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
     
-    const userRole = mockUser.role
-    const userType = mockUser.user_type
-    const userContextId = mockUser.context_id
+    // Obter dados do usuário autenticado
+    const userRole = (session.user as any).role || 'user'
+    const userId = session.user?.id
+    const userType = (session.user as any).userType
+    const userContextId = (session.user as any).context_id
     
     const body = await request.json()
     const { title, description, priority, category, category_id, created_by, assigned_to, due_date, is_internal } = body

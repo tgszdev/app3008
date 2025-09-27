@@ -14,15 +14,20 @@ export async function GET(request: Request) {
   try {
     console.log('🔍 API categories-stats chamada')
     
-    // BYPASS TEMPORÁRIO PARA TESTAR FILTRO - REMOVER DEPOIS
-    console.log('⚠️ BYPASS TEMPORÁRIO: Simulando usuário rodrigues2205@icloud.com')
+    const session = await auth()
+    
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     
     // Get query parameters for date filtering
     const { searchParams } = new URL(request.url)
     const startDate = searchParams.get('start_date')
     const endDate = searchParams.get('end_date')
     const selectedContextId = searchParams.get('context_id')
+    const selectedContextIds = searchParams.get('context_ids')
     console.log('🔍 Contexto selecionado via parâmetro:', selectedContextId)
+    console.log('🔍 Contextos múltiplos via parâmetro:', selectedContextIds)
 
     // Default to current month if no dates provided
     let filterStartDate: string
@@ -70,7 +75,13 @@ export async function GET(request: Request) {
       .lte('created_at', `${filterEndDate}T23:59:59`)
     
     // Apply multi-tenant filter
-    if (selectedContextId) {
+    if (selectedContextIds) {
+      // Múltiplos contextos
+      const contextIds = selectedContextIds.split(',').filter(id => id.trim())
+      query = query.in('context_id', contextIds)
+      console.log(`✅ Query categories filtrada por múltiplos contextos: ${contextIds}`)
+    } else if (selectedContextId) {
+      // Contexto único
       query = query.eq('context_id', selectedContextId)
       console.log(`✅ Query categories filtrada por contexto selecionado: ${selectedContextId}`)
     }

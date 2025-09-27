@@ -1,125 +1,53 @@
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = 'https://eyfvvximmeqmwdfqzqov.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5ZnZ2eGltbWVxbXdkZnF6cW92Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1ODUxODYsImV4cCI6MjA3MjE2MTE4Nn0.ht9a6MmtkfE5hVRmwpfyMcW24a4R7n-9hoW6eYd3K2w'
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5ZnZ2eGltbWVxbXdkZnF6cW92Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjU4NTE4NiwiZXhwIjoyMDcyMTYxMTg2fQ.uSItau5HKn79j6-dyFE_kyHEbGk7wrq64zrIVYxsVkw'
 
-const supabase = createClient(supabaseUrl, supabaseKey)
+const supabaseAdmin = createClient(supabaseUrl, supabaseKey)
 
 async function checkTableStructure() {
-  console.log('🔍 VERIFICANDO ESTRUTURA DA TABELA TICKETS')
-  console.log('=' .repeat(60))
+  console.log('🔍 VERIFICANDO ESTRUTURA DA TABELA TICKETS...')
   
   try {
-    // 1. VERIFICAR SE A TABELA EXISTE
-    console.log('\n📊 1. VERIFICANDO SE A TABELA EXISTE:')
-    console.log('-'.repeat(40))
+    // Verificar se há DEFAULT na coluna ticket_number
+    const { data: columns, error } = await supabaseAdmin
+      .rpc('exec_sql', {
+        sql: `
+          SELECT column_name, column_default, data_type, is_nullable
+          FROM information_schema.columns 
+          WHERE table_name = 'tickets' 
+          AND column_name = 'ticket_number'
+        `
+      })
     
-    const { data: tableInfo, error: tableError } = await supabase
-      .from('tickets')
-      .select('*')
-      .limit(1)
-    
-    if (tableError) {
-      console.error('❌ Erro ao acessar tabela tickets:', tableError)
+    if (error) {
+      console.error('❌ Erro ao verificar colunas:', error)
       return
     }
     
-    console.log('✅ Tabela tickets existe e é acessível')
+    console.log('📋 Estrutura da coluna ticket_number:')
+    console.log(JSON.stringify(columns, null, 2))
     
-    // 2. VERIFICAR ESTRUTURA DA TABELA
-    console.log('\n📊 2. VERIFICANDO ESTRUTURA DA TABELA:')
-    console.log('-'.repeat(40))
-    
-    const { data: sampleData, error: sampleError } = await supabase
-      .from('tickets')
-      .select('*')
-      .limit(1)
-    
-    if (sampleError) {
-      console.error('❌ Erro ao buscar dados da tabela:', sampleError)
-    } else {
-      console.log('✅ Tabela acessível, mas vazia')
-    }
-    
-    // 3. TENTAR INSERIR UM TICKET DE TESTE
-    console.log('\n📊 3. TESTANDO INSERÇÃO DE TICKET:')
-    console.log('-'.repeat(40))
-    
-    const testTicket = {
-      title: 'Teste de inserção',
-      description: 'Teste para verificar constraint',
-      status: 'open',
-      priority: 'medium',
-      category: 'general',
-      created_by: '3667610b-e7f0-4e79-85e8-4cecc0ebe5bc',
-      ticket_number: '1',
-      context_id: '85879bd8-d1d1-416b-ae55-e564687af28b'
-    }
-    
-    console.log('📤 Tentando inserir ticket de teste:', testTicket)
-    
-    const { data: insertResult, error: insertError } = await supabase
-      .from('tickets')
-      .insert(testTicket)
-      .select()
-    
-    if (insertError) {
-      console.error('❌ Erro ao inserir ticket:', insertError)
-      console.log('🔍 Detalhes do erro:', {
-        code: insertError.code,
-        message: insertError.message,
-        details: insertError.details,
-        hint: insertError.hint
+    // Verificar se há TRIGGERS
+    const { data: triggers, error: triggerError } = await supabaseAdmin
+      .rpc('exec_sql', {
+        sql: `
+          SELECT trigger_name, event_manipulation, action_statement
+          FROM information_schema.triggers 
+          WHERE event_object_table = 'tickets'
+        `
       })
-    } else {
-      console.log('✅ Ticket inserido com sucesso:', insertResult)
-      
-      // Remover o ticket de teste
-      if (insertResult && insertResult.length > 0) {
-        const { error: deleteError } = await supabase
-          .from('tickets')
-          .delete()
-          .eq('id', insertResult[0].id)
-        
-        if (deleteError) {
-          console.log('⚠️ Erro ao remover ticket de teste:', deleteError)
-        } else {
-          console.log('✅ Ticket de teste removido')
-        }
-      }
+    
+    if (triggerError) {
+      console.error('❌ Erro ao verificar triggers:', triggerError)
+      return
     }
     
-    // 4. VERIFICAR CONSTRAINTS
-    console.log('\n📊 4. VERIFICANDO CONSTRAINTS:')
-    console.log('-'.repeat(40))
-    
-    // Tentar inserir ticket com ticket_number duplicado
-    const duplicateTicket = {
-      title: 'Teste duplicata',
-      description: 'Teste para verificar constraint de duplicata',
-      status: 'open',
-      priority: 'medium',
-      category: 'general',
-      created_by: '3667610b-e7f0-4e79-85e8-4cecc0ebe5bc',
-      ticket_number: '1', // Mesmo número do teste anterior
-      context_id: '85879bd8-d1d1-416b-ae55-e564687af28b'
-    }
-    
-    console.log('📤 Tentando inserir ticket com número duplicado:', duplicateTicket)
-    
-    const { data: duplicateResult, error: duplicateError } = await supabase
-      .from('tickets')
-      .insert(duplicateTicket)
-      .select()
-    
-    if (duplicateError) {
-      console.log('✅ Constraint funcionando - erro esperado:', duplicateError.message)
-    } else {
-      console.log('❌ Constraint não funcionando - ticket duplicado inserido:', duplicateResult)
-    }
+    console.log('🔧 Triggers na tabela tickets:')
+    console.log(JSON.stringify(triggers, null, 2))
     
   } catch (error) {
-    console.error('❌ Erro no debug:', error.message)
+    console.error('❌ Erro geral:', error)
   }
 }
 

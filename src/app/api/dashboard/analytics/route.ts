@@ -6,27 +6,15 @@ export async function GET(request: Request) {
   try {
     const session = await auth()
     
-    // BYPASS TEMPORÁRIO PARA TESTAR FILTRO - REMOVER DEPOIS
     if (!session?.user?.id) {
-      console.log('⚠️ BYPASS TEMPORÁRIO: Simulando usuário rodrigues2205@icloud.com')
-      // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    
-      // SIMULAR USUÁRIO PARA TESTE
-      const mockSession = session || {
-        user: {
-          id: '2a33241e-ed38-48b5-9c84-e8c354ae9606',
-          email: 'rodrigues2205@icloud.com'
-        }
-      }
-    
-    const effectiveSession = session || mockSession
 
     // Obter dados do usuário e contexto multi-tenant
     const { data: userData, error: userError } = await supabaseAdmin
       .from('users')
       .select('id, role, user_type, context_id, context_name, context_type')
-      .eq('email', effectiveSession.user.email)
+      .eq('email', session.user.email)
       .single()
 
     if (userError || !userData) {
