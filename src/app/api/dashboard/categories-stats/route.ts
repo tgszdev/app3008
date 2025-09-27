@@ -191,11 +191,16 @@ export async function GET(request: Request) {
     }> = []
     
     console.log(`🔍 Processando ${tickets?.length || 0} tickets para status stats`)
+    console.log(`🔍 Tickets encontrados:`, tickets?.map(t => ({ id: t.id, status: t.status })))
     
     statusList.forEach(status => {
-      const count = tickets?.filter(t => t.status === status.slug).length || 0
+      const matchingTickets = tickets?.filter(t => t.status === status.slug) || []
+      const count = matchingTickets.length
       statusCounts[status.slug] = count
       console.log(`📊 Status ${status.name} (${status.slug}): ${count} tickets`)
+      if (matchingTickets.length > 0) {
+        console.log(`  - Tickets correspondentes:`, matchingTickets.map(t => t.id))
+      }
       statusCountsDetailed.push({
         slug: status.slug,
         name: status.name,
