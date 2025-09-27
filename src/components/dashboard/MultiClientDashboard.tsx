@@ -487,8 +487,11 @@ export default function MultiClientDashboard() {
       })
       
       console.log('🔄 Buscando dados multi-client com context_ids:', selectedClients)
+      console.log('🔄 URL da API:', `/api/dashboard/multi-client-analytics?${params}`)
       
       const response = await axios.get(`/api/dashboard/multi-client-analytics?${params}`)
+      
+      console.log('🔄 Resposta da API:', response.status, response.data)
       
       if (response.data) {
         setAnalyticsData(response.data)
@@ -496,6 +499,8 @@ export default function MultiClientDashboard() {
       }
     } catch (error: any) {
       console.error('Erro ao buscar dados multi-client:', error)
+      console.error('Status do erro:', error.response?.status)
+      console.error('Dados do erro:', error.response?.data)
       
       // Se erro de autenticação, mostrar estado vazio
       if (error.response?.status === 401) {

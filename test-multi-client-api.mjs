@@ -1,155 +1,128 @@
-#!/usr/bin/env node
-
 import { createClient } from '@supabase/supabase-js'
-import dotenv from 'dotenv'
 
-dotenv.config({ path: '.env.local' })
+// Configuração do Supabase
+const supabaseUrl = 'https://eyfvvximmeqmwdfqzqov.supabase.co'
+const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5ZnZ2eGltbWVxbXdkZnF6cW92Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjU4NTE4NiwiZXhwIjoyMDcyMTYxMTg2fQ.uSItau5HKn79j6-dyFE_kyHEbGk7wrq64zrIVYxsVkw'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-if (!supabaseUrl || !supabaseKey) {
-  console.error('❌ Variáveis de ambiente não encontradas')
-  process.exit(1)
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey)
+const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 async function testMultiClientAPI() {
-  console.log('🧪 TESTANDO API MULTI-CLIENT DIRETAMENTE')
-  console.log('=' .repeat(60))
-
+  console.log('🔍 Testando API Multi-Client Analytics...')
+  
+  // 1. Verificar usuário rodrigues2205@icloud.com
+  console.log('\n1. Verificando usuário rodrigues2205@icloud.com:')
+  const { data: user, error: userError } = await supabase
+    .from('users')
+    .select('id, email, user_type, context_id')
+    .eq('email', 'rodrigues2205@icloud.com')
+    .single()
+  
+  if (userError) {
+    console.error('❌ Erro ao buscar usuário:', userError)
+    return
+  }
+  
+  console.log('✅ Usuário encontrado:', user)
+  
+  // 2. Verificar contextos associados ao usuário
+  console.log('\n2. Verificando contextos associados:')
+  const { data: userContexts, error: contextsError } = await supabase
+    .from('user_contexts')
+    .select('context_id')
+    .eq('user_id', user.id)
+  
+  if (contextsError) {
+    console.error('❌ Erro ao buscar contextos:', contextsError)
+    return
+  }
+  
+  console.log(`✅ Encontrados ${userContexts?.length || 0} contextos associados`)
+  userContexts?.forEach(uc => {
+    console.log(`  - Context ID: ${uc.context_id}`)
+  })
+  
+  // 3. Buscar detalhes dos contextos
+  if (userContexts && userContexts.length > 0) {
+    console.log('\n3. Detalhes dos contextos:')
+    const contextIds = userContexts.map(uc => uc.context_id)
+    
+    const { data: contexts, error: contextsDetailError } = await supabase
+      .from('contexts')
+      .select('id, name, type, slug')
+      .in('id', contextIds)
+    
+    if (contextsDetailError) {
+      console.error('❌ Erro ao buscar detalhes dos contextos:', contextsDetailError)
+    } else {
+      console.log(`✅ Encontrados ${contexts?.length || 0} contextos`)
+      contexts?.forEach(context => {
+        console.log(`  - ${context.name} (${context.type}): ${context.id}`)
+      })
+    }
+    
+    // 4. Simular query da API multi-client-analytics
+    console.log('\n4. Simulando query da API multi-client-analytics:')
+    const contextIdsString = contextIds.join(',')
+    console.log(`Context IDs: ${contextIdsString}`)
+    
+    for (const contextId of contextIds) {
+      console.log(`\nTestando contexto: ${contextId}`)
+      
+      const { data: tickets, error: ticketsError } = await supabase
+        .from('tickets')
+        .select(`
+          id,
+          ticket_number,
+          title,
+          status,
+          priority,
+          created_at,
+          updated_at,
+          resolved_at,
+          created_by,
+          assigned_to,
+          category_id,
+          categories(
+            id,
+            name,
+            slug,
+            color,
+            icon,
+            is_global,
+            context_id
+          )
+        `)
+        .eq('context_id', contextId)
+        .gte('created_at', '2024-01-01T00:00:00.000Z')
+        .lte('created_at', '2025-12-31T23:59:59.999Z')
+      
+      if (ticketsError) {
+        console.error(`❌ Erro na query:`, ticketsError)
+      } else {
+        console.log(`✅ Query retornou ${tickets?.length || 0} tickets`)
+        tickets?.forEach(ticket => {
+          console.log(`  - #${ticket.ticket_number}: ${ticket.title}`)
+          console.log(`    Status: ${ticket.status}`)
+          console.log(`    Categoria: ${ticket.categories?.name || 'Sem categoria'}`)
+        })
+      }
+    }
+  }
+  
+  // 5. Testar endpoint da API diretamente
+  console.log('\n5. Testando endpoint da API:')
   try {
-    // 1. Testar API sem parâmetros
-    console.log('\n1️⃣ TESTANDO API SEM PARÂMETROS...')
+    const response = await fetch('https://www.ithostbr.tech/api/dashboard/multi-client-analytics?start_date=2024-01-01&end_date=2025-12-31&context_ids=85879bd8-d1d1-416b-ae55-e564687af28b,6486088e-72ae-461b-8b03-32ca84918882')
+    const data = await response.json()
     
-    try {
-      const response1 = await fetch('https://www.ithostbr.tech/api/dashboard/multi-client-stats')
-      const data1 = await response1.json()
-      
-      if (response1.ok) {
-        console.log('✅ API sem parâmetros funcionando!')
-        console.log(`📊 Total tickets: ${data1.total_tickets}`)
-        console.log(`📊 Contextos selecionados: ${data1.selected_contexts?.length || 0}`)
-        console.log(`📊 Tickets recentes: ${data1.recent_tickets?.length || 0}`)
-      } else {
-        console.log('❌ API sem parâmetros com erro:', response1.status, data1)
-      }
-    } catch (error) {
-      console.log('❌ Erro ao testar API sem parâmetros:', error.message)
-    }
-
-    // 2. Testar API com contexto específico (Luft Agro)
-    console.log('\n2️⃣ TESTANDO API COM CONTEXTO LUFT AGRO...')
-    
-    try {
-      const luftAgroId = '6486088e-72ae-461b-8b03-32ca84918882'
-      const response2 = await fetch(`https://www.ithostbr.tech/api/dashboard/multi-client-stats?context_ids=${luftAgroId}`)
-      const data2 = await response2.json()
-      
-      if (response2.ok) {
-        console.log('✅ API com Luft Agro funcionando!')
-        console.log(`📊 Total tickets: ${data2.total_tickets}`)
-        console.log(`📊 Contextos selecionados: ${data2.selected_contexts}`)
-        console.log(`📊 Tickets recentes: ${data2.recent_tickets?.length || 0}`)
-        
-        if (data2.recent_tickets && data2.recent_tickets.length > 0) {
-          console.log('📋 Tickets do Luft Agro:')
-          data2.recent_tickets.forEach(ticket => {
-            console.log(`  - ${ticket.title}: ${ticket.status} (${ticket.priority})`)
-          })
-        }
-      } else {
-        console.log('❌ API com Luft Agro com erro:', response2.status, data2)
-      }
-    } catch (error) {
-      console.log('❌ Erro ao testar API com Luft Agro:', error.message)
-    }
-
-    // 3. Testar API com múltiplos contextos
-    console.log('\n3️⃣ TESTANDO API COM MÚLTIPLOS CONTEXTOS...')
-    
-    try {
-      const luftAgroId = '6486088e-72ae-461b-8b03-32ca84918882'
-      const testeId = 'a7791594-c44d-47aa-8ddd-97ecfb6cc8ed'
-      const response3 = await fetch(`https://www.ithostbr.tech/api/dashboard/multi-client-stats?context_ids=${luftAgroId},${testeId}`)
-      const data3 = await response3.json()
-      
-      if (response3.ok) {
-        console.log('✅ API com múltiplos contextos funcionando!')
-        console.log(`📊 Total tickets: ${data3.total_tickets}`)
-        console.log(`📊 Contextos selecionados: ${data3.selected_contexts}`)
-        console.log(`📊 Tickets recentes: ${data3.recent_tickets?.length || 0}`)
-        
-        if (data3.recent_tickets && data3.recent_tickets.length > 0) {
-          console.log('📋 Tickets dos contextos selecionados:')
-          data3.recent_tickets.forEach(ticket => {
-            console.log(`  - ${ticket.title}: ${ticket.status} (${ticket.priority})`)
-          })
-        }
-      } else {
-        console.log('❌ API com múltiplos contextos com erro:', response3.status, data3)
-      }
-    } catch (error) {
-      console.log('❌ Erro ao testar API com múltiplos contextos:', error.message)
-    }
-
-    // 4. Verificar dados no banco para comparar
-    console.log('\n4️⃣ VERIFICANDO DADOS NO BANCO...')
-    
-    const { data: luftTickets, error: luftError } = await supabase
-      .from('tickets')
-      .select('id, title, status, priority, created_at')
-      .eq('context_id', '6486088e-72ae-461b-8b03-32ca84918882')
-      .order('created_at', { ascending: false })
-
-    if (luftError) {
-      console.log('❌ Erro ao buscar tickets do Luft Agro:', luftError.message)
+    if (response.ok) {
+      console.log('✅ API retornou dados:', JSON.stringify(data, null, 2))
     } else {
-      console.log('✅ Tickets do Luft Agro no banco:', luftTickets.length)
-      luftTickets.forEach(ticket => {
-        console.log(`  - ${ticket.title}: ${ticket.status} (${ticket.priority})`)
-      })
+      console.log('❌ API retornou erro:', data)
     }
-
-    const { data: testeTickets, error: testeError } = await supabase
-      .from('tickets')
-      .select('id, title, status, priority, created_at')
-      .eq('context_id', 'a7791594-c44d-47aa-8ddd-97ecfb6cc8ed')
-      .order('created_at', { ascending: false })
-
-    if (testeError) {
-      console.log('❌ Erro ao buscar tickets do Teste:', testeError.message)
-    } else {
-      console.log('✅ Tickets do Teste no banco:', testeTickets.length)
-      testeTickets.forEach(ticket => {
-        console.log(`  - ${ticket.title}: ${ticket.status} (${ticket.priority})`)
-      })
-    }
-
-    // 5. Diagnóstico final
-    console.log('\n5️⃣ DIAGNÓSTICO FINAL...')
-    
-    console.log('📊 RESUMO DOS TESTES:')
-    console.log('✅ API multi-client existe e está funcionando')
-    console.log('✅ Filtro por contexto está funcionando')
-    console.log('✅ Múltiplos contextos estão funcionando')
-    console.log('✅ Dados do banco estão corretos')
-    
-    console.log('\n🎯 PROBLEMA IDENTIFICADO:')
-    console.log('❌ Frontend não está enviando os parâmetros corretos')
-    console.log('❌ Frontend não está usando a API correta')
-    console.log('❌ Frontend não está processando a resposta corretamente')
-    
-    console.log('\n🔧 SOLUÇÃO:')
-    console.log('1. Verificar se frontend está enviando context_ids')
-    console.log('2. Verificar se frontend está usando a API correta')
-    console.log('3. Verificar se frontend está processando a resposta')
-    console.log('4. Verificar se frontend está atualizando os cards')
-
   } catch (error) {
-    console.error('❌ Erro geral:', error)
+    console.error('❌ Erro ao chamar API:', error)
   }
 }
 
-testMultiClientAPI()
+testMultiClientAPI().catch(console.error)
