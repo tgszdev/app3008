@@ -74,6 +74,8 @@ export async function GET(request: Request) {
       .gte('created_at', `${filterStartDate}T00:00:00`)
       .lte('created_at', `${filterEndDate}T23:59:59`)
     
+    console.log(`🔍 Query base criada para período: ${filterStartDate} até ${filterEndDate}`)
+    
     // Apply multi-tenant filter
     if (selectedContextIds) {
       // Múltiplos contextos
@@ -84,6 +86,8 @@ export async function GET(request: Request) {
       // Contexto único
       query = query.eq('context_id', selectedContextId)
       console.log(`✅ Query categories filtrada por contexto selecionado: ${selectedContextId}`)
+    } else {
+      console.log(`⚠️ Nenhum filtro de contexto aplicado - buscando todos os tickets`)
     }
 
     const { data: tickets, error: ticketsError } = await query
