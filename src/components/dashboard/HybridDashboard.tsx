@@ -504,7 +504,19 @@ export default function HybridDashboard() {
       
       const response = await axios.get(`/api/dashboard/categories-stats?${params}`)
       
+      console.log('🔄 Resposta da API categories-stats:', response.status, response.data)
+      
       if (response.data) {
+        console.log('✅ Dados de categorias carregados:', {
+          total_tickets: response.data.total_tickets,
+          status_summary_detailed: response.data.status_summary_detailed?.length || 0,
+          categorias: response.data.categorias?.length || 0
+        })
+        
+        if (response.data.status_summary_detailed) {
+          console.log('📊 Status summary detailed:', response.data.status_summary_detailed.map(s => `${s.name}: ${s.count}`))
+        }
+        
         setCategoryStats(response.data)
       }
     } catch (error: any) {
