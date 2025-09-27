@@ -1,15 +1,34 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 
 // GET - Buscar analytics agrupados por cliente/organização
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    // Autenticação
     const session = await auth()
+    
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    
+    // Obter dados do usuário e contexto multi-tenant
+    const { data: userData, error: userError } = await supabaseAdmin
+      .from('users')
+      .select('id, role, user_type, context_id, context_name, context_type')
+      .eq('email', session.user.email)
+      .single()
+
+    if (userError || !userData) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      )
+    }
+
+    const currentUserId = userData.id
+    const userRole = userData.role || 'user'
+    const userType = userData.user_type
+    const userContextId = userData.context_id
 
     const { searchParams } = new URL(request.url)
     const startDate = searchParams.get('start_date')
@@ -22,11 +41,11 @@ export async function GET(request: Request) {
       endDate,
       contextIds,
       userId,
-      userEmail: session.user.email
+      userEmail: session.user.email,
+      currentUserId,
+      userRole,
+      userType
     })
-    
-    console.log('🔍 Context IDs recebidos:', contextIds)
-    console.log('🔍 Context IDs length:', contextIds.length)
 
     if (!startDate || !endDate) {
       return NextResponse.json({ error: 'start_date and end_date are required' }, { status: 400 })
@@ -34,6 +53,31 @@ export async function GET(request: Request) {
 
     if (contextIds.length === 0) {
       return NextResponse.json({ error: 'context_ids are required' }, { status: 400 })
+    }
+
+    // Verificar se o usuário tem acesso aos contextos solicitados
+    if (userType === 'matrix') {
+      // Para usuários matrix, verificar se os contextos estão associados
+      const { data: userContexts, error: contextsError } = await supabaseAdmin
+        .from('user_contexts')
+        .select('context_id')
+        .eq('user_id', currentUserId)
+      
+      if (!contextsError && userContexts) {
+        const userContextIds = userContexts.map(uc => uc.context_id)
+        const unauthorizedContexts = contextIds.filter(id => !userContextIds.includes(id))
+        
+        if (unauthorizedContexts.length > 0) {
+          console.log('❌ Usuário não tem acesso aos contextos:', unauthorizedContexts)
+          return NextResponse.json({ error: 'Acesso negado a alguns contextos' }, { status: 403 })
+        }
+      }
+    } else if (userType === 'context') {
+      // Para usuários de contexto, só podem acessar seu próprio contexto
+      if (contextIds.length > 1 || !contextIds.includes(userContextId)) {
+        console.log('❌ Usuário de contexto tentando acessar contextos não autorizados')
+        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
+      }
     }
 
     // Buscar dados de cada contexto selecionado

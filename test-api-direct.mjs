@@ -1,75 +1,93 @@
-async function testApiDirect() {
-  console.log('🧪 TESTE DIRETO DA API')
-  console.log('=' .repeat(50))
+import { createClient } from '@supabase/supabase-js'
+
+// Configuração do Supabase
+const supabaseUrl = 'https://eyfvvximmeqmwdfqzqov.supabase.co'
+const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5ZnZ2eGltbWVxbXdkZnF6cW92Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjU4NTE4NiwiZXhwIjoyMDcyMTYxMTg2fQ.uSItau5HKn79j6-dyFE_kyHEbGk7wrq64zrIVYxsVkw'
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+async function testAPIDirect() {
+  console.log('🔍 Testando API diretamente...')
   
-  const luftAgroContextId = '6486088e-72ae-461b-8b03-32ca84918882'
+  // 1. Verificar tickets no banco
+  console.log('\n1. Verificando tickets no banco:')
+  const { data: tickets, error: ticketsError } = await supabase
+    .from('tickets')
+    .select('id, ticket_number, title, context_id, created_at, status')
+    .limit(10)
   
+  if (ticketsError) {
+    console.error('❌ Erro ao buscar tickets:', ticketsError)
+  } else {
+    console.log(`✅ Encontrados ${tickets?.length || 0} tickets`)
+    tickets?.forEach(ticket => {
+      console.log(`  - #${ticket.ticket_number}: ${ticket.title} (context: ${ticket.context_id})`)
+    })
+  }
+  
+  // 2. Testar query exata da API
+  console.log('\n2. Testando query exata da API:')
+  const contextIds = ['18031594-558a-4f45-847c-b1d2b58087f0', '85879bd8-d1d1-416b-ae55-e564687af28b', '6486088e-72ae-461b-8b03-32ca84918882', 'a7791594-c44d-47aa-8ddd-97ecfb6cc8ed']
+  
+  for (const contextId of contextIds) {
+    console.log(`\nTestando contexto: ${contextId}`)
+    
+    // Query exata da API
+    const { data: tickets, error } = await supabase
+      .from('tickets')
+      .select(`
+        id,
+        ticket_number,
+        title,
+        status,
+        priority,
+        created_at,
+        updated_at,
+        resolved_at,
+        created_by,
+        assigned_to,
+        category_id,
+        categories(
+          id,
+          name,
+          slug,
+          color,
+          icon,
+          is_global,
+          context_id
+        )
+      `)
+      .eq('context_id', contextId)
+      .gte('created_at', '2024-01-01T00:00:00.000Z')
+      .lte('created_at', '2025-12-31T23:59:59.999Z')
+    
+    if (error) {
+      console.error(`❌ Erro na query:`, error)
+    } else {
+      console.log(`✅ Query retornou ${tickets?.length || 0} tickets`)
+      tickets?.forEach(ticket => {
+        console.log(`  - #${ticket.ticket_number}: ${ticket.title}`)
+        console.log(`    Status: ${ticket.status}`)
+        console.log(`    Categoria: ${ticket.categories?.name || 'Sem categoria'}`)
+      })
+    }
+  }
+  
+  // 3. Testar endpoint da API
+  console.log('\n3. Testando endpoint da API:')
   try {
-    // Testar API sem contexto
-    console.log('📡 Testando API sem contexto...')
-    const responseSemContexto = await fetch('https://www.ithostbr.tech/api/dashboard/stats')
+    const response = await fetch('https://www.ithostbr.tech/api/dashboard/multi-client-analytics?start_date=2024-01-01&end_date=2025-12-31&context_ids=18031594-558a-4f45-847c-b1d2b58087f0,85879bd8-d1d1-416b-ae55-e564687af28b,6486088e-72ae-461b-8b03-32ca84918882,a7791594-c44d-47aa-8ddd-97ecfb6cc8ed')
+    const data = await response.json()
     
-    if (!responseSemContexto.ok) {
-      console.error('❌ Erro na API sem contexto:', responseSemContexto.status)
-      return
-    }
-    
-    const dataSemContexto = await responseSemContexto.json()
-    console.log('✅ Resposta sem contexto:')
-    console.log(`  Total: ${dataSemContexto.totalTickets || 'undefined'}`)
-    console.log(`  Abertos: ${dataSemContexto.openTickets || 'undefined'}`)
-    console.log(`  Fechados: ${dataSemContexto.closedTickets || 'undefined'}`)
-    console.log(`  Recentes: ${dataSemContexto.recentTickets?.length || 0}`)
-    
-    // Testar API com contexto
-    console.log('\n📡 Testando API com contexto...')
-    const responseComContexto = await fetch(`https://www.ithostbr.tech/api/dashboard/stats?context_id=${luftAgroContextId}`)
-    
-    if (!responseComContexto.ok) {
-      console.error('❌ Erro na API com contexto:', responseComContexto.status)
-      return
-    }
-    
-    const dataComContexto = await responseComContexto.json()
-    console.log('✅ Resposta com contexto:')
-    console.log(`  Total: ${dataComContexto.totalTickets || 'undefined'}`)
-    console.log(`  Abertos: ${dataComContexto.openTickets || 'undefined'}`)
-    console.log(`  Fechados: ${dataComContexto.closedTickets || 'undefined'}`)
-    console.log(`  Recentes: ${dataComContexto.recentTickets?.length || 0}`)
-    
-    // Comparar resultados
-    console.log('\n🔍 COMPARAÇÃO:')
-    console.log('-'.repeat(30))
-    
-    if (dataSemContexto.totalTickets !== dataComContexto.totalTickets) {
-      console.log('✅ FILTRO FUNCIONANDO: Valores diferentes com e sem contexto')
-      console.log(`  Sem contexto: ${dataSemContexto.totalTickets}`)
-      console.log(`  Com contexto: ${dataComContexto.totalTickets}`)
+    console.log(`Status: ${response.status}`)
+    if (response.ok) {
+      console.log('✅ API retornou dados:', JSON.stringify(data, null, 2))
     } else {
-      console.log('❌ FILTRO NÃO FUNCIONANDO: Valores iguais com e sem contexto')
-      console.log(`  Ambos: ${dataSemContexto.totalTickets}`)
+      console.log('❌ API retornou erro:', data)
     }
-    
-    // Verificar se as estatísticas estão sendo calculadas
-    console.log('\n🧮 VERIFICANDO CÁLCULO DAS ESTATÍSTICAS:')
-    console.log('-'.repeat(30))
-    
-    if (dataComContexto.totalTickets === undefined) {
-      console.log('❌ PROBLEMA: totalTickets é undefined')
-      console.log('🔍 Verificando estrutura da resposta...')
-      console.log('📋 Chaves da resposta:', Object.keys(dataComContexto))
-      
-      // Verificar se há algum erro na resposta
-      if (dataComContexto.error) {
-        console.log('❌ Erro na API:', dataComContexto.error)
-      }
-    } else {
-      console.log('✅ Estatísticas estão sendo calculadas')
-    }
-    
   } catch (error) {
-    console.error('❌ Erro no teste:', error.message)
+    console.error('❌ Erro ao chamar API:', error)
   }
 }
 
-testApiDirect()
+testAPIDirect().catch(console.error)
