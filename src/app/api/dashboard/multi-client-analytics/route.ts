@@ -65,7 +65,7 @@ export async function GET(request: Request) {
             created_by,
             assigned_to,
             category_id,
-            categories!inner(
+            categories(
               id,
               name,
               slug,
@@ -90,6 +90,8 @@ export async function GET(request: Request) {
           console.error(`❌ Erro ao buscar tickets do contexto ${contextId}:`, ticketsError)
           continue
         }
+
+        console.log(`✅ Contexto ${context.name}: ${tickets?.length || 0} tickets encontrados`)
 
         // Buscar status disponíveis com contagem
         const { data: statuses, error: statusError } = await supabaseAdmin
@@ -141,6 +143,30 @@ export async function GET(request: Request) {
               }
               catData.status_breakdown[ticket.status]++
             }
+          } else {
+            // Ticket sem categoria - criar categoria "Sem Categoria"
+            const key = 'uncategorized'
+            if (!categoryMap.has(key)) {
+              categoryMap.set(key, {
+                id: 'uncategorized',
+                name: 'Sem Categoria',
+                slug: 'sem-categoria',
+                color: '#6B7280',
+                icon: 'folder',
+                is_global: false,
+                context_id: contextId,
+                total: 0,
+                status_breakdown: {}
+              })
+            }
+            
+            const catData = categoryMap.get(key)
+            catData.total++
+            
+            if (!catData.status_breakdown[ticket.status]) {
+              catData.status_breakdown[ticket.status] = 0
+            }
+            catData.status_breakdown[ticket.status]++
           }
         })
 
