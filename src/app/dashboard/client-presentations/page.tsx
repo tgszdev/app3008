@@ -295,7 +295,7 @@ export default function ClientPresentations() {
       )
     }
 
-    // Template 5: Neural Network - Rede neural visual
+    // Template 5: Neural Network - Rede neural visual (baseado na imagem)
     if (id === 5) {
       return (
         <div className="space-y-8">
@@ -550,7 +550,7 @@ export default function ClientPresentations() {
     // Templates restantes (11-50) com layouts completamente diferentes
     if (id >= 11 && id <= 50) {
       const templates = [
-        // Template 11: Cyberpunk Grid
+        // Template 11: Cyberpunk Grid - Layout em grade com sombras
         () => (
           <div className="space-y-8">
             <div className="text-center">
@@ -593,7 +593,8 @@ export default function ClientPresentations() {
             </div>
           </div>
         ),
-        // Template 12: Holographic Data
+        
+        // Template 12: Holographic Data - Cards flutuantes com efeito 3D
         () => (
           <div className="space-y-8">
             <div className="text-center">
@@ -618,6 +619,332 @@ export default function ClientPresentations() {
                       <div className="text-center">
                         <p className="text-cyan-400 font-bold text-3xl">{client.tickets}</p>
                         <p className="text-sm text-gray-400">Total Tickets</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ),
+
+        // Template 13: Neural Pathways - Layout vertical com conexões
+        () => (
+          <div className="space-y-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-emerald-400 to-teal-600 bg-clip-text text-transparent">
+                Neural Pathways
+              </h2>
+              <p className="text-gray-400">Caminhos neurais com sinapses</p>
+            </div>
+            <div className="flex flex-col items-center space-y-8">
+              {mockClients.map((client, index) => (
+                <div key={client.id} className="relative">
+                  <div className="bg-gradient-to-br from-emerald-900/20 to-teal-900/20 rounded-2xl p-8 border border-emerald-500/30 hover:border-emerald-400 transition-all duration-500 w-96">
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center">
+                          <Activity className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold text-white">{client.name}</h3>
+                          <p className="text-gray-300 text-sm">{client.type} • {client.tickets} tickets</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-emerald-400 font-bold text-xl">{client.trend}</span>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="bg-emerald-800/30 rounded-xl p-4 border border-emerald-500/20">
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-300">Total no Período</span>
+                          <span className="text-emerald-400 font-bold text-xl">{client.tickets}</span>
+                        </div>
+                      </div>
+                      <div className="bg-yellow-800/30 rounded-xl p-4 border border-yellow-500/20">
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-300">Aberto</span>
+                          <span className="text-yellow-400 font-bold text-xl">{client.status.open}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {index < mockClients.length - 1 && (
+                    <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-0.5 h-8 bg-gradient-to-b from-emerald-500 to-teal-500"></div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        ),
+
+        // Template 14: Digital Hive - Layout hexagonal
+        () => (
+          <div className="space-y-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-amber-400 to-orange-600 bg-clip-text text-transparent">
+                Digital Hive
+              </h2>
+              <p className="text-gray-400">Colmeia digital com hexágonos</p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-8">
+              {mockClients.map((client) => (
+                <div key={client.id} className="relative group">
+                  <div className="bg-gradient-to-br from-amber-900/20 to-orange-900/20 rounded-2xl p-6 border border-amber-500/30 hover:border-amber-400 transition-all duration-300 transform hover:rotate-1 hover:scale-105">
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Hexagon className="w-8 h-8 text-white" />
+                      </div>
+                      <h3 className="text-lg font-bold text-white mb-2">{client.name}</h3>
+                      <p className="text-gray-300 text-sm mb-4">{client.type}</p>
+                      <div className="space-y-2">
+                        <div className="bg-amber-800/30 rounded-lg p-3 border border-amber-500/20">
+                          <div className="text-center">
+                            <p className="text-xs text-gray-400 mb-1">Total</p>
+                            <p className="text-amber-400 font-bold text-2xl">{client.tickets}</p>
+                          </div>
+                        </div>
+                        <div className="bg-yellow-800/30 rounded-lg p-3 border border-yellow-500/20">
+                          <div className="text-center">
+                            <p className="text-xs text-gray-400 mb-1">Aberto</p>
+                            <p className="text-yellow-400 font-bold text-2xl">{client.status.open}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ),
+
+        // Template 15: Quantum Wave - Layout ondulado
+        () => (
+          <div className="space-y-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-sky-400 to-cyan-600 bg-clip-text text-transparent">
+                Quantum Wave
+              </h2>
+              <p className="text-gray-400">Ondas quânticas com interferência</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {mockClients.map((client) => (
+                <div key={client.id} className="bg-gradient-to-br from-sky-900/20 to-cyan-900/20 rounded-2xl p-6 border border-sky-500/30 hover:border-sky-400 transition-all duration-300">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-r from-sky-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                        <Wind className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-white">{client.name}</h3>
+                        <p className="text-sm text-gray-400">{client.type} • {client.tickets} tickets</p>
+                      </div>
+                    </div>
+                    <span className="text-sky-400 font-bold text-lg">{client.trend}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-sky-800/30 rounded-lg p-3 border border-sky-500/20">
+                      <div className="text-center">
+                        <p className="text-xs text-gray-400 mb-1">Total</p>
+                        <p className="text-sky-400 font-bold text-xl">{client.tickets}</p>
+                      </div>
+                    </div>
+                    <div className="bg-yellow-800/30 rounded-lg p-3 border border-yellow-500/20">
+                      <div className="text-center">
+                        <p className="text-xs text-gray-400 mb-1">Aberto</p>
+                        <p className="text-yellow-400 font-bold text-xl">{client.status.open}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ),
+
+        // Template 16: Neon City - Layout urbano
+        () => (
+          <div className="space-y-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-fuchsia-400 to-pink-600 bg-clip-text text-transparent">
+                Neon City
+              </h2>
+              <p className="text-gray-400">Cidade neon com arranha-céus</p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-6">
+              {mockClients.map((client) => (
+                <div key={client.id} className="relative group">
+                  <div className="bg-gradient-to-br from-fuchsia-900/20 to-pink-900/20 rounded-2xl p-8 border border-fuchsia-500/30 hover:border-fuchsia-400 transition-all duration-500 hover:shadow-2xl hover:shadow-fuchsia-500/30 transform hover:-translate-y-2">
+                    <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-500/10 to-pink-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="relative z-10">
+                      <div className="text-center mb-4">
+                        <div className="w-16 h-16 bg-gradient-to-r from-fuchsia-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <Building className="w-8 h-8 text-white" />
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-1">{client.name}</h3>
+                        <p className="text-gray-300 text-sm">{client.type}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-fuchsia-400 font-bold text-3xl">{client.tickets}</p>
+                        <p className="text-sm text-gray-400">Total Tickets</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ),
+
+        // Template 17: Holographic Sphere - Layout esférico
+        () => (
+          <div className="space-y-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-indigo-400 to-purple-600 bg-clip-text text-transparent">
+                Holographic Sphere
+              </h2>
+              <p className="text-gray-400">Esferas holográficas flutuantes</p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-6">
+              {mockClients.map((client) => (
+                <div key={client.id} className="relative group">
+                  <div className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 rounded-2xl p-8 border border-indigo-500/30 hover:border-indigo-400 transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-500/30 transform hover:-translate-y-3">
+                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="relative z-10">
+                      <div className="text-center mb-6">
+                        <div className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <Circle className="w-8 h-8 text-white" />
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2">{client.name}</h3>
+                        <p className="text-gray-300 text-sm">{client.type}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-indigo-400 font-bold text-3xl">{client.tickets}</p>
+                        <p className="text-sm text-gray-400">Total Tickets</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ),
+
+        // Template 18: Cyber Circuit - Layout de circuitos
+        () => (
+          <div className="space-y-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-lime-400 to-green-600 bg-clip-text text-transparent">
+                Cyber Circuit
+              </h2>
+              <p className="text-gray-400">Circuitos cibernéticos animados</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {mockClients.map((client) => (
+                <div key={client.id} className="bg-gradient-to-br from-lime-900/20 to-green-900/20 rounded-2xl p-6 border border-lime-500/30 hover:border-lime-400 transition-all duration-300">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-r from-lime-500 to-green-500 rounded-lg flex items-center justify-center">
+                        <Cpu className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-white">{client.name}</h3>
+                        <p className="text-sm text-gray-400">{client.type} • {client.tickets} tickets</p>
+                      </div>
+                    </div>
+                    <span className="text-lime-400 font-bold text-lg">{client.trend}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-lime-800/30 rounded-lg p-3 border border-lime-500/20">
+                      <div className="text-center">
+                        <p className="text-xs text-gray-400 mb-1">Total</p>
+                        <p className="text-lime-400 font-bold text-xl">{client.tickets}</p>
+                      </div>
+                    </div>
+                    <div className="bg-yellow-800/30 rounded-lg p-3 border border-yellow-500/20">
+                      <div className="text-center">
+                        <p className="text-xs text-gray-400 mb-1">Aberto</p>
+                        <p className="text-yellow-400 font-bold text-xl">{client.status.open}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ),
+
+        // Template 19: Quantum Particles - Layout de partículas
+        () => (
+          <div className="space-y-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-rose-400 to-pink-600 bg-clip-text text-transparent">
+                Quantum Particles
+              </h2>
+              <p className="text-gray-400">Partículas quânticas em movimento</p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-6">
+              {mockClients.map((client) => (
+                <div key={client.id} className="relative group">
+                  <div className="bg-gradient-to-br from-rose-900/20 to-pink-900/20 rounded-2xl p-8 border border-rose-500/30 hover:border-rose-400 transition-all duration-500 hover:shadow-2xl hover:shadow-rose-500/30 transform hover:-translate-y-2">
+                    <div className="absolute inset-0 bg-gradient-to-r from-rose-500/10 to-pink-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="relative z-10">
+                      <div className="text-center mb-4">
+                        <div className="w-16 h-16 bg-gradient-to-r from-rose-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <Sparkles className="w-8 h-8 text-white" />
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-1">{client.name}</h3>
+                        <p className="text-gray-300 text-sm">{client.type}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-rose-400 font-bold text-3xl">{client.tickets}</p>
+                        <p className="text-sm text-gray-400">Total Tickets</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ),
+
+        // Template 20: Digital Galaxy - Layout galáctico
+        () => (
+          <div className="space-y-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-slate-400 to-gray-600 bg-clip-text text-transparent">
+                Digital Galaxy
+              </h2>
+              <p className="text-gray-400">Galáxia digital com estrelas</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {mockClients.map((client) => (
+                <div key={client.id} className="bg-gradient-to-br from-slate-900/20 to-gray-900/20 rounded-2xl p-6 border border-slate-500/30 hover:border-slate-400 transition-all duration-300">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-r from-slate-500 to-gray-500 rounded-lg flex items-center justify-center">
+                        <Star className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-white">{client.name}</h3>
+                        <p className="text-sm text-gray-400">{client.type} • {client.tickets} tickets</p>
+                      </div>
+                    </div>
+                    <span className="text-slate-400 font-bold text-lg">{client.trend}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-500/20">
+                      <div className="text-center">
+                        <p className="text-xs text-gray-400 mb-1">Total</p>
+                        <p className="text-slate-400 font-bold text-xl">{client.tickets}</p>
+                      </div>
+                    </div>
+                    <div className="bg-yellow-800/30 rounded-lg p-3 border border-yellow-500/20">
+                      <div className="text-center">
+                        <p className="text-xs text-gray-400 mb-1">Aberto</p>
+                        <p className="text-yellow-400 font-bold text-xl">{client.status.open}</p>
                       </div>
                     </div>
                   </div>
