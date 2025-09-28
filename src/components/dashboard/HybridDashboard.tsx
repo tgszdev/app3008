@@ -736,7 +736,9 @@ export default function HybridDashboard() {
                   </div>
                   
                   <div className="space-y-2 mb-4">
-                    {availableContexts.map((context) => (
+                    {availableContexts
+                      .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
+                      .map((context) => (
                       <label
                         key={context.id}
                         className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors rounded-xl"
@@ -977,7 +979,9 @@ export default function HybridDashboard() {
           </h2>
           {/* Layout em lista vertical */}
           <div className="space-y-2">
-            {analyticsData.clients.map((client, index) => (
+            {analyticsData.clients
+              .sort((a, b) => a.context.name.localeCompare(b.context.name, 'pt-BR'))
+              .map((client, index) => (
               <div key={client.context.id} className="relative">
                 <ClientCard
                   client={client}
