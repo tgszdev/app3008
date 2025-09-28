@@ -177,7 +177,7 @@ const CategoryCard = ({ category }: { category: any }) => {
       <div className="flex items-start justify-between mb-3 sm:mb-4">
         <div className="flex items-center flex-1 min-w-0">
           <div 
-            className="p-1.5 sm:p-2 rounded-lg mr-2 sm:mr-3 flex-shrink-0"
+            className="p-1.5 sm:p-2 rounded-xl mr-2 sm:mr-3 flex-shrink-0"
             style={{ backgroundColor, color: borderColor }}
           >
             <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -260,7 +260,7 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
   }
   
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
       {/* Header do Cliente */}
       <div 
         className="p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -344,7 +344,7 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
               </h4>
               <div className="space-y-2">
                 {client.tickets.slice(0, 5).map((ticket) => (
-                  <div key={ticket.id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div key={ticket.id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded-xl">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                         #{ticket.ticket_number} - {ticket.title}
@@ -691,7 +691,7 @@ export default function HybridDashboard() {
                     {availableContexts.map((context) => (
                       <label
                         key={context.id}
-                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors rounded-lg"
+                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors rounded-xl"
                       >
                         <input
                           type="checkbox"
