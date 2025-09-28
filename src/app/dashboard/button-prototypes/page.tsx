@@ -1015,6 +1015,512 @@ const ButtonPrototypes: ButtonPrototype[] = [
         </div>
       </div>
     )
+  },
+
+  // PROTÓTIPO 21: Botões em Linha com Popup
+  {
+    id: 21,
+    name: "Botões em Linha com Popup",
+    description: "Layout horizontal com popup do seletor",
+    category: "Layout",
+    features: ["Horizontal layout", "Dropdown popup", "Space efficient", "Clean alignment"],
+    icon: Layout,
+    complexity: "Medium",
+    futuristic: false,
+    professional: true,
+    preview: "Layout horizontal com popup do seletor",
+    component: (
+      <div className="bg-gray-900 p-6 rounded-xl">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-white">Dashboard</h2>
+              <p className="text-sm text-gray-400">Bem-vindo de volta, Thiago!</p>
+            </div>
+            <div className="relative">
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2">
+                <Building className="w-4 h-4" />
+                <span>4 clientes</span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              {/* Popup do seletor */}
+              <div className="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-4 z-50">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Building className="w-4 h-4 text-blue-600" />
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">Seleção Rápida</span>
+                  </div>
+                  <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <XCircle className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="space-y-2 mb-4">
+                  <label className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors rounded-lg">
+                    <input type="checkbox" className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">Luft Agro</span>
+                        <span className="px-2 py-1 text-xs rounded-xl font-medium bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300">Cliente</span>
+                      </div>
+                    </div>
+                    <CheckCircle className="w-4 h-4 text-blue-600" />
+                  </label>
+                  <label className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors rounded-lg">
+                    <input type="checkbox" className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">Simas Log</span>
+                        <span className="px-2 py-1 text-xs rounded-xl font-medium bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300">Cliente</span>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2">
+              <User className="w-4 h-4" />
+              <span>Meus Tickets</span>
+            </button>
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              <span>Mês Atual</span>
+              <Filter className="w-4 h-4" />
+            </button>
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2">
+              <Download className="w-4 h-4" />
+              <span>Exportar PDF</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  },
+
+  // PROTÓTIPO 22: Botões com Hover Effects
+  {
+    id: 22,
+    name: "Botões com Hover Effects",
+    description: "Efeitos visuais avançados no hover",
+    category: "Interaction",
+    features: ["Advanced hover", "Smooth transitions", "Visual feedback", "Engaging UX"],
+    icon: Zap,
+    complexity: "Medium",
+    futuristic: true,
+    professional: true,
+    preview: "Efeitos visuais avançados no hover",
+    component: (
+      <div className="bg-gray-900 p-6 rounded-xl">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-white">Dashboard</h2>
+              <p className="text-sm text-gray-400">Bem-vindo de volta, Thiago!</p>
+            </div>
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 hover:scale-105 hover:shadow-lg transition-all duration-300 flex items-center gap-2">
+              <Building className="w-4 h-4" />
+              <span>4 clientes</span>
+              <ChevronDown className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="flex gap-3">
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 hover:scale-105 hover:shadow-lg transition-all duration-300 flex items-center gap-2 group">
+              <User className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
+              <span>Meus Tickets</span>
+            </button>
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 hover:scale-105 hover:shadow-lg transition-all duration-300 flex items-center gap-2 group">
+              <Calendar className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
+              <span>Mês Atual</span>
+              <Filter className="w-4 h-4" />
+            </button>
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 hover:scale-105 hover:shadow-lg transition-all duration-300 flex items-center gap-2 group">
+              <Download className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
+              <span>Exportar PDF</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  },
+
+  // PROTÓTIPO 23: Botões com Ripple Effect
+  {
+    id: 23,
+    name: "Botões com Ripple Effect",
+    description: "Efeito de ondulação ao clicar",
+    category: "Interaction",
+    features: ["Ripple animation", "Click feedback", "Material design", "Visual response"],
+    icon: Target,
+    complexity: "High",
+    futuristic: false,
+    professional: true,
+    preview: "Efeito de ondulação ao clicar",
+    component: (
+      <div className="bg-gray-900 p-6 rounded-xl">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-white">Dashboard</h2>
+              <p className="text-sm text-gray-400">Bem-vindo de volta, Thiago!</p>
+            </div>
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2 relative overflow-hidden">
+              <Building className="w-4 h-4" />
+              <span>4 clientes</span>
+              <ChevronDown className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="flex gap-3">
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2 relative overflow-hidden">
+              <User className="w-4 h-4" />
+              <span>Meus Tickets</span>
+            </button>
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2 relative overflow-hidden">
+              <Calendar className="w-4 h-4" />
+              <span>Mês Atual</span>
+              <Filter className="w-4 h-4" />
+            </button>
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2 relative overflow-hidden">
+              <Download className="w-4 h-4" />
+              <span>Exportar PDF</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  },
+
+  // PROTÓTIPO 24: Botões com Glow Effect
+  {
+    id: 24,
+    name: "Botões com Glow Effect",
+    description: "Efeito de brilho e neon",
+    category: "Visual",
+    features: ["Glow effects", "Neon styling", "Futuristic look", "Eye catching"],
+    icon: Sparkles,
+    complexity: "Medium",
+    futuristic: true,
+    professional: true,
+    preview: "Efeito de brilho e neon",
+    component: (
+      <div className="bg-black p-6 rounded-xl">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-cyan-400">Dashboard</h2>
+              <p className="text-sm text-cyan-300">Bem-vindo de volta, Thiago!</p>
+            </div>
+            <button className="px-4 py-2 bg-cyan-500/20 border border-cyan-500 text-cyan-400 rounded-xl hover:bg-cyan-500/30 transition-all duration-300 flex items-center gap-2 shadow-[0_0_20px_rgba(34,211,238,0.3)] hover:shadow-[0_0_30px_rgba(34,211,238,0.5)]">
+              <Building className="w-4 h-4" />
+              <span>4 clientes</span>
+              <ChevronDown className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="flex gap-3">
+            <button className="px-4 py-2 bg-green-500/20 border border-green-500 text-green-400 rounded-xl hover:bg-green-500/30 transition-all duration-300 flex items-center gap-2 shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)]">
+              <User className="w-4 h-4" />
+              <span>Meus Tickets</span>
+            </button>
+            <button className="px-4 py-2 bg-purple-500/20 border border-purple-500 text-purple-400 rounded-xl hover:bg-purple-500/30 transition-all duration-300 flex items-center gap-2 shadow-[0_0_20px_rgba(168,85,247,0.3)] hover:shadow-[0_0_30px_rgba(168,85,247,0.5)]">
+              <Calendar className="w-4 h-4" />
+              <span>Mês Atual</span>
+              <Filter className="w-4 h-4" />
+            </button>
+            <button className="px-4 py-2 bg-pink-500/20 border border-pink-500 text-pink-400 rounded-xl hover:bg-pink-500/30 transition-all duration-300 flex items-center gap-2 shadow-[0_0_20px_rgba(236,72,153,0.3)] hover:shadow-[0_0_30px_rgba(236,72,153,0.5)]">
+              <Download className="w-4 h-4" />
+              <span>Exportar PDF</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  },
+
+  // PROTÓTIPO 25: Botões com Progress Bar
+  {
+    id: 25,
+    name: "Botões com Progress Bar",
+    description: "Barra de progresso integrada",
+    category: "Visual",
+    features: ["Progress indicators", "Loading states", "Visual feedback", "Status display"],
+    icon: Activity,
+    complexity: "Medium",
+    futuristic: false,
+    professional: true,
+    preview: "Barra de progresso integrada",
+    component: (
+      <div className="bg-gray-900 p-6 rounded-xl">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-white">Dashboard</h2>
+              <p className="text-sm text-gray-400">Bem-vindo de volta, Thiago!</p>
+            </div>
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2">
+              <Building className="w-4 h-4" />
+              <span>4 clientes</span>
+              <ChevronDown className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="flex gap-3">
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2 relative overflow-hidden">
+              <User className="w-4 h-4" />
+              <span>Meus Tickets</span>
+              <div className="absolute bottom-0 left-0 h-1 bg-green-500 w-3/4"></div>
+            </button>
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2 relative overflow-hidden">
+              <Calendar className="w-4 h-4" />
+              <span>Mês Atual</span>
+              <Filter className="w-4 h-4" />
+              <div className="absolute bottom-0 left-0 h-1 bg-yellow-500 w-1/2"></div>
+            </button>
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2 relative overflow-hidden">
+              <Download className="w-4 h-4" />
+              <span>Exportar PDF</span>
+              <div className="absolute bottom-0 left-0 h-1 bg-red-500 w-1/4"></div>
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  },
+
+  // PROTÓTIPO 26: Botões com Ícones Animados
+  {
+    id: 26,
+    name: "Ícones Animados",
+    description: "Ícones com animações suaves",
+    category: "Interaction",
+    features: ["Animated icons", "Smooth transitions", "Visual feedback", "Engaging UX"],
+    icon: Zap,
+    complexity: "Medium",
+    futuristic: true,
+    professional: true,
+    preview: "Ícones com animações suaves",
+    component: (
+      <div className="bg-gray-900 p-6 rounded-xl">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-white">Dashboard</h2>
+              <p className="text-sm text-gray-400">Bem-vindo de volta, Thiago!</p>
+            </div>
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2">
+              <Building className="w-4 h-4 animate-pulse" />
+              <span>4 clientes</span>
+              <ChevronDown className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="flex gap-3">
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2">
+              <User className="w-4 h-4 animate-bounce" />
+              <span>Meus Tickets</span>
+            </button>
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2">
+              <Calendar className="w-4 h-4 animate-spin" />
+              <span>Mês Atual</span>
+              <Filter className="w-4 h-4" />
+            </button>
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2">
+              <Download className="w-4 h-4 animate-pulse" />
+              <span>Exportar PDF</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  },
+
+  // PROTÓTIPO 27: Botões com Bordas Animadas
+  {
+    id: 27,
+    name: "Bordas Animadas",
+    description: "Bordas que se movem e brilham",
+    category: "Visual",
+    features: ["Animated borders", "Moving effects", "Eye catching", "Modern look"],
+    icon: Sparkles,
+    complexity: "High",
+    futuristic: true,
+    professional: true,
+    preview: "Bordas que se movem e brilham",
+    component: (
+      <div className="bg-gray-900 p-6 rounded-xl">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-white">Dashboard</h2>
+              <p className="text-sm text-gray-400">Bem-vindo de volta, Thiago!</p>
+            </div>
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2 relative overflow-hidden">
+              <Building className="w-4 h-4" />
+              <span>4 clientes</span>
+              <ChevronDown className="w-4 h-4" />
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+            </button>
+          </div>
+          <div className="flex gap-3">
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2 relative overflow-hidden">
+              <User className="w-4 h-4" />
+              <span>Meus Tickets</span>
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-green-500/20 to-transparent animate-pulse"></div>
+            </button>
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2 relative overflow-hidden">
+              <Calendar className="w-4 h-4" />
+              <span>Mês Atual</span>
+              <Filter className="w-4 h-4" />
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-yellow-500/20 to-transparent animate-pulse"></div>
+            </button>
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2 relative overflow-hidden">
+              <Download className="w-4 h-4" />
+              <span>Exportar PDF</span>
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-purple-500/20 to-transparent animate-pulse"></div>
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  },
+
+  // PROTÓTIPO 28: Botões com Partículas
+  {
+    id: 28,
+    name: "Botões com Partículas",
+    description: "Efeito de partículas flutuantes",
+    category: "Visual",
+    features: ["Particle effects", "Floating elements", "Dynamic visuals", "Engaging animations"],
+    icon: Sparkles,
+    complexity: "High",
+    futuristic: true,
+    professional: true,
+    preview: "Efeito de partículas flutuantes",
+    component: (
+      <div className="bg-gray-900 p-6 rounded-xl relative overflow-hidden">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-white">Dashboard</h2>
+              <p className="text-sm text-gray-400">Bem-vindo de volta, Thiago!</p>
+            </div>
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2 relative">
+              <Building className="w-4 h-4" />
+              <span>4 clientes</span>
+              <ChevronDown className="w-4 h-4" />
+              <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full animate-ping"></div>
+            </button>
+          </div>
+          <div className="flex gap-3">
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2 relative">
+              <User className="w-4 h-4" />
+              <span>Meus Tickets</span>
+              <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full animate-ping"></div>
+            </button>
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2 relative">
+              <Calendar className="w-4 h-4" />
+              <span>Mês Atual</span>
+              <Filter className="w-4 h-4" />
+              <div className="absolute -top-1 -right-1 w-2 h-2 bg-orange-400 rounded-full animate-ping"></div>
+            </button>
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2 relative">
+              <Download className="w-4 h-4" />
+              <span>Exportar PDF</span>
+              <div className="absolute -top-1 -right-1 w-2 h-2 bg-purple-400 rounded-full animate-ping"></div>
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  },
+
+  // PROTÓTIPO 29: Botões com Texto Dinâmico
+  {
+    id: 29,
+    name: "Texto Dinâmico",
+    description: "Texto que muda baseado no estado",
+    category: "Interaction",
+    features: ["Dynamic text", "State-based content", "Smart labels", "Context awareness"],
+    icon: Target,
+    complexity: "Medium",
+    futuristic: true,
+    professional: true,
+    preview: "Texto que muda baseado no estado",
+    component: (
+      <div className="bg-gray-900 p-6 rounded-xl">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-white">Dashboard</h2>
+              <p className="text-sm text-gray-400">Bem-vindo de volta, Thiago!</p>
+            </div>
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2">
+              <Building className="w-4 h-4" />
+              <span>4 clientes selecionados</span>
+              <ChevronDown className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="flex gap-3">
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2">
+              <User className="w-4 h-4" />
+              <span>12 meus tickets</span>
+            </button>
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              <span>Dezembro 2024</span>
+              <Filter className="w-4 h-4" />
+            </button>
+            <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2">
+              <Download className="w-4 h-4" />
+              <span>Baixar relatório</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  },
+
+  // PROTÓTIPO 30: Botões com Cores Dinâmicas
+  {
+    id: 30,
+    name: "Cores Dinâmicas",
+    description: "Cores que mudam baseado no contexto",
+    category: "Visual",
+    features: ["Dynamic colors", "Context-aware", "Smart theming", "Adaptive design"],
+    icon: Palette,
+    complexity: "High",
+    futuristic: true,
+    professional: true,
+    preview: "Cores que mudam baseado no contexto",
+    component: (
+      <div className="bg-gray-900 p-6 rounded-xl">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-white">Dashboard</h2>
+              <p className="text-sm text-gray-400">Bem-vindo de volta, Thiago!</p>
+            </div>
+            <button className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 flex items-center gap-2">
+              <Building className="w-4 h-4" />
+              <span>4 clientes</span>
+              <ChevronDown className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="flex gap-3">
+            <button className="px-4 py-2 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-xl hover:from-green-600 hover:to-teal-700 transition-all duration-300 flex items-center gap-2">
+              <User className="w-4 h-4" />
+              <span>Meus Tickets</span>
+            </button>
+            <button className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl hover:from-orange-600 hover:to-red-700 transition-all duration-300 flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              <span>Mês Atual</span>
+              <Filter className="w-4 h-4" />
+            </button>
+            <button className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl hover:from-purple-600 hover:to-pink-700 transition-all duration-300 flex items-center gap-2">
+              <Download className="w-4 h-4" />
+              <span>Exportar PDF</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    )
   }
 ]
 
