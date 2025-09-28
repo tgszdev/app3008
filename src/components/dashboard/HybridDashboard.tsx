@@ -424,13 +424,22 @@ export default function HybridDashboard() {
       if (saved) {
         try {
           const parsed = JSON.parse(saved)
-          if (Array.isArray(parsed)) {
+          if (Array.isArray(parsed) && parsed.length > 0) {
             setSelectedClients(parsed)
             console.log('🔄 Carregando seleções do localStorage:', parsed)
+          } else {
+            // Se localStorage está vazio ou inválido, não selecionar nada
+            console.log('🔄 localStorage vazio - não selecionando nenhum cliente')
+            setSelectedClients([])
           }
         } catch (error) {
           console.error('Erro ao carregar seleções do localStorage:', error)
+          setSelectedClients([])
         }
+      } else {
+        // Se não há localStorage, não selecionar nada
+        console.log('🔄 Nenhum localStorage encontrado - não selecionando nenhum cliente')
+        setSelectedClients([])
       }
     }
   }, [])
@@ -438,8 +447,14 @@ export default function HybridDashboard() {
   // Salvar seleções no localStorage sempre que mudarem
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('selectedClients', JSON.stringify(selectedClients))
-      console.log('🔄 Salvando seleções no localStorage:', selectedClients)
+      if (selectedClients.length > 0) {
+        localStorage.setItem('selectedClients', JSON.stringify(selectedClients))
+        console.log('🔄 Salvando seleções no localStorage:', selectedClients)
+      } else {
+        // Se não há seleções, remover do localStorage
+        localStorage.removeItem('selectedClients')
+        console.log('🔄 Removendo seleções do localStorage (lista vazia)')
+      }
     }
   }, [selectedClients])
 
@@ -466,16 +481,12 @@ export default function HybridDashboard() {
 
   useEffect(() => {
     if (mounted && !contextLoading) {
-      // Se não tem clientes selecionados, carregar todos os contextos disponíveis
+      // Se tem clientes selecionados, buscar dados
       if (selectedClients.length > 0) {
         fetchMultiClientData()
-      } else if (availableContexts.length > 0) {
-        // Se não tem seleção, carregar todos os contextos disponíveis
-        console.log('🔄 Carregando todos os contextos disponíveis:', availableContexts.map(c => c.id))
-        setSelectedClients(availableContexts.map(c => c.id))
       } else {
-        // Se não tem contextos, parar loading e mostrar estado vazio
-        console.log('⚠️ Nenhum contexto disponível - parando loading')
+        // Se não tem seleção, parar loading e mostrar estado vazio
+        console.log('⚠️ Nenhum cliente selecionado - parando loading')
         setLoading(false)
       }
     }
