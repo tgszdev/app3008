@@ -104,19 +104,17 @@ const ButtonPrototypes: ButtonPrototype[] = [
     preview: "Botões com elevação sutil e animações de hover",
     component: (
       <div className="bg-gray-900 p-6 rounded-xl">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-bold text-white">Dashboard</h2>
-              <p className="text-sm text-gray-400">Bem-vindo de volta, Thiago!</p>
-            </div>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-white">Dashboard</h2>
+            <p className="text-sm text-gray-400">Bem-vindo de volta, Thiago!</p>
+          </div>
+          <div className="flex items-center gap-3">
             <button className="px-4 py-2 bg-blue-600 text-white rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2">
               <Building className="w-4 h-4" />
               <span>4 clientes</span>
               <ChevronDown className="w-4 h-4" />
             </button>
-          </div>
-          <div className="flex gap-3">
             <button className="px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2 text-white">
               <User className="w-4 h-4" />
               <span>Meus Tickets</span>
@@ -1031,12 +1029,12 @@ const ButtonPrototypes: ButtonPrototype[] = [
     preview: "Layout horizontal com popup do seletor",
     component: (
       <div className="bg-gray-900 p-6 rounded-xl">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-bold text-white">Dashboard</h2>
-              <p className="text-sm text-gray-400">Bem-vindo de volta, Thiago!</p>
-            </div>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-white">Dashboard</h2>
+            <p className="text-sm text-gray-400">Bem-vindo de volta, Thiago!</p>
+          </div>
+          <div className="flex items-center gap-3">
             <div className="relative">
               <button className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2">
                 <Building className="w-4 h-4" />
@@ -1077,8 +1075,6 @@ const ButtonPrototypes: ButtonPrototype[] = [
                 </div>
               </div>
             </div>
-          </div>
-          <div className="flex gap-3">
             <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2">
               <User className="w-4 h-4" />
               <span>Meus Tickets</span>
@@ -1112,19 +1108,17 @@ const ButtonPrototypes: ButtonPrototype[] = [
     preview: "Efeitos visuais avançados no hover",
     component: (
       <div className="bg-gray-900 p-6 rounded-xl">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-bold text-white">Dashboard</h2>
-              <p className="text-sm text-gray-400">Bem-vindo de volta, Thiago!</p>
-            </div>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-white">Dashboard</h2>
+            <p className="text-sm text-gray-400">Bem-vindo de volta, Thiago!</p>
+          </div>
+          <div className="flex items-center gap-3">
             <button className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 hover:scale-105 hover:shadow-lg transition-all duration-300 flex items-center gap-2">
               <Building className="w-4 h-4" />
               <span>4 clientes</span>
               <ChevronDown className="w-4 h-4" />
             </button>
-          </div>
-          <div className="flex gap-3">
             <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 hover:scale-105 hover:shadow-lg transition-all duration-300 flex items-center gap-2 group">
               <User className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
               <span>Meus Tickets</span>
