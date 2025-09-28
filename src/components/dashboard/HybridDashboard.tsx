@@ -742,27 +742,27 @@ export default function HybridDashboard() {
             </span>
           </div>
           
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-3">
             {/* Botão Meus Tickets */}
             <button
               onClick={toggleMyTickets}
-              className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-2 border rounded-lg transition-colors ${
+              className={`flex items-center justify-center gap-2 px-4 py-2 border rounded-xl transition-colors ${
                 myTicketsOnly 
                   ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
                   : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
             >
               <User className="h-4 w-4 flex-shrink-0" />
-              <span className="text-xs sm:text-sm">Meus Tickets</span>
+              <span className="text-sm font-medium">Meus Tickets</span>
             </button>
           
             {/* Botão Filtro de Data */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
               <Calendar className="h-4 w-4 flex-shrink-0" />
-              <span className="text-xs sm:text-sm truncate">
+              <span className="text-sm font-medium truncate">
                 {periodFilter.start_date === getCurrentMonthDates().start_date && 
                  periodFilter.end_date === getCurrentMonthDates().end_date
                   ? 'Mês Atual'
@@ -776,14 +776,14 @@ export default function HybridDashboard() {
             <button
               onClick={handleExportPDF}
               disabled={isGeneratingPDF}
-              className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isGeneratingPDF ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <FileDown className="h-4 w-4 flex-shrink-0" />
               )}
-              <span className="text-xs sm:text-sm">
+              <span className="text-sm font-medium">
                 {isGeneratingPDF ? 'Gerando...' : 'Exportar PDF'}
               </span>
             </button>
@@ -793,7 +793,7 @@ export default function HybridDashboard() {
 
       {/* Filtros de Período */}
       {showFilters && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
             Filtrar por Período
           </h3>
@@ -806,7 +806,7 @@ export default function HybridDashboard() {
                 type="date"
                 value={tempFilter.start_date}
                 onChange={(e) => setTempFilter({ ...tempFilter, start_date: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
             <div>
@@ -817,20 +817,20 @@ export default function HybridDashboard() {
                 type="date"
                 value={tempFilter.end_date}
                 onChange={(e) => setTempFilter({ ...tempFilter, end_date: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 mt-4">
             <button
               onClick={handleApplyFilter}
-              className="flex-1 sm:flex-initial px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium"
+              className="flex-1 sm:flex-initial px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium"
             >
               Aplicar Filtro
             </button>
             <button
               onClick={handleResetFilter}
-              className="flex-1 sm:flex-initial px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 active:bg-gray-400 dark:active:bg-gray-800 transition-colors text-sm font-medium"
+              className="flex-1 sm:flex-initial px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 active:bg-gray-400 dark:active:bg-gray-800 transition-colors text-sm font-medium"
             >
               Limpar Filtro
             </button>
@@ -839,7 +839,7 @@ export default function HybridDashboard() {
       )}
 
       {/* Informações do Período */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3">
         <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-300">
           <span className="font-medium block sm:inline">Período analisado:</span>
           <span className="block sm:inline sm:ml-1">
