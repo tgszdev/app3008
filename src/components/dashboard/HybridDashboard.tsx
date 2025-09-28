@@ -278,16 +278,16 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              {formatDateShort(client.summary.period.start_date)} - {formatDateShort(client.summary.period.end_date)}
-    </span>
-            {isExpanded ? (
-              <ChevronUp className="h-5 w-5 text-gray-400" />
-            ) : (
-              <ChevronDown className="h-5 w-5 text-gray-400" />
-            )}
-          </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                    Ver mais
+                  </span>
+                  {isExpanded ? (
+                    <ChevronUp className="h-5 w-5 text-gray-400" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5 text-gray-400" />
+                  )}
+                </div>
         </div>
       </div>
 
