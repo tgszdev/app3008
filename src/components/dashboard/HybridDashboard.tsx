@@ -260,21 +260,23 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
     return TicketIcon
   }
   
-  // Calcular trend real baseado no total de tickets
-  const calculateTrend = () => {
-    const totalTickets = client.summary.total_tickets
-    if (totalTickets === 0) return '+0%'
+  // Calcular percentual de distribuição dos tickets
+  const calculateDistributionPercentage = () => {
+    const clientTickets = client.summary.total_tickets
+    if (clientTickets === 0) return '0%'
     
-    // Calcular percentual baseado no total de tickets
-    // Usar uma fórmula que gera percentuais realistas
-    const basePercentage = Math.min(totalTickets * 2, 50) // Máximo 50%
-    const randomVariation = Math.floor(Math.random() * 5) - 2 // -2 a +2
-    const finalPercentage = Math.max(0, basePercentage + randomVariation)
+    // Buscar total de tickets de todos os clientes selecionados
+    const totalAllTickets = analyticsData?.consolidated?.total_tickets || 0
     
-    return `+${finalPercentage}%`
+    if (totalAllTickets === 0) return '0%'
+    
+    // Calcular percentual de distribuição
+    const percentage = Math.round((clientTickets / totalAllTickets) * 100)
+    
+    return `${percentage}%`
   }
   
-  const trend = calculateTrend()
+  const trend = calculateDistributionPercentage()
   
   return (
     <div className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 rounded-2xl p-6 border border-indigo-500/30 hover:border-indigo-400 transition-all duration-500 w-full">
