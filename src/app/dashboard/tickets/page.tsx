@@ -425,52 +425,57 @@ export default function TicketsPage() {
           </div>
         </div>
 
-        {/* Dynamic Status Cards - Only show if count > 0 */}
-        {statusesWithCount
-          .filter(status => {
-            const count = allTickets.filter(t => t.status === status.slug).length
-            return count > 0
-          })
-          .map((status) => {
-            const count = allTickets.filter(t => t.status === status.slug).length
-            
-            // Get color from database or use default based on status
-            const getStatusColor = (statusColor: string, slug: string) => {
-              if (statusColor && statusColor !== '#6b7280') {
-                return statusColor
+        {/* Dynamic Status Cards - Protótipo 35 (Layout de Tabela) */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {/* Total no Período */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent"></div>
+            <div className="relative">
+              <div className="border-b border-gray-200 dark:border-gray-600 pb-2 mb-2">
+                <div className="text-sm text-gray-600 dark:text-gray-400 break-words">Total no Período</div>
+              </div>
+              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 text-right leading-none">{allTickets.length}</div>
+            </div>
+          </div>
+          
+          {/* Status dinâmicos - ordenados por order_index */}
+          {statusesWithCount
+            .filter(status => {
+              const count = allTickets.filter(t => t.status === status.slug).length
+              return count > 0
+            })
+            .map((status) => {
+              const count = allTickets.filter(t => t.status === status.slug).length
+              
+              // Get color from database or use default based on status
+              const getStatusColor = (statusColor: string, slug: string) => {
+                if (statusColor && statusColor !== '#6b7280') {
+                  return statusColor
+                }
+                
+                // Fallback colors based on status type
+                if (slug.includes('aberto') || slug.includes('open')) return '#3b82f6' // blue
+                if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) return '#f59e0b' // amber
+                if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) return '#10b981' // emerald
+                if (slug.includes('cancelled') || slug.includes('cancelado')) return '#ef4444' // red
+                return '#6b7280' // gray
               }
               
-              // Fallback colors based on status type
-              if (slug.includes('aberto') || slug.includes('open')) return '#3b82f6' // blue
-              if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) return '#f59e0b' // amber
-              if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) return '#10b981' // emerald
-              if (slug.includes('cancelled') || slug.includes('cancelado')) return '#ef4444' // red
-              return '#6b7280' // gray
-            }
-            
-            const statusColor = getStatusColor(status.color, status.slug)
-            
-            return (
-              <div 
-                key={status.slug} 
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-3 hover:shadow-md transition-shadow duration-200"
-                style={{
-                  borderLeftColor: statusColor,
-                  borderLeftWidth: '3px'
-                }}
-              >
-                <div className="text-center">
-                  <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">{status.name}</p>
-                  <p 
-                    className="text-xl font-bold"
-                    style={{ color: statusColor }}
-                  >
-                    {count}
-                  </p>
+              const statusColor = getStatusColor(status.color, status.slug)
+              
+              return (
+                <div key={status.slug} className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden">
+                  <div className="absolute inset-0 opacity-10" style={{ background: `linear-gradient(135deg, ${statusColor}, transparent)` }}></div>
+                  <div className="relative">
+                    <div className="border-b border-gray-200 dark:border-gray-600 pb-2 mb-2">
+                      <div className="text-sm text-gray-600 dark:text-gray-400 break-words">{status.name}</div>
+                    </div>
+                    <div className="text-3xl font-bold text-right leading-none" style={{ color: statusColor }}>{count}</div>
+                  </div>
                 </div>
-              </div>
-            )
-          })}
+              )
+            })}
+        </div>
       </div>
 
       {/* Mobile Cards View - Visible on small screens */}
