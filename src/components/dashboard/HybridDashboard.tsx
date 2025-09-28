@@ -604,110 +604,21 @@ export default function HybridDashboard() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                    Dashboard {myTicketsOnly && '- Meus Tickets'} {selectedClients.length === 1 && '- Cliente Específico'}
+            Dashboard {myTicketsOnly && '- Meus Tickets'} {selectedClients.length === 1 && '- Cliente Específico'}
           </h1>
           <p className="mt-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
             Bem-vindo de volta, {session?.user?.name}!
             {myTicketsOnly 
               ? ' Visualizando apenas seus tickets.'
-                      : selectedClients.length === 1 
-                        ? ' Visualizando tickets do cliente selecionado.'
-                        : ' Visualizando todos os clientes agrupados.'
+              : selectedClients.length === 1 
+                ? ' Visualizando tickets do cliente selecionado.'
+                : ' Visualizando todos os clientes agrupados.'
             }
           </p>
-                </div>
-              
-                    {/* Popup de seleção de clientes */}
-                    {showClientPopup && (
-                      <div 
-                        ref={popupRef}
-                        className="absolute top-full left-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-4 z-50"
-                      >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <Building className="w-4 h-4 text-blue-600" />
-                      <span className="text-sm font-semibold text-gray-900 dark:text-white">Seleção Rápida</span>
-                    </div>
-                    <button
-                      onClick={() => setShowClientPopup(false)}
-                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                  
-                  <div className="space-y-2 mb-4">
-                    {availableContexts.map((context) => (
-                      <label
-                        key={context.id}
-                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors rounded-lg"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedClients.includes(context.id)}
-                          onChange={() => {
-                            if (selectedClients.includes(context.id)) {
-                              handleClientSelectionChange(selectedClients.filter(id => id !== context.id))
-                            } else {
-                              handleClientSelectionChange([...selectedClients, context.id])
-                            }
-                          }}
-                          className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-900 dark:text-white">
-                              {context.name}
-                            </span>
-                            <span className={`px-2 py-1 text-xs rounded-xl font-medium ${
-                              context.type === 'organization' 
-                                ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300" 
-                                : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300"
-                            }`}>
-                              {context.type === 'organization' ? 'Cliente' : 'Dept'}
-              </span>
-            </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
-                            {context.slug}
-                          </div>
-                        </div>
-                        {selectedClients.includes(context.id) && (
-                          <Check className="w-4 h-4 text-blue-600" />
-                        )}
-                      </label>
-                    ))}
         </div>
-        
-                  <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {selectedClients.length} de {availableContexts.length} selecionados
-                    </span>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleClientSelectionChange(availableContexts.map(c => c.id))}
-                        className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
-                      >
-                        Todos
-                      </button>
-                      <button
-                        onClick={() => {
-                          handleClientSelectionChange([])
-                          localStorage.removeItem('selectedClients')
-                        }}
-                        className="text-xs text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300 font-medium transition-colors"
-                      >
-                        Limpar
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+      </div>
         
       {/* Segunda linha: Botões de ação originais */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
