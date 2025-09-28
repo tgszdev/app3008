@@ -297,35 +297,66 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
         </div>
       </div>
       
-      {/* Status em Layout de Tabela - Protótipo 35 */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
-        {/* Total no Período */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent"></div>
-          <div className="relative">
-            <div className="border-b border-gray-200 dark:border-gray-600 pb-2 mb-2">
-              <div className="text-sm text-gray-600 dark:text-gray-400 break-words">Total no Período</div>
-            </div>
-            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 text-right leading-none">{client.summary.total_tickets}</div>
-          </div>
-        </div>
-        
-        {/* Status dinâmicos - ordenados por order_index */}
+      {/* Status em Lista Neural Network Style */}
+      <div className="space-y-3 mb-6">
+        {/* Status dinâmicos em lista vertical - ordenados por order_index */}
         {client.status_stats.map((status, index) => {
+          // Sistema de cores melhorado com acessibilidade
           const statusColor = status.color || '#6B7280'
           
+          // Função para determinar se a cor é clara ou escura
+          const isLightColor = (color: string) => {
+            const hex = color.replace('#', '')
+            const r = parseInt(hex.substr(0, 2), 16)
+            const g = parseInt(hex.substr(2, 2), 16)
+            const b = parseInt(hex.substr(4, 2), 16)
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000
+            return brightness > 128
+          }
+          
+          // Cores adaptativas para dark/light mode
+          const getAdaptiveColors = (color: string) => {
+            const isLight = isLightColor(color)
+            return {
+              bg: isLight 
+                ? `bg-[${color}]/10 dark:bg-[${color}]/20` 
+                : `bg-[${color}]/20 dark:bg-[${color}]/30`,
+              border: isLight 
+                ? `border-[${color}]/20 dark:border-[${color}]/30` 
+                : `border-[${color}]/30 dark:border-[${color}]/40`,
+              text: isLight 
+                ? `text-slate-700 dark:text-slate-200` 
+                : `text-slate-600 dark:text-slate-300`,
+              number: color
+            }
+          }
+          
+          const colors = getAdaptiveColors(statusColor)
+          
           return (
-            <div key={status.id} className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10" style={{ background: `linear-gradient(135deg, ${statusColor}, transparent)` }}></div>
-              <div className="relative">
-                <div className="border-b border-gray-200 dark:border-gray-600 pb-2 mb-2">
-                  <div className="text-sm text-gray-600 dark:text-gray-400 break-words">{status.name}</div>
-                </div>
-                <div className="text-3xl font-bold text-right leading-none" style={{ color: statusColor }}>{status.count}</div>
+            <div key={status.id} className={`${colors.bg} ${colors.border} rounded-xl p-4 border transition-all duration-200 hover:shadow-sm`}>
+              <div className="flex justify-between items-center">
+                <span className={`${colors.text} truncate font-medium`} title={status.name}>
+                  {status.name}
+                </span>
+                <span 
+                  className="font-bold text-xl"
+                  style={{ color: statusColor }}
+                >
+                  {status.count}
+                </span>
               </div>
             </div>
           )
         })}
+        
+        {/* Total no Período - sempre no final */}
+        <div className="bg-blue-50 dark:bg-blue-900/30 rounded-xl p-4 border border-blue-200 dark:border-blue-700">
+          <div className="flex justify-between items-center">
+            <span className="text-slate-700 dark:text-slate-200 font-medium">Total no Período</span>
+            <span className="text-blue-600 dark:text-blue-400 font-bold text-xl">{client.summary.total_tickets}</span>
+          </div>
+        </div>
       </div>
 
       {/* Botão Ver mais Neural Network Style */}
