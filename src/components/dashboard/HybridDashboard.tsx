@@ -263,13 +263,16 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
   const trend = client.summary.total_tickets > 10 ? '+15%' : '+8%'
   
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 w-full">
-      {/* Header do Cliente */}
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+      {/* Header da Lista */}
+      <div 
+        className="p-4 cursor-pointer"
+        onClick={onToggle}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-              <Building className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <Building className="w-5 h-5 text-white" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{client.context.name}</h3>
@@ -278,55 +281,42 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
               </p>
             </div>
           </div>
-          <div className="text-right">
-            <span className="text-green-600 dark:text-green-400 font-bold text-lg">{trend}</span>
-          </div>
-        </div>
-      </div>
-      
-      {/* Cards de Status */}
-      <div className="p-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
-            <div className="text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total no Período</p>
-              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{client.summary.total_tickets}</p>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-6">
+              <div className="text-center">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Total</p>
+                <p className="text-lg font-bold text-blue-600 dark:text-blue-400">{client.summary.total_tickets}</p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Aberto</p>
+                <p className="text-lg font-bold text-yellow-600 dark:text-yellow-400">
+                  {client.status_stats.find(s => s.slug === 'open')?.count || 0}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Em Progresso</p>
+                <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
+                  {client.status_stats.find(s => s.slug === 'in_progress')?.count || 0}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Resolvido</p>
+                <p className="text-lg font-bold text-green-600 dark:text-green-400">
+                  {client.status_stats.find(s => s.slug === 'resolved')?.count || 0}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                Ver mais
+              </span>
+              {isExpanded ? (
+                <ChevronUp className="h-5 w-5 text-gray-400" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-gray-400" />
+              )}
             </div>
           </div>
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-4 border border-yellow-200 dark:border-yellow-800">
-            <div className="text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Aberto</p>
-              <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
-                {client.status_stats.find(s => s.slug === 'open')?.count || 0}
-              </p>
-            </div>
-          </div>
-          <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4 border border-orange-200 dark:border-orange-800">
-            <div className="text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Em Progresso</p>
-              <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
-                {client.status_stats.find(s => s.slug === 'in_progress')?.count || 0}
-              </p>
-            </div>
-          </div>
-          <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-4 border border-green-200 dark:border-green-800">
-            <div className="text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Resolvido</p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                {client.status_stats.find(s => s.slug === 'resolved')?.count || 0}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Botão Ver mais */}
-        <div className="flex justify-center">
-          <button
-            onClick={onToggle}
-            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl transition-all duration-300 text-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-          >
-            {isExpanded ? 'Ver menos' : 'Ver mais'}
-          </button>
         </div>
       </div>
 
@@ -938,8 +928,8 @@ export default function HybridDashboard() {
             <Building className="h-5 w-5" />
             Dados por Cliente
           </h2>
-          {/* Layout em grid responsivo */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {/* Layout em lista vertical */}
+          <div className="space-y-2">
             {analyticsData.clients.map((client, index) => (
               <div key={client.context.id} className="relative">
                 <ClientCard
