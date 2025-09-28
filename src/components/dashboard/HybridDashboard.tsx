@@ -282,29 +282,42 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-6">
-              <div className="text-center">
+            <div className="flex flex-wrap gap-3 max-w-2xl">
+              {/* Total sempre primeiro */}
+              <div className="text-center min-w-[60px] bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 border border-blue-200 dark:border-blue-800">
                 <p className="text-xs text-gray-500 dark:text-gray-400">Total</p>
                 <p className="text-lg font-bold text-blue-600 dark:text-blue-400">{client.summary.total_tickets}</p>
               </div>
-              <div className="text-center">
-                <p className="text-xs text-gray-500 dark:text-gray-400">Aberto</p>
-                <p className="text-lg font-bold text-yellow-600 dark:text-yellow-400">
-                  {client.status_stats.find(s => s.slug === 'open')?.count || 0}
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-xs text-gray-500 dark:text-gray-400">Em Progresso</p>
-                <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
-                  {client.status_stats.find(s => s.slug === 'in_progress')?.count || 0}
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-xs text-gray-500 dark:text-gray-400">Resolvido</p>
-                <p className="text-lg font-bold text-green-600 dark:text-green-400">
-                  {client.status_stats.find(s => s.slug === 'resolved')?.count || 0}
-                </p>
-              </div>
+              
+              {/* Status dinâmicos em lista flexível */}
+              {client.status_stats.map((status, index) => {
+                const getStatusColor = (slug: string) => {
+                  if (slug.includes('aberto') || slug.includes('open')) return 'text-yellow-600 dark:text-yellow-400'
+                  if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) return 'text-orange-600 dark:text-orange-400'
+                  if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) return 'text-green-600 dark:text-green-400'
+                  if (slug.includes('cancelled') || slug.includes('cancelado')) return 'text-red-600 dark:text-red-400'
+                  return 'text-gray-600 dark:text-gray-400'
+                }
+                
+                const getStatusBg = (slug: string) => {
+                  if (slug.includes('aberto') || slug.includes('open')) return 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
+                  if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) return 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800'
+                  if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) return 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                  if (slug.includes('cancelled') || slug.includes('cancelado')) return 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                  return 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800'
+                }
+                
+                return (
+                  <div key={status.id} className={`text-center min-w-[100px] rounded-lg p-2 border ${getStatusBg(status.slug)}`}>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate" title={status.name}>
+                      {status.name.length > 15 ? `${status.name.substring(0, 15)}...` : status.name}
+                    </p>
+                    <p className={`text-lg font-bold ${getStatusColor(status.slug)}`}>
+                      {status.count}
+                    </p>
+                  </div>
+                )
+              })}
             </div>
             <div className="flex items-center gap-2">
               <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
