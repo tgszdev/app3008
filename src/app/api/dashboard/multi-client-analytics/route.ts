@@ -175,15 +175,34 @@ export async function GET(request: NextRequest) {
         const uniqueTicketStatuses = [...new Set(tickets?.map(t => t.status) || [])]
         console.log(`🎯 Status únicos dos tickets:`, uniqueTicketStatuses)
         
-        // Buscar status que correspondem aos tickets encontrados
-        const relevantStatuses = statuses.filter(status => 
-          uniqueTicketStatuses.includes(status.slug)
-        )
+        // Mapear status dos tickets para slugs da tabela
+        const statusMapping = {
+          'open': 'open',
+          'in_progress': 'in_progress', 
+          'resolved': 'resolved',
+          'closed': 'closed',
+          'cancelled': 'cancelled',
+          'cancelado': 'cancelled',
+          'em-homologacao': 'em-homologacao',
+          'ag-deploy-em-producao': 'ag-deploy-em-producao',
+          'ag-deploy-em-homologacao': 'ag-deploy-em-homologacao',
+          'ag-retorno-cliente': 'ag-retorno-cliente'
+        }
+        
+        // Buscar status que correspondem aos tickets encontrados (com mapeamento)
+        const relevantStatuses = statuses.filter(status => {
+          const mappedStatus = statusMapping[status.slug] || status.slug
+          return uniqueTicketStatuses.includes(mappedStatus) || uniqueTicketStatuses.includes(status.slug)
+        })
         console.log(`✅ Status relevantes encontrados:`, relevantStatuses.map(s => `${s.name} (${s.slug})`))
         
         const statusStats = relevantStatuses.map(status => {
           const matchingTickets = tickets?.filter(ticket => {
-            const matches = ticket.status === status.slug
+            // Verificar correspondência direta ou através do mapeamento
+            const directMatch = ticket.status === status.slug
+            const mappedMatch = statusMapping[ticket.status] === status.slug
+            const matches = directMatch || mappedMatch
+            
             if (matches) {
               console.log(`✅ MATCH: Ticket ${ticket.ticket_number} (${ticket.status}) === Status ${status.name} (${status.slug})`)
             }
