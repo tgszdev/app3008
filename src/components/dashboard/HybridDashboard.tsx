@@ -927,45 +927,44 @@ export default function HybridDashboard() {
           </p>
         </div>
 
-      {/* Resumo Consolidado */}
+      {/* Resumo Consolidado - Protótipo 35 (Layout de Tabela) */}
       {analyticsData && analyticsData.consolidated.status_stats.length > 0 && (
         <div>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
             <BarChart className="h-5 w-5" />
             Resumo Consolidado
           </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-4">
-          <StatCard
-            title="Total no Período"
-              value={analyticsData.consolidated.total_tickets}
-            icon={TicketIcon}
-            color="bg-blue-600"
-            statusColor="#2563eb"
-          />
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {/* Total no Período */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent"></div>
+              <div className="relative">
+                <div className="border-b border-gray-200 dark:border-gray-600 pb-2 mb-2">
+                  <div className="text-sm text-gray-600 dark:text-gray-400 break-words">Total no Período</div>
+                </div>
+                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 text-right leading-none">{analyticsData.consolidated.total_tickets}</div>
+              </div>
+            </div>
+            
+            {/* Status dinâmicos - ordenados por order_index */}
             {analyticsData.consolidated.status_stats
-            .filter(status => status.count > 0)
-            .map((status) => {
-              const getStatusIcon = (slug: string) => {
-                // Usar ícones dinâmicos baseados no slug ou padrão
-                if (slug.includes('aberto') || slug.includes('open')) return AlertCircle
-                if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) return Clock
-                if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) return CheckCircle
-                if (slug.includes('cancelled') || slug.includes('cancelado')) return XCircle
-                return TicketIcon
-              }
-              
-              const Icon = getStatusIcon(status.slug)
-              
-              return (
-                <StatCard
-                  key={status.slug}
-                  title={status.name}
-                  value={status.count}
-                  icon={Icon}
-                  statusColor={status.color}
-                />
-              )
-            })}
+              .filter(status => status.count > 0)
+              .map((status) => {
+                const statusColor = status.color || '#6B7280'
+                
+                return (
+                  <div key={status.slug} className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-10" style={{ background: `linear-gradient(135deg, ${statusColor}, transparent)` }}></div>
+                    <div className="relative">
+                      <div className="border-b border-gray-200 dark:border-gray-600 pb-2 mb-2">
+                        <div className="text-sm text-gray-600 dark:text-gray-400 break-words">{status.name}</div>
+                      </div>
+                      <div className="text-3xl font-bold text-right leading-none" style={{ color: statusColor }}>{status.count}</div>
+                    </div>
+                  </div>
+                )
+              })}
           </div>
         </div>
       )}
