@@ -145,11 +145,22 @@ export async function POST(request: NextRequest) {
     
     console.log(`✅ Ticket_number gerado via SEQUENCE: ${ticketNumber}`)
 
+    // BUSCAR STATUS PADRÃO DA TABELA
+    const { data: defaultStatus } = await supabaseAdmin
+      .from('ticket_statuses')
+      .select('slug')
+      .order('order_index', { ascending: true })
+      .limit(1)
+      .single()
+    
+    const defaultStatusSlug = defaultStatus?.slug || 'ABERTO'
+    console.log(`🎯 Status padrão definido: ${defaultStatusSlug}`)
+
     // CRIAR TICKET COM SEQUENCE (SEM RETRY - SEQUENCE É ATÔMICO)
     const ticketData: any = {
       title,
       description,
-      status: 'open',
+      status: defaultStatusSlug,
       priority: priority || 'medium',
       category: category || 'general', // Manter compatibilidade
       created_by,

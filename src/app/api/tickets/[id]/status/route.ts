@@ -22,9 +22,18 @@ export async function PUT(request: NextRequest, context: RouteParams) {
       return NextResponse.json({ error: 'Status é obrigatório' }, { status: 400 })
     }
 
-    const validStatuses = ['open', 'in_progress', 'resolved', 'closed', 'cancelled']
-    if (!validStatuses.includes(status)) {
-      return NextResponse.json({ error: 'Status inválido' }, { status: 400 })
+    // BUSCAR STATUS VÁLIDOS DA TABELA
+    const { data: validStatuses } = await supabaseAdmin
+      .from('ticket_statuses')
+      .select('slug')
+      .order('order_index', { ascending: true })
+    
+    const validStatusSlugs = validStatuses?.map(s => s.slug) || []
+    
+    if (!validStatusSlugs.includes(status)) {
+      return NextResponse.json({ 
+        error: `Status inválido. Status válidos: ${validStatusSlugs.join(', ')}` 
+      }, { status: 400 })
     }
 
     // Verificar permissões
@@ -40,7 +49,7 @@ export async function PUT(request: NextRequest, context: RouteParams) {
     }
 
     // Se está resolvendo ou fechando, adicionar timestamp e notas
-    if (status === 'resolved' || status === 'closed') {
+    if (status === 'RESOLVIDO' || status === 'FECHADO') {
       updateData.resolved_at = new Date().toISOString()
       if (resolution_notes) {
         updateData.resolution_notes = resolution_notes
@@ -48,7 +57,7 @@ export async function PUT(request: NextRequest, context: RouteParams) {
     }
 
     // Se está fechando, adicionar timestamp de fechamento
-    if (status === 'closed') {
+    if (status === 'FECHADO') {
       updateData.closed_at = new Date().toISOString()
     }
 
@@ -66,7 +75,7 @@ export async function PUT(request: NextRequest, context: RouteParams) {
     }
 
     // Atualizar SLA se o ticket foi resolvido
-    if (status === 'resolved' || status === 'closed') {
+    if (status === 'RESOLVIDO' || status === 'FECHADO') {
       try {
         const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/sla/ticket/${params.id}`, {
           method: 'POST',
