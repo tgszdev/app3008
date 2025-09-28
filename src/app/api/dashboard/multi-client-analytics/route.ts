@@ -213,7 +213,8 @@ export async function GET(request: NextRequest) {
         
         console.log(`✅ Status dinâmicos criados:`, dynamicStatusStats.map(s => `${s.name} (${s.slug}): ${s.count}`))
         
-        const statusStats = dynamicStatusStats
+        // Ordenar status por order_index (mesma ordem do cadastro)
+        const statusStats = dynamicStatusStats.sort((a, b) => a.order_index - b.order_index)
         
         console.log(`📊 Status stats finais para ${context.name}:`, statusStats.map(s => `${s.name}: ${s.count}`))
 

@@ -299,15 +299,7 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
       
       {/* Status em Lista Neural Network Style */}
       <div className="space-y-3 mb-6">
-        {/* Total sempre primeiro */}
-        <div className="bg-blue-50 dark:bg-blue-900/30 rounded-xl p-4 border border-blue-200 dark:border-blue-700">
-          <div className="flex justify-between items-center">
-            <span className="text-slate-700 dark:text-slate-200 font-medium">Total no Período</span>
-            <span className="text-blue-600 dark:text-blue-400 font-bold text-xl">{client.summary.total_tickets}</span>
-          </div>
-        </div>
-        
-        {/* Status dinâmicos em lista vertical */}
+        {/* Status dinâmicos em lista vertical - ordenados por order_index */}
         {client.status_stats.map((status, index) => {
           // Sistema de cores melhorado com acessibilidade
           const statusColor = status.color || '#6B7280'
@@ -357,6 +349,14 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
             </div>
           )
         })}
+        
+        {/* Total no Período - sempre no final */}
+        <div className="bg-blue-50 dark:bg-blue-900/30 rounded-xl p-4 border border-blue-200 dark:border-blue-700">
+          <div className="flex justify-between items-center">
+            <span className="text-slate-700 dark:text-slate-200 font-medium">Total no Período</span>
+            <span className="text-blue-600 dark:text-blue-400 font-bold text-xl">{client.summary.total_tickets}</span>
+          </div>
+        </div>
       </div>
 
       {/* Botão Ver mais Neural Network Style */}
