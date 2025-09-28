@@ -732,7 +732,7 @@ export default function HybridDashboard() {
         </div>
         
               {/* Segunda linha: Botões de ação originais */}
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div className="flex items-center justify-between">
                 {/* Informações do modo de visualização */}
                 <div className="flex items-center gap-2">
                   <Building className="w-4 h-4 text-blue-600" />
@@ -744,7 +744,7 @@ export default function HybridDashboard() {
                   </span>
                 </div>
                 
-                <div className="flex flex-wrap gap-3">
+                <div className="flex items-center gap-3">
                   {/* Botão Meus Tickets com bordas animadas */}
                   <button
                     onClick={toggleMyTickets}
