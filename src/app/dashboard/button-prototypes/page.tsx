@@ -1035,12 +1035,10 @@ const ButtonPrototypes: ButtonPrototype[] = [
             <p className="text-sm text-gray-400">Bem-vindo de volta, Thiago!</p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2">
-                <Building className="w-4 h-4" />
-                <span>4 clientes</span>
-                <ChevronDown className="w-4 h-4" />
-              </button>
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2 relative">
+              <Building className="w-4 h-4" />
+              <span>4 clientes</span>
+              <ChevronDown className="w-4 h-4" />
               {/* Popup do seletor */}
               <div className="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-4 z-50">
                 <div className="flex items-center justify-between mb-3">
@@ -1074,7 +1072,7 @@ const ButtonPrototypes: ButtonPrototype[] = [
                   </label>
                 </div>
               </div>
-            </div>
+            </button>
             <button className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors flex items-center gap-2">
               <User className="w-4 h-4" />
               <span>Meus Tickets</span>
