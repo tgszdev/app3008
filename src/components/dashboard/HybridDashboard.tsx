@@ -263,65 +263,71 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
   const trend = client.summary.total_tickets > 10 ? '+15%' : '+8%'
   
   return (
-    <div className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 rounded-2xl p-8 border border-indigo-500/30 hover:border-indigo-400 transition-all duration-500 w-full">
-      {/* Header do Cliente - Neural Network Style */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center">
-            <Activity className="w-6 h-6 text-white" />
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 w-full">
+      {/* Header do Cliente */}
+      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+              <Building className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{client.context.name}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {client.context.type === 'organization' ? 'Cliente' : 'Departamento'} • {client.summary.total_tickets} tickets
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-lg font-bold text-white">{client.context.name}</h3>
-            <p className="text-gray-300 text-sm">{client.context.type === 'organization' ? 'Cliente' : 'Departamento'} • {client.summary.total_tickets} tickets</p>
+          <div className="text-right">
+            <span className="text-green-600 dark:text-green-400 font-bold text-lg">{trend}</span>
           </div>
-        </div>
-        <div className="text-right">
-          <span className="text-indigo-400 font-bold text-xl">{trend}</span>
         </div>
       </div>
       
-      {/* Cards de Status - Neural Network Style - Layout horizontal */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-indigo-800/30 rounded-xl p-4 border border-indigo-500/20">
-          <div className="flex justify-between items-center">
-            <span className="text-gray-300">Total no Período</span>
-            <span className="text-indigo-400 font-bold text-xl">{client.summary.total_tickets}</span>
+      {/* Cards de Status */}
+      <div className="p-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+            <div className="text-center">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total no Período</p>
+              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{client.summary.total_tickets}</p>
+            </div>
+          </div>
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-4 border border-yellow-200 dark:border-yellow-800">
+            <div className="text-center">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Aberto</p>
+              <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+                {client.status_stats.find(s => s.slug === 'open')?.count || 0}
+              </p>
+            </div>
+          </div>
+          <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4 border border-orange-200 dark:border-orange-800">
+            <div className="text-center">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Em Progresso</p>
+              <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                {client.status_stats.find(s => s.slug === 'in_progress')?.count || 0}
+              </p>
+            </div>
+          </div>
+          <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-4 border border-green-200 dark:border-green-800">
+            <div className="text-center">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Resolvido</p>
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                {client.status_stats.find(s => s.slug === 'resolved')?.count || 0}
+              </p>
+            </div>
           </div>
         </div>
-        <div className="bg-yellow-800/30 rounded-xl p-4 border border-yellow-500/20">
-          <div className="flex justify-between items-center">
-            <span className="text-gray-300">Aberto</span>
-            <span className="text-yellow-400 font-bold text-xl">
-              {client.status_stats.find(s => s.slug === 'open')?.count || 0}
-            </span>
-          </div>
-        </div>
-        <div className="bg-blue-800/30 rounded-xl p-4 border border-blue-500/20">
-          <div className="flex justify-between items-center">
-            <span className="text-gray-300">Em Progresso</span>
-            <span className="text-blue-400 font-bold text-xl">
-              {client.status_stats.find(s => s.slug === 'in_progress')?.count || 0}
-            </span>
-          </div>
-        </div>
-        <div className="bg-green-800/30 rounded-xl p-4 border border-green-500/20">
-          <div className="flex justify-between items-center">
-            <span className="text-gray-300">Resolvido</span>
-            <span className="text-green-400 font-bold text-xl">
-              {client.status_stats.find(s => s.slug === 'resolved')?.count || 0}
-            </span>
-          </div>
-        </div>
-      </div>
 
-      {/* Botão Ver mais */}
-      <div className="flex justify-center">
-        <button
-          onClick={onToggle}
-          className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-colors text-sm font-medium"
-        >
-          {isExpanded ? 'Ver menos' : 'Ver mais'}
-        </button>
+        {/* Botão Ver mais */}
+        <div className="flex justify-center">
+          <button
+            onClick={onToggle}
+            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl transition-all duration-300 text-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+          >
+            {isExpanded ? 'Ver menos' : 'Ver mais'}
+          </button>
+        </div>
       </div>
 
       {/* Conteúdo expandido */}
@@ -932,8 +938,8 @@ export default function HybridDashboard() {
             <Building className="h-5 w-5" />
             Dados por Cliente
           </h2>
-          {/* Neural Network Layout - Cards em grid responsivo */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+          {/* Layout em grid responsivo */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {analyticsData.clients.map((client, index) => (
               <div key={client.context.id} className="relative">
                 <ClientCard
