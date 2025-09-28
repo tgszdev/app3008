@@ -159,17 +159,43 @@ export async function GET(request: Request) {
         order_index: number
       }> = []
       
-      // Initialize all status with 0 count
-      statusList.forEach(status => {
-        const count = cat.statusCounts.get(status.slug) || 0
-        statusBreakdown[status.slug] = count
-        statusBreakdownDetailed.push({
-          slug: status.slug,
-          name: status.name,
-          color: status.color,
-          count: count,
-          order_index: status.order_index
-        })
+      // Usar sistema dinâmico para status das categorias
+      const uniqueCategoryStatuses = [...new Set(Array.from(cat.statusCounts.keys()))]
+      
+      uniqueCategoryStatuses.forEach(ticketStatus => {
+        const count = cat.statusCounts.get(ticketStatus) || 0
+        
+        if (count > 0) {
+          // Buscar se existe na tabela
+          const existingStatus = statusList.find(s => s.slug === ticketStatus)
+          
+          if (existingStatus) {
+            // Usar status da tabela
+            statusBreakdown[existingStatus.slug] = count
+            statusBreakdownDetailed.push({
+              slug: existingStatus.slug,
+              name: existingStatus.name,
+              color: existingStatus.color,
+              count: count,
+              order_index: existingStatus.order_index
+            })
+          } else {
+            // Criar status dinâmico
+            const dynamicName = ticketStatus
+              .split('-')
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(' ')
+            
+            statusBreakdown[ticketStatus] = count
+            statusBreakdownDetailed.push({
+              slug: ticketStatus,
+              name: dynamicName,
+              color: '#6B7280', // Cor padrão
+              count: count,
+              order_index: 999
+            })
+          }
+        }
       })
       
       // Sort status by order_index
