@@ -202,6 +202,13 @@ export async function GET(request: Request) {
       // Sort status by order_index
       statusBreakdownDetailed.sort((a, b) => a.order_index - b.order_index)
       
+      // Debug: verificar se statusBreakdown está sendo populado
+      console.log(`🔍 Debug categoria ${cat.name}:`, {
+        statusBreakdown: statusBreakdown,
+        statusBreakdownDetailed: statusBreakdownDetailed.length,
+        statusBreakdownDetailedContent: statusBreakdownDetailed
+      })
+      
       return {
         id: cat.id,
         nome: cat.name,
