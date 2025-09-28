@@ -167,9 +167,22 @@ export async function GET(request: NextRequest) {
         }
 
         // Calcular estatísticas por status
+        console.log(`🔍 DEBUG STATUS COMPARISON:`)
+        console.log(`📋 Status disponíveis:`, statuses.map(s => `${s.name} (${s.slug})`))
+        console.log(`🎫 Tickets encontrados:`, tickets?.map(t => `${t.ticket_number}: ${t.status}`) || [])
+        
         const statusStats = statuses.map(status => {
-          const count = tickets?.filter(ticket => ticket.status === status.slug).length || 0
+          const matchingTickets = tickets?.filter(ticket => {
+            const matches = ticket.status === status.slug
+            if (matches) {
+              console.log(`✅ MATCH: Ticket ${ticket.ticket_number} (${ticket.status}) === Status ${status.name} (${status.slug})`)
+            }
+            return matches
+          }) || []
+          
+          const count = matchingTickets.length
           console.log(`📊 Status ${status.name} (${status.slug}): ${count} tickets`)
+          
           return {
             ...status,
             count
