@@ -329,15 +329,15 @@ export const Prototype52 = () => (
     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
       <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500"></div>
-        <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">Total no Período</div>
-        <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{mockData.total}</div>
+        <div className="text-sm text-gray-600 dark:text-gray-400 mb-2 break-words">Total no Período</div>
+        <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 text-right">{mockData.total}</div>
       </div>
       
       {mockData.status.map((status, index) => (
         <div key={index} className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1" style={{ background: `linear-gradient(90deg, ${status.color}, ${status.color}80)` }}></div>
-          <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">{status.name}</div>
-          <div className="text-3xl font-bold" style={{ color: status.color }}>{status.count}</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400 mb-2 break-words">{status.name}</div>
+          <div className="text-3xl font-bold text-right" style={{ color: status.color }}>{status.count}</div>
         </div>
       ))}
     </div>

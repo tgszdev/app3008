@@ -31,7 +31,7 @@ export const Prototype31 = () => (
           <div className="grid grid-cols-2 gap-2">
             <div>
               <div className="text-xs text-gray-500 dark:text-gray-400">Total</div>
-              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{mockData.total}</div>
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 text-right">{mockData.total}</div>
             </div>
             <div>
               <div className="text-xs text-gray-500 dark:text-gray-400">Período</div>
@@ -48,11 +48,11 @@ export const Prototype31 = () => (
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">Count</div>
-                <div className="text-2xl font-bold" style={{ color: status.color }}>{status.count}</div>
+                <div className="text-2xl font-bold text-right" style={{ color: status.color }}>{status.count}</div>
               </div>
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">Status</div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">{status.name}</div>
+                <div className="text-xs text-gray-600 dark:text-gray-400 break-words">{status.name}</div>
               </div>
             </div>
           </div>
@@ -74,8 +74,8 @@ export const Prototype32 = () => (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent"></div>
         <div className="relative">
-          <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">Total no Período</div>
-          <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">{mockData.total}</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400 mb-2 break-words">Total no Período</div>
+          <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2 text-right">{mockData.total}</div>
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1">
             <div className="bg-blue-600 h-1 rounded-full" style={{ width: '100%' }}></div>
           </div>
@@ -88,8 +88,8 @@ export const Prototype32 = () => (
           <div key={index} className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden">
             <div className="absolute inset-0 opacity-10" style={{ background: `linear-gradient(135deg, ${status.color}, transparent)` }}></div>
             <div className="relative">
-              <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">{status.name}</div>
-              <div className="text-3xl font-bold mb-2" style={{ color: status.color }}>{status.count}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400 mb-2 break-words">{status.name}</div>
+              <div className="text-3xl font-bold mb-2 text-right" style={{ color: status.color }}>{status.count}</div>
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1">
                 <div className="h-1 rounded-full" style={{ width: `${percentage}%`, backgroundColor: status.color }}></div>
               </div>
@@ -114,8 +114,8 @@ export const Prototype33 = () => (
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent"></div>
         <div className="relative">
           <div className="space-y-1">
-            <div className="text-sm text-gray-600 dark:text-gray-400">Total no Período</div>
-            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{mockData.total}</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400 break-words">Total no Período</div>
+            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 text-right">{mockData.total}</div>
             <div className="text-xs text-gray-500 dark:text-gray-400">tickets</div>
           </div>
         </div>
@@ -126,8 +126,8 @@ export const Prototype33 = () => (
           <div className="absolute inset-0 opacity-10" style={{ background: `linear-gradient(135deg, ${status.color}, transparent)` }}></div>
           <div className="relative">
             <div className="space-y-1">
-              <div className="text-sm text-gray-600 dark:text-gray-400">{status.name}</div>
-              <div className="text-3xl font-bold" style={{ color: status.color }}>{status.count}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400 break-words">{status.name}</div>
+              <div className="text-3xl font-bold text-right" style={{ color: status.color }}>{status.count}</div>
               <div className="text-xs text-gray-500 dark:text-gray-400">tickets</div>
             </div>
           </div>
@@ -150,7 +150,7 @@ export const Prototype34 = () => (
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent"></div>
         <div className="relative">
           <div className="text-center">
-            <div className="text-lg text-gray-600 dark:text-gray-400 mb-3">Total no Período</div>
+            <div className="text-lg text-gray-600 dark:text-gray-400 mb-3 break-words">Total no Período</div>
             <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">{mockData.total}</div>
             <div className="text-sm text-gray-500 dark:text-gray-400">tickets processados</div>
           </div>
@@ -162,7 +162,7 @@ export const Prototype34 = () => (
           <div className="absolute inset-0 opacity-10" style={{ background: `linear-gradient(135deg, ${status.color}, transparent)` }}></div>
           <div className="relative">
             <div className="text-center">
-              <div className="text-lg text-gray-600 dark:text-gray-400 mb-3">{status.name}</div>
+              <div className="text-lg text-gray-600 dark:text-gray-400 mb-3 break-words">{status.name}</div>
               <div className="text-4xl font-bold mb-2" style={{ color: status.color }}>{status.count}</div>
               <div className="text-sm text-gray-500 dark:text-gray-400">tickets</div>
             </div>
@@ -186,9 +186,9 @@ export const Prototype35 = () => (
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent"></div>
         <div className="relative">
           <div className="border-b border-gray-200 dark:border-gray-600 pb-2 mb-2">
-            <div className="text-sm text-gray-600 dark:text-gray-400">Total no Período</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400 break-words">Total no Período</div>
           </div>
-          <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{mockData.total}</div>
+          <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 text-right">{mockData.total}</div>
         </div>
       </div>
       
@@ -197,9 +197,9 @@ export const Prototype35 = () => (
           <div className="absolute inset-0 opacity-10" style={{ background: `linear-gradient(135deg, ${status.color}, transparent)` }}></div>
           <div className="relative">
             <div className="border-b border-gray-200 dark:border-gray-600 pb-2 mb-2">
-              <div className="text-sm text-gray-600 dark:text-gray-400">{status.name}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400 break-words">{status.name}</div>
             </div>
-            <div className="text-3xl font-bold" style={{ color: status.color }}>{status.count}</div>
+            <div className="text-3xl font-bold text-right" style={{ color: status.color }}>{status.count}</div>
           </div>
         </div>
       ))}
