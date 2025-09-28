@@ -263,74 +263,74 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
   const trend = client.summary.total_tickets > 10 ? '+15%' : '+8%'
   
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-      {/* Header da Lista */}
-      <div 
-        className="p-4 cursor-pointer"
-        onClick={onToggle}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <Building className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{client.context.name}</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {client.context.type === 'organization' ? 'Cliente' : 'Departamento'} • {client.summary.total_tickets} tickets
-              </p>
-            </div>
+    <div className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 rounded-2xl p-6 border border-indigo-500/30 hover:border-indigo-400 transition-all duration-500 w-full">
+      {/* Header Neural Network Style */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center">
+            <Activity className="w-6 h-6 text-white" />
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex flex-wrap gap-3 max-w-2xl">
-              {/* Total sempre primeiro */}
-              <div className="text-center min-w-[60px] bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 border border-blue-200 dark:border-blue-800">
-                <p className="text-xs text-gray-500 dark:text-gray-400">Total</p>
-                <p className="text-lg font-bold text-blue-600 dark:text-blue-400">{client.summary.total_tickets}</p>
-              </div>
-              
-              {/* Status dinâmicos em lista flexível */}
-              {client.status_stats.map((status, index) => {
-                const getStatusColor = (slug: string) => {
-                  if (slug.includes('aberto') || slug.includes('open')) return 'text-yellow-600 dark:text-yellow-400'
-                  if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) return 'text-orange-600 dark:text-orange-400'
-                  if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) return 'text-green-600 dark:text-green-400'
-                  if (slug.includes('cancelled') || slug.includes('cancelado')) return 'text-red-600 dark:text-red-400'
-                  return 'text-gray-600 dark:text-gray-400'
-                }
-                
-                const getStatusBg = (slug: string) => {
-                  if (slug.includes('aberto') || slug.includes('open')) return 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
-                  if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) return 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800'
-                  if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) return 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
-                  if (slug.includes('cancelled') || slug.includes('cancelado')) return 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
-                  return 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800'
-                }
-                
-                return (
-                  <div key={status.id} className={`text-center min-w-[100px] rounded-lg p-2 border ${getStatusBg(status.slug)}`}>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate" title={status.name}>
-                      {status.name.length > 15 ? `${status.name.substring(0, 15)}...` : status.name}
-                    </p>
-                    <p className={`text-lg font-bold ${getStatusColor(status.slug)}`}>
-                      {status.count}
-                    </p>
-                  </div>
-                )
-              })}
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
-                Ver mais
-              </span>
-              {isExpanded ? (
-                <ChevronUp className="h-5 w-5 text-gray-400" />
-              ) : (
-                <ChevronDown className="h-5 w-5 text-gray-400" />
-              )}
-            </div>
+          <div>
+            <h3 className="text-lg font-bold text-white">{client.context.name}</h3>
+            <p className="text-gray-300 text-sm">{client.context.type === 'organization' ? 'Cliente' : 'Departamento'} • {client.summary.total_tickets} tickets</p>
           </div>
         </div>
+        <div className="text-right">
+          <span className="text-indigo-400 font-bold text-xl">{trend}</span>
+        </div>
+      </div>
+      
+      {/* Status em Lista Neural Network Style */}
+      <div className="space-y-3 mb-6">
+        {/* Total sempre primeiro */}
+        <div className="bg-indigo-800/30 rounded-xl p-4 border border-indigo-500/20">
+          <div className="flex justify-between items-center">
+            <span className="text-gray-300">Total no Período</span>
+            <span className="text-indigo-400 font-bold text-xl">{client.summary.total_tickets}</span>
+          </div>
+        </div>
+        
+        {/* Status dinâmicos em lista vertical */}
+        {client.status_stats.map((status, index) => {
+          const getStatusColor = (slug: string) => {
+            if (slug.includes('aberto') || slug.includes('open')) return 'text-yellow-400'
+            if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) return 'text-orange-400'
+            if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) return 'text-green-400'
+            if (slug.includes('cancelled') || slug.includes('cancelado')) return 'text-red-400'
+            return 'text-gray-400'
+          }
+          
+          const getStatusBg = (slug: string) => {
+            if (slug.includes('aberto') || slug.includes('open')) return 'bg-yellow-800/30 border-yellow-500/20'
+            if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) return 'bg-orange-800/30 border-orange-500/20'
+            if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) return 'bg-green-800/30 border-green-500/20'
+            if (slug.includes('cancelled') || slug.includes('cancelado')) return 'bg-red-800/30 border-red-500/20'
+            return 'bg-gray-800/30 border-gray-500/20'
+          }
+          
+          return (
+            <div key={status.id} className={`${getStatusBg(status.slug)} rounded-xl p-4 border`}>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300 truncate" title={status.name}>
+                  {status.name}
+                </span>
+                <span className={`font-bold text-xl ${getStatusColor(status.slug)}`}>
+                  {status.count}
+                </span>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Botão Ver mais Neural Network Style */}
+      <div className="flex justify-center">
+        <button
+          onClick={onToggle}
+          className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-all duration-300 text-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+        >
+          {isExpanded ? 'Ver menos' : 'Ver mais'}
+        </button>
       </div>
 
       {/* Conteúdo expandido */}
