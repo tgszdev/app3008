@@ -34,7 +34,6 @@ import {
   X,
   Check
 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { getIcon } from '@/lib/icons'
 
 // =====================================================
@@ -389,7 +388,6 @@ export default function HybridDashboard() {
     contextType,
     isLoading: contextLoading 
   } = useOrganization()
-  const router = useRouter()
   
   // Estados
   const [mounted, setMounted] = useState(false)
@@ -404,8 +402,6 @@ export default function HybridDashboard() {
   const [showFilters, setShowFilters] = useState(false)
   const [myTicketsOnly, setMyTicketsOnly] = useState(false)
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
-  const [tempFilter, setTempFilter] = useState<{start_date: string, end_date: string}>(getCurrentMonthDates())
-  
   // Filtros de período
   const getCurrentMonthDates = () => {
     // Usar período mais amplo para pegar dados existentes
@@ -419,6 +415,7 @@ export default function HybridDashboard() {
   }
   
   const [periodFilter, setPeriodFilter] = useState(getCurrentMonthDates())
+  const [tempFilter, setTempFilter] = useState<{start_date: string, end_date: string}>(getCurrentMonthDates())
 
   // Carregar seleções do localStorage na inicialização
   useEffect(() => {
