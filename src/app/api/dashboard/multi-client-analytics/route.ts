@@ -175,29 +175,45 @@ export async function GET(request: NextRequest) {
         const uniqueTicketStatuses = [...new Set(tickets?.map(t => t.status) || [])]
         console.log(`🎯 Status únicos dos tickets:`, uniqueTicketStatuses)
         
-        // Buscar status que correspondem EXATAMENTE aos tickets encontrados
-        const relevantStatuses = statuses.filter(status => 
-          uniqueTicketStatuses.includes(status.slug)
-        )
-        console.log(`✅ Status relevantes encontrados:`, relevantStatuses.map(s => `${s.name} (${s.slug})`))
-        
-        const statusStats = relevantStatuses.map(status => {
-          const matchingTickets = tickets?.filter(ticket => {
-            const matches = ticket.status === status.slug
-            if (matches) {
-              console.log(`✅ MATCH: Ticket ${ticket.ticket_number} (${ticket.status}) === Status ${status.name} (${status.slug})`)
+        // Criar status dinâmicos baseados nos tickets encontrados
+        // Se não existir na tabela, criar um status temporário
+        const dynamicStatusStats = uniqueTicketStatuses.map(ticketStatus => {
+          // Buscar se existe na tabela
+          const existingStatus = statuses.find(s => s.slug === ticketStatus)
+          
+          if (existingStatus) {
+            // Usar status da tabela
+            const matchingTickets = tickets?.filter(ticket => ticket.status === ticketStatus) || []
+            return {
+              id: existingStatus.id,
+              name: existingStatus.name,
+              slug: existingStatus.slug,
+              color: existingStatus.color,
+              order_index: existingStatus.order_index,
+              count: matchingTickets.length
             }
-            return matches
-          }) || []
-          
-          const count = matchingTickets.length
-          console.log(`📊 Status ${status.name} (${status.slug}): ${count} tickets`)
-          
-          return {
-            ...status,
-            count
+          } else {
+            // Criar status dinâmico baseado no slug do ticket
+            const matchingTickets = tickets?.filter(ticket => ticket.status === ticketStatus) || []
+            const dynamicName = ticketStatus
+              .split('-')
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(' ')
+            
+            return {
+              id: `dynamic-${ticketStatus}`,
+              name: dynamicName,
+              slug: ticketStatus,
+              color: '#6B7280', // Cor padrão
+              order_index: 999,
+              count: matchingTickets.length
+            }
           }
         }).filter(status => status.count > 0) // Só mostrar status com tickets
+        
+        console.log(`✅ Status dinâmicos criados:`, dynamicStatusStats.map(s => `${s.name} (${s.slug}): ${s.count}`))
+        
+        const statusStats = dynamicStatusStats
         
         console.log(`📊 Status stats finais para ${context.name}:`, statusStats.map(s => `${s.name}: ${s.count}`))
 

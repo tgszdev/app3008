@@ -207,25 +207,49 @@ export async function GET(request: Request) {
     const uniqueTicketStatuses = [...new Set(tickets?.map(t => t.status) || [])]
     console.log(`🎯 Status únicos dos tickets:`, uniqueTicketStatuses)
     
-    // Buscar status que correspondem aos tickets encontrados
-    const relevantStatuses = statusList.filter(status => 
-      uniqueTicketStatuses.includes(status.slug)
-    )
-    console.log(`✅ Status relevantes encontrados:`, relevantStatuses.map(s => `${s.name} (${s.slug})`))
-    
-    relevantStatuses.forEach(status => {
-      const matchingTickets = tickets?.filter(t => t.status === status.slug) || []
-      const count = matchingTickets.length
-      statusCounts[status.slug] = count
-      console.log(`📊 Status ${status.name} (${status.slug}): ${count} tickets`)
-      if (matchingTickets.length > 0) {
-        console.log(`  - Tickets correspondentes:`, matchingTickets.map(t => t.id))
+    // Criar status dinâmicos baseados nos tickets encontrados
+    const dynamicStatusStats = uniqueTicketStatuses.map(ticketStatus => {
+      // Buscar se existe na tabela
+      const existingStatus = statusList.find(s => s.slug === ticketStatus)
+      
+      if (existingStatus) {
+        // Usar status da tabela
+        const matchingTickets = tickets?.filter(ticket => ticket.status === ticketStatus) || []
+        return {
+          slug: existingStatus.slug,
+          name: existingStatus.name,
+          color: existingStatus.color,
+          count: matchingTickets.length,
+          order_index: existingStatus.order_index
+        }
+      } else {
+        // Criar status dinâmico baseado no slug do ticket
+        const matchingTickets = tickets?.filter(ticket => ticket.status === ticketStatus) || []
+        const dynamicName = ticketStatus
+          .split('-')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ')
+        
+        return {
+          slug: ticketStatus,
+          name: dynamicName,
+          color: '#6B7280', // Cor padrão
+          count: matchingTickets.length,
+          order_index: 999
+        }
       }
+    }).filter(status => status.count > 0) // Só mostrar status com tickets
+    
+    console.log(`✅ Status dinâmicos criados:`, dynamicStatusStats.map(s => `${s.name} (${s.slug}): ${s.count}`))
+    
+    // Aplicar aos arrays de resposta
+    dynamicStatusStats.forEach(status => {
+      statusCounts[status.slug] = status.count
       statusCountsDetailed.push({
         slug: status.slug,
         name: status.name,
         color: status.color,
-        count: count,
+        count: status.count,
         order_index: status.order_index
       })
     })
