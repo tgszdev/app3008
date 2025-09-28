@@ -700,7 +700,7 @@ export default function HybridDashboard() {
               {/* Botão principal com bordas animadas */}
               <button
                 onClick={() => setShowClientPopup(!showClientPopup)}
-                className="w-40 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 flex items-center gap-2 relative overflow-hidden whitespace-nowrap"
+                className="w-40 h-10 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 flex items-center gap-2 relative overflow-hidden whitespace-nowrap"
               >
                 <Building className="w-4 h-4" />
                 <span className="text-xs font-medium">
@@ -809,7 +809,7 @@ export default function HybridDashboard() {
           {/* Botão Meus Tickets com bordas animadas */}
           <button
             onClick={toggleMyTickets}
-            className={`w-40 flex items-center justify-center gap-2 px-4 py-2 border rounded-xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
+            className={`w-40 h-10 flex items-center justify-center gap-2 px-4 border rounded-xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
               myTicketsOnly 
                 ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
                 : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
@@ -824,7 +824,7 @@ export default function HybridDashboard() {
           {/* Botão Filtro de Data com bordas animadas */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="w-40 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
+            className="w-40 h-10 flex items-center justify-center gap-2 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
           >
             <Calendar className="h-4 w-4 flex-shrink-0" />
             <span className="text-sm font-medium">
@@ -843,7 +843,7 @@ export default function HybridDashboard() {
           <button
             onClick={handleExportPDF}
             disabled={isGeneratingPDF}
-            className="w-40 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden whitespace-nowrap"
+            className="w-40 h-10 flex items-center justify-center gap-2 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden whitespace-nowrap"
           >
             {isGeneratingPDF ? (
               <Loader2 className="h-4 w-4 animate-spin" />
