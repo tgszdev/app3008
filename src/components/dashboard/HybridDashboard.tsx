@@ -263,7 +263,7 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
   const trend = client.summary.total_tickets > 10 ? '+15%' : '+8%'
   
   return (
-    <div className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 rounded-2xl p-8 border border-indigo-500/30 hover:border-indigo-400 transition-all duration-500 w-full max-w-md mx-auto">
+    <div className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 rounded-2xl p-8 border border-indigo-500/30 hover:border-indigo-400 transition-all duration-500 w-full">
       {/* Header do Cliente - Neural Network Style */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
@@ -280,8 +280,8 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
         </div>
       </div>
       
-      {/* Cards de Status - Neural Network Style */}
-      <div className="space-y-3">
+      {/* Cards de Status - Neural Network Style - Layout horizontal */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-indigo-800/30 rounded-xl p-4 border border-indigo-500/20">
           <div className="flex justify-between items-center">
             <span className="text-gray-300">Total no Período</span>
@@ -296,13 +296,29 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
             </span>
           </div>
         </div>
+        <div className="bg-blue-800/30 rounded-xl p-4 border border-blue-500/20">
+          <div className="flex justify-between items-center">
+            <span className="text-gray-300">Em Progresso</span>
+            <span className="text-blue-400 font-bold text-xl">
+              {client.status_stats.find(s => s.slug === 'in_progress')?.count || 0}
+            </span>
+          </div>
+        </div>
+        <div className="bg-green-800/30 rounded-xl p-4 border border-green-500/20">
+          <div className="flex justify-between items-center">
+            <span className="text-gray-300">Resolvido</span>
+            <span className="text-green-400 font-bold text-xl">
+              {client.status_stats.find(s => s.slug === 'resolved')?.count || 0}
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Botão Ver mais */}
-      <div className="mt-6">
+      <div className="flex justify-center">
         <button
           onClick={onToggle}
-          className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-colors text-sm font-medium"
+          className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-colors text-sm font-medium"
         >
           {isExpanded ? 'Ver menos' : 'Ver mais'}
         </button>
@@ -916,8 +932,8 @@ export default function HybridDashboard() {
             <Building className="h-5 w-5" />
             Dados por Cliente
           </h2>
-          {/* Neural Network Layout - Cards em coluna com conexões */}
-          <div className="flex flex-col items-center space-y-8">
+          {/* Neural Network Layout - Cards em grid responsivo */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
             {analyticsData.clients.map((client, index) => (
               <div key={client.context.id} className="relative">
                 <ClientCard
@@ -925,9 +941,6 @@ export default function HybridDashboard() {
                   isExpanded={expandedClients.has(client.context.id)}
                   onToggle={() => toggleClientExpansion(client.context.id)}
                 />
-                {index < analyticsData.clients.length - 1 && (
-                  <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-0.5 h-8 bg-gradient-to-b from-indigo-500 to-purple-500"></div>
-                )}
               </div>
             ))}
           </div>
