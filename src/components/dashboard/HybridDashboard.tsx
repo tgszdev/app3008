@@ -620,25 +620,27 @@ export default function HybridDashboard() {
             </p>
           </div>
           
-          {/* Layout em Popup - Seletor Múltiplo de Clientes (apenas para matriz) */}
-          {isMatrixUser && (
-            <div className="relative">
-              {/* Botão principal */}
-              <button
-                onClick={() => setShowClientPopup(!showClientPopup)}
-                className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
-              >
-                <Building className="w-4 h-4" />
-                <span className="text-xs font-medium">
-                  {selectedClients.length === 0 
-                    ? 'Selecionar Clientes' 
-                    : selectedClients.length === 1 
-                      ? availableContexts.find(c => c.id === selectedClients[0])?.name || 'Cliente'
-                      : `${selectedClients.length} clientes`
-                  }
-                </span>
-                <ChevronDown className="w-4 h-4" />
-              </button>
+                {/* Layout em Popup - Seletor Múltiplo de Clientes (apenas para matriz) */}
+                {isMatrixUser && (
+                  <div className="relative">
+                    {/* Botão principal com bordas animadas */}
+                    <button
+                      onClick={() => setShowClientPopup(!showClientPopup)}
+                      className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 flex items-center gap-2 relative overflow-hidden"
+                    >
+                      <Building className="w-4 h-4" />
+                      <span className="text-xs font-medium">
+                        {selectedClients.length === 0 
+                          ? 'Selecionar Clientes' 
+                          : selectedClients.length === 1 
+                            ? availableContexts.find(c => c.id === selectedClients[0])?.name || 'Cliente'
+                            : `${selectedClients.length} clientes`
+                        }
+                      </span>
+                      <ChevronDown className="w-4 h-4" />
+                      {/* Bordas animadas */}
+                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-blue-500/20 to-transparent animate-pulse"></div>
+                    </button>
               
               {/* Popup de seleção de clientes */}
               {showClientPopup && (
@@ -729,66 +731,72 @@ export default function HybridDashboard() {
           )}
         </div>
         
-        {/* Segunda linha: Botões de ação originais */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          {/* Informações do modo de visualização */}
-          <div className="flex items-center gap-2">
-            <Building className="w-4 h-4 text-blue-600" />
-            <span className="text-sm text-gray-600 dark:text-gray-400">
-              Modo: 
-              <span className="font-medium ml-1 text-gray-900 dark:text-white">
-                {selectedClients.length > 1 ? 'Multi-Cliente' : selectedClients.length === 1 ? 'Cliente Específico' : 'Todos os Clientes'}
-              </span>
-            </span>
-          </div>
-          
-          <div className="flex flex-wrap gap-3">
-            {/* Botão Meus Tickets */}
-            <button
-              onClick={toggleMyTickets}
-              className={`flex items-center justify-center gap-2 px-4 py-2 border rounded-xl transition-colors ${
-                myTicketsOnly 
-                  ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
-                  : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
-              }`}
-            >
-              <User className="h-4 w-4 flex-shrink-0" />
-              <span className="text-sm font-medium">Meus Tickets</span>
-            </button>
-          
-            {/* Botão Filtro de Data */}
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            >
-              <Calendar className="h-4 w-4 flex-shrink-0" />
-              <span className="text-sm font-medium truncate">
-                {periodFilter.start_date === getCurrentMonthDates().start_date && 
-                 periodFilter.end_date === getCurrentMonthDates().end_date
-                  ? 'Mês Atual'
-                  : `${formatDateShort(periodFilter.start_date)} - ${formatDateShort(periodFilter.end_date)}`
-                }
-              </span>
-              <Filter className="h-4 w-4 flex-shrink-0" />
-            </button>
-            
-            {/* Botão Export PDF */}
-            <button
-              onClick={handleExportPDF}
-              disabled={isGeneratingPDF}
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isGeneratingPDF ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <FileDown className="h-4 w-4 flex-shrink-0" />
-              )}
-              <span className="text-sm font-medium">
-                {isGeneratingPDF ? 'Gerando...' : 'Exportar PDF'}
-              </span>
-            </button>
-          </div>
-        </div>
+              {/* Segunda linha: Botões de ação originais */}
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                {/* Informações do modo de visualização */}
+                <div className="flex items-center gap-2">
+                  <Building className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    Modo: 
+                    <span className="font-medium ml-1 text-gray-900 dark:text-white">
+                      {selectedClients.length > 1 ? 'Multi-Cliente' : selectedClients.length === 1 ? 'Cliente Específico' : 'Todos os Clientes'}
+                    </span>
+                  </span>
+                </div>
+                
+                <div className="flex flex-wrap gap-3">
+                  {/* Botão Meus Tickets com bordas animadas */}
+                  <button
+                    onClick={toggleMyTickets}
+                    className={`flex items-center justify-center gap-2 px-4 py-2 border rounded-xl transition-all duration-300 relative overflow-hidden ${
+                      myTicketsOnly 
+                        ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
+                        : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    <User className="h-4 w-4 flex-shrink-0" />
+                    <span className="text-sm font-medium">Meus Tickets</span>
+                    {/* Bordas animadas */}
+                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+                  </button>
+                
+                  {/* Botão Filtro de Data com bordas animadas */}
+                  <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden"
+                  >
+                    <Calendar className="h-4 w-4 flex-shrink-0" />
+                    <span className="text-sm font-medium truncate">
+                      {periodFilter.start_date === getCurrentMonthDates().start_date && 
+                       periodFilter.end_date === getCurrentMonthDates().end_date
+                        ? 'Mês Atual'
+                        : `${formatDateShort(periodFilter.start_date)} - ${formatDateShort(periodFilter.end_date)}`
+                      }
+                    </span>
+                    <Filter className="h-4 w-4 flex-shrink-0" />
+                    {/* Bordas animadas */}
+                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-yellow-500/20 to-transparent animate-pulse"></div>
+                  </button>
+                  
+                  {/* Botão Export PDF com bordas animadas */}
+                  <button
+                    onClick={handleExportPDF}
+                    disabled={isGeneratingPDF}
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
+                  >
+                    {isGeneratingPDF ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <FileDown className="h-4 w-4 flex-shrink-0" />
+                    )}
+                    <span className="text-sm font-medium">
+                      {isGeneratingPDF ? 'Gerando...' : 'Exportar PDF'}
+                    </span>
+                    {/* Bordas animadas */}
+                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-purple-500/20 to-transparent animate-pulse"></div>
+                  </button>
+                </div>
+              </div>
       </div>
 
       {/* Filtros de Período */}
