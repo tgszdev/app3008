@@ -187,7 +187,7 @@ export async function GET(request: NextRequest) {
             ...status,
             count
           }
-        }).filter(status => status.count > 0)
+        })
         
         console.log(`📊 Status stats finais para ${context.name}:`, statusStats.map(s => `${s.name}: ${s.count}`))
 
