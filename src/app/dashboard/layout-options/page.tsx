@@ -31,7 +31,9 @@ import {
   XCircle,
   Info,
   AlertTriangle,
-  RefreshCw
+  RefreshCw,
+  Bell,
+  Heart
 } from 'lucide-react'
 
 interface LayoutOption {
@@ -765,7 +767,10 @@ export default function LayoutOptionsPage() {
               <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center gap-4">
                   <div className="p-3 bg-white/20 rounded-xl">
-                    <selectedOption.icon className="h-8 w-8 text-white" />
+                    {(() => {
+                      const Icon = selectedOption.icon
+                      return <Icon className="h-8 w-8 text-white" />
+                    })()}
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-white">{selectedOption.name}</h2>
