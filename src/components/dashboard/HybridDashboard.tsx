@@ -145,7 +145,7 @@ const StatCard = ({ title, value, icon: Icon, trend, color, statusColor }: any) 
   
   return (
     <div 
-      className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-3 hover:shadow-md transition-shadow duration-200"
+      className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow duration-200"
       style={{
         borderLeftColor: cardColor,
         borderLeftWidth: '3px'
@@ -292,7 +292,7 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
       </div>
 
       {/* Cards de Status (sempre visíveis) */}
-      <div className="px-4 pb-4">
+      <div className="px-4 pb-6">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           <StatCard
             title="Total no Período"
