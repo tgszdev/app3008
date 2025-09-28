@@ -404,9 +404,10 @@ export default function HybridDashboard() {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
   // Filtros de período
   const getCurrentMonthDates = () => {
-    // Usar período mais amplo para pegar dados existentes
-    const firstDay = new Date(2024, 0, 1) // Janeiro 2024
-    const lastDay = new Date(2025, 11, 31) // Dezembro 2025
+    // Usar mês atual do primeiro ao último dia
+    const now = new Date()
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1) // Primeiro dia do mês atual
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0) // Último dia do mês atual
     
     return {
       start_date: firstDay.toISOString().split('T')[0],
