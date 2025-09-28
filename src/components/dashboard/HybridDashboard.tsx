@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useOrganization } from '@/contexts/OrganizationContext'
-import { useRouter } from 'next/navigation'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import {
@@ -28,79 +27,100 @@ import {
   Mail,
   Shield,
   Phone,
-  ChevronDown,
-  Check,
-  X,
   User,
-  FileDown
+  FileDown,
+  ChevronDown,
+  ChevronUp,
+  X,
+  Check
 } from 'lucide-react'
-import html2canvas from 'html2canvas'
-import jsPDF from 'jspdf'
 import { getIcon } from '@/lib/icons'
-import { OrganizationSelector } from '@/components/OrganizationSelector'
-import { MultiClientSelector, SelectedClientsTags } from '@/components/MultiClientSelector'
-import { ModernClientSelector } from '@/components/ModernClientSelector'
 
 // =====================================================
 // TIPOS E INTERFACES
 // =====================================================
 
-interface Stats {
-  totalTickets: number
-  openTickets: number
-  inProgressTickets: number
-  resolvedTickets: number
-  cancelledTickets: number
-  ticketsTrend: string
-}
-
-interface StatusInfo {
-  slug: string
-  name: string
-  color: string
-  count: number
-  order_index: number
-}
-
-interface CategoryStat {
-  id: string
-  nome: string
-  icon: string | null
-  color: string | null
-  quantidade: number
-  percentual: number
-  status_breakdown: Record<string, number>
-  status_breakdown_detailed: StatusInfo[]
-}
-
-interface DashboardData {
-  total_tickets: number
-  periodo: { data_inicio: string; data_fim: string }
-  categorias: CategoryStat[]
-  status_summary: {
-    open: number
-    in_progress: number
-    resolved: number
-    cancelled: number
+interface ClientData {
+  context: {
+    id: string
+    name: string
+    type: string
+    slug: string
   }
-  status_summary_detailed: StatusInfo[]
-  available_status: StatusInfo[]
-  average_resolution_time: string
+  summary: {
+    total_tickets: number
+    avg_resolution_time: string
+    period: {
+      start_date: string
+      end_date: string
+    }
+  }
+  status_stats: Array<{
+    id: string
+    name: string
+    slug: string
+    color: string
+    count: number
+    order_index: number
+  }>
+  category_stats: Array<{
+    id: string
+    name: string
+    slug: string
+    color: string
+    icon: string
+    is_global: boolean
+    context_id: string
+    total: number
+    percentage: number
+    status_breakdown: Record<string, number>
+    status_breakdown_detailed: Array<{
+      slug: string
+      name: string
+      color: string
+      count: number
+      order_index: number
+    }>
+  }>
+  tickets: Array<{
+    id: string
+    ticket_number: string
+    title: string
+    status: string
+    priority: string
+    created_at: string
+  }>
 }
 
-interface RecentTicket {
-  id: string
-  ticket_number: string
-  title: string
-  status: string
-  priority: string
-  requester: string
-  created_at: string
-}
-
-interface PeriodFilter {
-  start_date: string
-  end_date: string
+interface MultiClientAnalytics {
+  clients: ClientData[]
+  consolidated: {
+    total_tickets: number
+    period: {
+      start_date: string
+      end_date: string
+    }
+    status_stats: Array<{
+      id: string
+      name: string
+      slug: string
+      color: string
+      count: number
+      order_index: number
+    }>
+    category_stats: Array<{
+      id: string
+      name: string
+      slug: string
+      color: string
+      icon: string
+      is_global: boolean
+      context_id: string
+      total: number
+      percentage: number
+      status_breakdown: Record<string, number>
+    }>
+  }
 }
 
 // =====================================================
@@ -144,7 +164,7 @@ const StatCard = ({ title, value, icon: Icon, trend, color, statusColor }: any) 
   )
 }
 
-const CategoryCard = ({ category }: { category: CategoryStat }) => {
+const CategoryCard = ({ category }: { category: any }) => {
   const Icon = getIcon(category.icon)
   const backgroundColor = category.color ? `${category.color}20` : '#E5E7EB'
   const borderColor = category.color || '#6B7280'
@@ -157,23 +177,23 @@ const CategoryCard = ({ category }: { category: CategoryStat }) => {
       <div className="flex items-start justify-between mb-3 sm:mb-4">
         <div className="flex items-center flex-1 min-w-0">
           <div 
-            className="p-1.5 sm:p-2 rounded-xl mr-2 sm:mr-3 flex-shrink-0"
+            className="p-1.5 sm:p-2 rounded-lg mr-2 sm:mr-3 flex-shrink-0"
             style={{ backgroundColor, color: borderColor }}
           >
             <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
           <div className="min-w-0 flex-1">
             <h3 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white truncate">
-              {category.nome}
+              {category.name}
             </h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">
-              {category.percentual}% do total
+              {category.percentage}% do total
             </p>
           </div>
         </div>
         <div className="text-right ml-2 flex-shrink-0">
           <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-            {category.quantidade}
+            {category.total}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400">
             tickets
@@ -183,7 +203,7 @@ const CategoryCard = ({ category }: { category: CategoryStat }) => {
       
       <div className="mt-3 sm:mt-4">
         <div className="flex h-2 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700">
-          {category.status_breakdown_detailed.map((status, index) => {
+          {category.status_breakdown_detailed.map((status: any, index: number) => {
             if (status.count <= 0) return null
             
             return (
@@ -191,7 +211,7 @@ const CategoryCard = ({ category }: { category: CategoryStat }) => {
                 key={status.slug}
                 className="transition-all duration-300" 
                 style={{ 
-                  width: `${(status.count / category.quantidade) * 100}%`,
+                  width: `${(status.count / category.total) * 100}%`,
                   backgroundColor: status.color
                 }}
                 title={`${status.name}: ${status.count}`}
@@ -202,8 +222,8 @@ const CategoryCard = ({ category }: { category: CategoryStat }) => {
         
         <div className="mt-3 space-y-1">
           {category.status_breakdown_detailed
-            .filter(status => status.count > 0)
-            .map((status) => (
+            .filter((status: any) => status.count > 0)
+            .map((status: any) => (
               <div key={status.slug} className="flex items-center justify-between text-xs">
                 <div className="flex items-center">
                   <div 
@@ -226,49 +246,131 @@ const CategoryCard = ({ category }: { category: CategoryStat }) => {
   )
 }
 
-const StatusBadge = ({ status }: { status: string }) => {
-  const colors: Record<string, string> = {
-    open: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-    in_progress: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-    resolved: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-    closed: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
-    cancelled: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+const ClientCard = ({ client, isExpanded, onToggle }: { 
+  client: ClientData
+  isExpanded: boolean
+  onToggle: () => void
+}) => {
+  const getStatusIcon = (slug: string) => {
+    if (slug.includes('aberto') || slug.includes('open')) return AlertCircle
+    if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) return Clock
+    if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) return CheckCircle
+    if (slug.includes('cancelled') || slug.includes('cancelado')) return XCircle
+    return TicketIcon
   }
-  
-  const labels: Record<string, string> = {
-    open: 'Aberto',
-    in_progress: 'Em Progresso',
-    resolved: 'Resolvido',
-    closed: 'Fechado',
-    cancelled: 'Cancelado',
-  }
-  
-  return (
-    <span className={`px-3 py-1.5 text-xs font-medium rounded-xl ${colors[status] || colors.open}`}>
-      {labels[status] || status}
-    </span>
-  )
-}
 
-const PriorityBadge = ({ priority }: { priority: string }) => {
-  const colors: Record<string, string> = {
-    low: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
-    medium: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-    high: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
-    critical: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-  }
-  
-  const labels: Record<string, string> = {
-    low: 'Baixa',
-    medium: 'Média',
-    high: 'Alta',
-    critical: 'Crítica',
-  }
-  
   return (
-    <span className={`px-3 py-1.5 text-xs font-medium rounded-xl ${colors[priority] || colors.medium}`}>
-      {labels[priority] || priority}
-    </span>
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+      {/* Header do Cliente */}
+      <div 
+        className="p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        onClick={onToggle}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Building className="h-5 w-5 text-blue-600" />
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {client.context.name}
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {client.context.type === 'organization' ? 'Cliente' : 'Departamento'} • {client.summary.total_tickets} tickets
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              {formatDateShort(client.summary.period.start_date)} - {formatDateShort(client.summary.period.end_date)}
+            </span>
+            {isExpanded ? (
+              <ChevronUp className="h-5 w-5 text-gray-400" />
+            ) : (
+              <ChevronDown className="h-5 w-5 text-gray-400" />
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Cards de Status (sempre visíveis) */}
+      <div className="px-4 pb-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <StatCard
+            title="Total no Período"
+            value={client.summary.total_tickets}
+            icon={TicketIcon}
+            color="bg-blue-600"
+            statusColor="#2563eb"
+          />
+          {client.status_stats
+            .filter(status => status.count > 0)
+            .map((status) => {
+              const Icon = getStatusIcon(status.slug)
+              return (
+                <StatCard
+                  key={status.slug}
+                  title={status.name}
+                  value={status.count}
+                  icon={Icon}
+                  statusColor={status.color}
+                />
+              )
+            })}
+        </div>
+      </div>
+
+      {/* Conteúdo Expandível */}
+      {isExpanded && (
+        <div className="border-t border-gray-200 dark:border-gray-700 p-4 space-y-6">
+          {/* Cards de Categorias */}
+          {client.category_stats.length > 0 && (
+            <div>
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                <PieChartIcon className="h-4 w-4" />
+                Categorias
+              </h4>
+              <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                {client.category_stats.map((category) => (
+                  <CategoryCard key={category.id} category={category} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Tickets Recentes */}
+          {client.tickets.length > 0 && (
+            <div>
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+                Tickets Recentes
+              </h4>
+              <div className="space-y-2">
+                {client.tickets.slice(0, 5).map((ticket) => (
+                  <div key={ticket.id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        #{ticket.ticket_number} - {ticket.title}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {formatDateShort(ticket.created_at)}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 ml-2">
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        ticket.status === 'aberto' ? 'bg-blue-100 text-blue-800' :
+                        ticket.status === 'em-progresso' ? 'bg-yellow-100 text-yellow-800' :
+                        ticket.status === 'resolvido' ? 'bg-green-100 text-green-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {ticket.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -286,18 +388,21 @@ export default function HybridDashboard() {
     contextType,
     isLoading: contextLoading 
   } = useOrganization()
-  const router = useRouter()
   
   // Estados
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [showFilters, setShowFilters] = useState(false)
+  const [selectedClients, setSelectedClients] = useState<string[]>([])
+  const [expandedClients, setExpandedClients] = useState<Set<string>>(new Set())
+  const [analyticsData, setAnalyticsData] = useState<MultiClientAnalytics | null>(null)
+  const [showClientPopup, setShowClientPopup] = useState(false)
+  const popupRef = useRef<HTMLDivElement>(null)
   
   // Filtros de período
   const getCurrentMonthDates = () => {
-    const now = new Date()
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+    // Usar período mais amplo para pegar dados existentes
+    const firstDay = new Date(2024, 0, 1) // Janeiro 2024
+    const lastDay = new Date(2025, 11, 31) // Dezembro 2025
     
     return {
       start_date: firstDay.toISOString().split('T')[0],
@@ -305,28 +410,7 @@ export default function HybridDashboard() {
     }
   }
   
-  const [periodFilter, setPeriodFilter] = useState<PeriodFilter>(getCurrentMonthDates())
-  const [tempFilter, setTempFilter] = useState<PeriodFilter>(getCurrentMonthDates())
-  const [myTicketsOnly, setMyTicketsOnly] = useState(false)
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
-  const [showClientPopup, setShowClientPopup] = useState(false)
-  const popupRef = useRef<HTMLDivElement>(null)
-  
-  // Estados para seleção múltipla de clientes (gerenciados pelo pai)
-  const [selectedClients, setSelectedClients] = useState<string[]>([])
-  
-  // Dados do dashboard
-  const [stats, setStats] = useState<Stats>({
-    totalTickets: 0,
-    openTickets: 0,
-    inProgressTickets: 0,
-    resolvedTickets: 0,
-    cancelledTickets: 0,
-    ticketsTrend: '+0%'
-  })
-  
-  const [categoryStats, setCategoryStats] = useState<DashboardData | null>(null)
-  const [recentTickets, setRecentTickets] = useState<RecentTicket[]>([])
+  const [periodFilter, setPeriodFilter] = useState(getCurrentMonthDates())
 
   // Carregar seleções do localStorage na inicialização
   useEffect(() => {
@@ -354,10 +438,6 @@ export default function HybridDashboard() {
     }
   }, [selectedClients])
 
-  // =====================================================
-  // EFEITOS
-  // =====================================================
-
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -381,262 +461,84 @@ export default function HybridDashboard() {
 
   useEffect(() => {
     if (mounted && !contextLoading) {
-      fetchDashboardData()
-      fetchCategoryStats()
-    }
-  }, [mounted, contextLoading, periodFilter, myTicketsOnly, selectedClients])
-
-  // =====================================================
-  // FUNÇÕES DE FETCH DE DADOS
-  // =====================================================
-
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true)
-      console.log('🔄 fetchDashboardData chamado com selectedClients:', selectedClients)
-      
-      // Log do tipo de usuário para debug
-      console.log('🔄 Tipo de usuário:', isMatrixUser ? 'matrix' : 'context')
-      
-      // Escolher API baseada na seleção de clientes
-      let apiUrl = '/api/dashboard/stats'
-      const params = new URLSearchParams({
-        start_date: periodFilter.start_date,
-        end_date: periodFilter.end_date
-      })
-      
-      // Se tem clientes selecionados, usar API multi-client
+      // Se não tem clientes selecionados, carregar todos os contextos disponíveis
       if (selectedClients.length > 0) {
-        apiUrl = '/api/dashboard/multi-client-stats'
-        params.append('context_ids', selectedClients.join(','))
-        console.log('✅ Usando API multi-client para contextos:', selectedClients)
-        console.log('✅ Parâmetros enviados:', params.toString())
+        fetchMultiClientData()
+      } else if (availableContexts.length > 0) {
+        // Se não tem seleção, carregar todos os contextos disponíveis
+        console.log('🔄 Carregando todos os contextos disponíveis:', availableContexts.map(c => c.id))
+        setSelectedClients(availableContexts.map(c => c.id))
       } else {
-        // Se não tem seleção de clientes, usar API padrão com currentContext
-        apiUrl = '/api/dashboard/stats'
-        if (currentContext?.id) {
-          params.append('context_id', currentContext.id)
-          console.log('✅ Usando API padrão com currentContext:', currentContext.id)
-        } else {
-          console.log('⚠️ Nenhum contexto disponível - carregando dados globais')
-        }
+        // Se não tem contextos, parar loading e mostrar estado vazio
+        console.log('⚠️ Nenhum contexto disponível - parando loading')
+        setLoading(false)
       }
-      
-      // Adicionar filtro de usuário se ativo
-      if (myTicketsOnly && session?.user?.id) {
-        params.append('user_id', session.user.id)
-      }
-      
-      const response = await axios.get(`${apiUrl}?${params}`)
-      
-      if (response.data) {
-        let statsData = response.data.stats || {
-          totalTickets: response.data.total_tickets || 0,
-          openTickets: response.data.open_tickets || 0,
-          inProgressTickets: response.data.in_progress_tickets || 0,
-          resolvedTickets: response.data.resolved_tickets || 0,
-          cancelledTickets: response.data.cancelled_tickets || 0,
-          ticketsTrend: response.data.tickets_trend || '+0%'
-        }
-        
-        let recentTicketsData = response.data.recentTickets || response.data.recent_tickets || []
-        
-        // A API já retorna dados filtrados quando context_id é enviado
-        console.log('✅ Usando dados filtrados da API:', {
-          totalTickets: statsData.totalTickets,
-          recentTickets: recentTicketsData.length,
-          apiUrl: apiUrl
-        })
-        console.log('🎯 Tickets recentes recebidos:', recentTicketsData)
-        
-        setStats(statsData)
-        setRecentTickets(recentTicketsData)
-      }
-    } catch (error: any) {
-      console.error('Error fetching dashboard data:', error)
-      toast.error('Erro ao carregar dados do dashboard')
-      
-      if (error.response?.status === 401) {
-        router.push('/login')
-      }
-    } finally {
-      setLoading(false)
     }
-  }
+  }, [mounted, contextLoading, selectedClients, periodFilter, availableContexts])
 
-  const fetchCategoryStats = async () => {
-    try {
-      console.log('🔄 fetchCategoryStats chamado com selectedClients:', selectedClients)
-      
-      // Log do tipo de usuário para debug
-      console.log('🔄 fetchCategoryStats - Tipo de usuário:', isMatrixUser ? 'matrix' : 'context')
-      
-      const params = new URLSearchParams({
-        start_date: periodFilter.start_date,
-        end_date: periodFilter.end_date
-      })
-      
-      // Adicionar contexto selecionado se disponível
-      if (selectedClients.length > 0) {
-        if (selectedClients.length === 1) {
-          // Cliente único - usar context_id
-          params.append('context_id', selectedClients[0])
-          console.log('✅ Adicionando context_id único para categories:', selectedClients[0])
-        } else {
-          // Múltiplos clientes - usar context_ids
-          params.append('context_ids', selectedClients.join(','))
-          console.log('✅ Adicionando context_ids para categories:', selectedClients)
-        }
-      } else {
-        // Se não tem seleção de clientes, usar currentContext
-        if (currentContext?.id) {
-          params.append('context_id', currentContext.id)
-          console.log('✅ Usando currentContext para categories:', currentContext.id)
-        } else {
-          console.log('⚠️ Nenhum contexto disponível - carregando categorias globais')
-        }
-      }
-      
-      // Adicionar filtro de usuário se ativo
-      if (myTicketsOnly && session?.user?.id) {
-        params.append('user_id', session.user.id)
-      }
-      
-      const response = await axios.get(`/api/dashboard/categories-stats?${params}`)
-      
-      console.log('🔄 Resposta da API categories-stats:', response.status, response.data)
-      
-      if (response.data) {
-        console.log('✅ Dados de categorias carregados:', {
-          total_tickets: response.data.total_tickets,
-          status_summary_detailed: response.data.status_summary_detailed?.length || 0,
-          categorias: response.data.categorias?.length || 0
-        })
-        
-        if (response.data.status_summary_detailed) {
-          console.log('📊 Status summary detailed:', response.data.status_summary_detailed.map(s => `${s.name}: ${s.count}`))
-        }
-        
-        setCategoryStats(response.data)
-      }
-    } catch (error: any) {
-      console.error('Error fetching category stats:', error)
-      toast.error('Erro ao carregar estatísticas por categoria')
-    }
-  }
-
-  const fetchMultiClientData = async (selectedIds: string[]) => {
+  const fetchMultiClientData = async () => {
     try {
       setLoading(true)
       
-      // Usar API multi-client para múltiplas seleções
-      const apiUrl = '/api/dashboard/multi-client-stats'
       const params = new URLSearchParams({
         start_date: periodFilter.start_date,
         end_date: periodFilter.end_date,
-        context_ids: selectedIds.join(',')
+        context_ids: selectedClients.join(',')
       })
       
-      // Adicionar filtro de usuário se ativo
-      if (myTicketsOnly && session?.user?.id) {
-        params.append('user_id', session.user.id)
-      }
+      console.log('🔄 Buscando dados multi-client com context_ids:', selectedClients)
+      console.log('🔄 URL da API:', `/api/dashboard/multi-client-analytics?${params}`)
       
-      const response = await axios.get(`${apiUrl}?${params}`)
+      const response = await axios.get(`/api/dashboard/multi-client-analytics?${params}`)
+      
+      console.log('🔄 Resposta da API:', response.status, response.data)
       
       if (response.data) {
-        setStats(response.data.stats || {
-          totalTickets: response.data.total_tickets || 0,
-          openTickets: response.data.open_tickets || 0,
-          inProgressTickets: response.data.in_progress_tickets || 0,
-          resolvedTickets: response.data.resolved_tickets || 0,
-          cancelledTickets: response.data.cancelled_tickets || 0,
-          ticketsTrend: response.data.tickets_trend || '+0%'
-        })
-        setRecentTickets(response.data.recentTickets || response.data.recent_tickets || [])
+        setAnalyticsData(response.data)
+        console.log('✅ Dados multi-client carregados:', response.data)
       }
     } catch (error: any) {
       console.error('Erro ao buscar dados multi-client:', error)
-      toast.error('Erro ao carregar dados dos clientes selecionados')
+      console.error('Status do erro:', error.response?.status)
+      console.error('Dados do erro:', error.response?.data)
+      
+      // Se erro de autenticação, mostrar estado vazio
+      if (error.response?.status === 401) {
+        console.log('⚠️ Usuário não autenticado - mostrando estado vazio')
+        setAnalyticsData(null)
+      } else {
+        toast.error('Erro ao carregar dados dos clientes selecionados')
+      }
     } finally {
       setLoading(false)
     }
   }
 
-  // =====================================================
-  // FUNÇÕES DE HANDLERS
-  // =====================================================
-
-  const handleApplyFilter = () => {
-    setPeriodFilter(tempFilter)
-    setShowFilters(false)
-  }
-
-  const handleResetFilter = () => {
-    const defaultDates = getCurrentMonthDates()
-    setTempFilter(defaultDates)
-    setPeriodFilter(defaultDates)
-    setShowFilters(false)
-  }
-
-  const handleTicketClick = (ticketId: string) => {
-    router.push(`/dashboard/tickets/${ticketId}`)
-  }
-
-  const toggleMyTickets = () => {
-    setMyTicketsOnly(!myTicketsOnly)
-  }
-
-  // =====================================================
-  // FUNÇÕES PARA SELEÇÃO MÚLTIPLA DE CLIENTES
-  // =====================================================
-
   const handleClientSelectionChange = (selectedIds: string[]) => {
-    try {
-      console.log('🔄 Mudança de seleção de clientes:', selectedIds)
-      console.log('🔄 selectedClients antes:', selectedClients)
-      setSelectedClients(selectedIds)
-      console.log('🔄 selectedClients depois:', selectedIds)
-      // O useEffect vai automaticamente recarregar os dados
-    } catch (error) {
-      console.error('Erro ao processar mudança de seleção:', error)
+    console.log('🔄 Mudança de seleção de clientes:', selectedIds)
+    setSelectedClients(selectedIds)
+    setExpandedClients(new Set()) // Reset expanded clients
+  }
+
+  const toggleClientExpansion = (clientId: string) => {
+    const newExpanded = new Set(expandedClients)
+    if (newExpanded.has(clientId)) {
+      newExpanded.delete(clientId)
+    } else {
+      newExpanded.add(clientId)
     }
+    setExpandedClients(newExpanded)
   }
 
-  const handleRemoveClient = (clientId: string) => {
-    // Esta função será chamada pelo MultiClientSelector
-    // Não precisamos fazer nada aqui pois o MultiClientSelector gerencia seu próprio estado
-    console.log('🔄 Removendo cliente:', clientId)
+  if (!mounted) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      </div>
+    )
   }
 
-  const handleClearAllClients = () => {
-    // Esta função será chamada pelo MultiClientSelector
-    // Não precisamos fazer nada aqui pois o MultiClientSelector gerencia seu próprio estado
-    console.log('🔄 Limpando todos os clientes')
-  }
-
-
-  // =====================================================
-  // FUNÇÃO DE EXPORT PDF (SIMPLIFICADA)
-  // =====================================================
-
-  const handleExportPDF = async () => {
-    try {
-      setIsGeneratingPDF(true)
-      toast.success('Funcionalidade de PDF será implementada em breve!')
-    } catch (error) {
-      console.error('Error generating PDF:', error)
-      toast.error('Erro ao gerar PDF')
-    } finally {
-      setIsGeneratingPDF(false)
-    }
-  }
-
-  // =====================================================
-  // RENDERIZAÇÃO CONDICIONAL
-  // =====================================================
-
-  if (!mounted || contextLoading) {
+  if (contextLoading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
         <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
@@ -652,92 +554,39 @@ export default function HybridDashboard() {
     )
   }
 
-  // =====================================================
-  // RENDERIZAÇÃO PRINCIPAL
-  // =====================================================
-
   return (
-    <div id="dashboard-content" className="space-y-4 sm:space-y-6">
-      {/* Header com Contexto */}
+    <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-col gap-4">
-        {/* Primeira linha: Título e Seletor */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-              Dashboard {myTicketsOnly && '- Meus Tickets'}
+              Dashboard
             </h1>
             <p className="mt-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-              Bem-vindo de volta, {session?.user?.name}!
-              {myTicketsOnly 
-                ? ' Visualizando apenas seus tickets.'
-                : ' Aqui está um resumo do sistema.'
-              }
+              Bem-vindo de volta, {session?.user?.name}! Aqui está um resumo do sistema.
             </p>
           </div>
           
           {/* Layout em Popup - Seletor Múltiplo de Clientes (apenas para matriz) */}
           {isMatrixUser && (
             <div className="relative">
-              {/* Botões principais */}
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setShowClientPopup(!showClientPopup)}
-                  className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
-                >
-                  <Building className="w-4 h-4" />
-                  <span className="text-xs font-medium">
-                    {selectedClients.length === 0 
-                      ? 'Selecionar Clientes' 
-                      : selectedClients.length === 1 
-                        ? availableContexts.find(c => c.id === selectedClients[0])?.name || 'Cliente'
-                        : `${selectedClients.length} clientes`
-                    }
-                  </span>
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-                
-                <button
-                  onClick={toggleMyTickets}
-                  className={`px-3 py-2 border rounded-xl transition-colors flex items-center gap-2 ${
-                    myTicketsOnly 
-                      ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
-                      : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <User className="w-4 h-4" />
-                  <span className="text-xs font-medium">Meus Tickets</span>
-                </button>
-                
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
-                >
-                  <Calendar className="w-4 h-4" />
-                  <span className="text-xs font-medium truncate">
-                    {periodFilter.start_date === getCurrentMonthDates().start_date && 
-                     periodFilter.end_date === getCurrentMonthDates().end_date
-                      ? 'Mês Atual'
-                      : `${formatDateShort(periodFilter.start_date)} - ${formatDateShort(periodFilter.end_date)}`
-                    }
-                  </span>
-                  <Filter className="w-4 h-4" />
-                </button>
-                
-                <button
-                  onClick={handleExportPDF}
-                  disabled={isGeneratingPDF}
-                  className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                >
-                  {isGeneratingPDF ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <FileDown className="w-4 h-4" />
-                  )}
-                  <span className="text-xs font-medium">
-                    {isGeneratingPDF ? 'Gerando...' : 'Exportar PDF'}
-                  </span>
-                </button>
-              </div>
+              {/* Botão principal */}
+              <button
+                onClick={() => setShowClientPopup(!showClientPopup)}
+                className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+              >
+                <Building className="w-4 h-4" />
+                <span className="text-xs font-medium">
+                  {selectedClients.length === 0 
+                    ? 'Selecionar Clientes' 
+                    : selectedClients.length === 1 
+                      ? availableContexts.find(c => c.id === selectedClients[0])?.name || 'Cliente'
+                      : `${selectedClients.length} clientes`
+                  }
+                </span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
               
               {/* Popup de seleção de clientes */}
               {showClientPopup && (
@@ -757,7 +606,6 @@ export default function HybridDashboard() {
                       <X className="w-4 h-4" />
                     </button>
                   </div>
-                  
                   
                   <div className="space-y-2 mb-4">
                     {availableContexts.map((context) => (
@@ -828,252 +676,117 @@ export default function HybridDashboard() {
             </div>
           )}
         </div>
-        
-        {/* Segunda linha: Informações do contexto */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        </div>
       </div>
 
-      {/* Filtros de Período */}
-      {showFilters && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-            Filtrar por Período
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Data Início
-              </label>
-              <input
-                type="date"
-                value={tempFilter.start_date}
-                onChange={(e) => setTempFilter({ ...tempFilter, start_date: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Data Fim
-              </label>
-              <input
-                type="date"
-                value={tempFilter.end_date}
-                onChange={(e) => setTempFilter({ ...tempFilter, end_date: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-2 mt-4">
-            <button
-              onClick={handleApplyFilter}
-              className="flex-1 sm:flex-initial px-4 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium"
-            >
-              Aplicar Filtro
-            </button>
-            <button
-              onClick={handleResetFilter}
-              className="flex-1 sm:flex-initial px-4 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 active:bg-gray-400 dark:active:bg-gray-800 transition-colors text-sm font-medium"
-            >
-              Limpar Filtro
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Informações do Período */}
-      {categoryStats && (
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3">
-          <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-300">
-            <span className="font-medium block sm:inline">Período analisado:</span>
-            <span className="block sm:inline sm:ml-1">
-              {formatDateShort(categoryStats.periodo.data_inicio)} até {formatDateShort(categoryStats.periodo.data_fim)}
-            </span>
-            <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
-              • <strong>{categoryStats.total_tickets}</strong> {myTicketsOnly ? 'seus tickets' : 'tickets'} no período
-            </span>
-            {myTicketsOnly && (
-              <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
-                • <span className="font-medium">Filtrado por: Meus Tickets</span>
-              </span>
-            )}
-          </p>
-        </div>
-      )}
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+        <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-300">
+          <span className="font-medium block sm:inline">Período analisado:</span>
+          <span className="block sm:inline sm:ml-1">
+            {formatDateShort(periodFilter.start_date)} até {formatDateShort(periodFilter.end_date)}
+          </span>
+          <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
+            • <strong>{analyticsData?.consolidated.total_tickets || 0}</strong> tickets no período
+          </span>
+          <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
+            • <strong>{selectedClients.length}</strong> clientes selecionados
+          </span>
+        </p>
+      </div>
 
-      {/* Cards de Status */}
-      {categoryStats && categoryStats.status_summary_detailed && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-4">
-          <StatCard
-            title="Total no Período"
-            value={categoryStats.total_tickets}
-            icon={TicketIcon}
-            color="bg-blue-600"
-            statusColor="#2563eb"
-          />
-          {categoryStats.status_summary_detailed
-            .filter(status => status.count > 0)
-            .map((status) => {
-              const getStatusIcon = (slug: string) => {
-                if (slug.includes('aberto') || slug.includes('open')) return AlertCircle
-                if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) return Clock
-                if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) return CheckCircle
-                if (slug.includes('cancelled') || slug.includes('cancelado')) return XCircle
-                return TicketIcon
-              }
-              
-              const Icon = getStatusIcon(status.slug)
-              
-              return (
-                <StatCard
-                  key={status.slug}
-                  title={status.name}
-                  value={status.count}
-                  icon={Icon}
-                  statusColor={status.color}
-                />
-              )
-            })}
-        </div>
-      )}
-
-      {/* Cards de Categorias */}
-      {categoryStats && categoryStats.categorias.length > 0 && (
+      {/* Resumo Consolidado */}
+      {analyticsData && analyticsData.consolidated.status_stats.length > 0 && (
         <div>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <PieChartIcon className="h-5 w-5" />
-            Tickets por Categoria
+            <BarChart className="h-5 w-5" />
+            Resumo Consolidado
           </h2>
-          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {categoryStats.categorias.map((category) => (
-              <CategoryCard key={category.id} category={category} />
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-4">
+            <StatCard
+              title="Total no Período"
+              value={analyticsData.consolidated.total_tickets}
+              icon={TicketIcon}
+              color="bg-blue-600"
+              statusColor="#2563eb"
+            />
+            {analyticsData.consolidated.status_stats
+              .filter(status => status.count > 0)
+              .map((status) => {
+                const getStatusIcon = (slug: string) => {
+                  if (slug.includes('aberto') || slug.includes('open')) return AlertCircle
+                  if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) return Clock
+                  if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) return CheckCircle
+                  if (slug.includes('cancelled') || slug.includes('cancelado')) return XCircle
+                  return TicketIcon
+                }
+                
+                const Icon = getStatusIcon(status.slug)
+                
+                return (
+                  <StatCard
+                    key={status.slug}
+                    title={status.name}
+                    value={status.count}
+                    icon={Icon}
+                    statusColor={status.color}
+                  />
+                )
+              })}
+          </div>
+        </div>
+      )}
+
+      {/* Cards por Cliente */}
+      {analyticsData && analyticsData.clients.length > 0 && (
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <Building className="h-5 w-5" />
+            Dados por Cliente
+          </h2>
+          <div className="space-y-4">
+            {analyticsData.clients.map((client) => (
+              <ClientCard
+                key={client.context.id}
+                client={client}
+                isExpanded={expandedClients.has(client.context.id)}
+                onToggle={() => toggleClientExpansion(client.context.id)}
+              />
             ))}
           </div>
         </div>
       )}
 
-      {/* Tickets Recentes */}
-      <div id="recent-tickets-section" className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-            {myTicketsOnly ? 'Meus Chamados Recentes' : 'Chamados Recentes'}
-          </h2>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Últimos {myTicketsOnly ? 'seus' : ''} tickets criados {myTicketsOnly ? '' : '(não afetado pelo filtro de período)'}
+      {/* Estado Vazio */}
+      {selectedClients.length === 0 && (
+        <div className="text-center py-12">
+          <Building className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            Nenhum cliente selecionado
+          </h3>
+          <p className="text-gray-500 dark:text-gray-400 mb-4">
+            Selecione um ou mais clientes para visualizar os dados
           </p>
-        </div>
-        
-        {recentTickets.length > 0 ? (
-          <>
-            {/* Tabela Desktop */}
-            <div className="hidden sm:block overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 dark:bg-gray-900">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Número
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Título
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Prioridade
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Solicitante
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Data
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {recentTickets.map((ticket) => (
-                    <tr 
-                      key={ticket.id} 
-                      className="hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer"
-                      onClick={() => handleTicketClick(ticket.id)}
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                        #{ticket.ticket_number}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">
-                        <div className="truncate max-w-xs" title={ticket.title}>
-                          {ticket.title}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <StatusBadge status={ticket.status} />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <PriorityBadge priority={ticket.priority} />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                        {ticket.created_by_user?.email || ticket.created_by || 'N/A'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                        {formatDateShort(ticket.created_at)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Cards Mobile */}
-            <div className="sm:hidden divide-y divide-gray-200 dark:divide-gray-700">
-              {recentTickets.map((ticket) => (
-                <div
-                  key={ticket.id}
-                  className="p-4 hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer"
-                  onClick={() => handleTicketClick(ticket.id)}
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      #{ticket.ticket_number}
-                    </span>
-                    <StatusBadge status={ticket.status} />
-                  </div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
-                    {ticket.title.toUpperCase()}
-                  </h3>
-                  <div className="flex justify-between items-center">
-                    <PriorityBadge priority={ticket.priority} />
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {formatDateShort(ticket.created_at)}
-                    </span>
-                  </div>
-                  <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-                    Solicitante: {ticket.created_by_user?.email || ticket.created_by || 'N/A'}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
-        ) : (
-          <div className="text-center py-8">
-            <p className="text-gray-500 dark:text-gray-400">
-              {selectedClients.length === 0 
-                ? 'Selecione um cliente para ver os chamados recentes'
-                : 'Nenhum chamado encontrado'
-              }
+          {!isMatrixUser && (
+            <p className="text-sm text-gray-400">
+              Apenas usuários matriz podem selecionar múltiplos clientes
             </p>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
-      {/* Botão Ver Todos */}
-      {recentTickets.length > 0 && (
-        <div className="flex justify-center">
-          <button
-            onClick={() => router.push('/dashboard/tickets')}
-            className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-          >
-            Ver todos os chamados →
-          </button>
+      {/* Estado sem dados */}
+      {selectedClients.length > 0 && (!analyticsData || analyticsData.clients.length === 0) && (
+        <div className="text-center py-12">
+          <BarChart className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            Nenhum dado encontrado
+          </h3>
+          <p className="text-gray-500 dark:text-gray-400 mb-4">
+            Não foram encontrados tickets para os clientes selecionados no período
+          </p>
+          <p className="text-sm text-gray-400">
+            Verifique se há tickets criados para estes clientes ou tente um período diferente
+          </p>
         </div>
       )}
     </div>
