@@ -292,7 +292,7 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
       </div>
 
       {/* Cards de Status (sempre visíveis) */}
-      <div className="px-4 pb-6">
+      <div className="px-4 pb-6 pt-2">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           <StatCard
             title="Total no Período"
@@ -922,7 +922,7 @@ export default function HybridDashboard() {
       {/* Cards por Cliente */}
       {analyticsData && analyticsData.clients.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
             <Building className="h-5 w-5" />
             Dados por Cliente
           </h2>
