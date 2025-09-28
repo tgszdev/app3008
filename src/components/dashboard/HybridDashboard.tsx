@@ -280,45 +280,71 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
   const trend = calculateDistributionPercentage()
   
   return (
-    <div className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 rounded-2xl p-6 border border-indigo-500/30 hover:border-indigo-400 transition-all duration-500 w-full">
+    <div className="bg-white dark:bg-slate-800/90 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-500 w-full shadow-lg dark:shadow-2xl">
       {/* Header Neural Network Style */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center">
+          <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
             <Activity className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white">{client.context.name}</h3>
-            <p className="text-gray-300 text-sm">{client.context.type === 'organization' ? 'Cliente' : 'Departamento'} • {client.summary.total_tickets} tickets</p>
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white">{client.context.name}</h3>
+            <p className="text-slate-600 dark:text-slate-300 text-sm">{client.context.type === 'organization' ? 'Cliente' : 'Departamento'} • {client.summary.total_tickets} tickets</p>
           </div>
         </div>
         <div className="text-right">
-          <span className="text-indigo-400 font-bold text-xl">{trend}</span>
+          <span className="text-blue-600 dark:text-blue-400 font-bold text-xl">{trend}</span>
         </div>
       </div>
       
       {/* Status em Lista Neural Network Style */}
       <div className="space-y-3 mb-6">
         {/* Total sempre primeiro */}
-        <div className="bg-indigo-800/30 rounded-xl p-4 border border-indigo-500/20">
+        <div className="bg-blue-50 dark:bg-blue-900/30 rounded-xl p-4 border border-blue-200 dark:border-blue-700">
           <div className="flex justify-between items-center">
-            <span className="text-gray-300">Total no Período</span>
-            <span className="text-indigo-400 font-bold text-xl">{client.summary.total_tickets}</span>
+            <span className="text-slate-700 dark:text-slate-200 font-medium">Total no Período</span>
+            <span className="text-blue-600 dark:text-blue-400 font-bold text-xl">{client.summary.total_tickets}</span>
           </div>
         </div>
         
         {/* Status dinâmicos em lista vertical */}
         {client.status_stats.map((status, index) => {
-          // Usar cores dinâmicas da tabela ticket_statuses
+          // Sistema de cores melhorado com acessibilidade
           const statusColor = status.color || '#6B7280'
-          const textColor = `text-[${statusColor}]`
-          const bgColor = `bg-[${statusColor}]/20`
-          const borderColor = `border-[${statusColor}]/30`
+          
+          // Função para determinar se a cor é clara ou escura
+          const isLightColor = (color: string) => {
+            const hex = color.replace('#', '')
+            const r = parseInt(hex.substr(0, 2), 16)
+            const g = parseInt(hex.substr(2, 2), 16)
+            const b = parseInt(hex.substr(4, 2), 16)
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000
+            return brightness > 128
+          }
+          
+          // Cores adaptativas para dark/light mode
+          const getAdaptiveColors = (color: string) => {
+            const isLight = isLightColor(color)
+            return {
+              bg: isLight 
+                ? `bg-[${color}]/10 dark:bg-[${color}]/20` 
+                : `bg-[${color}]/20 dark:bg-[${color}]/30`,
+              border: isLight 
+                ? `border-[${color}]/20 dark:border-[${color}]/30` 
+                : `border-[${color}]/30 dark:border-[${color}]/40`,
+              text: isLight 
+                ? `text-slate-700 dark:text-slate-200` 
+                : `text-slate-600 dark:text-slate-300`,
+              number: color
+            }
+          }
+          
+          const colors = getAdaptiveColors(statusColor)
           
           return (
-            <div key={status.id} className={`${bgColor} ${borderColor} rounded-xl p-4 border`}>
+            <div key={status.id} className={`${colors.bg} ${colors.border} rounded-xl p-4 border transition-all duration-200 hover:shadow-sm`}>
               <div className="flex justify-between items-center">
-                <span className="text-gray-300 truncate" title={status.name}>
+                <span className={`${colors.text} truncate font-medium`} title={status.name}>
                   {status.name}
                 </span>
                 <span 
@@ -337,7 +363,7 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
       <div className="flex justify-center">
         <button
           onClick={onToggle}
-          className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-all duration-300 text-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+          className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl transition-all duration-300 text-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800"
         >
           {isExpanded ? 'Ver menos' : 'Ver mais'}
         </button>
@@ -380,11 +406,7 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                     </div>
                     <div className="flex items-center gap-2 ml-2">
                       <span 
-                        className="px-2 py-1 text-xs font-medium rounded-full"
-                        style={{
-                          backgroundColor: `${ticket.status_color || '#6B7280'}20`,
-                          color: ticket.status_color || '#6B7280'
-                        }}
+                        className="px-2 py-1 text-xs font-medium rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
                       >
                         {ticket.status}
                       </span>
