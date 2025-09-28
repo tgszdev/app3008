@@ -271,8 +271,8 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
     
     if (totalAllTickets === 0) return '0%'
     
-    // Calcular percentual de distribuição
-    const percentage = Math.round((clientTickets / totalAllTickets) * 100)
+    // Calcular percentual de distribuição com 1 casa decimal
+    const percentage = ((clientTickets / totalAllTickets) * 100).toFixed(1)
     
     return `${percentage}%`
   }
