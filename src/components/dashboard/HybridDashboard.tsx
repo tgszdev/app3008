@@ -246,10 +246,11 @@ const CategoryCard = ({ category }: { category: any }) => {
   )
 }
 
-const ClientCard = ({ client, isExpanded, onToggle }: { 
+const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: { 
   client: ClientData
   isExpanded: boolean
   onToggle: () => void
+  analyticsData: MultiClientAnalytics | null
 }) => {
   const getStatusIcon = (slug: string) => {
     // Usar ícones dinâmicos baseados no slug ou padrão
@@ -960,6 +961,7 @@ export default function HybridDashboard() {
                   client={client}
                   isExpanded={expandedClients.has(client.context.id)}
                   onToggle={() => toggleClientExpansion(client.context.id)}
+                  analyticsData={analyticsData}
                 />
               </div>
             ))}
