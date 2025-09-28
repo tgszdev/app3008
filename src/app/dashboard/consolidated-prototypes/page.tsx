@@ -66,6 +66,40 @@ import {
   Prototype29,
   Prototype30
 } from '@/components/prototypes/FinalPrototypes'
+import { 
+  Prototype31, 
+  Prototype32, 
+  Prototype33, 
+  Prototype34, 
+  Prototype35,
+  Prototype36,
+  Prototype37,
+  Prototype38,
+  Prototype39,
+  Prototype40
+} from '@/components/prototypes/TextBasedPrototypes'
+import { 
+  Prototype41, 
+  Prototype42, 
+  Prototype43, 
+  Prototype44, 
+  Prototype45,
+  Prototype46,
+  Prototype47,
+  Prototype48,
+  Prototype49,
+  Prototype50,
+  Prototype51,
+  Prototype52,
+  Prototype53,
+  Prototype54,
+  Prototype55,
+  Prototype56,
+  Prototype57,
+  Prototype58,
+  Prototype59,
+  Prototype60
+} from '@/components/prototypes/AdditionalTextPrototypes'
 
 // Dados mockados para os protótipos
 const mockData = {
@@ -297,7 +331,37 @@ export default function ConsolidatedPrototypes() {
     { id: 27, name: 'Cards com Sombra Dinâmica', component: Prototype27 },
     { id: 28, name: 'Cards com Gradiente Animado', component: Prototype28 },
     { id: 29, name: 'Cards com Borda Animada', component: Prototype29 },
-    { id: 30, name: 'Cards com Partículas Flutuantes', component: Prototype30 }
+    { id: 30, name: 'Cards com Partículas Flutuantes', component: Prototype30 },
+    { id: 31, name: 'Texto - Layout Duas Colunas', component: Prototype31 },
+    { id: 32, name: 'Texto - Com Progresso', component: Prototype32 },
+    { id: 33, name: 'Texto - Layout Lista', component: Prototype33 },
+    { id: 34, name: 'Texto - Layout Centralizado', component: Prototype34 },
+    { id: 35, name: 'Texto - Layout Tabela', component: Prototype35 },
+    { id: 36, name: 'Texto - Layout Dashboard', component: Prototype36 },
+    { id: 37, name: 'Texto - Layout Minimalista', component: Prototype37 },
+    { id: 38, name: 'Texto - Com Destaque', component: Prototype38 },
+    { id: 39, name: 'Texto - Com Informações Extras', component: Prototype39 },
+    { id: 40, name: 'Texto - Com Estatísticas', component: Prototype40 },
+    { id: 41, name: 'Texto - Com Badge', component: Prototype41 },
+    { id: 42, name: 'Texto - Com Linha Divisória', component: Prototype42 },
+    { id: 43, name: 'Texto - Com Fundo Colorido', component: Prototype43 },
+    { id: 44, name: 'Texto - Com Sombra Colorida', component: Prototype44 },
+    { id: 45, name: 'Texto - Com Borda Colorida', component: Prototype45 },
+    { id: 46, name: 'Texto - Com Gradiente de Texto', component: Prototype46 },
+    { id: 47, name: 'Texto - Com Hover Effect', component: Prototype47 },
+    { id: 48, name: 'Texto - Com Animação', component: Prototype48 },
+    { id: 49, name: 'Texto - Com Glassmorphism', component: Prototype49 },
+    { id: 50, name: 'Texto - Com Neumorphism', component: Prototype50 },
+    { id: 51, name: 'Texto - Com Borda Animada', component: Prototype51 },
+    { id: 52, name: 'Texto - Com Partículas', component: Prototype52 },
+    { id: 53, name: 'Texto - Com Efeito de Brilho', component: Prototype53 },
+    { id: 54, name: 'Texto - Com Efeito de Ondas', component: Prototype54 },
+    { id: 55, name: 'Texto - Com Efeito de Escala', component: Prototype55 },
+    { id: 56, name: 'Texto - Com Efeito de Rotação', component: Prototype56 },
+    { id: 57, name: 'Texto - Com Efeito de Desfoque', component: Prototype57 },
+    { id: 58, name: 'Texto - Com Sombra Dinâmica', component: Prototype58 },
+    { id: 59, name: 'Texto - Com Gradiente Animado', component: Prototype59 },
+    { id: 60, name: 'Texto - Com Partículas Flutuantes', component: Prototype60 }
   ]
   
   const SelectedComponent = prototypes.find(p => p.id === selectedPrototype)?.component || Prototype1
@@ -310,7 +374,10 @@ export default function ConsolidatedPrototypes() {
             Protótipos - Resumo Consolidado
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            30 sugestões completas com Dark Mode, Light Mode, Color Theory, Color Psychology, Acessibilidade WCAG e UX
+            60 sugestões completas com Dark Mode, Light Mode, Color Theory, Color Psychology, Acessibilidade WCAG e UX
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
+            Protótipos 31-60: Baseados nos protótipos 17 e 23, sem ícones e com texto completo
           </p>
         </div>
         
