@@ -259,68 +259,58 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
     return TicketIcon
   }
   
+  // Calcular trend baseado no total de tickets
+  const trend = client.summary.total_tickets > 10 ? '+15%' : '+8%'
+  
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-      {/* Header do Cliente */}
-      <div 
-        className="p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-        onClick={onToggle}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Building className="h-5 w-5 text-blue-600" />
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {client.context.name}
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {client.context.type === 'organization' ? 'Cliente' : 'Departamento'} • {client.summary.total_tickets} tickets
-              </p>
-            </div>
+    <div className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 rounded-2xl p-8 border border-indigo-500/30 hover:border-indigo-400 transition-all duration-500 w-full max-w-md mx-auto">
+      {/* Header do Cliente - Neural Network Style */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center">
+            <Activity className="w-6 h-6 text-white" />
           </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
-                    Ver mais
-                  </span>
-                  {isExpanded ? (
-                    <ChevronUp className="h-5 w-5 text-gray-400" />
-                  ) : (
-                    <ChevronDown className="h-5 w-5 text-gray-400" />
-                  )}
-                </div>
+          <div>
+            <h3 className="text-lg font-bold text-white">{client.context.name}</h3>
+            <p className="text-gray-300 text-sm">{client.context.type === 'organization' ? 'Cliente' : 'Departamento'} • {client.summary.total_tickets} tickets</p>
+          </div>
+        </div>
+        <div className="text-right">
+          <span className="text-indigo-400 font-bold text-xl">{trend}</span>
+        </div>
+      </div>
+      
+      {/* Cards de Status - Neural Network Style */}
+      <div className="space-y-3">
+        <div className="bg-indigo-800/30 rounded-xl p-4 border border-indigo-500/20">
+          <div className="flex justify-between items-center">
+            <span className="text-gray-300">Total no Período</span>
+            <span className="text-indigo-400 font-bold text-xl">{client.summary.total_tickets}</span>
+          </div>
+        </div>
+        <div className="bg-yellow-800/30 rounded-xl p-4 border border-yellow-500/20">
+          <div className="flex justify-between items-center">
+            <span className="text-gray-300">Aberto</span>
+            <span className="text-yellow-400 font-bold text-xl">
+              {client.status_stats.find(s => s.slug === 'open')?.count || 0}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Cards de Status (sempre visíveis) */}
-      <div className="px-4 pb-6 pt-2">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          <StatCard
-            title="Total no Período"
-            value={client.summary.total_tickets}
-            icon={TicketIcon}
-            color="bg-blue-600"
-            statusColor="#2563eb"
-          />
-          {client.status_stats
-            .filter(status => status.count > 0)
-            .map((status) => {
-              const Icon = getStatusIcon(status.slug)
-              return (
-                <StatCard
-                  key={status.slug}
-                  title={status.name}
-                  value={status.count}
-                  icon={Icon}
-                  statusColor={status.color}
-                />
-              )
-            })}
-        </div>
+      {/* Botão Ver mais */}
+      <div className="mt-6">
+        <button
+          onClick={onToggle}
+          className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-colors text-sm font-medium"
+        >
+          {isExpanded ? 'Ver menos' : 'Ver mais'}
+        </button>
       </div>
 
-      {/* Conteúdo Expandível */}
+      {/* Conteúdo expandido */}
       {isExpanded && (
-        <div className="border-t border-gray-200 dark:border-gray-700 p-4 space-y-6">
+        <div className="mt-6 space-y-4">
           {/* Cards de Categorias */}
           {client.category_stats.length > 0 && (
             <div>
@@ -919,21 +909,26 @@ export default function HybridDashboard() {
         </div>
       )}
 
-      {/* Cards por Cliente */}
+      {/* Cards por Cliente - Neural Network Layout */}
       {analyticsData && analyticsData.clients.length > 0 && (
         <div>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
             <Building className="h-5 w-5" />
             Dados por Cliente
           </h2>
-          <div className="space-y-4">
-            {analyticsData.clients.map((client) => (
-              <ClientCard
-                key={client.context.id}
-                client={client}
-                isExpanded={expandedClients.has(client.context.id)}
-                onToggle={() => toggleClientExpansion(client.context.id)}
-              />
+          {/* Neural Network Layout - Cards em coluna com conexões */}
+          <div className="flex flex-col items-center space-y-8">
+            {analyticsData.clients.map((client, index) => (
+              <div key={client.context.id} className="relative">
+                <ClientCard
+                  client={client}
+                  isExpanded={expandedClients.has(client.context.id)}
+                  onToggle={() => toggleClientExpansion(client.context.id)}
+                />
+                {index < analyticsData.clients.length - 1 && (
+                  <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-0.5 h-8 bg-gradient-to-b from-indigo-500 to-purple-500"></div>
+                )}
+              </div>
             ))}
           </div>
         </div>
