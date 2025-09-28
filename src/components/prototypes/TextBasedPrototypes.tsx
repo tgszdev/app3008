@@ -188,7 +188,7 @@ export const Prototype35 = () => (
           <div className="border-b border-gray-200 dark:border-gray-600 pb-2 mb-2">
             <div className="text-sm text-gray-600 dark:text-gray-400 break-words">Total no Período</div>
           </div>
-          <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 text-right">{mockData.total}</div>
+          <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 text-right leading-none">{mockData.total}</div>
         </div>
       </div>
       
@@ -199,7 +199,7 @@ export const Prototype35 = () => (
             <div className="border-b border-gray-200 dark:border-gray-600 pb-2 mb-2">
               <div className="text-sm text-gray-600 dark:text-gray-400 break-words">{status.name}</div>
             </div>
-            <div className="text-3xl font-bold text-right" style={{ color: status.color }}>{status.count}</div>
+            <div className="text-3xl font-bold text-right leading-none" style={{ color: status.color }}>{status.count}</div>
           </div>
         </div>
       ))}
