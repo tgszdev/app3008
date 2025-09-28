@@ -252,6 +252,7 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
   onToggle: () => void
 }) => {
   const getStatusIcon = (slug: string) => {
+    // Usar ícones dinâmicos baseados no slug ou padrão
     if (slug.includes('aberto') || slug.includes('open')) return AlertCircle
     if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) return Clock
     if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) return CheckCircle
@@ -292,29 +293,22 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
         
         {/* Status dinâmicos em lista vertical */}
         {client.status_stats.map((status, index) => {
-          const getStatusColor = (slug: string) => {
-            if (slug.includes('aberto') || slug.includes('open')) return 'text-yellow-400'
-            if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) return 'text-orange-400'
-            if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) return 'text-green-400'
-            if (slug.includes('cancelled') || slug.includes('cancelado')) return 'text-red-400'
-            return 'text-gray-400'
-          }
-          
-          const getStatusBg = (slug: string) => {
-            if (slug.includes('aberto') || slug.includes('open')) return 'bg-yellow-800/30 border-yellow-500/20'
-            if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) return 'bg-orange-800/30 border-orange-500/20'
-            if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) return 'bg-green-800/30 border-green-500/20'
-            if (slug.includes('cancelled') || slug.includes('cancelado')) return 'bg-red-800/30 border-red-500/20'
-            return 'bg-gray-800/30 border-gray-500/20'
-          }
+          // Usar cores dinâmicas da tabela ticket_statuses
+          const statusColor = status.color || '#6B7280'
+          const textColor = `text-[${statusColor}]`
+          const bgColor = `bg-[${statusColor}]/20`
+          const borderColor = `border-[${statusColor}]/30`
           
           return (
-            <div key={status.id} className={`${getStatusBg(status.slug)} rounded-xl p-4 border`}>
+            <div key={status.id} className={`${bgColor} ${borderColor} rounded-xl p-4 border`}>
               <div className="flex justify-between items-center">
                 <span className="text-gray-300 truncate" title={status.name}>
                   {status.name}
                 </span>
-                <span className={`font-bold text-xl ${getStatusColor(status.slug)}`}>
+                <span 
+                  className="font-bold text-xl"
+                  style={{ color: statusColor }}
+                >
                   {status.count}
                 </span>
               </div>
@@ -369,14 +363,15 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
                       </p>
                     </div>
                     <div className="flex items-center gap-2 ml-2">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        ticket.status === 'aberto' ? 'bg-blue-100 text-blue-800' :
-                        ticket.status === 'em-progresso' ? 'bg-yellow-100 text-yellow-800' :
-                        ticket.status === 'resolvido' ? 'bg-green-100 text-green-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
+                      <span 
+                        className="px-2 py-1 text-xs font-medium rounded-full"
+                        style={{
+                          backgroundColor: `${ticket.status_color || '#6B7280'}20`,
+                          color: ticket.status_color || '#6B7280'
+                        }}
+                      >
                         {ticket.status}
-    </span>
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -911,6 +906,7 @@ export default function HybridDashboard() {
             .filter(status => status.count > 0)
             .map((status) => {
               const getStatusIcon = (slug: string) => {
+                // Usar ícones dinâmicos baseados no slug ou padrão
                 if (slug.includes('aberto') || slug.includes('open')) return AlertCircle
                 if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) return Clock
                 if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) return CheckCircle
