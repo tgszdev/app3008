@@ -46,13 +46,19 @@ export async function GET(request: Request) {
 
     console.log('Using dates for query:', { filterStartDate, filterEndDate })
 
-    // Status padrão
-    const statusList = [
-      { id: '1', name: 'Aberto', slug: 'aberto', color: '#3b82f6', order_index: 1 },
-      { id: '2', name: 'Em Progresso', slug: 'em-progresso', color: '#f59e0b', order_index: 2 },
-      { id: '3', name: 'Resolvido', slug: 'resolvido', color: '#10b981', order_index: 3 },
-      { id: '4', name: 'Fechado', slug: 'fechado', color: '#6b7280', order_index: 4 }
-    ]
+    // Buscar status dinamicamente da tabela ticket_statuses
+    const { data: statuses, error: statusError } = await supabaseAdmin
+      .from('ticket_statuses')
+      .select('id, name, slug, color, order_index')
+      .order('order_index', { ascending: true })
+
+    if (statusError) {
+      console.error('❌ Erro ao buscar status:', statusError)
+      return NextResponse.json({ error: 'Erro ao buscar status' }, { status: 500 })
+    }
+
+    const statusList = statuses || []
+    console.log(`📋 Status dinâmicos carregados:`, statusList.map(s => `${s.name} (${s.slug})`))
 
     // Get all tickets within the date range with category information
     let query = supabaseAdmin
@@ -197,7 +203,17 @@ export async function GET(request: Request) {
     console.log(`🔍 Processando ${tickets?.length || 0} tickets para status stats`)
     console.log(`🔍 Tickets encontrados:`, tickets?.map(t => ({ id: t.id, status: t.status })))
     
-    statusList.forEach(status => {
+    // Primeiro, identificar todos os status únicos dos tickets
+    const uniqueTicketStatuses = [...new Set(tickets?.map(t => t.status) || [])]
+    console.log(`🎯 Status únicos dos tickets:`, uniqueTicketStatuses)
+    
+    // Buscar status que correspondem aos tickets encontrados
+    const relevantStatuses = statusList.filter(status => 
+      uniqueTicketStatuses.includes(status.slug)
+    )
+    console.log(`✅ Status relevantes encontrados:`, relevantStatuses.map(s => `${s.name} (${s.slug})`))
+    
+    relevantStatuses.forEach(status => {
       const matchingTickets = tickets?.filter(t => t.status === status.slug) || []
       const count = matchingTickets.length
       statusCounts[status.slug] = count

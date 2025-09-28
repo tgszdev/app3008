@@ -166,12 +166,22 @@ export async function GET(request: NextRequest) {
           continue
         }
 
-        // Calcular estatísticas por status
+        // Calcular estatísticas por status - DINÂMICO
         console.log(`🔍 DEBUG STATUS COMPARISON:`)
         console.log(`📋 Status disponíveis:`, statuses.map(s => `${s.name} (${s.slug})`))
         console.log(`🎫 Tickets encontrados:`, tickets?.map(t => `${t.ticket_number}: ${t.status}`) || [])
         
-        const statusStats = statuses.map(status => {
+        // Primeiro, identificar todos os status únicos dos tickets
+        const uniqueTicketStatuses = [...new Set(tickets?.map(t => t.status) || [])]
+        console.log(`🎯 Status únicos dos tickets:`, uniqueTicketStatuses)
+        
+        // Buscar status que correspondem aos tickets encontrados
+        const relevantStatuses = statuses.filter(status => 
+          uniqueTicketStatuses.includes(status.slug)
+        )
+        console.log(`✅ Status relevantes encontrados:`, relevantStatuses.map(s => `${s.name} (${s.slug})`))
+        
+        const statusStats = relevantStatuses.map(status => {
           const matchingTickets = tickets?.filter(ticket => {
             const matches = ticket.status === status.slug
             if (matches) {
@@ -187,7 +197,7 @@ export async function GET(request: NextRequest) {
             ...status,
             count
           }
-        })
+        }).filter(status => status.count > 0) // Só mostrar status com tickets
         
         console.log(`📊 Status stats finais para ${context.name}:`, statusStats.map(s => `${s.name}: ${s.count}`))
 
