@@ -45,7 +45,7 @@ interface ClientData {
     id: string
     name: string
     type: string
-    slug: string
+  slug: string
   }
   summary: {
     total_tickets: number
@@ -57,14 +57,14 @@ interface ClientData {
   }
   status_stats: Array<{
     id: string
-    name: string
+  name: string
     slug: string
-    color: string
-    count: number
-    order_index: number
+  color: string
+  count: number
+  order_index: number
   }>
   category_stats: Array<{
-    id: string
+  id: string
     name: string
     slug: string
     color: string
@@ -73,7 +73,7 @@ interface ClientData {
     context_id: string
     total: number
     percentage: number
-    status_breakdown: Record<string, number>
+  status_breakdown: Record<string, number>
     status_breakdown_detailed: Array<{
       slug: string
       name: string
@@ -83,12 +83,12 @@ interface ClientData {
     }>
   }>
   tickets: Array<{
-    id: string
-    ticket_number: string
-    title: string
-    status: string
-    priority: string
-    created_at: string
+  id: string
+  ticket_number: string
+  title: string
+  status: string
+  priority: string
+  created_at: string
   }>
 }
 
@@ -97,8 +97,8 @@ interface MultiClientAnalytics {
   consolidated: {
     total_tickets: number
     period: {
-      start_date: string
-      end_date: string
+  start_date: string
+  end_date: string
     }
     status_stats: Array<{
       id: string
@@ -258,7 +258,7 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
     if (slug.includes('cancelled') || slug.includes('cancelado')) return XCircle
     return TicketIcon
   }
-
+  
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
       {/* Header do Cliente */}
@@ -281,7 +281,7 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-500 dark:text-gray-400">
               {formatDateShort(client.summary.period.start_date)} - {formatDateShort(client.summary.period.end_date)}
-            </span>
+    </span>
             {isExpanded ? (
               <ChevronUp className="h-5 w-5 text-gray-400" />
             ) : (
@@ -361,7 +361,7 @@ const ClientCard = ({ client, isExpanded, onToggle }: {
                         'bg-gray-100 text-gray-800'
                       }`}>
                         {ticket.status}
-                      </span>
+    </span>
                     </div>
                   </div>
                 ))}
@@ -604,49 +604,152 @@ export default function HybridDashboard() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-              Dashboard {myTicketsOnly && '- Meus Tickets'} {selectedClients.length === 1 && '- Cliente Específico'}
-            </h1>
-            <p className="mt-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-              Bem-vindo de volta, {session?.user?.name}!
-              {myTicketsOnly 
-                ? ' Visualizando apenas seus tickets.'
-                : selectedClients.length === 1 
-                  ? ' Visualizando tickets do cliente selecionado.'
-                  : ' Visualizando todos os clientes agrupados.'
-              }
-            </p>
-          </div>
-          
-                {/* Layout em Popup - Seletor Múltiplo de Clientes (apenas para matriz) */}
-                {isMatrixUser && (
-                  <div className="relative">
-                    {/* Botão principal com bordas animadas */}
+              <div className="flex flex-col gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+                    Dashboard {myTicketsOnly && '- Meus Tickets'} {selectedClients.length === 1 && '- Cliente Específico'}
+          </h1>
+          <p className="mt-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+            Bem-vindo de volta, {session?.user?.name}!
+            {myTicketsOnly 
+              ? ' Visualizando apenas seus tickets.'
+                      : selectedClients.length === 1 
+                        ? ' Visualizando tickets do cliente selecionado.'
+                        : ' Visualizando todos os clientes agrupados.'
+            }
+          </p>
+                </div>
+              
+                    {/* Popup de seleção de clientes */}
+                    {showClientPopup && (
+                      <div 
+                        ref={popupRef}
+                        className="absolute top-full left-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-4 z-50"
+                      >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Building className="w-4 h-4 text-blue-600" />
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">Seleção Rápida</span>
+                    </div>
                     <button
-                      onClick={() => setShowClientPopup(!showClientPopup)}
-                      className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 flex items-center gap-2 relative overflow-hidden"
+                      onClick={() => setShowClientPopup(false)}
+                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                     >
-                      <Building className="w-4 h-4" />
-                      <span className="text-xs font-medium">
-                        {selectedClients.length === 0 
-                          ? 'Selecionar Clientes' 
-                          : selectedClients.length === 1 
-                            ? availableContexts.find(c => c.id === selectedClients[0])?.name || 'Cliente'
-                            : `${selectedClients.length} clientes`
-                        }
-                      </span>
-                      <ChevronDown className="w-4 h-4" />
-                      {/* Bordas animadas */}
-                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-blue-500/20 to-transparent animate-pulse"></div>
+                      <X className="w-4 h-4" />
                     </button>
+                  </div>
+                  
+                  <div className="space-y-2 mb-4">
+                    {availableContexts.map((context) => (
+                      <label
+                        key={context.id}
+                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors rounded-lg"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedClients.includes(context.id)}
+                          onChange={() => {
+                            if (selectedClients.includes(context.id)) {
+                              handleClientSelectionChange(selectedClients.filter(id => id !== context.id))
+                            } else {
+                              handleClientSelectionChange([...selectedClients, context.id])
+                            }
+                          }}
+                          className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">
+                              {context.name}
+                            </span>
+                            <span className={`px-2 py-1 text-xs rounded-xl font-medium ${
+                              context.type === 'organization' 
+                                ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300" 
+                                : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300"
+                            }`}>
+                              {context.type === 'organization' ? 'Cliente' : 'Dept'}
+              </span>
+            </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {context.slug}
+                          </div>
+                        </div>
+                        {selectedClients.includes(context.id) && (
+                          <Check className="w-4 h-4 text-blue-600" />
+                        )}
+                      </label>
+                    ))}
+        </div>
+        
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {selectedClients.length} de {availableContexts.length} selecionados
+                    </span>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleClientSelectionChange(availableContexts.map(c => c.id))}
+                        className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
+                      >
+                        Todos
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleClientSelectionChange([])
+                          localStorage.removeItem('selectedClients')
+                        }}
+                        className="text-xs text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300 font-medium transition-colors"
+                      >
+                        Limpar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        
+      {/* Segunda linha: Botões de ação originais */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        {/* Informações do modo de visualização */}
+        <div className="flex items-center gap-2">
+          <Building className="w-4 h-4 text-blue-600" />
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            Modo: 
+            <span className="font-medium ml-1 text-gray-900 dark:text-white">
+              {selectedClients.length > 1 ? 'Multi-Cliente' : selectedClients.length === 1 ? 'Cliente Específico' : 'Todos os Clientes'}
+            </span>
+          </span>
+        </div>
+        
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Seletor de Clientes (apenas para matriz) */}
+          {isMatrixUser && (
+            <div className="relative">
+              {/* Botão principal com bordas animadas */}
+              <button
+                onClick={() => setShowClientPopup(!showClientPopup)}
+                className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 flex items-center gap-2 relative overflow-hidden whitespace-nowrap"
+              >
+                <Building className="w-4 h-4" />
+                <span className="text-xs font-medium">
+                  {selectedClients.length === 0 
+                    ? 'Selecionar Clientes' 
+                    : selectedClients.length === 1 
+                      ? availableContexts.find(c => c.id === selectedClients[0])?.name || 'Cliente'
+                      : `${selectedClients.length} clientes`
+                  }
+                </span>
+                <ChevronDown className="w-4 h-4" />
+                {/* Bordas animadas */}
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-blue-500/20 to-transparent animate-pulse"></div>
+              </button>
               
               {/* Popup de seleção de clientes */}
               {showClientPopup && (
                 <div 
                   ref={popupRef}
-                  className="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-4 z-50"
+                  className="absolute top-full left-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-4 z-50"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
@@ -729,74 +832,58 @@ export default function HybridDashboard() {
               )}
             </div>
           )}
-        </div>
+
+          {/* Botão Meus Tickets com bordas animadas */}
+          <button
+            onClick={toggleMyTickets}
+            className={`flex items-center justify-center gap-2 px-4 py-2 border rounded-xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
+              myTicketsOnly 
+                ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
+                : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+            }`}
+          >
+            <User className="h-4 w-4 flex-shrink-0" />
+            <span className="text-sm font-medium">Meus Tickets</span>
+            {/* Bordas animadas */}
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+          </button>
         
-              {/* Segunda linha: Botões de ação originais */}
-              <div className="flex items-center justify-between">
-                {/* Informações do modo de visualização */}
-                <div className="flex items-center gap-2">
-                  <Building className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    Modo: 
-                    <span className="font-medium ml-1 text-gray-900 dark:text-white">
-                      {selectedClients.length > 1 ? 'Multi-Cliente' : selectedClients.length === 1 ? 'Cliente Específico' : 'Todos os Clientes'}
-                    </span>
-                  </span>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  {/* Botão Meus Tickets com bordas animadas */}
-                  <button
-                    onClick={toggleMyTickets}
-                    className={`flex items-center justify-center gap-2 px-4 py-2 border rounded-xl transition-all duration-300 relative overflow-hidden ${
-                      myTicketsOnly 
-                        ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
-                        : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
-                    }`}
-                  >
-                    <User className="h-4 w-4 flex-shrink-0" />
-                    <span className="text-sm font-medium">Meus Tickets</span>
-                    {/* Bordas animadas */}
-                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
-                  </button>
-                
-                  {/* Botão Filtro de Data com bordas animadas */}
-                  <button
-                    onClick={() => setShowFilters(!showFilters)}
-                    className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden"
-                  >
-                    <Calendar className="h-4 w-4 flex-shrink-0" />
-                    <span className="text-sm font-medium truncate">
-                      {periodFilter.start_date === getCurrentMonthDates().start_date && 
-                       periodFilter.end_date === getCurrentMonthDates().end_date
-                        ? 'Mês Atual'
-                        : `${formatDateShort(periodFilter.start_date)} - ${formatDateShort(periodFilter.end_date)}`
-                      }
-                    </span>
-                    <Filter className="h-4 w-4 flex-shrink-0" />
-                    {/* Bordas animadas */}
-                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-yellow-500/20 to-transparent animate-pulse"></div>
-                  </button>
-                  
-                  {/* Botão Export PDF com bordas animadas */}
-                  <button
-                    onClick={handleExportPDF}
-                    disabled={isGeneratingPDF}
-                    className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
-                  >
-                    {isGeneratingPDF ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <FileDown className="h-4 w-4 flex-shrink-0" />
-                    )}
-                    <span className="text-sm font-medium">
-                      {isGeneratingPDF ? 'Gerando...' : 'Exportar PDF'}
-                    </span>
-                    {/* Bordas animadas */}
-                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-purple-500/20 to-transparent animate-pulse"></div>
-                  </button>
-                </div>
-              </div>
+          {/* Botão Filtro de Data com bordas animadas */}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
+          >
+            <Calendar className="h-4 w-4 flex-shrink-0" />
+            <span className="text-sm font-medium">
+              {periodFilter.start_date === getCurrentMonthDates().start_date && 
+               periodFilter.end_date === getCurrentMonthDates().end_date
+                ? 'Mês Atual'
+                : `${formatDateShort(periodFilter.start_date)} - ${formatDateShort(periodFilter.end_date)}`
+              }
+            </span>
+            <Filter className="h-4 w-4 flex-shrink-0" />
+            {/* Bordas animadas */}
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-yellow-500/20 to-transparent animate-pulse"></div>
+          </button>
+          
+          {/* Botão Export PDF com bordas animadas */}
+          <button
+            onClick={handleExportPDF}
+            disabled={isGeneratingPDF}
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden whitespace-nowrap"
+          >
+            {isGeneratingPDF ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <FileDown className="h-4 w-4 flex-shrink-0" />
+            )}
+            <span className="text-sm font-medium">
+              {isGeneratingPDF ? 'Gerando...' : 'Exportar PDF'}
+            </span>
+            {/* Bordas animadas */}
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-purple-500/20 to-transparent animate-pulse"></div>
+          </button>
+        </div>
       </div>
 
       {/* Filtros de Período */}
@@ -848,24 +935,24 @@ export default function HybridDashboard() {
 
       {/* Informações do Período */}
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3">
-        <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-300">
-          <span className="font-medium block sm:inline">Período analisado:</span>
-          <span className="block sm:inline sm:ml-1">
+          <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-300">
+            <span className="font-medium block sm:inline">Período analisado:</span>
+            <span className="block sm:inline sm:ml-1">
             {formatDateShort(periodFilter.start_date)} até {formatDateShort(periodFilter.end_date)}
-          </span>
-          <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
+            </span>
+            <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
             • <strong>{analyticsData?.consolidated.total_tickets || 0}</strong> {myTicketsOnly ? 'seus tickets' : 'tickets'} no período
           </span>
           <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
             • <strong>{selectedClients.length}</strong> clientes selecionados
-          </span>
-          {myTicketsOnly && (
-            <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
-              • <span className="font-medium">Filtrado por: Meus Tickets</span>
             </span>
-          )}
-        </p>
-      </div>
+            {myTicketsOnly && (
+              <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
+                • <span className="font-medium">Filtrado por: Meus Tickets</span>
+              </span>
+            )}
+          </p>
+        </div>
 
       {/* Resumo Consolidado */}
       {analyticsData && analyticsData.consolidated.status_stats.length > 0 && (
@@ -874,37 +961,37 @@ export default function HybridDashboard() {
             <BarChart className="h-5 w-5" />
             Resumo Consolidado
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-4">
-            <StatCard
-              title="Total no Período"
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-4">
+          <StatCard
+            title="Total no Período"
               value={analyticsData.consolidated.total_tickets}
-              icon={TicketIcon}
-              color="bg-blue-600"
-              statusColor="#2563eb"
-            />
+            icon={TicketIcon}
+            color="bg-blue-600"
+            statusColor="#2563eb"
+          />
             {analyticsData.consolidated.status_stats
-              .filter(status => status.count > 0)
-              .map((status) => {
-                const getStatusIcon = (slug: string) => {
-                  if (slug.includes('aberto') || slug.includes('open')) return AlertCircle
-                  if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) return Clock
-                  if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) return CheckCircle
-                  if (slug.includes('cancelled') || slug.includes('cancelado')) return XCircle
-                  return TicketIcon
-                }
-                
-                const Icon = getStatusIcon(status.slug)
-                
-                return (
-                  <StatCard
-                    key={status.slug}
-                    title={status.name}
-                    value={status.count}
-                    icon={Icon}
-                    statusColor={status.color}
-                  />
-                )
-              })}
+            .filter(status => status.count > 0)
+            .map((status) => {
+              const getStatusIcon = (slug: string) => {
+                if (slug.includes('aberto') || slug.includes('open')) return AlertCircle
+                if (slug.includes('progresso') || slug.includes('progress') || slug.includes('aguardando') || slug.includes('deploy')) return Clock
+                if (slug.includes('resolvido') || slug.includes('resolved') || slug.includes('fechado') || slug.includes('closed')) return CheckCircle
+                if (slug.includes('cancelled') || slug.includes('cancelado')) return XCircle
+                return TicketIcon
+              }
+              
+              const Icon = getStatusIcon(status.slug)
+              
+              return (
+                <StatCard
+                  key={status.slug}
+                  title={status.name}
+                  value={status.count}
+                  icon={Icon}
+                  statusColor={status.color}
+                />
+              )
+            })}
           </div>
         </div>
       )}
@@ -953,7 +1040,7 @@ export default function HybridDashboard() {
           <BarChart className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
             Nenhum dado encontrado
-          </h3>
+                  </h3>
           <p className="text-gray-500 dark:text-gray-400 mb-4">
             Não foram encontrados tickets para os clientes selecionados no período
           </p>
