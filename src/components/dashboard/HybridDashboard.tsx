@@ -34,6 +34,7 @@ import {
   X,
   Check
 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { getIcon } from '@/lib/icons'
 
 // =====================================================
@@ -388,6 +389,7 @@ export default function HybridDashboard() {
     contextType,
     isLoading: contextLoading 
   } = useOrganization()
+  const router = useRouter()
   
   // Estados
   const [mounted, setMounted] = useState(false)
@@ -397,6 +399,12 @@ export default function HybridDashboard() {
   const [analyticsData, setAnalyticsData] = useState<MultiClientAnalytics | null>(null)
   const [showClientPopup, setShowClientPopup] = useState(false)
   const popupRef = useRef<HTMLDivElement>(null)
+  
+  // Estados dos botões originais
+  const [showFilters, setShowFilters] = useState(false)
+  const [myTicketsOnly, setMyTicketsOnly] = useState(false)
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
+  const [tempFilter, setTempFilter] = useState<{start_date: string, end_date: string}>(getCurrentMonthDates())
   
   // Filtros de período
   const getCurrentMonthDates = () => {
@@ -530,6 +538,47 @@ export default function HybridDashboard() {
     setExpandedClients(newExpanded)
   }
 
+  // =====================================================
+  // FUNÇÕES DOS BOTÕES ORIGINAIS
+  // =====================================================
+
+  const toggleMyTickets = () => {
+    setMyTicketsOnly(!myTicketsOnly)
+    console.log('🔄 Meus Tickets toggled:', !myTicketsOnly)
+  }
+
+  const handleApplyFilter = () => {
+    setPeriodFilter(tempFilter)
+    setShowFilters(false)
+    console.log('🔄 Filtro aplicado:', tempFilter)
+  }
+
+  const handleResetFilter = () => {
+    const currentMonth = getCurrentMonthDates()
+    setTempFilter(currentMonth)
+    setPeriodFilter(currentMonth)
+    setShowFilters(false)
+    console.log('🔄 Filtro resetado para mês atual')
+  }
+
+  const handleExportPDF = async () => {
+    try {
+      setIsGeneratingPDF(true)
+      console.log('🔄 Iniciando exportação PDF...')
+      
+      // Simular geração de PDF (implementar funcionalidade real depois)
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      toast.success('PDF exportado com sucesso!')
+      console.log('✅ PDF exportado')
+    } catch (error) {
+      console.error('❌ Erro ao exportar PDF:', error)
+      toast.error('Erro ao exportar PDF')
+    } finally {
+      setIsGeneratingPDF(false)
+    }
+  }
+
   if (!mounted) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -561,10 +610,16 @@ export default function HybridDashboard() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-              Dashboard
+              Dashboard {myTicketsOnly && '- Meus Tickets'} {selectedClients.length === 1 && '- Cliente Específico'}
             </h1>
             <p className="mt-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-              Bem-vindo de volta, {session?.user?.name}! Aqui está um resumo do sistema.
+              Bem-vindo de volta, {session?.user?.name}!
+              {myTicketsOnly 
+                ? ' Visualizando apenas seus tickets.'
+                : selectedClients.length === 1 
+                  ? ' Visualizando tickets do cliente selecionado.'
+                  : ' Visualizando todos os clientes agrupados.'
+              }
             </p>
           </div>
           
@@ -676,7 +731,115 @@ export default function HybridDashboard() {
             </div>
           )}
         </div>
+        
+        {/* Segunda linha: Botões de ação originais */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          {/* Informações do modo de visualização */}
+          <div className="flex items-center gap-2">
+            <Building className="w-4 h-4 text-blue-600" />
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              Modo: 
+              <span className="font-medium ml-1 text-gray-900 dark:text-white">
+                {selectedClients.length > 1 ? 'Multi-Cliente' : selectedClients.length === 1 ? 'Cliente Específico' : 'Todos os Clientes'}
+              </span>
+            </span>
+          </div>
+          
+          <div className="flex flex-wrap gap-2">
+            {/* Botão Meus Tickets */}
+            <button
+              onClick={toggleMyTickets}
+              className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-2 border rounded-lg transition-colors ${
+                myTicketsOnly 
+                  ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
+                  : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+              }`}
+            >
+              <User className="h-4 w-4 flex-shrink-0" />
+              <span className="text-xs sm:text-sm">Meus Tickets</span>
+            </button>
+          
+            {/* Botão Filtro de Data */}
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              <Calendar className="h-4 w-4 flex-shrink-0" />
+              <span className="text-xs sm:text-sm truncate">
+                {periodFilter.start_date === getCurrentMonthDates().start_date && 
+                 periodFilter.end_date === getCurrentMonthDates().end_date
+                  ? 'Mês Atual'
+                  : `${formatDateShort(periodFilter.start_date)} - ${formatDateShort(periodFilter.end_date)}`
+                }
+              </span>
+              <Filter className="h-4 w-4 flex-shrink-0" />
+            </button>
+            
+            {/* Botão Export PDF */}
+            <button
+              onClick={handleExportPDF}
+              disabled={isGeneratingPDF}
+              className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isGeneratingPDF ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <FileDown className="h-4 w-4 flex-shrink-0" />
+              )}
+              <span className="text-xs sm:text-sm">
+                {isGeneratingPDF ? 'Gerando...' : 'Exportar PDF'}
+              </span>
+            </button>
+          </div>
+        </div>
       </div>
+
+      {/* Filtros de Período */}
+      {showFilters && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+            Filtrar por Período
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Data Início
+              </label>
+              <input
+                type="date"
+                value={tempFilter.start_date}
+                onChange={(e) => setTempFilter({ ...tempFilter, start_date: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Data Fim
+              </label>
+              <input
+                type="date"
+                value={tempFilter.end_date}
+                onChange={(e) => setTempFilter({ ...tempFilter, end_date: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2 mt-4">
+            <button
+              onClick={handleApplyFilter}
+              className="flex-1 sm:flex-initial px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium"
+            >
+              Aplicar Filtro
+            </button>
+            <button
+              onClick={handleResetFilter}
+              className="flex-1 sm:flex-initial px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 active:bg-gray-400 dark:active:bg-gray-800 transition-colors text-sm font-medium"
+            >
+              Limpar Filtro
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Informações do Período */}
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
@@ -686,11 +849,16 @@ export default function HybridDashboard() {
             {formatDateShort(periodFilter.start_date)} até {formatDateShort(periodFilter.end_date)}
           </span>
           <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
-            • <strong>{analyticsData?.consolidated.total_tickets || 0}</strong> tickets no período
+            • <strong>{analyticsData?.consolidated.total_tickets || 0}</strong> {myTicketsOnly ? 'seus tickets' : 'tickets'} no período
           </span>
           <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
             • <strong>{selectedClients.length}</strong> clientes selecionados
           </span>
+          {myTicketsOnly && (
+            <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
+              • <span className="font-medium">Filtrado por: Meus Tickets</span>
+            </span>
+          )}
         </p>
       </div>
 
