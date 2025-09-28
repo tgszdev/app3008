@@ -198,12 +198,6 @@ export async function GET(request: Request) {
         }
       })
       
-      // Debug: verificar se statusBreakdown está sendo populado
-      console.log(`🔍 Debug categoria ${cat.name}:`, {
-        uniqueStatuses: uniqueCategoryStatuses,
-        statusBreakdown: statusBreakdown,
-        statusBreakdownDetailed: statusBreakdownDetailed.length
-      })
       
       // Sort status by order_index
       statusBreakdownDetailed.sort((a, b) => a.order_index - b.order_index)
