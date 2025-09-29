@@ -427,6 +427,7 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                     return `bg-[${statusColor}]`
                   }
 
+
                   const getPriorityColor = (priority: string) => {
                     switch (priority) {
                       case 'critical': return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
@@ -444,8 +445,11 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                         <div className="flex-shrink-0">
                           <div className="w-3 h-20 bg-gray-200 dark:bg-gray-700 rounded-full">
                             <div 
-                              className={`w-3 rounded-full ${getProgressColor(ticket.status)}`}
-                              style={{ height: `${getProgressValue(ticket.status)}%` }}
+                              className="w-3 rounded-full"
+                              style={{ 
+                                height: `${getProgressValue(ticket.status)}%`,
+                                backgroundColor: statusColor
+                              }}
                             ></div>
                           </div>
                         </div>
@@ -469,23 +473,41 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                               <Calendar className="h-3 w-3" />
                               {formatDateShort(ticket.created_at)}
                             </span>
+                            <span className="flex items-center gap-1">
+                              <User className="h-3 w-3" />
+                              Sistema
+                            </span>
                           </div>
                           
                           {/* Steps horizontais */}
                           <div className="flex items-center gap-2">
                             {['Aberto', 'Em Análise', 'Em Atendimento', 'Resolvido'].map((step, index) => (
                               <div key={step} className="flex items-center">
-                                <div className={`w-3 h-3 rounded-full ${
-                                  index < getStepValue(ticket.status) 
-                                    ? getStepColor(ticket.status) 
-                                    : 'bg-gray-300 dark:bg-gray-600'
-                                }`}></div>
-                                {index < 3 && (
-                                  <div className={`w-8 h-1 rounded-full ${
-                                    index < getStepValue(ticket.status) - 1 
-                                      ? getStepColor(ticket.status) 
+                                <div 
+                                  className={`w-3 h-3 rounded-full ${
+                                    index < getStepValue(ticket.status) 
+                                      ? '' 
                                       : 'bg-gray-300 dark:bg-gray-600'
-                                  }`}></div>
+                                  }`}
+                                  style={{
+                                    backgroundColor: index < getStepValue(ticket.status) 
+                                      ? statusColor 
+                                      : undefined
+                                  }}
+                                ></div>
+                                {index < 3 && (
+                                  <div 
+                                    className={`w-8 h-1 rounded-full ${
+                                      index < getStepValue(ticket.status) - 1 
+                                        ? '' 
+                                        : 'bg-gray-300 dark:bg-gray-600'
+                                    }`}
+                                    style={{
+                                      backgroundColor: index < getStepValue(ticket.status) - 1 
+                                        ? statusColor 
+                                        : undefined
+                                    }}
+                                  ></div>
                                 )}
                               </div>
                             ))}
