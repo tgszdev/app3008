@@ -338,7 +338,7 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
               <div className="flex justify-between items-center">
                 <span className={`${colors.text} truncate font-medium`} title={status.name}>
                   {status.name}
-                </span>
+    </span>
                 <span 
                   className="font-bold text-xl"
                   style={{ color: statusColor }}
@@ -395,31 +395,34 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
               </h4>
               <div className="space-y-3">
                 {client.tickets.slice(0, 5).map((ticket) => {
-                  const getStepValue = (status: string) => {
-                    // Buscar o order_index do status no cadastro
-                    const statusInfo = client.status_stats.find(s => s.slug === status)
-                    return statusInfo?.order_index || 1
-                  }
-
                   // Buscar cor do status no cadastro
                   const statusInfo = client.status_stats.find(s => s.slug === ticket.status)
                   const statusColor = statusInfo?.color || '#6B7280'
 
-                  const getStepColor = (status: string) => {
-                    return `bg-[${statusColor}]`
+                  // Processar histórico de status para mostrar steps reais
+                  const getStatusHistory = () => {
+                    if (!(ticket as any).ticket_history) return []
+                    
+                    // Filtrar apenas mudanças de status
+                    const statusChanges = (ticket as any).ticket_history
+                      .filter((history: any) => history.action_type === 'status_changed' && history.field_changed === 'status')
+                      .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+                    
+                    // Adicionar status inicial (criado)
+                    const initialStatus = {
+                      status: 'Aberto', // Status inicial sempre é Aberto
+                      created_at: ticket.created_at,
+                      user: (ticket as any).created_by_user
+                    }
+                    
+                    return [initialStatus, ...statusChanges.map((change: any) => ({
+                      status: change.new_value,
+                      created_at: change.created_at,
+                      user: change.user
+                    }))]
                   }
 
-                  const getProgressValue = (status: string) => {
-                    // Calcular progresso baseado no order_index
-                    const statusInfo = client.status_stats.find(s => s.slug === status)
-                    const maxOrder = Math.max(...client.status_stats.map(s => s.order_index))
-                    const currentOrder = statusInfo?.order_index || 1
-                    return (currentOrder / maxOrder) * 100
-                  }
-
-                  const getProgressColor = (status: string) => {
-                    return `bg-[${statusColor}]`
-                  }
+                  const statusHistory = getStatusHistory()
 
 
                   const getPriorityColor = (priority: string) => {
@@ -430,31 +433,17 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                       case 'low': return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
                       default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
                     }
-                  }
-
-                  return (
+  }
+  
+  return (
                     <div key={ticket.id} className="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-300">
-                      <div className="flex items-start gap-4">
-                        {/* Progress Bar Vertical */}
-                        <div className="flex-shrink-0">
-                          <div className="w-3 h-20 bg-gray-200 dark:bg-gray-700 rounded-full">
-                            <div 
-                              className="w-3 rounded-full"
-                              style={{ 
-                                height: `${getProgressValue(ticket.status)}%`,
-                                backgroundColor: statusColor
-                              }}
-                            ></div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex-1 space-y-3">
+                      <div className="space-y-3">
                           {/* Header com número, título e prioridade */}
                           <div className="flex items-center gap-2">
                             <span className="font-semibold text-gray-900 dark:text-white text-sm">#{ticket.ticket_number}</span>
                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPriorityColor(ticket.priority)}`}>
                               {ticket.priority === 'critical' ? 'Crítico' : ticket.priority === 'high' ? 'Alto' : ticket.priority === 'medium' ? 'Médio' : 'Baixo'}
-                            </span>
+    </span>
                             <span 
                               className="text-xs font-medium px-2 py-1 rounded-full ml-auto"
                               style={{
@@ -481,47 +470,41 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                             </span>
                           </div>
                           
-                          {/* Steps horizontais - usando status reais do cadastro */}
+                          {/* Steps horizontais - baseados no histórico real */}
                           <div className="flex items-center gap-2">
-                            {client.status_stats
-                              .sort((a, b) => a.order_index - b.order_index)
-                              .map((status, index) => {
-                                const isActive = status.slug === ticket.status
-                                const isCompleted = status.order_index < getStepValue(ticket.status)
-                                
-                                return (
-                                  <div key={status.slug} className="flex items-center">
+                            {statusHistory.map((historyItem, index) => {
+                              const isLast = index === statusHistory.length - 1
+                              const isCurrent = isLast
+                              
+                              // Buscar cor do status no cadastro
+                              const historyStatusInfo = client.status_stats.find(s => s.slug === historyItem.status)
+                              const historyStatusColor = historyStatusInfo?.color || '#6B7280'
+                              
+                              return (
+                                <div key={`${historyItem.status}-${index}`} className="flex items-center">
+                                  <div 
+                                    className={`w-3 h-3 rounded-full ${
+                                      isCurrent
+                                        ? 'ring-2 ring-offset-2' 
+                                        : ''
+                                    }`}
+                                    style={{
+                                      backgroundColor: historyStatusColor
+                                    }}
+                                    title={`${historyItem.status} em ${new Date(historyItem.created_at).toLocaleDateString('pt-BR')} por ${historyItem.user?.name || 'Sistema'}`}
+                                  ></div>
+                                  {!isLast && (
                                     <div 
-                                      className={`w-3 h-3 rounded-full ${
-                                        isActive || isCompleted
-                                          ? '' 
-                                          : 'bg-gray-300 dark:bg-gray-600'
-                                      }`}
+                                      className="w-8 h-1 rounded-full"
                                       style={{
-                                        backgroundColor: isActive || isCompleted
-                                          ? status.color 
-                                          : undefined
+                                        backgroundColor: historyStatusColor
                                       }}
                                     ></div>
-                                    {index < client.status_stats.length - 1 && (
-                                      <div 
-                                        className={`w-8 h-1 rounded-full ${
-                                          isCompleted
-                                            ? '' 
-                                            : 'bg-gray-300 dark:bg-gray-600'
-                                        }`}
-                                        style={{
-                                          backgroundColor: isCompleted
-                                            ? status.color 
-                                            : undefined
-                                        }}
-                                      ></div>
-                                    )}
-                                  </div>
-                                )
-                              })}
+                                  )}
+                                </div>
+                              )
+                            })}
                           </div>
-                        </div>
                       </div>
                     </div>
                   )
@@ -803,8 +786,8 @@ export default function HybridDashboard() {
             <span className="font-medium ml-1 text-gray-900 dark:text-white">
               {selectedClients.length > 1 ? 'Multi-Cliente' : selectedClients.length === 1 ? 'Cliente Específico' : 'Todos os Clientes'}
             </span>
-          </span>
-        </div>
+              </span>
+            </div>
         
         <div className="flex items-center gap-3 flex-wrap">
           {/* Seletor de Clientes (apenas para matriz) */}
@@ -890,8 +873,8 @@ export default function HybridDashboard() {
                         )}
                       </label>
                     ))}
-                  </div>
-                  
+        </div>
+        
                   <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
                     <span className="text-xs text-gray-500 dark:text-gray-400">
                       {selectedClients.length} de {availableContexts.length} selecionados
@@ -933,7 +916,7 @@ export default function HybridDashboard() {
             {/* Bordas animadas */}
             <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
           </button>
-        
+          
           {/* Botão Filtro de Data com bordas animadas */}
           <button
             onClick={() => setShowFilters(!showFilters)}
@@ -1051,12 +1034,12 @@ export default function HybridDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {/* Status dinâmicos - ordenados por order_index */}
             {analyticsData.consolidated.status_stats
-              .filter(status => status.count > 0)
+            .filter(status => status.count > 0)
               .sort((a, b) => a.order_index - b.order_index)
-              .map((status) => {
+            .map((status) => {
                 const statusColor = status.color || '#6B7280'
-                
-                return (
+              
+              return (
                   <div key={status.slug} className="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden">
                     <div className="absolute inset-0 opacity-10" style={{ background: `linear-gradient(135deg, ${statusColor}, transparent)` }}></div>
                     <div className="relative">

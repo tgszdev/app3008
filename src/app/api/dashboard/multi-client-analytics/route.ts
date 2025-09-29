@@ -116,6 +116,15 @@ export async function GET(request: NextRequest) {
             category_id,
             created_by_user:users!tickets_created_by_fkey(id, name, email),
             assigned_to_user:users!tickets_assigned_to_fkey(id, name, email),
+            ticket_history:ticket_history(
+              id,
+              action_type,
+              field_changed,
+              old_value,
+              new_value,
+              created_at,
+              user:users(id, name, email)
+            ),
             categories(
               id,
               name,
