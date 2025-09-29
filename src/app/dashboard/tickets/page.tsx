@@ -466,7 +466,6 @@ export default function TicketsPage() {
               )
             })}
         </div>
-      </div>
 
       {/* Mobile Cards View - Visible on small screens */}
       <div className="block lg:hidden space-y-3">
