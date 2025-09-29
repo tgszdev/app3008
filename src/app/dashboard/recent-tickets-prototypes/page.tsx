@@ -54,6 +54,38 @@ import {
   RecentTicketsPrototype30 
 } from '@/components/prototypes/RecentTicketsPrototypes6'
 
+import { 
+  RecentTicketsPrototype31, 
+  RecentTicketsPrototype32, 
+  RecentTicketsPrototype33, 
+  RecentTicketsPrototype34, 
+  RecentTicketsPrototype35 
+} from '@/components/prototypes/RecentTicketsPrototypes7'
+
+import { 
+  RecentTicketsPrototype36, 
+  RecentTicketsPrototype37, 
+  RecentTicketsPrototype38, 
+  RecentTicketsPrototype39, 
+  RecentTicketsPrototype40 
+} from '@/components/prototypes/RecentTicketsPrototypes8'
+
+import { 
+  RecentTicketsPrototype41, 
+  RecentTicketsPrototype42, 
+  RecentTicketsPrototype43, 
+  RecentTicketsPrototype44, 
+  RecentTicketsPrototype45 
+} from '@/components/prototypes/RecentTicketsPrototypes9'
+
+import { 
+  RecentTicketsPrototype46, 
+  RecentTicketsPrototype47, 
+  RecentTicketsPrototype48, 
+  RecentTicketsPrototype49, 
+  RecentTicketsPrototype50 
+} from '@/components/prototypes/RecentTicketsPrototypes10'
+
 const prototypes = [
   { id: 1, name: 'Layout Clássico com Badges', component: RecentTicketsPrototype1 },
   { id: 2, name: 'Layout com Ícones de Prioridade', component: RecentTicketsPrototype2 },
@@ -85,6 +117,26 @@ const prototypes = [
   { id: 28, name: 'Layout com Cards de Status', component: RecentTicketsPrototype28 },
   { id: 29, name: 'Layout com Cards de Status', component: RecentTicketsPrototype29 },
   { id: 30, name: 'Layout com Cards de Status', component: RecentTicketsPrototype30 },
+  { id: 31, name: 'Layout com Progress Bar - Versão Compacta', component: RecentTicketsPrototype31 },
+  { id: 32, name: 'Layout com Cards Flutuantes - Versão Horizontal', component: RecentTicketsPrototype32 },
+  { id: 33, name: 'Layout com Progress Bar - Versão Vertical', component: RecentTicketsPrototype33 },
+  { id: 34, name: 'Layout com Cards Flutuantes - Versão Compacta', component: RecentTicketsPrototype34 },
+  { id: 35, name: 'Layout com Progress Bar - Versão Circular', component: RecentTicketsPrototype35 },
+  { id: 36, name: 'Layout com Cards Flutuantes - Versão Grid', component: RecentTicketsPrototype36 },
+  { id: 37, name: 'Layout com Progress Bar - Versão Dupla', component: RecentTicketsPrototype37 },
+  { id: 38, name: 'Layout com Cards Flutuantes - Versão Lista', component: RecentTicketsPrototype38 },
+  { id: 39, name: 'Layout com Progress Bar - Versão Estrelas', component: RecentTicketsPrototype39 },
+  { id: 40, name: 'Layout com Cards Flutuantes - Versão Minimalista', component: RecentTicketsPrototype40 },
+  { id: 41, name: 'Layout com Progress Bar - Versão Animated', component: RecentTicketsPrototype41 },
+  { id: 42, name: 'Layout com Cards Flutuantes - Versão Glass', component: RecentTicketsPrototype42 },
+  { id: 43, name: 'Layout com Progress Bar - Versão Steps', component: RecentTicketsPrototype43 },
+  { id: 44, name: 'Layout com Cards Flutuantes - Versão Neon', component: RecentTicketsPrototype44 },
+  { id: 45, name: 'Layout com Progress Bar - Versão Radial', component: RecentTicketsPrototype45 },
+  { id: 46, name: 'Layout com Cards Flutuantes - Versão Card Stack', component: RecentTicketsPrototype46 },
+  { id: 47, name: 'Layout com Progress Bar - Versão Gradient', component: RecentTicketsPrototype47 },
+  { id: 48, name: 'Layout com Cards Flutuantes - Versão Hover', component: RecentTicketsPrototype48 },
+  { id: 49, name: 'Layout com Progress Bar - Versão Pulsing', component: RecentTicketsPrototype49 },
+  { id: 50, name: 'Layout com Cards Flutuantes - Versão Final', component: RecentTicketsPrototype50 },
 ]
 
 export default function RecentTicketsPrototypesPage() {
@@ -112,7 +164,7 @@ export default function RecentTicketsPrototypesPage() {
             Protótipos de Tickets Recentes
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            30 sugestões de apresentação para a seção "Tickets Recentes" com criticidade e autor
+            50 sugestões de apresentação para a seção "Tickets Recentes" com criticidade e autor
           </p>
         </div>
 
