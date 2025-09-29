@@ -935,15 +935,15 @@ export default function HybridDashboard() {
             Resumo Consolidado
           </h2>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {/* Total no Período */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent"></div>
               <div className="relative">
-                <div className="border-b border-gray-200 dark:border-gray-600 pb-2 mb-2">
-                  <div className="text-sm text-gray-600 dark:text-gray-400 break-words">Total no Período</div>
+                <div className="border-b border-gray-200 dark:border-gray-600 pb-3 mb-3">
+                  <div className="text-base font-medium text-gray-700 dark:text-gray-300 break-words">Total no Período</div>
                 </div>
-                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 text-right leading-none">{analyticsData.consolidated.total_tickets}</div>
+                <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 text-right leading-none">{analyticsData.consolidated.total_tickets}</div>
               </div>
             </div>
             
@@ -954,13 +954,13 @@ export default function HybridDashboard() {
                 const statusColor = status.color || '#6B7280'
                 
                 return (
-                  <div key={status.slug} className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden">
+                  <div key={status.slug} className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden">
                     <div className="absolute inset-0 opacity-10" style={{ background: `linear-gradient(135deg, ${statusColor}, transparent)` }}></div>
                     <div className="relative">
-                      <div className="border-b border-gray-200 dark:border-gray-600 pb-2 mb-2">
-                        <div className="text-sm text-gray-600 dark:text-gray-400 break-words">{status.name}</div>
+                      <div className="border-b border-gray-200 dark:border-gray-600 pb-3 mb-3">
+                        <div className="text-base font-medium text-gray-700 dark:text-gray-300 break-words">{status.name}</div>
                       </div>
-                      <div className="text-3xl font-bold text-right leading-none" style={{ color: statusColor }}>{status.count}</div>
+                      <div className="text-4xl font-bold text-right leading-none" style={{ color: statusColor }}>{status.count}</div>
                     </div>
                   </div>
                 )
