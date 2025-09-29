@@ -114,6 +114,8 @@ export async function GET(request: NextRequest) {
             created_by,
             assigned_to,
             category_id,
+            created_by_user:users!tickets_created_by_fkey(id, name, email),
+            assigned_to_user:users!tickets_assigned_to_fkey(id, name, email),
             categories(
               id,
               name,

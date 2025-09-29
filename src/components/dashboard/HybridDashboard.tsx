@@ -396,13 +396,9 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
               <div className="space-y-3">
                 {client.tickets.slice(0, 5).map((ticket) => {
                   const getStepValue = (status: string) => {
-                    switch (status) {
-                      case 'resolvido': return 4
-                      case 'em-atendimento': return 3
-                      case 'em-analise': return 2
-                      case 'aberto': return 1
-                      default: return 1
-                    }
+                    // Buscar o order_index do status no cadastro
+                    const statusInfo = client.status_stats.find(s => s.slug === status)
+                    return statusInfo?.order_index || 1
                   }
 
                   // Buscar cor do status no cadastro
@@ -414,13 +410,11 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                   }
 
                   const getProgressValue = (status: string) => {
-                    switch (status) {
-                      case 'resolvido': return 100
-                      case 'em-atendimento': return 75
-                      case 'em-analise': return 50
-                      case 'aberto': return 25
-                      default: return 25
-                    }
+                    // Calcular progresso baseado no order_index
+                    const statusInfo = client.status_stats.find(s => s.slug === status)
+                    const maxOrder = Math.max(...client.status_stats.map(s => s.order_index))
+                    const currentOrder = statusInfo?.order_index || 1
+                    return (currentOrder / maxOrder) * 100
                   }
 
                   const getProgressColor = (status: string) => {
@@ -461,7 +455,15 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPriorityColor(ticket.priority)}`}>
                               {ticket.priority === 'critical' ? 'Crítico' : ticket.priority === 'high' ? 'Alto' : ticket.priority === 'medium' ? 'Médio' : 'Baixo'}
                             </span>
-                            <span className="text-xs font-medium text-gray-700 dark:text-gray-300 ml-auto">{ticket.status}</span>
+                            <span 
+                              className="text-xs font-medium px-2 py-1 rounded-full ml-auto"
+                              style={{
+                                backgroundColor: `${statusColor}20`,
+                                color: statusColor
+                              }}
+                            >
+                              {ticket.status}
+                            </span>
                           </div>
                           
                           {/* Título do ticket */}
@@ -475,42 +477,49 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                             </span>
                             <span className="flex items-center gap-1">
                               <User className="h-3 w-3" />
-                              Sistema
+                              {(ticket as any).created_by_user?.name || 'Sistema'}
                             </span>
                           </div>
                           
-                          {/* Steps horizontais */}
+                          {/* Steps horizontais - usando status reais do cadastro */}
                           <div className="flex items-center gap-2">
-                            {['Aberto', 'Em Análise', 'Em Atendimento', 'Resolvido'].map((step, index) => (
-                              <div key={step} className="flex items-center">
-                                <div 
-                                  className={`w-3 h-3 rounded-full ${
-                                    index < getStepValue(ticket.status) 
-                                      ? '' 
-                                      : 'bg-gray-300 dark:bg-gray-600'
-                                  }`}
-                                  style={{
-                                    backgroundColor: index < getStepValue(ticket.status) 
-                                      ? statusColor 
-                                      : undefined
-                                  }}
-                                ></div>
-                                {index < 3 && (
-                                  <div 
-                                    className={`w-8 h-1 rounded-full ${
-                                      index < getStepValue(ticket.status) - 1 
-                                        ? '' 
-                                        : 'bg-gray-300 dark:bg-gray-600'
-                                    }`}
-                                    style={{
-                                      backgroundColor: index < getStepValue(ticket.status) - 1 
-                                        ? statusColor 
-                                        : undefined
-                                    }}
-                                  ></div>
-                                )}
-                              </div>
-                            ))}
+                            {client.status_stats
+                              .sort((a, b) => a.order_index - b.order_index)
+                              .map((status, index) => {
+                                const isActive = status.slug === ticket.status
+                                const isCompleted = status.order_index < getStepValue(ticket.status)
+                                
+                                return (
+                                  <div key={status.slug} className="flex items-center">
+                                    <div 
+                                      className={`w-3 h-3 rounded-full ${
+                                        isActive || isCompleted
+                                          ? '' 
+                                          : 'bg-gray-300 dark:bg-gray-600'
+                                      }`}
+                                      style={{
+                                        backgroundColor: isActive || isCompleted
+                                          ? status.color 
+                                          : undefined
+                                      }}
+                                    ></div>
+                                    {index < client.status_stats.length - 1 && (
+                                      <div 
+                                        className={`w-8 h-1 rounded-full ${
+                                          isCompleted
+                                            ? '' 
+                                            : 'bg-gray-300 dark:bg-gray-600'
+                                        }`}
+                                        style={{
+                                          backgroundColor: isCompleted
+                                            ? status.color 
+                                            : undefined
+                                        }}
+                                      ></div>
+                                    )}
+                                  </div>
+                                )
+                              })}
                           </div>
                         </div>
                       </div>
