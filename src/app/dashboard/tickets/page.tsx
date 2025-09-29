@@ -428,7 +428,7 @@ export default function TicketsPage() {
         {/* Dynamic Status Cards - Protótipo 35 (Layout de Tabela) - Corrigido para evitar sobreposição */}
         <div className="flex flex-wrap gap-6">
           {/* Total no Período */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden w-[280px] flex-shrink-0">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden w-[280px] h-[120px] flex-shrink-0">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent"></div>
             <div className="relative">
               <div className="border-b border-gray-200 dark:border-gray-600 pb-3 mb-3">
