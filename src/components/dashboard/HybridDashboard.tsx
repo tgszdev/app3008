@@ -480,10 +480,21 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                               const historyStatusInfo = client.status_stats.find(s => s.slug === historyItem.status)
                               const historyStatusColor = historyStatusInfo?.color || '#6B7280'
                               
+                              const formatDate = (dateString: string) => {
+                                const date = new Date(dateString)
+                                return date.toLocaleDateString('pt-BR', {
+                                  day: '2-digit',
+                                  month: '2-digit',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })
+                              }
+                              
                               return (
-                                <div key={`${historyItem.status}-${index}`} className="flex items-center">
+                                <div key={`${historyItem.status}-${index}`} className="flex items-center group relative">
                                   <div 
-                                    className={`w-3 h-3 rounded-full ${
+                                    className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-200 hover:scale-110 ${
                                       isCurrent
                                         ? 'ring-2 ring-offset-2' 
                                         : ''
@@ -491,8 +502,21 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                                     style={{
                                       backgroundColor: historyStatusColor
                                     }}
-                                    title={`${historyItem.status} em ${new Date(historyItem.created_at).toLocaleDateString('pt-BR')} por ${historyItem.user?.name || 'Sistema'}`}
                                   ></div>
+                                  
+                                  {/* Tooltip instantâneo */}
+                                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-0 pointer-events-none whitespace-nowrap z-50">
+                                    <div className="font-semibold">{historyItem.status}</div>
+                                    <div className="text-gray-300">
+                                      {formatDate(historyItem.created_at)}
+                                    </div>
+                                    <div className="text-gray-400">
+                                      por {historyItem.user?.name || 'Sistema'}
+                                    </div>
+                                    {/* Seta do tooltip */}
+                                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+                                  </div>
+                                  
                                   {!isLast && (
                                     <div 
                                       className="w-8 h-1 rounded-full"
