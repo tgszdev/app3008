@@ -401,25 +401,48 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
 
                   // Processar histórico de status para mostrar steps reais
                   const getStatusHistory = () => {
-                    if (!(ticket as any).ticket_history) return []
+                    if (!(ticket as any).ticket_history) {
+                      // Se não há histórico, mostrar apenas o status atual
+                      return [{
+                        status: ticket.status,
+                        created_at: ticket.created_at,
+                        user: (ticket as any).created_by_user
+                      }]
+                    }
                     
                     // Filtrar apenas mudanças de status
                     const statusChanges = (ticket as any).ticket_history
                       .filter((history: any) => history.action_type === 'status_changed' && history.field_changed === 'status')
                       .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
                     
-                    // Adicionar status inicial (criado)
-                    const initialStatus = {
-                      status: 'Aberto', // Status inicial sempre é Aberto
+                    // Criar array com status inicial + mudanças
+                    const history: Array<{
+                      status: string;
+                      created_at: string;
+                      user: any;
+                    }> = []
+                    
+                    // Adicionar status inicial (sempre Aberto quando criado)
+                    history.push({
+                      status: 'Aberto',
                       created_at: ticket.created_at,
                       user: (ticket as any).created_by_user
-                    }
+                    })
                     
-                    return [initialStatus, ...statusChanges.map((change: any) => ({
-                      status: change.new_value,
-                      created_at: change.created_at,
-                      user: change.user
-                    }))]
+                    // Adicionar apenas as mudanças de status que realmente aconteceram
+                    statusChanges.forEach((change: any) => {
+                      // Evitar duplicatas - só adicionar se for diferente do último status
+                      const lastStatus = history[history.length - 1]?.status
+                      if (change.new_value !== lastStatus) {
+                        history.push({
+                          status: change.new_value,
+                          created_at: change.created_at,
+                          user: change.user
+                        })
+                      }
+                    })
+                    
+                    return history
                   }
 
                   const statusHistory = getStatusHistory()
