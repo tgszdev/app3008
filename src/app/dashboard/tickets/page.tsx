@@ -415,21 +415,8 @@ export default function TicketsPage() {
         </div>
       </div>
 
-      {/* Stats - Dynamic with zero filtering */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-4">
-        {/* Total Card - Always visible */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden w-[280px] h-[120px] flex-shrink-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent"></div>
-          <div className="relative">
-            <div className="border-b border-gray-200 dark:border-gray-600 pb-3 mb-3">
-              <div className="text-base font-medium text-gray-700 dark:text-gray-300 break-words">Total</div>
-            </div>
-            <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 text-right leading-none">{allTickets.length}</div>
-          </div>
-        </div>
-
-        {/* Dynamic Status Cards - Protótipo 35 (Layout de Tabela) - Corrigido para evitar sobreposição */}
-        <div className="flex flex-wrap gap-6">
+      {/* Dynamic Status Cards - Protótipo 35 (Layout de Tabela) - Corrigido para evitar sobreposição */}
+      <div className="flex flex-wrap gap-6">
           {/* Total no Período */}
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden w-[280px] h-[120px] flex-shrink-0">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent"></div>
