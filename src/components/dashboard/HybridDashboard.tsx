@@ -387,32 +387,114 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
             </div>
           )}
 
-          {/* Tickets Recentes */}
+          {/* Tickets Recentes - Protótipo 33 com Steps */}
           {client.tickets.length > 0 && (
             <div>
               <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
                 Tickets Recentes
               </h4>
-              <div className="space-y-2">
-                {client.tickets.slice(0, 5).map((ticket) => (
-                  <div key={ticket.id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded-xl">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                        #{ticket.ticket_number} - {ticket.title}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {formatDateShort(ticket.created_at)}
-                      </p>
+              <div className="space-y-3">
+                {client.tickets.slice(0, 5).map((ticket) => {
+                  const getStepValue = (status: string) => {
+                    switch (status) {
+                      case 'resolvido': return 4
+                      case 'em-atendimento': return 3
+                      case 'em-analise': return 2
+                      case 'aberto': return 1
+                      default: return 1
+                    }
+                  }
+
+                  // Buscar cor do status no cadastro
+                  const statusInfo = client.status_stats.find(s => s.slug === ticket.status)
+                  const statusColor = statusInfo?.color || '#6B7280'
+
+                  const getStepColor = (status: string) => {
+                    return `bg-[${statusColor}]`
+                  }
+
+                  const getProgressValue = (status: string) => {
+                    switch (status) {
+                      case 'resolvido': return 100
+                      case 'em-atendimento': return 75
+                      case 'em-analise': return 50
+                      case 'aberto': return 25
+                      default: return 25
+                    }
+                  }
+
+                  const getProgressColor = (status: string) => {
+                    return `bg-[${statusColor}]`
+                  }
+
+                  const getPriorityColor = (priority: string) => {
+                    switch (priority) {
+                      case 'critical': return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+                      case 'high': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400'
+                      case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                      case 'low': return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+                    }
+                  }
+
+                  return (
+                    <div key={ticket.id} className="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-300">
+                      <div className="flex items-start gap-4">
+                        {/* Progress Bar Vertical */}
+                        <div className="flex-shrink-0">
+                          <div className="w-3 h-20 bg-gray-200 dark:bg-gray-700 rounded-full">
+                            <div 
+                              className={`w-3 rounded-full ${getProgressColor(ticket.status)}`}
+                              style={{ height: `${getProgressValue(ticket.status)}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex-1 space-y-3">
+                          {/* Header com número, título e prioridade */}
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-gray-900 dark:text-white text-sm">#{ticket.ticket_number}</span>
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPriorityColor(ticket.priority)}`}>
+                              {ticket.priority === 'critical' ? 'Crítico' : ticket.priority === 'high' ? 'Alto' : ticket.priority === 'medium' ? 'Médio' : 'Baixo'}
+                            </span>
+                            <span className="text-xs font-medium text-gray-700 dark:text-gray-300 ml-auto">{ticket.status}</span>
+                          </div>
+                          
+                          {/* Título do ticket */}
+                          <h3 className="font-medium text-gray-900 dark:text-white text-sm line-clamp-2">{ticket.title}</h3>
+                          
+                          {/* Informações do ticket */}
+                          <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-400">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              {formatDateShort(ticket.created_at)}
+                            </span>
+                          </div>
+                          
+                          {/* Steps horizontais */}
+                          <div className="flex items-center gap-2">
+                            {['Aberto', 'Em Análise', 'Em Atendimento', 'Resolvido'].map((step, index) => (
+                              <div key={step} className="flex items-center">
+                                <div className={`w-3 h-3 rounded-full ${
+                                  index < getStepValue(ticket.status) 
+                                    ? getStepColor(ticket.status) 
+                                    : 'bg-gray-300 dark:bg-gray-600'
+                                }`}></div>
+                                {index < 3 && (
+                                  <div className={`w-8 h-1 rounded-full ${
+                                    index < getStepValue(ticket.status) - 1 
+                                      ? getStepColor(ticket.status) 
+                                      : 'bg-gray-300 dark:bg-gray-600'
+                                  }`}></div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 ml-2">
-                      <span 
-                        className="px-2 py-1 text-xs font-medium rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
-                      >
-                        {ticket.status}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           )}
