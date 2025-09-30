@@ -458,15 +458,31 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                     }
   }
   
+  // Obter cor da prioridade para a borda
+  const getPriorityBorderColor = (priority: string) => {
+    switch (priority) {
+      case 'critical': return '#ef4444'
+      case 'high': return '#f97316'
+      case 'medium': return '#eab308'
+      case 'low': return '#22c55e'
+      default: return '#6b7280'
+    }
+  }
+
   return (
-                    <div key={ticket.id} className="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-300">
+                    <div 
+                      key={ticket.id} 
+                      className="bg-white dark:bg-gray-800 rounded-2xl p-4 border shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer"
+                      style={{ borderColor: getPriorityBorderColor(ticket.priority) }}
+                      onClick={() => window.open(`/dashboard/tickets/${ticket.id}`, '_blank')}
+                    >
                       <div className="space-y-3">
                           {/* Header com número, título e prioridade */}
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-gray-900 dark:text-white text-sm">#{ticket.ticket_number}</span>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="font-semibold text-gray-900 dark:text-white text-xl sm:text-2xl">#{ticket.ticket_number}</span>
                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPriorityColor(ticket.priority)}`}>
                               {ticket.priority === 'critical' ? 'Crítico' : ticket.priority === 'high' ? 'Alto' : ticket.priority === 'medium' ? 'Médio' : 'Baixo'}
-    </span>
+                            </span>
                             <span 
                               className="text-xs font-medium px-2 py-1 rounded-full ml-auto"
                               style={{
@@ -479,18 +495,37 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                           </div>
                           
                           {/* Título do ticket */}
-                          <h3 className="font-medium text-gray-900 dark:text-white text-sm line-clamp-2">{ticket.title}</h3>
+                          <h3 className="font-medium text-gray-900 dark:text-white text-sm sm:text-base line-clamp-2">{ticket.title}</h3>
                           
-                          {/* Informações do ticket */}
-                          <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-400">
-                            <span className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                              {formatDateShort(ticket.created_at)}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <User className="h-3 w-3" />
-                              {(ticket as any).created_by_user?.name || 'Sistema'}
-                            </span>
+                          {/* Informações do ticket - Grid 2x2 */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3 flex-shrink-0" />
+                              <span className="truncate">
+                                <span className="font-medium hidden sm:inline">Data de Abertura:</span>
+                                <span className="font-medium sm:hidden">Abertura:</span> {formatDateShort(ticket.created_at)}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <User className="h-3 w-3 flex-shrink-0" />
+                              <span className="truncate">
+                                <span className="font-medium hidden sm:inline">Autor do Chamado:</span>
+                                <span className="font-medium sm:hidden">Autor:</span> {(ticket as any).created_by_user?.name || 'Sistema'}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <User className="h-3 w-3 flex-shrink-0" />
+                              <span className="truncate">
+                                <span className="font-medium hidden sm:inline">Atribuído Para:</span>
+                                <span className="font-medium sm:hidden">Atribuído:</span> {(ticket as any).assigned_to_user?.name || 'Não atribuído'}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Building className="h-3 w-3 flex-shrink-0" />
+                              <span className="truncate">
+                                <span className="font-medium">Cliente:</span> {client.context.name}
+                              </span>
+                            </div>
                           </div>
                           
                           {/* Steps horizontais - baseados no histórico real */}
