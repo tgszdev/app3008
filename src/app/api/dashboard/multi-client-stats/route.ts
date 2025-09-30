@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server'
 import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
+import { getUserContextIds } from '@/lib/context-helpers'
 
 export async function GET(request: NextRequest) {
   try {
@@ -50,16 +51,8 @@ export async function GET(request: NextRequest) {
       console.log('🎯 API Multi-client recebeu context_ids:', targetContextIds)
     }
 
-    // Se não foram fornecidos context_ids, buscar contextos associados ao usuário
     if (targetContextIds.length === 0) {
-      const { data: userContexts, error: contextsError } = await supabaseAdmin
-        .from('user_contexts')
-        .select('context_id')
-        .eq('user_id', currentUser.id)
-      
-      if (!contextsError && userContexts) {
-        targetContextIds = userContexts.map(uc => uc.context_id)
-      }
+      targetContextIds = await getUserContextIds(currentUser.id)
     }
 
     // Construir query base

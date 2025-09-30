@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
+import { getUserContextIds } from '@/lib/context-helpers'
 
 // GET - API dinâmica de categorias (SEM HARDCODING)
 export async function GET(request: Request) {
@@ -67,29 +68,22 @@ export async function GET(request: Request) {
       }
       
     } else if (userData.user_type === 'matrix') {
-      // Usuário matrix: categorias globais + de todos os contextos associados
       console.log('🔍 Usuário matrix - buscando contextos associados')
       
-      // Buscar contextos associados ao usuário matrix
-      const { data: userContexts, error: userContextsError } = await supabaseAdmin
-        .from('user_contexts')
-        .select('context_id')
-        .eq('user_id', userData.id)
-
-      if (userContextsError) {
-        console.log('⚠️ Erro ao buscar contextos do usuário matrix:', userContextsError.message)
-        // Fallback: apenas categorias globais
+      try {
+        const contextIds = await getUserContextIds(userData.id)
+        
+        if (contextIds.length === 0) {
+          query = query.eq('is_global', true)
+          console.log('⚠️ Usuário matrix sem contextos associados - apenas globais')
+        } else {
+          query = query.or(`is_global.eq.true,context_id.in.(${contextIds.join(',')})`)
+          console.log('✅ Filtro aplicado: globais + contextos', contextIds)
+        }
+      } catch (error) {
+        console.log('⚠️ Erro ao buscar contextos do usuário matrix')
         query = query.eq('is_global', true)
         console.log('⚠️ Fallback: apenas categorias globais')
-      } else if (userContexts.length === 0) {
-        // Se não tem contextos associados, apenas globais
-        query = query.eq('is_global', true)
-        console.log('⚠️ Usuário matrix sem contextos associados - apenas globais')
-      } else {
-        // Filtrar por contextos associados + globais
-        const contextIds = userContexts.map(uc => uc.context_id)
-        query = query.or(`is_global.eq.true,context_id.in.(${contextIds.join(',')})`)
-        console.log('✅ Filtro aplicado: globais + contextos', contextIds)
       }
       
     } else {

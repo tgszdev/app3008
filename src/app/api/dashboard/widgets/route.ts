@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server'
 import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
+import { getUserContextIds } from '@/lib/context-helpers'
 
 export async function GET(request: NextRequest) {
   try {
@@ -40,7 +41,6 @@ export async function GET(request: NextRequest) {
     const defaultStartDate = startDate || new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
     const defaultEndDate = endDate || new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
 
-    // Get user's associated organizations
     const { data: userContexts, error: contextsError } = await supabaseAdmin
       .from('user_contexts')
       .select('context_id, contexts(name, slug)')

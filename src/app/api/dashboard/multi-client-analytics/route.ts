@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server'
 import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
+import { getUserContextIds } from '@/lib/context-helpers'
 
 // GET - Buscar analytics agrupados por cliente/organização
 export async function GET(request: NextRequest) {
@@ -55,22 +56,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'context_ids are required' }, { status: 400 })
     }
 
-    // Verificar se o usuário tem acesso aos contextos solicitados
     if (userType === 'matrix') {
-      // Para usuários matrix, verificar se os contextos estão associados
-      const { data: userContexts, error: contextsError } = await supabaseAdmin
-        .from('user_contexts')
-        .select('context_id')
-        .eq('user_id', currentUserId)
+      const allowedContextIds = await getUserContextIds(currentUserId)
       
-      if (!contextsError && userContexts) {
-        const userContextIds = userContexts.map(uc => uc.context_id)
-        const unauthorizedContexts = contextIds.filter(id => !userContextIds.includes(id))
-        
-        if (unauthorizedContexts.length > 0) {
-          console.log('❌ Usuário não tem acesso aos contextos:', unauthorizedContexts)
-          return NextResponse.json({ error: 'Acesso negado a alguns contextos' }, { status: 403 })
-        }
+      if (allowedContextIds.length === 0) {
+        return NextResponse.json({ error: 'No contexts associated with user' }, { status: 403 })
+      }
+      
+      const unauthorizedContexts = contextIds.filter(id => !allowedContextIds.includes(id))
+      
+      if (unauthorizedContexts.length > 0) {
+        console.log('❌ Usuário não tem acesso aos contextos:', unauthorizedContexts)
+        return NextResponse.json({ error: 'Acesso negado a alguns contextos' }, { status: 403 })
       }
     } else if (userType === 'context') {
       // Para usuários de contexto, só podem acessar seu próprio contexto

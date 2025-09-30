@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
+import { applyContextFilter } from '@/lib/context-helpers'
 
 export async function GET(request: Request) {
   try {
@@ -78,24 +79,7 @@ export async function GET(request: Request) {
       .lte('created_at', endDate.toISOString())
 
     // Apply multi-tenant filter
-    if (userType === 'context' && userContextId) {
-      // Usuários de contexto só veem tickets do seu contexto
-      ticketsQuery = ticketsQuery.eq('context_id', userContextId)
-    } else if (userType === 'matrix') {
-      // Para usuários matrix, buscar contextos associados
-      const { data: userContexts, error: contextsError } = await supabaseAdmin
-        .from('user_contexts')
-        .select('context_id')
-        .eq('user_id', currentUserId)
-      
-      if (!contextsError && userContexts && userContexts.length > 0) {
-        const associatedContextIds = userContexts.map(uc => uc.context_id)
-        ticketsQuery = ticketsQuery.in('context_id', associatedContextIds)
-      } else {
-        // Se não tem contextos associados, não mostrar nenhum ticket
-        ticketsQuery = ticketsQuery.eq('context_id', '00000000-0000-0000-0000-000000000000')
-      }
-    }
+    ticketsQuery = await applyContextFilter(ticketsQuery, userType, userContextId, currentUserId)
 
     const { data: tickets, error: ticketsError } = await ticketsQuery
 
@@ -130,23 +114,7 @@ export async function GET(request: Request) {
       .gte('created_at', previousStartDate.toISOString())
       .lte('created_at', previousEndDate.toISOString())
 
-    if (userType === 'context' && userContextId) {
-      previousTicketsQuery = previousTicketsQuery.eq('context_id', userContextId)
-    } else if (userType === 'matrix') {
-      // Para usuários matrix, buscar contextos associados
-      const { data: userContexts, error: contextsError } = await supabaseAdmin
-        .from('user_contexts')
-        .select('context_id')
-        .eq('user_id', currentUserId)
-      
-      if (!contextsError && userContexts && userContexts.length > 0) {
-        const associatedContextIds = userContexts.map(uc => uc.context_id)
-        previousTicketsQuery = previousTicketsQuery.in('context_id', associatedContextIds)
-      } else {
-        // Se não tem contextos associados, não mostrar nenhum ticket
-        previousTicketsQuery = previousTicketsQuery.eq('context_id', '00000000-0000-0000-0000-000000000000')
-      }
-    }
+    previousTicketsQuery = await applyContextFilter(previousTicketsQuery, userType, userContextId, currentUserId)
 
     const { data: previousTickets } = await previousTicketsQuery
 
