@@ -945,16 +945,28 @@ export default function TicketsPage() {
               }
             }
 
+            // Obter cor da prioridade para a borda
+            const getPriorityBorderColor = (priority: string) => {
+              switch (priority) {
+                case 'critical': return '#ef4444' // red-500
+                case 'high': return '#f97316' // orange-500
+                case 'medium': return '#eab308' // yellow-500
+                case 'low': return '#22c55e' // green-500
+                default: return '#6b7280' // gray-500
+              }
+            }
+
             return (
               <div 
                 key={ticket.id} 
-                className="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer"
+                className="bg-white dark:bg-gray-800 rounded-2xl p-4 border shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer"
+                style={{ borderColor: getPriorityBorderColor(ticket.priority) }}
                 onClick={() => window.location.href = `/dashboard/tickets/${ticket.id}`}
               >
                 <div className="space-y-3">
                   {/* Header com número, título e prioridade */}
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-gray-900 dark:text-white text-sm">#{ticket.ticket_number}</span>
+                    <span className="font-semibold text-gray-900 dark:text-white text-2xl">#{ticket.ticket_number}</span>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPriorityColor(ticket.priority)}`}>
                       {ticket.priority === 'critical' ? 'Crítico' : ticket.priority === 'high' ? 'Alto' : ticket.priority === 'medium' ? 'Médio' : 'Baixo'}
                     </span>
