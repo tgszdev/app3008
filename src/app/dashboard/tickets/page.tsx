@@ -333,10 +333,10 @@ export default function TicketsPage() {
         console.log('🔍 Filtrando por clientes:', selectedClients)
       }
 
-      // Filtro de "Meus Tickets"
+      // Filtro de "Meus Chamados" (criador OU responsável)
       if (myTicketsOnly && session?.user?.id) {
-        params.append('assigned_to', session.user.id)
-        console.log('🔍 Filtrando por meus tickets:', session.user.id)
+        params.append('myTickets', session.user.id)
+        console.log('🔍 Filtrando por meus chamados (criador OU responsável):', session.user.id)
       }
 
       // Filtro de período
@@ -389,9 +389,9 @@ export default function TicketsPage() {
         params.append('end_date', periodFilter.end_date)
       }
 
-      // Aplicar filtro "Meus Chamados"
+      // Aplicar filtro "Meus Chamados" (criador OU responsável)
       if (myTicketsOnly && session?.user?.id) {
-        params.append('userId', session.user.id)
+        params.append('myTickets', session.user.id)
       }
 
       const queryString = params.toString()
@@ -624,7 +624,7 @@ export default function TicketsPage() {
             </div>
           )}
 
-          {/* Botão Meus Tickets */}
+          {/* Botão Meus Chamados */}
           <button
             onClick={toggleMyTickets}
             className={`w-40 h-10 flex items-center justify-center gap-2 px-4 border rounded-xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
@@ -634,7 +634,7 @@ export default function TicketsPage() {
             }`}
           >
             <User className="h-4 w-4 flex-shrink-0" />
-            <span className="text-sm font-medium">Meus Tickets</span>
+            <span className="text-sm font-medium">Meus Chamados</span>
             <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
           </button>
           
