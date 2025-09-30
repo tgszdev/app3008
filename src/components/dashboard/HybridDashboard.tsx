@@ -474,7 +474,7 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                       key={ticket.id} 
                       className="bg-white dark:bg-gray-800 rounded-2xl p-4 border shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer"
                       style={{ borderColor: getPriorityBorderColor(ticket.priority) }}
-                      onClick={() => window.open(`/dashboard/tickets/${ticket.id}`, '_blank')}
+                      onClick={() => window.location.href = `/dashboard/tickets/${ticket.id}`}
                     >
                       <div className="space-y-3">
                           {/* Header com número, título e prioridade */}
