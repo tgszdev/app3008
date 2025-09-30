@@ -529,17 +529,17 @@ export default function TicketsPage() {
           </p>
         </div>
 
-        {/* Botões de Ação */}
-        <div className="flex flex-wrap items-center gap-3">
+        {/* Botões de Ação - Responsivo */}
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           {/* Seletor de Clientes */}
           {availableContexts && availableContexts.length > 0 && (
             <div className="relative" ref={clientSelectorRef}>
               <button
                 onClick={() => setShowClientSelector(!showClientSelector)}
-                className="w-40 h-10 flex items-center justify-between gap-2 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
+                className="w-full sm:w-auto min-w-[160px] h-10 flex items-center justify-between gap-2 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
               >
                 <Building2 className="h-4 w-4 flex-shrink-0" />
-                <span className="text-xs font-medium">
+                <span className="text-xs sm:text-sm font-medium truncate">
                   {selectedClients.length === 0 
                     ? 'Selecionar Clientes'
                     : selectedClients.length === 1
@@ -627,7 +627,7 @@ export default function TicketsPage() {
           {/* Botão Meus Chamados */}
           <button
             onClick={toggleMyTickets}
-            className={`w-40 h-10 flex items-center justify-center gap-2 px-4 border rounded-3xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
+            className={`w-full sm:w-auto min-w-[160px] h-10 flex items-center justify-center gap-2 px-3 sm:px-4 border rounded-3xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
               myTicketsOnly 
                 ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
                 : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
@@ -641,7 +641,7 @@ export default function TicketsPage() {
           {/* Botão Filtro de Data */}
           <button
             onClick={() => setShowDateFilters(!showDateFilters)}
-            className="w-40 h-10 flex items-center justify-center gap-2 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
+            className="w-full sm:w-auto min-w-[160px] h-10 flex items-center justify-center gap-2 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
           >
             <Calendar className="h-4 w-4 flex-shrink-0" />
             <span className="text-sm font-medium">
@@ -659,7 +659,7 @@ export default function TicketsPage() {
           <button
             onClick={handleExportPDF}
             disabled={isGeneratingPDF}
-            className="w-40 h-10 flex items-center justify-center gap-2 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden whitespace-nowrap"
+            className="w-full sm:w-auto min-w-[160px] h-10 flex items-center justify-center gap-2 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden whitespace-nowrap"
           >
             {isGeneratingPDF ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -679,7 +679,7 @@ export default function TicketsPage() {
               fetchAllTickets()
             }}
             className={cn(
-              "w-40 h-10 flex items-center justify-center gap-2 px-4 border border-gray-200 dark:border-gray-700",
+              "w-full sm:w-auto min-w-[160px] h-10 flex items-center justify-center gap-2 px-3 sm:px-4 border border-gray-200 dark:border-gray-700",
               "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700",
               "text-gray-700 dark:text-gray-300 font-medium rounded-3xl transition-all duration-300",
               refreshing && "opacity-50 cursor-not-allowed"
@@ -693,7 +693,7 @@ export default function TicketsPage() {
           {/* Botão Novo Chamado */}
           <Link
             href="/dashboard/tickets/new"
-            className="w-48 h-10 flex items-center justify-center gap-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-3xl transition-all duration-300 whitespace-nowrap"
+            className="w-full sm:w-auto min-w-[192px] h-10 flex items-center justify-center gap-2 px-3 sm:px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-3xl transition-all duration-300 whitespace-nowrap"
           >
             <Plus className="h-5 w-5" />
             <span className="text-sm font-medium">Novo Chamado</span>
@@ -796,7 +796,7 @@ export default function TicketsPage() {
       </div>
 
       {/* Dynamic Status Cards - Ordenados por order_index e respeitando filtros */}
-      <div className="flex flex-wrap gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {/* Status dinâmicos - ordenados por order_index */}
           {statusesWithCount
             .sort((a, b) => (a.order_index || 999) - (b.order_index || 999))
@@ -827,14 +827,14 @@ export default function TicketsPage() {
                 <div 
                   key={status.slug} 
                   onClick={() => setStatusFilter(status.slug)}
-                  className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden w-[280px] flex-shrink-0 cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-105"
+                  className="bg-white dark:bg-gray-800 rounded-3xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-105"
                 >
                   <div className="absolute inset-0 opacity-10" style={{ background: `linear-gradient(135deg, ${statusColor}, transparent)` }}></div>
                   <div className="relative">
-                    <div className="border-b border-gray-200 dark:border-gray-600 pb-3 mb-3">
-                      <div className="text-base font-medium text-gray-700 dark:text-gray-300 break-words">{status.name}</div>
+                    <div className="border-b border-gray-200 dark:border-gray-600 pb-2 sm:pb-3 mb-2 sm:mb-3">
+                      <div className="text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 break-words">{status.name}</div>
                     </div>
-                    <div className="text-4xl font-bold text-right leading-none" style={{ color: statusColor }}>{count}</div>
+                    <div className="text-3xl sm:text-4xl font-bold text-right leading-none" style={{ color: statusColor }}>{count}</div>
                   </div>
                 </div>
               )
@@ -843,14 +843,14 @@ export default function TicketsPage() {
           {/* Total no Período - sempre por último */}
           <div 
             onClick={() => setStatusFilter('all')}
-            className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden w-[280px] h-[120px] flex-shrink-0 cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-105"
+            className="bg-white dark:bg-gray-800 rounded-3xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-105"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent"></div>
             <div className="relative">
-              <div className="border-b border-gray-200 dark:border-gray-600 pb-3 mb-3">
-                <div className="text-base font-medium text-gray-700 dark:text-gray-300 break-words">Total no Período</div>
+              <div className="border-b border-gray-200 dark:border-gray-600 pb-2 sm:pb-3 mb-2 sm:mb-3">
+                <div className="text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 break-words">Total no Período</div>
               </div>
-              <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 text-right leading-none">{tickets.length}</div>
+              <div className="text-3xl sm:text-4xl font-bold text-blue-600 dark:text-blue-400 text-right leading-none">{tickets.length}</div>
             </div>
           </div>
 
@@ -858,9 +858,9 @@ export default function TicketsPage() {
           {statusFilter !== 'all' && (
             <div 
               onClick={() => setStatusFilter('all')}
-              className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden w-[120px] h-[120px] flex-shrink-0 cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-105 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center justify-center"
+              className="bg-white dark:bg-gray-800 rounded-3xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-105 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center justify-center min-h-[100px] sm:min-h-[120px]"
             >
-              <XCircle className="h-16 w-16 text-red-500 dark:text-red-400" />
+              <XCircle className="h-12 w-12 sm:h-16 sm:w-16 text-red-500 dark:text-red-400" />
             </div>
           )}
       </div>
@@ -965,8 +965,8 @@ export default function TicketsPage() {
               >
                 <div className="space-y-3">
                   {/* Header com número, título e prioridade */}
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-gray-900 dark:text-white text-2xl">#{ticket.ticket_number}</span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-semibold text-gray-900 dark:text-white text-xl sm:text-2xl">#{ticket.ticket_number}</span>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPriorityColor(ticket.priority)}`}>
                       {ticket.priority === 'critical' ? 'Crítico' : ticket.priority === 'high' ? 'Alto' : ticket.priority === 'medium' ? 'Médio' : 'Baixo'}
                     </span>
@@ -982,26 +982,29 @@ export default function TicketsPage() {
                   </div>
                   
                   {/* Título do ticket */}
-                  <h3 className="font-medium text-gray-900 dark:text-white text-sm line-clamp-2">{ticket.title}</h3>
+                  <h3 className="font-medium text-gray-900 dark:text-white text-sm sm:text-base line-clamp-2">{ticket.title}</h3>
                   
-                  {/* Informações do ticket - Grid 2x2 */}
-                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 dark:text-gray-400">
+                  {/* Informações do ticket - Grid responsivo */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                     <div className="flex items-center gap-1">
                       <Calendar className="h-3 w-3 flex-shrink-0" />
                       <span className="truncate">
-                        <span className="font-medium">Data de Abertura:</span> {getTimeAgo(ticket.created_at)}
+                        <span className="font-medium hidden sm:inline">Data de Abertura:</span>
+                        <span className="font-medium sm:hidden">Abertura:</span> {getTimeAgo(ticket.created_at)}
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
                       <User className="h-3 w-3 flex-shrink-0" />
                       <span className="truncate">
-                        <span className="font-medium">Autor do Chamado:</span> {ticket.created_by_user?.name || 'Sistema'}
+                        <span className="font-medium hidden sm:inline">Autor do Chamado:</span>
+                        <span className="font-medium sm:hidden">Autor:</span> {ticket.created_by_user?.name || 'Sistema'}
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
                       <User className="h-3 w-3 flex-shrink-0" />
                       <span className="truncate">
-                        <span className="font-medium">Atribuído Para:</span> {ticket.assigned_to_user?.name || 'Não atribuído'}
+                        <span className="font-medium hidden sm:inline">Atribuído Para:</span>
+                        <span className="font-medium sm:hidden">Atribuído:</span> {ticket.assigned_to_user?.name || 'Não atribuído'}
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
