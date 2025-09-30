@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
@@ -182,6 +182,7 @@ export default function TicketsPage() {
   const [tempFilter, setTempFilter] = useState(periodFilter)
   const [showDateFilters, setShowDateFilters] = useState(false)
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
+  const clientSelectorRef = useRef<HTMLDivElement>(null)
 
   // Mapeamento removido - agora usa slugs direto do banco de dados
   // Os status no dropdown já vêm com os slugs corretos do banco
@@ -240,9 +241,84 @@ export default function TicketsPage() {
   }
 
   const handleClientSelectionChange = (clientIds: string[]) => {
+    console.log('🔄 Mudança de seleção de clientes:', clientIds)
     setSelectedClients(clientIds)
-    localStorage.setItem('selectedClients', JSON.stringify(clientIds))
   }
+
+  // Carregar seleções do localStorage na inicialização
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('selectedClients')
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved)
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setSelectedClients(parsed)
+          }
+        } catch (e) {
+          console.error('Erro ao parsear selectedClients:', e)
+        }
+      }
+
+      const savedMyTickets = localStorage.getItem('myTicketsOnly')
+      if (savedMyTickets) {
+        setMyTicketsOnly(savedMyTickets === 'true')
+      }
+
+      const savedPeriodFilter = localStorage.getItem('periodFilter')
+      if (savedPeriodFilter) {
+        try {
+          const parsed = JSON.parse(savedPeriodFilter)
+          setPeriodFilter(parsed)
+          setTempFilter(parsed)
+        } catch (e) {
+          console.error('Erro ao parsear periodFilter:', e)
+        }
+      }
+    }
+  }, [])
+
+  // Salvar seleções no localStorage sempre que mudarem
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (selectedClients.length > 0) {
+        localStorage.setItem('selectedClients', JSON.stringify(selectedClients))
+        console.log('🔄 Salvando seleções no localStorage:', selectedClients)
+      } else {
+        localStorage.removeItem('selectedClients')
+        console.log('🔄 Removendo seleções do localStorage (lista vazia)')
+      }
+    }
+  }, [selectedClients])
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('myTicketsOnly', myTicketsOnly.toString())
+    }
+  }, [myTicketsOnly])
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('periodFilter', JSON.stringify(periodFilter))
+    }
+  }, [periodFilter])
+
+  // Fechar seletor ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (clientSelectorRef.current && !clientSelectorRef.current.contains(event.target as Node)) {
+        setShowClientSelector(false)
+      }
+    }
+
+    if (showClientSelector) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showClientSelector])
 
   const fetchTickets = async (showLoader = true) => {
     if (showLoader) setLoading(true)
@@ -250,16 +326,38 @@ export default function TicketsPage() {
 
     try {
       const params = new URLSearchParams()
+      
+      // Filtro de clientes
+      if (selectedClients.length > 0) {
+        params.append('context_ids', selectedClients.join(','))
+        console.log('🔍 Filtrando por clientes:', selectedClients)
+      }
+
+      // Filtro de "Meus Tickets"
+      if (myTicketsOnly && session?.user?.id) {
+        params.append('assigned_to', session.user.id)
+        console.log('🔍 Filtrando por meus tickets:', session.user.id)
+      }
+
+      // Filtro de período
+      if (periodFilter.start_date && periodFilter.end_date) {
+        params.append('start_date', periodFilter.start_date)
+        params.append('end_date', periodFilter.end_date)
+        console.log('🔍 Filtrando por período:', periodFilter)
+      }
+
+      // Filtro de status
       if (statusFilter !== 'all') {
-        // Usar slug direto do banco de dados
         params.append('status', statusFilter)
       }
-      if (priorityFilter !== 'all') params.append('priority', priorityFilter)
+
+      // Filtro de prioridade
+      if (priorityFilter !== 'all') {
+        params.append('priority', priorityFilter)
+      }
 
       const url = `/api/tickets?${params.toString()}`
       console.log('🔍 Fetching tickets with URL:', url)
-      console.log('🔍 Status filter:', statusFilter)
-      console.log('🔍 Priority filter:', priorityFilter)
 
       const response = await axios.get(url)
       console.log('✅ Tickets received:', response.data.length)
@@ -287,7 +385,7 @@ export default function TicketsPage() {
   useEffect(() => {
     fetchTickets()
     fetchAllTickets() // Buscar todos para os cards
-  }, [statusFilter, priorityFilter])
+  }, [statusFilter, priorityFilter, selectedClients, myTicketsOnly, periodFilter])
 
   const handleDeleteTicket = async (ticketId: string) => {
     if (!confirm('Tem certeza que deseja excluir este chamado?')) return
@@ -399,25 +497,22 @@ export default function TicketsPage() {
         <div className="flex flex-wrap items-center gap-3">
           {/* Seletor de Clientes */}
           {availableContexts && availableContexts.length > 0 && (
-            <div className="relative">
+            <div className="relative" ref={clientSelectorRef}>
               <button
                 onClick={() => setShowClientSelector(!showClientSelector)}
-                className="w-full sm:w-46 h-10 flex items-center justify-between gap-2 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 whitespace-nowrap"
+                className="w-40 h-10 flex items-center justify-between gap-2 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
               >
-                <Building2 className="h-4 w-4 flex-shrink-0 text-gray-500 dark:text-gray-400" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
+                <Building2 className="h-4 w-4 flex-shrink-0" />
+                <span className="text-xs font-medium">
                   {selectedClients.length === 0 
-                    ? 'Todos os clientes'
+                    ? 'Selecionar Clientes'
                     : selectedClients.length === 1
                       ? availableContexts.find(c => c.id === selectedClients[0])?.name || 'Cliente'
                       : `${selectedClients.length} clientes`
                   }
                 </span>
-                {showClientSelector ? (
-                  <ChevronUp className="h-4 w-4 flex-shrink-0 text-gray-400" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 flex-shrink-0 text-gray-400" />
-                )}
+                <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-blue-500/20 to-transparent animate-pulse"></div>
               </button>
 
               {showClientSelector && (
@@ -428,19 +523,19 @@ export default function TicketsPage() {
                       .map((context) => (
                         <label
                           key={context.id}
-                          className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer transition-colors"
+                          className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors rounded-xl"
                         >
                           <input
                             type="checkbox"
                             checked={selectedClients.includes(context.id)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                handleClientSelectionChange([...selectedClients, context.id])
-                              } else {
+                            onChange={() => {
+                              if (selectedClients.includes(context.id)) {
                                 handleClientSelectionChange(selectedClients.filter(id => id !== context.id))
+                              } else {
+                                handleClientSelectionChange([...selectedClients, context.id])
                               }
                             }}
-                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                            className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
                           />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
