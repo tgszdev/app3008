@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
+import { getUserContextIds } from '@/lib/context-helpers'
 
 export async function GET(request: NextRequest) {
   try {
@@ -119,19 +120,13 @@ export async function GET(request: NextRequest) {
         return comment.ticket?.context_id === userContextId
       })
     } else if (userType === 'matrix') {
-      // Para usuários matrix, buscar contextos associados
-      const { data: userContexts, error: contextsError } = await supabaseAdmin
-        .from('user_contexts')
-        .select('context_id')
-        .eq('user_id', currentUserId)
+      const associatedContextIds = await getUserContextIds(currentUserId)
       
-      if (!contextsError && userContexts && userContexts.length > 0) {
-        const associatedContextIds = userContexts.map(uc => uc.context_id)
+      if (associatedContextIds.length > 0) {
         filteredComments = filteredComments.filter((comment: any) => {
           return associatedContextIds.includes(comment.ticket?.context_id)
         })
       } else {
-        // Se não tem contextos associados, não mostrar nenhum comentário
         filteredComments = []
       }
     }

@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server'
 import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
+import { applyContextFilter } from '@/lib/context-helpers'
 
 export async function GET(request: NextRequest) {
   try {
@@ -62,20 +63,8 @@ export async function GET(request: NextRequest) {
     } else if (userType === 'context' && userContextId) {
       // Usuários de contexto só veem tickets do seu contexto
       query = query.eq('context_id', userContextId)
-    } else if (userType === 'matrix') {
-      // Para usuários matrix, buscar contextos associados
-      const { data: userContexts, error: contextsError } = await supabaseAdmin
-        .from('user_contexts')
-        .select('context_id')
-        .eq('user_id', currentUserId)
-      
-      if (!contextsError && userContexts && userContexts.length > 0) {
-        const associatedContextIds = userContexts.map(uc => uc.context_id)
-        query = query.in('context_id', associatedContextIds)
-      } else {
-        // Se não tem contextos associados, não mostrar nenhum ticket
-        query = query.eq('context_id', '00000000-0000-0000-0000-000000000000')
-      }
+    } else {
+      query = await applyContextFilter(query, userType, userContextId, currentUserId)
     }
     
     // Apply user filter if provided
@@ -157,25 +146,7 @@ export async function GET(request: NextRequest) {
       .lte('created_at', `${defaultEndDate}T23:59:59`)
       .order('created_at', { ascending: false })
     
-    // Apply multi-tenant filter to recent tickets
-    if (userType === 'context' && userContextId) {
-      // Usuários de contexto só veem tickets do seu contexto
-      recentQuery = recentQuery.eq('context_id', userContextId)
-    } else if (userType === 'matrix') {
-      // Para usuários matrix, buscar contextos associados
-      const { data: userContexts, error: contextsError } = await supabaseAdmin
-        .from('user_contexts')
-        .select('context_id')
-        .eq('user_id', currentUserId)
-      
-      if (!contextsError && userContexts && userContexts.length > 0) {
-        const associatedContextIds = userContexts.map(uc => uc.context_id)
-        recentQuery = recentQuery.in('context_id', associatedContextIds)
-      } else {
-        // Se não tem contextos associados, não mostrar nenhum ticket
-        recentQuery = recentQuery.eq('context_id', '00000000-0000-0000-0000-000000000000')
-      }
-    }
+    recentQuery = await applyContextFilter(recentQuery, userType, userContextId, currentUserId)
     
     // Apply user filter to recent tickets as well
     if (userId) {
@@ -203,19 +174,8 @@ export async function GET(request: NextRequest) {
         // Filtrar por contexto específico selecionado
         simpleQuery = simpleQuery.eq('context_id', selectedContextId)
         console.log(`✅ Query simples filtrada por contexto selecionado: ${selectedContextId}`)
-      } else if (userType === 'context' && userContextId) {
-        simpleQuery = simpleQuery.eq('context_id', userContextId)
-      } else if (userType === 'matrix') {
-        // Para usuários matrix, buscar contextos associados
-        const { data: userContexts, error: contextsError } = await supabaseAdmin
-          .from('user_contexts')
-          .select('context_id')
-          .eq('user_id', currentUserId)
-        
-        if (!contextsError && userContexts && userContexts.length > 0) {
-          const contextIds = userContexts.map(uc => uc.context_id)
-          simpleQuery = simpleQuery.in('context_id', contextIds)
-        }
+      } else {
+        simpleQuery = await applyContextFilter(simpleQuery, userType, userContextId, currentUserId)
       }
       
       if (userId) {
