@@ -8,6 +8,7 @@ import { usePermissions } from '@/hooks/usePermissions'
 import { useStatuses } from '@/hooks/useStatuses'
 import { useStatusesWithCount } from '@/hooks/useStatusesWithCount'
 import { usePrioritiesWithCount } from '@/hooks/usePrioritiesWithCount'
+import { useOrganization } from '@/contexts/OrganizationContext'
 import {
   Plus,
   Search,
@@ -25,6 +26,11 @@ import {
   Loader2,
   RefreshCw,
   Lock,
+  FileDown,
+  ChevronDown,
+  ChevronUp,
+  Check,
+  Building2,
 } from 'lucide-react'
 import { getIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
@@ -157,6 +163,7 @@ export default function TicketsPage() {
   const { statuses: availableStatuses } = useStatuses()
   const { statuses: statusesWithCount } = useStatusesWithCount()
   const { priorities: prioritiesWithCount } = usePrioritiesWithCount()
+  const { availableContexts } = useOrganization()
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [allTickets, setAllTickets] = useState<Ticket[]>([]) // Para contagem nos cards
   const [loading, setLoading] = useState(true)
@@ -165,6 +172,16 @@ export default function TicketsPage() {
   const [statusFilter, setStatusFilter] = useState('all')
   const [priorityFilter, setPriorityFilter] = useState('all')
   const [showFilters, setShowFilters] = useState(false)
+  const [selectedClients, setSelectedClients] = useState<string[]>([])
+  const [myTicketsOnly, setMyTicketsOnly] = useState(false)
+  const [showClientSelector, setShowClientSelector] = useState(false)
+  const [periodFilter, setPeriodFilter] = useState({
+    start_date: '',
+    end_date: ''
+  })
+  const [tempFilter, setTempFilter] = useState(periodFilter)
+  const [showDateFilters, setShowDateFilters] = useState(false)
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
 
   // Mapeamento removido - agora usa slugs direto do banco de dados
   // Os status no dropdown já vêm com os slugs corretos do banco
@@ -176,6 +193,55 @@ export default function TicketsPage() {
       .map(word => word.charAt(0).toUpperCase())
       .join('')
       .substring(0, 3) // Máximo 3 iniciais
+  }
+
+  // Funções auxiliares para data
+  const getCurrentMonthDates = () => {
+    const now = new Date()
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+    return {
+      start_date: firstDay.toISOString().split('T')[0],
+      end_date: lastDay.toISOString().split('T')[0]
+    }
+  }
+
+  const formatDateShort = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+  }
+
+  // Funções dos botões
+  const toggleMyTickets = () => {
+    setMyTicketsOnly(!myTicketsOnly)
+  }
+
+  const handleApplyFilter = () => {
+    setPeriodFilter(tempFilter)
+    setShowDateFilters(false)
+  }
+
+  const handleResetFilter = () => {
+    const currentMonth = getCurrentMonthDates()
+    setTempFilter(currentMonth)
+    setPeriodFilter(currentMonth)
+    setShowDateFilters(false)
+  }
+
+  const handleExportPDF = async () => {
+    setIsGeneratingPDF(true)
+    try {
+      toast.success('Funcionalidade de exportação em desenvolvimento')
+    } catch (error) {
+      toast.error('Erro ao gerar PDF')
+    } finally {
+      setIsGeneratingPDF(false)
+    }
+  }
+
+  const handleClientSelectionChange = (clientIds: string[]) => {
+    setSelectedClients(clientIds)
+    localStorage.setItem('selectedClients', JSON.stringify(clientIds))
   }
 
   const fetchTickets = async (showLoader = true) => {
@@ -319,38 +385,234 @@ export default function TicketsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             Chamados
           </h1>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
             Gerencie todos os chamados de suporte
           </p>
         </div>
-        <div className="mt-4 sm:mt-0 flex gap-3">
+
+        {/* Botões de Ação */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Seletor de Clientes */}
+          {availableContexts && availableContexts.length > 0 && (
+            <div className="relative">
+              <button
+                onClick={() => setShowClientSelector(!showClientSelector)}
+                className="w-full sm:w-46 h-10 flex items-center justify-between gap-2 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 whitespace-nowrap"
+              >
+                <Building2 className="h-4 w-4 flex-shrink-0 text-gray-500 dark:text-gray-400" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
+                  {selectedClients.length === 0 
+                    ? 'Todos os clientes'
+                    : selectedClients.length === 1
+                      ? availableContexts.find(c => c.id === selectedClients[0])?.name || 'Cliente'
+                      : `${selectedClients.length} clientes`
+                  }
+                </span>
+                {showClientSelector ? (
+                  <ChevronUp className="h-4 w-4 flex-shrink-0 text-gray-400" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 flex-shrink-0 text-gray-400" />
+                )}
+              </button>
+
+              {showClientSelector && (
+                <div className="absolute z-50 mt-2 w-72 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-3 max-h-96 overflow-y-auto">
+                  <div className="space-y-2">
+                    {availableContexts
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map((context) => (
+                        <label
+                          key={context.id}
+                          className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer transition-colors"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedClients.includes(context.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                handleClientSelectionChange([...selectedClients, context.id])
+                              } else {
+                                handleClientSelectionChange(selectedClients.filter(id => id !== context.id))
+                              }
+                            }}
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                {context.name}
+                              </span>
+                              <span className={`px-2 py-1 text-xs rounded-xl font-medium ${
+                                context.type === 'organization' 
+                                  ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300" 
+                                  : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300"
+                              }`}>
+                                {context.type === 'organization' ? 'Cliente' : 'Dept'}
+                              </span>
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                              {context.slug}
+                            </div>
+                          </div>
+                          {selectedClients.includes(context.id) && (
+                            <Check className="w-4 h-4 text-blue-600" />
+                          )}
+                        </label>
+                      ))}
+                  </div>
+                  
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {selectedClients.length} de {availableContexts.length} selecionados
+                    </span>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleClientSelectionChange(availableContexts.map(c => c.id))}
+                        className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
+                      >
+                        Todos
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleClientSelectionChange([])
+                          localStorage.removeItem('selectedClients')
+                        }}
+                        className="text-xs text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300 font-medium transition-colors"
+                      >
+                        Limpar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Botão Meus Tickets */}
+          <button
+            onClick={toggleMyTickets}
+            className={`w-40 h-10 flex items-center justify-center gap-2 px-4 border rounded-xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
+              myTicketsOnly 
+                ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
+                : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+            }`}
+          >
+            <User className="h-4 w-4 flex-shrink-0" />
+            <span className="text-sm font-medium">Meus Tickets</span>
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+          </button>
+          
+          {/* Botão Filtro de Data */}
+          <button
+            onClick={() => setShowDateFilters(!showDateFilters)}
+            className="w-40 h-10 flex items-center justify-center gap-2 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
+          >
+            <Calendar className="h-4 w-4 flex-shrink-0" />
+            <span className="text-sm font-medium">
+              {periodFilter.start_date === getCurrentMonthDates().start_date && 
+               periodFilter.end_date === getCurrentMonthDates().end_date
+                ? 'Mês Atual'
+                : `${formatDateShort(periodFilter.start_date)} - ${formatDateShort(periodFilter.end_date)}`
+              }
+            </span>
+            <Filter className="h-4 w-4 flex-shrink-0" />
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-yellow-500/20 to-transparent animate-pulse"></div>
+          </button>
+          
+          {/* Botão Export PDF */}
+          <button
+            onClick={handleExportPDF}
+            disabled={isGeneratingPDF}
+            className="w-40 h-10 flex items-center justify-center gap-2 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden whitespace-nowrap"
+          >
+            {isGeneratingPDF ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <FileDown className="h-4 w-4 flex-shrink-0" />
+            )}
+            <span className="text-sm font-medium">
+              {isGeneratingPDF ? 'Gerando...' : 'Exportar PDF'}
+            </span>
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-purple-500/20 to-transparent animate-pulse"></div>
+          </button>
+
+          {/* Botão Atualizar */}
           <button
             onClick={() => fetchTickets(false)}
             className={cn(
-              "inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600",
+              "w-40 h-10 flex items-center justify-center gap-2 px-4 border border-gray-200 dark:border-gray-700",
               "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700",
-              "text-gray-700 dark:text-gray-300 font-medium rounded-lg transition-colors",
+              "text-gray-700 dark:text-gray-300 font-medium rounded-xl transition-all duration-300",
               refreshing && "opacity-50 cursor-not-allowed"
             )}
             disabled={refreshing}
           >
-            <RefreshCw className={cn("h-4 w-4 mr-2", refreshing && "animate-spin")} />
-            Atualizar
+            <RefreshCw className={cn("h-4 w-4", refreshing && "animate-spin")} />
+            <span className="text-sm font-medium">Atualizar</span>
           </button>
+
+          {/* Botão Novo Chamado */}
           <Link
             href="/dashboard/tickets/new"
-            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+            className="w-40 h-10 flex items-center justify-center gap-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-all duration-300"
           >
-            <Plus className="h-5 w-5 mr-2" />
-            Novo Chamado
+            <Plus className="h-5 w-5" />
+            <span className="text-sm font-medium">Novo Chamado</span>
           </Link>
         </div>
       </div>
+
+      {/* Filtros de Período */}
+      {showDateFilters && (
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+            Filtrar por Período
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Data Início
+              </label>
+              <input
+                type="date"
+                value={tempFilter.start_date}
+                onChange={(e) => setTempFilter({ ...tempFilter, start_date: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Data Fim
+              </label>
+              <input
+                type="date"
+                value={tempFilter.end_date}
+                onChange={(e) => setTempFilter({ ...tempFilter, end_date: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2 mt-4">
+            <button
+              onClick={handleApplyFilter}
+              className="flex-1 sm:flex-initial px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium"
+            >
+              Aplicar Filtro
+            </button>
+            <button
+              onClick={handleResetFilter}
+              className="flex-1 sm:flex-initial px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 active:bg-gray-400 dark:active:bg-gray-800 transition-colors text-sm font-medium"
+            >
+              Limpar Filtro
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
