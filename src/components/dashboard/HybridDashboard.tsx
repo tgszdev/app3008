@@ -494,7 +494,10 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                           </div>
                           
                           {/* Steps horizontais - baseados no histórico real */}
-                          <div className="flex items-center gap-2">
+                          <div 
+                            className="flex items-center gap-2"
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             {statusHistory.map((historyItem, index) => {
                               const isLast = index === statusHistory.length - 1
                               const isCurrent = isLast
