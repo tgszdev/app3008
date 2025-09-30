@@ -552,7 +552,7 @@ export default function TicketsPage() {
               </button>
 
               {showClientSelector && (
-                <div className="absolute z-50 mt-2 w-72 bg-white dark:bg-gray-800 rounded-3xl shadow-lg border border-gray-200 dark:border-gray-700 p-3 max-h-96 overflow-y-auto">
+                <div className="absolute z-50 mt-2 left-0 right-0 sm:w-72 sm:left-auto sm:right-auto bg-white dark:bg-gray-800 rounded-3xl shadow-lg border border-gray-200 dark:border-gray-700 p-3 max-h-96 overflow-y-auto">
                   <div className="space-y-2">
                     {availableContexts
                       .sort((a, b) => a.name.localeCompare(b.name))
