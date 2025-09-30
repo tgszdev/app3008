@@ -885,134 +885,182 @@ export default function TicketsPage() {
         </div>
       )}
 
-      {/* Mobile Cards View - Visible on small screens */}
-      {selectedClients.length > 0 && (
-        <div className="block lg:hidden space-y-3">
-          {filteredTickets.length === 0 ? (
-            <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 text-center">
-              <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-500 dark:text-gray-400 mb-4">
-                Nenhum chamado encontrado
-              </p>
-              <Link
-                href="/dashboard/tickets/new"
-                className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-3xl transition-colors"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Criar Primeiro Chamado
-              </Link>
-            </div>
-          ) : (
-          filteredTickets.map((ticket) => {
-            // Get status configuration from dynamic statuses or fallback
-            const currentStatusData = availableStatuses.find(s => s.slug === ticket.status)
-            const status = currentStatusData 
-              ? {
-                  label: currentStatusData.name,
-                  color: getStatusBadgeColor(currentStatusData.color),
-                  icon: getStatusIcon(currentStatusData)
+      {/* Lista de Tickets - Layout idêntico aos Tickets Recentes */}
+      {selectedClients.length > 0 && filteredTickets.length > 0 && (
+        <div className="space-y-3">
+          {filteredTickets.map((ticket) => {
+            // Buscar cor do status no cadastro
+            const statusInfo = availableStatuses.find(s => s.slug === ticket.status)
+            const statusColor = statusInfo?.color || '#6B7280'
+
+            // Processar histórico de status para mostrar steps reais
+            const getStatusHistory = () => {
+              if (!(ticket as any).ticket_history) {
+                return [{
+                  status: ticket.status,
+                  created_at: ticket.created_at,
+                  user: ticket.created_by_user
+                }]
+              }
+              
+              const statusChanges = (ticket as any).ticket_history
+                .filter((history: any) => history.action_type === 'status_changed' && history.field_changed === 'status')
+                .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+              
+              const history: Array<{
+                status: string;
+                created_at: string;
+                user: any;
+              }> = []
+              
+              history.push({
+                status: 'Aberto',
+                created_at: ticket.created_at,
+                user: ticket.created_by_user
+              })
+              
+              statusChanges.forEach((change: any) => {
+                const lastStatus = history[history.length - 1]?.status
+                if (change.new_value !== lastStatus) {
+                  history.push({
+                    status: change.new_value,
+                    created_at: change.created_at,
+                    user: change.user
+                  })
                 }
-              : defaultStatusConfig[ticket.status] || defaultStatusConfig.open
-            
-            const priority = priorityConfig[ticket.priority]
-            const StatusIcon = status.icon
+              })
+              
+              return history
+            }
+
+            const statusHistory = getStatusHistory()
+
+            const getPriorityColor = (priority: string) => {
+              switch (priority) {
+                case 'critical': return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+                case 'high': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400'
+                case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                case 'low': return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+              }
+            }
 
             return (
-              <div key={ticket.id} className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-                {/* Header */}
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex-1">
-                    <div className="flex flex-wrap items-center gap-2 mb-1">
-                      <span className="text-xs font-mono text-gray-500">#{ticket.ticket_number}</span>
-                      {ticket.is_internal && (
-                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">
-                          <Lock className="h-3 w-3 mr-1" />
-                          Interno
-                        </span>
-                      )}
-                      <span className={cn(
-                        "inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full",
-                        status.color
-                      )}>
-                        <StatusIcon className="h-3 w-3 mr-1" />
-                        {status.label}
-                      </span>
-                      <span className={cn(
-                        "inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full",
-                        priority.color
-                      )}>
-                        {priority.label}
-                      </span>
-                      {(() => {
-                        const categoryInfo = getCategoryInfo(ticket)
-                        const Icon = categoryInfo.IconComponent
-                        return (
-                          <span 
-                            className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full"
-                            style={{ 
-                              backgroundColor: categoryInfo.color + '20', 
-                              color: categoryInfo.color 
-                            }}
-                          >
-                            <Icon className="h-3 w-3 mr-1" />
-                            {categoryInfo.name}
-                          </span>
-                        )
-                      })()}
-                    </div>
-                    <Link
-                      href={`/dashboard/tickets/${ticket.id}`}
-                      className="text-base font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 line-clamp-2"
+              <div 
+                key={ticket.id} 
+                className="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer"
+                onClick={() => window.location.href = `/dashboard/tickets/${ticket.id}`}
+              >
+                <div className="space-y-3">
+                  {/* Header com número, título e prioridade */}
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-gray-900 dark:text-white text-sm">#{ticket.ticket_number}</span>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPriorityColor(ticket.priority)}`}>
+                      {ticket.priority === 'critical' ? 'Crítico' : ticket.priority === 'high' ? 'Alto' : ticket.priority === 'medium' ? 'Médio' : 'Baixo'}
+                    </span>
+                    <span 
+                      className="text-xs font-medium px-2 py-1 rounded-full ml-auto"
+                      style={{
+                        backgroundColor: `${statusColor}20`,
+                        color: statusColor
+                      }}
                     >
-                      {ticket.title.toUpperCase()}
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Info */}
-                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                  <div className="flex items-center gap-1">
-                    <User className="h-3 w-3" />
-                    <span>{ticket.created_by_user?.name || 'Desconhecido'}</span>
+                      {statusInfo?.name || ticket.status}
+                    </span>
                   </div>
                   
-                  {ticket.assigned_to_user && (
-                    <div className="flex items-center gap-1">
+                  {/* Título do ticket */}
+                  <h3 className="font-medium text-gray-900 dark:text-white text-sm line-clamp-2">{ticket.title}</h3>
+                  
+                  {/* Informações do ticket */}
+                  <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-400">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
+                      {getTimeAgo(ticket.created_at)}
+                    </span>
+                    <span className="flex items-center gap-1">
                       <User className="h-3 w-3" />
-                      <span>→ {ticket.assigned_to_user.name}</span>
-                    </div>
-                  )}
-                  
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    <span>{getTimeAgo(ticket.created_at)}</span>
+                      {ticket.created_by_user?.name || 'Sistema'}
+                    </span>
                   </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center justify-end gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                  <Link
-                    href={`/dashboard/tickets/${ticket.id}`}
-                    className="flex-1 text-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-3xl transition-colors"
-                  >
-                    <Eye className="h-4 w-4 inline mr-1" />
-                    Ver Detalhes
-                  </Link>
-                  {(hasPermission('tickets_delete') || (session?.user as any)?.role === 'admin') && (
-                    <button
-                      onClick={() => handleDeleteTicket(ticket.id)}
-                      className="p-1.5 text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-                      title="Excluir"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  )}
+                  
+                  {/* Steps horizontais - baseados no histórico real */}
+                  <div className="flex items-center gap-2">
+                    {statusHistory.map((historyItem, index) => {
+                      const isLast = index === statusHistory.length - 1
+                      const isCurrent = isLast
+                      
+                      const historyStatusInfo = availableStatuses.find(s => s.slug === historyItem.status)
+                      const historyStatusColor = historyStatusInfo?.color || '#6B7280'
+                      
+                      const formatDate = (dateString: string) => {
+                        const date = new Date(dateString)
+                        return date.toLocaleDateString('pt-BR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })
+                      }
+                      
+                      return (
+                        <div key={`${historyItem.status}-${index}`} className="flex items-center group relative">
+                          <div 
+                            className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-200 hover:scale-110 ${
+                              isCurrent ? 'ring-2 ring-offset-2' : ''
+                            }`}
+                            style={{
+                              backgroundColor: historyStatusColor
+                            }}
+                          ></div>
+                          
+                          {/* Tooltip instantâneo */}
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-0 pointer-events-none whitespace-nowrap z-50">
+                            <div className="font-semibold">{historyItem.status}</div>
+                            <div className="text-gray-300">
+                              {formatDate(historyItem.created_at)}
+                            </div>
+                            <div className="text-gray-400">
+                              por {historyItem.user?.name || 'Sistema'}
+                            </div>
+                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+                          </div>
+                          
+                          {!isLast && (
+                            <div 
+                              className="w-8 h-1 rounded-full"
+                              style={{
+                                backgroundColor: historyStatusColor
+                              }}
+                            ></div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
               </div>
             )
-          })
-        )}
-      </div>
+          })}
+        </div>
+      )}
+
+      {/* Estado vazio */}
+      {selectedClients.length > 0 && filteredTickets.length === 0 && (
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 text-center">
+          <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+          <p className="text-gray-500 dark:text-gray-400 mb-4">
+            Nenhum chamado encontrado
+          </p>
+          <Link
+            href="/dashboard/tickets/new"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-3xl transition-colors"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Criar Primeiro Chamado
+          </Link>
+        </div>
       )}
 
       {/* Desktop Table View - Clean & Intuitive Design */}
