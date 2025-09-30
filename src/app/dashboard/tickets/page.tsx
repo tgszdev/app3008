@@ -866,6 +866,14 @@ export default function TicketsPage() {
               <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 text-right leading-none">{tickets.length}</div>
             </div>
           </div>
+
+          {/* Card de Limpar Filtro - somente ícone */}
+          <div 
+            onClick={() => setStatusFilter('all')}
+            className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden w-[120px] h-[120px] flex-shrink-0 cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-105 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center justify-center"
+          >
+            <XCircle className="h-16 w-16 text-red-500 dark:text-red-400" />
+          </div>
       </div>
 
       {/* Estado Vazio - Nenhum cliente selecionado */}
