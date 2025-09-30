@@ -25,6 +25,9 @@ export async function GET(request: NextRequest) {
     const priority = searchParams.get('priority')
     const userIdFilter = searchParams.get('userId')
     const assignedTo = searchParams.get('assignedTo')
+    const contextIds = searchParams.get('context_ids')
+    const startDate = searchParams.get('start_date')
+    const endDate = searchParams.get('end_date')
 
     let query = supabaseAdmin
       .from('tickets')
@@ -62,6 +65,21 @@ export async function GET(request: NextRequest) {
     }
     if (assignedTo) {
       query = query.eq('assigned_to', assignedTo)
+    }
+    
+    // Filtro por context_ids (clientes selecionados)
+    if (contextIds) {
+      const contextIdArray = contextIds.split(',').filter(Boolean)
+      if (contextIdArray.length > 0) {
+        console.log('🔍 Filtrando por context_ids:', contextIdArray)
+        query = query.in('context_id', contextIdArray)
+      }
+    }
+
+    // Filtro por período
+    if (startDate && endDate) {
+      console.log('🔍 Filtrando por período:', { startDate, endDate })
+      query = query.gte('created_at', startDate).lte('created_at', endDate + 'T23:59:59.999Z')
     }
 
     const { data: tickets, error } = await query
