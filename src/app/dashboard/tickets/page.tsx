@@ -371,10 +371,36 @@ export default function TicketsPage() {
     }
   }
 
-  // Buscar todos os tickets para contagem nos cards
+  // Buscar todos os tickets para contagem nos cards (COM FILTROS)
   const fetchAllTickets = async () => {
     try {
-      const response = await axios.get('/api/tickets')
+      // Construir URL com os mesmos filtros de clientes e período
+      let url = '/api/tickets'
+      const params = new URLSearchParams()
+
+      // Aplicar filtro de clientes
+      if (selectedClients.length > 0) {
+        params.append('context_ids', selectedClients.join(','))
+      }
+
+      // Aplicar filtro de período
+      if (periodFilter.start_date && periodFilter.end_date) {
+        params.append('start_date', periodFilter.start_date)
+        params.append('end_date', periodFilter.end_date)
+      }
+
+      // Aplicar filtro "Meus Chamados"
+      if (myTicketsOnly && session?.user?.id) {
+        params.append('userId', session.user.id)
+      }
+
+      const queryString = params.toString()
+      if (queryString) {
+        url += `?${queryString}`
+      }
+
+      console.log('📊 Fetching all tickets for cards with URL:', url)
+      const response = await axios.get(url)
       console.log('📊 All tickets for cards:', response.data.length)
       setAllTickets(response.data)
     } catch (error: any) {

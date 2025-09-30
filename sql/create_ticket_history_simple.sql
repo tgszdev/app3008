@@ -187,3 +187,4 @@ SELECT 'Tabela ticket_history criada com sucesso!' as resultado;
 
 
 
+
