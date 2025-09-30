@@ -774,22 +774,6 @@ export default function TicketsPage() {
             !showFilters && "hidden lg:flex"
           )}>
             <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-3xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">Todos os Status</option>
-              {/* Only show status that have tickets (count > 0) */}
-              {statusesWithCount
-                .filter(status => status.count > 0)
-                .map((status) => (
-                  <option key={status.id} value={status.slug}>
-                    {status.name}
-                  </option>
-                ))}
-            </select>
-
-            <select
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-3xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
