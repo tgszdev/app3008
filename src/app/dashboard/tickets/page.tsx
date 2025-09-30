@@ -840,12 +840,7 @@ export default function TicketsPage() {
                 <div 
                   key={status.slug} 
                   onClick={() => setStatusFilter(status.slug)}
-                  className={`bg-white dark:bg-gray-800 rounded-3xl p-6 border shadow-sm relative overflow-hidden w-[280px] flex-shrink-0 cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-105 ${
-                    statusFilter === status.slug 
-                      ? 'border-2 ring-2 ring-offset-2' 
-                      : 'border-gray-200 dark:border-gray-700'
-                  }`}
-                  style={statusFilter === status.slug ? { borderColor: statusColor, ringColor: statusColor + '40' } : {}}
+                  className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden w-[280px] flex-shrink-0 cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-105"
                 >
                   <div className="absolute inset-0 opacity-10" style={{ background: `linear-gradient(135deg, ${statusColor}, transparent)` }}></div>
                   <div className="relative">
@@ -861,11 +856,7 @@ export default function TicketsPage() {
           {/* Total no Período - sempre por último */}
           <div 
             onClick={() => setStatusFilter('all')}
-            className={`bg-white dark:bg-gray-800 rounded-3xl p-6 border shadow-sm relative overflow-hidden w-[280px] h-[120px] flex-shrink-0 cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-105 ${
-              statusFilter === 'all' 
-                ? 'border-2 border-blue-500 ring-2 ring-blue-500/40 ring-offset-2' 
-                : 'border-gray-200 dark:border-gray-700'
-            }`}
+            className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden w-[280px] h-[120px] flex-shrink-0 cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-105"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent"></div>
             <div className="relative">
