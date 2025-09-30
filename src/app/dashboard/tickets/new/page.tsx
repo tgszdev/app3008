@@ -246,7 +246,7 @@ export default function NewTicketPage() {
   if (permissionsError) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-2xl p-6">
           <h2 className="text-lg font-semibold text-yellow-900 dark:text-yellow-100 mb-2">
             Aviso de Permissões
           </h2>
@@ -279,7 +279,7 @@ export default function NewTicketPage() {
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
           {/* Title */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -290,7 +290,7 @@ export default function NewTicketPage() {
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Descreva brevemente o problema ou solicitação"
               required
             />
@@ -305,7 +305,7 @@ export default function NewTicketPage() {
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={8}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               placeholder="Forneça o máximo de detalhes possível sobre o problema ou solicitação..."
               required
             />
@@ -325,7 +325,7 @@ export default function NewTicketPage() {
               <select
                 value={formData.priority}
                 onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="low">Baixa - Pode esperar</option>
                 <option value="medium">Média - Importante mas não urgente</option>
@@ -343,19 +343,19 @@ export default function NewTicketPage() {
                 </span>
               </label>
               {loadingCategories ? (
-                <div className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 flex items-center justify-center">
+                <div className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-gray-50 dark:bg-gray-700 flex items-center justify-center">
                   <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
                   <span className="ml-2 text-sm text-gray-500">Carregando categorias...</span>
                 </div>
               ) : categories.length === 0 ? (
-                <div className="w-full px-4 py-2 border border-red-300 dark:border-red-600 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">
+                <div className="w-full px-4 py-2 border border-red-300 dark:border-red-600 rounded-2xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">
                   Nenhuma categoria disponível. Contate o administrador.
                 </div>
               ) : (
                 <select
                   value={formData.category_id}
                   onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 >
                   <option value="">Selecione uma categoria...</option>
@@ -378,7 +378,7 @@ export default function NewTicketPage() {
                 <select
                   value={formData.assigned_to}
                   onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">Selecione um responsável...</option>
                   {analysts.map((analyst) => (
@@ -402,7 +402,7 @@ export default function NewTicketPage() {
                   value={formData.due_date}
                   onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
                   min={new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             )}
@@ -410,7 +410,7 @@ export default function NewTicketPage() {
           
           {/* Internal Ticket Checkbox */}
           {canEditAllTickets && (
-            <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+            <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl">
               <label className="flex items-start space-x-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -454,7 +454,7 @@ export default function NewTicketPage() {
               <label
                 htmlFor="file-upload"
                 className={cn(
-                  "flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors",
+                  "flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer transition-colors",
                   selectedFiles.length >= 5 
                     ? "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 cursor-not-allowed"
                     : "border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -499,7 +499,7 @@ export default function NewTicketPage() {
                 {selectedFiles.map((file, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700"
                   >
                     <div className="flex items-center space-x-3">
                       <File className="h-5 w-5 text-gray-400" />
@@ -534,7 +534,7 @@ export default function NewTicketPage() {
         <div className="flex justify-end gap-3">
           <Link
             href="/dashboard/tickets"
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             <X className="inline h-4 w-4 mr-2" />
             Cancelar
@@ -543,7 +543,7 @@ export default function NewTicketPage() {
             type="submit"
             disabled={loading || loadingCategories || uploadingFiles}
             className={cn(
-              "px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center",
+              "px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-2xl transition-colors flex items-center",
               (loading || loadingCategories || uploadingFiles) && "opacity-50 cursor-not-allowed"
             )}
           >
@@ -563,7 +563,7 @@ export default function NewTicketPage() {
       </form>
 
       {/* Info Box */}
-      <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+      <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-4">
         <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-2">
           💡 Dicas para um atendimento mais rápido:
         </h3>
