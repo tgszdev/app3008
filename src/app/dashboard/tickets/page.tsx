@@ -383,8 +383,18 @@ export default function TicketsPage() {
   }
 
   useEffect(() => {
-    fetchTickets()
-    fetchAllTickets() // Buscar todos para os cards
+    // IMPORTANTE: Só buscar tickets se houver clientes selecionados
+    // Se não tiver nenhum cliente selecionado, não deve mostrar nada
+    if (selectedClients.length > 0) {
+      console.log('✅ Clientes selecionados:', selectedClients)
+      fetchTickets()
+      fetchAllTickets()
+    } else {
+      console.log('⚠️ Nenhum cliente selecionado - limpando lista de tickets')
+      setTickets([])
+      setAllTickets([])
+      setLoading(false)
+    }
   }, [statusFilter, priorityFilter, selectedClients, myTicketsOnly, periodFilter])
 
   const handleDeleteTicket = async (ticketId: string) => {
@@ -824,23 +834,44 @@ export default function TicketsPage() {
             })}
         </div>
 
+      {/* Estado Vazio - Nenhum cliente selecionado */}
+      {selectedClients.length === 0 && (
+        <div className="text-center py-12">
+          <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            Nenhum cliente selecionado
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            Selecione um ou mais clientes para visualizar os chamados
+          </p>
+          <button
+            onClick={() => setShowClientSelector(true)}
+            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+          >
+            <Building2 className="h-4 w-4 mr-2" />
+            Selecionar Clientes
+          </button>
+        </div>
+      )}
+
       {/* Mobile Cards View - Visible on small screens */}
-      <div className="block lg:hidden space-y-3">
-        {filteredTickets.length === 0 ? (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 text-center">
-            <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-            <p className="text-gray-500 dark:text-gray-400 mb-4">
-              Nenhum chamado encontrado
-            </p>
-            <Link
-              href="/dashboard/tickets/new"
-              className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Criar Primeiro Chamado
-            </Link>
-          </div>
-        ) : (
+      {selectedClients.length > 0 && (
+        <div className="block lg:hidden space-y-3">
+          {filteredTickets.length === 0 ? (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 text-center">
+              <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+              <p className="text-gray-500 dark:text-gray-400 mb-4">
+                Nenhum chamado encontrado
+              </p>
+              <Link
+                href="/dashboard/tickets/new"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Criar Primeiro Chamado
+              </Link>
+            </div>
+          ) : (
           filteredTickets.map((ticket) => {
             // Get status configuration from dynamic statuses or fallback
             const currentStatusData = availableStatuses.find(s => s.slug === ticket.status)
@@ -951,9 +982,11 @@ export default function TicketsPage() {
           })
         )}
       </div>
+      )}
 
       {/* Desktop Table View - Clean & Intuitive Design */}
-      <div className="hidden lg:block bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+      {selectedClients.length > 0 && (
+        <div className="hidden lg:block bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-max">
             <thead className="bg-gray-50 dark:bg-gray-900">
@@ -1131,6 +1164,7 @@ export default function TicketsPage() {
           </div>
         )}
       </div>
+      )}
     </div>
   )
 }
