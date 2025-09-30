@@ -972,16 +972,32 @@ export default function TicketsPage() {
                   {/* Título do ticket */}
                   <h3 className="font-medium text-gray-900 dark:text-white text-sm line-clamp-2">{ticket.title}</h3>
                   
-                  {/* Informações do ticket */}
-                  <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-400">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      {getTimeAgo(ticket.created_at)}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <User className="h-3 w-3" />
-                      {ticket.created_by_user?.name || 'Sistema'}
-                    </span>
+                  {/* Informações do ticket - Grid 2x2 */}
+                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3 flex-shrink-0" />
+                      <span className="truncate">
+                        <span className="font-medium">Data de Abertura:</span> {getTimeAgo(ticket.created_at)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <User className="h-3 w-3 flex-shrink-0" />
+                      <span className="truncate">
+                        <span className="font-medium">Autor do Chamado:</span> {ticket.created_by_user?.name || 'Sistema'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <User className="h-3 w-3 flex-shrink-0" />
+                      <span className="truncate">
+                        <span className="font-medium">Atribuído Para:</span> {ticket.assigned_to_user?.name || 'Não atribuído'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Building2 className="h-3 w-3 flex-shrink-0" />
+                      <span className="truncate">
+                        <span className="font-medium">Cliente:</span> {(ticket as any).context_info?.name || 'Não definido'}
+                      </span>
+                    </div>
                   </div>
                   
                   {/* Steps horizontais - baseados no histórico real */}

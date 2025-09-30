@@ -37,7 +37,17 @@ export async function GET(request: NextRequest) {
         created_by_user:users!tickets_created_by_fkey(id, name, email),
         assigned_to_user:users!tickets_assigned_to_fkey(id, name, email),
         category_info:categories!tickets_category_id_fkey(id, name, slug, color, icon),
-        comments:ticket_comments(count)
+        context_info:contexts!tickets_context_id_fkey(id, name, slug),
+        comments:ticket_comments(count),
+        ticket_history:ticket_history(
+          id,
+          action_type,
+          field_changed,
+          old_value,
+          new_value,
+          created_at,
+          user_id
+        )
       `)
 
     // IMPORTANTE: Filtrar por contexto e tickets internos ANTES de outros filtros
