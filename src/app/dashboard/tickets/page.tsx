@@ -533,10 +533,10 @@ export default function TicketsPage() {
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           {/* Seletor de Clientes */}
           {availableContexts && availableContexts.length > 0 && (
-            <div className="relative" ref={clientSelectorRef}>
+            <div className="w-full sm:w-auto relative" ref={clientSelectorRef}>
               <button
                 onClick={() => setShowClientSelector(!showClientSelector)}
-                className="w-full sm:w-auto min-w-[160px] h-10 flex items-center justify-between gap-2 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
+                className="w-full h-10 flex items-center justify-between gap-2 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
               >
                 <Building2 className="h-4 w-4 flex-shrink-0" />
                 <span className="text-xs sm:text-sm font-medium truncate">
