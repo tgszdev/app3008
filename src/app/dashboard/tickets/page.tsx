@@ -536,7 +536,7 @@ export default function TicketsPage() {
             <div className="relative" ref={clientSelectorRef}>
               <button
                 onClick={() => setShowClientSelector(!showClientSelector)}
-                className="w-40 h-10 flex items-center justify-between gap-2 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
+                className="w-40 h-10 flex items-center justify-between gap-2 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
               >
                 <Building2 className="h-4 w-4 flex-shrink-0" />
                 <span className="text-xs font-medium">
@@ -548,18 +548,18 @@ export default function TicketsPage() {
                   }
                 </span>
                 <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-blue-500/20 to-transparent animate-pulse"></div>
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-transparent via-blue-500/20 to-transparent animate-pulse"></div>
               </button>
 
               {showClientSelector && (
-                <div className="absolute z-50 mt-2 w-72 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-3 max-h-96 overflow-y-auto">
+                <div className="absolute z-50 mt-2 w-72 bg-white dark:bg-gray-800 rounded-3xl shadow-lg border border-gray-200 dark:border-gray-700 p-3 max-h-96 overflow-y-auto">
                   <div className="space-y-2">
                     {availableContexts
                       .sort((a, b) => a.name.localeCompare(b.name))
                       .map((context) => (
                         <label
                           key={context.id}
-                          className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors rounded-xl"
+                          className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors rounded-3xl"
                         >
                           <input
                             type="checkbox"
@@ -578,7 +578,7 @@ export default function TicketsPage() {
                               <span className="text-sm font-medium text-gray-900 dark:text-white">
                                 {context.name}
                               </span>
-                              <span className={`px-2 py-1 text-xs rounded-xl font-medium ${
+                              <span className={`px-2 py-1 text-xs rounded-3xl font-medium ${
                                 context.type === 'organization' 
                                   ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300" 
                                   : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300"
@@ -627,7 +627,7 @@ export default function TicketsPage() {
           {/* Botão Meus Chamados */}
           <button
             onClick={toggleMyTickets}
-            className={`w-40 h-10 flex items-center justify-center gap-2 px-4 border rounded-xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
+            className={`w-40 h-10 flex items-center justify-center gap-2 px-4 border rounded-3xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
               myTicketsOnly 
                 ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
                 : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
@@ -635,13 +635,13 @@ export default function TicketsPage() {
           >
             <User className="h-4 w-4 flex-shrink-0" />
             <span className="text-sm font-medium">Meus Chamados</span>
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
           </button>
           
           {/* Botão Filtro de Data */}
           <button
             onClick={() => setShowDateFilters(!showDateFilters)}
-            className="w-40 h-10 flex items-center justify-center gap-2 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
+            className="w-40 h-10 flex items-center justify-center gap-2 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
           >
             <Calendar className="h-4 w-4 flex-shrink-0" />
             <span className="text-sm font-medium">
@@ -652,14 +652,14 @@ export default function TicketsPage() {
               }
             </span>
             <Filter className="h-4 w-4 flex-shrink-0" />
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-yellow-500/20 to-transparent animate-pulse"></div>
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-transparent via-yellow-500/20 to-transparent animate-pulse"></div>
           </button>
           
           {/* Botão Export PDF */}
           <button
             onClick={handleExportPDF}
             disabled={isGeneratingPDF}
-            className="w-40 h-10 flex items-center justify-center gap-2 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden whitespace-nowrap"
+            className="w-40 h-10 flex items-center justify-center gap-2 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden whitespace-nowrap"
           >
             {isGeneratingPDF ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -669,7 +669,7 @@ export default function TicketsPage() {
             <span className="text-sm font-medium">
               {isGeneratingPDF ? 'Gerando...' : 'Exportar PDF'}
             </span>
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-purple-500/20 to-transparent animate-pulse"></div>
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-transparent via-purple-500/20 to-transparent animate-pulse"></div>
           </button>
 
           {/* Botão Atualizar */}
@@ -678,7 +678,7 @@ export default function TicketsPage() {
             className={cn(
               "w-40 h-10 flex items-center justify-center gap-2 px-4 border border-gray-200 dark:border-gray-700",
               "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700",
-              "text-gray-700 dark:text-gray-300 font-medium rounded-xl transition-all duration-300",
+              "text-gray-700 dark:text-gray-300 font-medium rounded-3xl transition-all duration-300",
               refreshing && "opacity-50 cursor-not-allowed"
             )}
             disabled={refreshing}
@@ -690,7 +690,7 @@ export default function TicketsPage() {
           {/* Botão Novo Chamado */}
           <Link
             href="/dashboard/tickets/new"
-            className="w-40 h-10 flex items-center justify-center gap-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-all duration-300"
+            className="w-40 h-10 flex items-center justify-center gap-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-3xl transition-all duration-300"
           >
             <Plus className="h-5 w-5" />
             <span className="text-sm font-medium">Novo Chamado</span>
@@ -700,7 +700,7 @@ export default function TicketsPage() {
 
       {/* Filtros de Período */}
       {showDateFilters && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
             Filtrar por Período
           </h3>
@@ -713,7 +713,7 @@ export default function TicketsPage() {
                 type="date"
                 value={tempFilter.start_date}
                 onChange={(e) => setTempFilter({ ...tempFilter, start_date: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-3xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
             <div>
@@ -724,20 +724,20 @@ export default function TicketsPage() {
                 type="date"
                 value={tempFilter.end_date}
                 onChange={(e) => setTempFilter({ ...tempFilter, end_date: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-3xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 mt-4">
             <button
               onClick={handleApplyFilter}
-              className="flex-1 sm:flex-initial px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium"
+              className="flex-1 sm:flex-initial px-4 py-2 bg-blue-600 text-white rounded-3xl hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium"
             >
               Aplicar Filtro
             </button>
             <button
               onClick={handleResetFilter}
-              className="flex-1 sm:flex-initial px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 active:bg-gray-400 dark:active:bg-gray-800 transition-colors text-sm font-medium"
+              className="flex-1 sm:flex-initial px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-3xl hover:bg-gray-300 dark:hover:bg-gray-600 active:bg-gray-400 dark:active:bg-gray-800 transition-colors text-sm font-medium"
             >
               Limpar Filtro
             </button>
@@ -763,7 +763,7 @@ export default function TicketsPage() {
 
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="lg:hidden inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+            className="lg:hidden inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-3xl bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
           >
             <Filter className="h-4 w-4 mr-2" />
             Filtros
@@ -776,7 +776,7 @@ export default function TicketsPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-3xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">Todos os Status</option>
               {/* Only show status that have tickets (count > 0) */}
@@ -792,7 +792,7 @@ export default function TicketsPage() {
             <select
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-3xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">Todas as Prioridades</option>
               {/* Only show priorities that have tickets (count > 0) */}
@@ -811,7 +811,7 @@ export default function TicketsPage() {
       {/* Dynamic Status Cards - Protótipo 35 (Layout de Tabela) - Corrigido para evitar sobreposição */}
       <div className="flex flex-wrap gap-6">
           {/* Total no Período */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden w-[280px] h-[120px] flex-shrink-0">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden w-[280px] h-[120px] flex-shrink-0">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent"></div>
             <div className="relative">
               <div className="border-b border-gray-200 dark:border-gray-600 pb-3 mb-3">
@@ -847,7 +847,7 @@ export default function TicketsPage() {
               const statusColor = getStatusColor(status.color, status.slug)
               
               return (
-                <div key={status.slug} className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden w-[280px] flex-shrink-0">
+                <div key={status.slug} className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden w-[280px] flex-shrink-0">
                   <div className="absolute inset-0 opacity-10" style={{ background: `linear-gradient(135deg, ${statusColor}, transparent)` }}></div>
                   <div className="relative">
                     <div className="border-b border-gray-200 dark:border-gray-600 pb-3 mb-3">
@@ -872,7 +872,7 @@ export default function TicketsPage() {
           </p>
           <button
             onClick={() => setShowClientSelector(true)}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-3xl transition-colors"
           >
             <Building2 className="h-4 w-4 mr-2" />
             Selecionar Clientes
@@ -884,14 +884,14 @@ export default function TicketsPage() {
       {selectedClients.length > 0 && (
         <div className="block lg:hidden space-y-3">
           {filteredTickets.length === 0 ? (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 text-center">
+            <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 text-center">
               <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-3" />
               <p className="text-gray-500 dark:text-gray-400 mb-4">
                 Nenhum chamado encontrado
               </p>
               <Link
                 href="/dashboard/tickets/new"
-                className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-3xl transition-colors"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Criar Primeiro Chamado
@@ -913,7 +913,7 @@ export default function TicketsPage() {
             const StatusIcon = status.icon
 
             return (
-              <div key={ticket.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+              <div key={ticket.id} className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
                 {/* Header */}
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex-1">
@@ -988,7 +988,7 @@ export default function TicketsPage() {
                 <div className="flex items-center justify-end gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                   <Link
                     href={`/dashboard/tickets/${ticket.id}`}
-                    className="flex-1 text-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                    className="flex-1 text-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-3xl transition-colors"
                   >
                     <Eye className="h-4 w-4 inline mr-1" />
                     Ver Detalhes
@@ -1012,7 +1012,7 @@ export default function TicketsPage() {
 
       {/* Desktop Table View - Clean & Intuitive Design */}
       {selectedClients.length > 0 && (
-        <div className="hidden lg:block bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="hidden lg:block bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-max">
             <thead className="bg-gray-50 dark:bg-gray-900">
@@ -1057,7 +1057,7 @@ export default function TicketsPage() {
                       </p>
                       <Link
                         href="/dashboard/tickets/new"
-                        className="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+                        className="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-3xl transition-colors"
                       >
                         <Plus className="h-4 w-4 mr-2" />
                         Criar Primeiro Chamado
@@ -1165,7 +1165,7 @@ export default function TicketsPage() {
                       <td style={{ minWidth: '60px', width: '60px' }} className="px-3 py-3 whitespace-nowrap text-right">
                         <Link
                           href={`/dashboard/tickets/${ticket.id}`}
-                          className="inline-flex items-center justify-center w-8 h-8 text-gray-600 hover:text-blue-600 hover:bg-blue-50 dark:text-gray-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 transition-all duration-200 rounded-lg flex-shrink-0"
+                          className="inline-flex items-center justify-center w-8 h-8 text-gray-600 hover:text-blue-600 hover:bg-blue-50 dark:text-gray-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 transition-all duration-200 rounded-3xl flex-shrink-0"
                           title="Visualizar ticket"
                         >
                           <Eye className="h-4 w-4" />
