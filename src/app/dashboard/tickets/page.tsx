@@ -690,7 +690,7 @@ export default function TicketsPage() {
           {/* Botão Novo Chamado */}
           <Link
             href="/dashboard/tickets/new"
-            className="w-40 h-10 flex items-center justify-center gap-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-3xl transition-all duration-300"
+            className="w-48 h-10 flex items-center justify-center gap-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-3xl transition-all duration-300 whitespace-nowrap"
           >
             <Plus className="h-5 w-5" />
             <span className="text-sm font-medium">Novo Chamado</span>
