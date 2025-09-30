@@ -672,24 +672,6 @@ export default function TicketsPage() {
             <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-transparent via-purple-500/20 to-transparent animate-pulse"></div>
           </button>
 
-          {/* Botão Atualizar */}
-          <button
-            onClick={() => {
-              fetchTickets(false)
-              fetchAllTickets()
-            }}
-            className={cn(
-              "w-full sm:w-auto min-w-[160px] h-10 flex items-center justify-center gap-2 px-3 sm:px-4 border border-gray-200 dark:border-gray-700",
-              "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700",
-              "text-gray-700 dark:text-gray-300 font-medium rounded-3xl transition-all duration-300",
-              refreshing && "opacity-50 cursor-not-allowed"
-            )}
-            disabled={refreshing}
-          >
-            <RefreshCw className={cn("h-4 w-4", refreshing && "animate-spin")} />
-            <span className="text-sm font-medium">Atualizar</span>
-          </button>
-
           {/* Botão Novo Chamado */}
           <Link
             href="/dashboard/tickets/new"
