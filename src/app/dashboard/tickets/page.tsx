@@ -784,7 +784,7 @@ export default function TicketsPage() {
                 .filter(status => status.count > 0)
                 .map((status) => (
                   <option key={status.id} value={status.slug}>
-                    {status.name} ({status.count})
+                    {status.name}
                   </option>
                 ))}
             </select>
@@ -800,7 +800,7 @@ export default function TicketsPage() {
                 .filter(priority => priority.count > 0)
                 .map((priority) => (
                   <option key={priority.slug} value={priority.slug}>
-                    {priority.name} ({priority.count})
+                    {priority.name}
                   </option>
                 ))}
             </select>
