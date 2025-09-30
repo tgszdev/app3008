@@ -674,7 +674,10 @@ export default function TicketsPage() {
 
           {/* Botão Atualizar */}
           <button
-            onClick={() => fetchTickets(false)}
+            onClick={() => {
+              fetchTickets(false)
+              fetchAllTickets()
+            }}
             className={cn(
               "w-40 h-10 flex items-center justify-center gap-2 px-4 border border-gray-200 dark:border-gray-700",
               "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700",
