@@ -99,6 +99,17 @@ const priorityConfig = {
   critical: { label: 'Crítica', color: 'bg-red-500', icon: AlertTriangle }
 }
 
+// Mapeamento de cores para bordas
+const getPriorityBorderColor = (priority: string) => {
+  switch (priority) {
+    case 'critical': return '#ef4444' // red-500
+    case 'high': return '#f97316' // orange-500
+    case 'medium': return '#3b82f6' // blue-500
+    case 'low': return '#6b7280' // gray-500
+    default: return '#6b7280'
+  }
+}
+
 interface Attachment {
   id: string
   file_name: string
