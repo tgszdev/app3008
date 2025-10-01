@@ -974,14 +974,19 @@ export default function TicketsPage() {
             return (
               <div 
                 key={ticket.id} 
-                className="bg-white dark:bg-gray-800 rounded-2xl p-4 border shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer"
+                className="bg-white dark:bg-gray-800 rounded-2xl p-4 border shadow-sm hover:shadow-lg transition-all duration-300"
                 style={{ borderColor: getPriorityBorderColor(ticket.priority) }}
-                onClick={() => window.location.href = `/dashboard/tickets/${ticket.id}`}
               >
                 <div className="space-y-3">
                   {/* Header com número, título e prioridade */}
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-semibold text-gray-900 dark:text-white text-xl sm:text-2xl">#{ticket.ticket_number}</span>
+                    <a 
+                      href={`/dashboard/tickets/${ticket.id}`}
+                      className="font-semibold text-gray-900 dark:text-white text-xl sm:text-2xl hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      #{ticket.ticket_number}
+                    </a>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPriorityColor(ticket.priority)}`}>
                       {ticket.priority === 'critical' ? 'Crítico' : ticket.priority === 'high' ? 'Alto' : ticket.priority === 'medium' ? 'Médio' : 'Baixo'}
                     </span>
