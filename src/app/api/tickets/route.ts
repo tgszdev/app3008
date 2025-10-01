@@ -237,18 +237,22 @@ export async function POST(request: NextRequest) {
     console.log('ID:', newTicket.id)
     console.log('Título:', newTicket.title)
 
-    // Criar registro no histórico (ignorar erros)
+    // Criar registro inicial no histórico com data correta
     try {
       await supabaseAdmin
         .from('ticket_history')
         .insert({
           ticket_id: newTicket.id,
           user_id: created_by,
-          action: 'created'
-          // Remover created_at - deixar o Supabase gerenciar automaticamente
+          action_type: 'status_changed',
+          field_changed: 'status',
+          old_value: '',
+          new_value: defaultStatusSlug,
+          created_at: createdAtBrazil // Usar mesma data do ticket
         })
+      console.log('✅ Histórico inicial criado com sucesso')
     } catch (historyError) {
-      console.log('Erro ao criar histórico (ignorado):', historyError)
+      console.log('⚠️ Erro ao criar histórico (ignorado):', historyError)
     }
 
     // Enviar notificação para o responsável (se houver)
@@ -452,23 +456,46 @@ async function handleUpdate(request: NextRequest) {
     // Registrar mudanças no histórico
     const changes: any[] = []
     
+    // Usar fuso horário de São Paulo para histórico
+    const nowBrazil = new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' })
+    const historyTimestamp = new Date(nowBrazil).toISOString()
+    
     if (currentTicket) {
       Object.keys(updateData).forEach(key => {
         if (key !== 'updated_at' && currentTicket[key] !== updateData[key]) {
           changes.push({
             ticket_id: id,
             user_id: userId || currentTicket.created_by,
-            action: 'updated',
-            field_name: key,
+            action_type: key === 'status' ? 'status_changed' : 'updated',
+            field_changed: key,
             old_value: String(currentTicket[key] || ''),
             new_value: String(updateData[key] || ''),
-            created_at: new Date().toISOString()
+            created_at: historyTimestamp
           })
         }
       })
 
       if (changes.length > 0) {
-        await supabaseAdmin.from('ticket_history').insert(changes)
+        // Verificar se já existe um registro idêntico recente (evitar duplicatas)
+        const { data: recentHistory } = await supabaseAdmin
+          .from('ticket_history')
+          .select('*')
+          .eq('ticket_id', id)
+          .gte('created_at', new Date(Date.now() - 5000).toISOString()) // Últimos 5 segundos
+          .order('created_at', { ascending: false })
+          .limit(1)
+        
+        // Se houver registro idêntico recente, não inserir
+        const isDuplicate = recentHistory && recentHistory.length > 0 && 
+          recentHistory[0].field_changed === changes[0].field_changed &&
+          recentHistory[0].new_value === changes[0].new_value
+        
+        if (!isDuplicate) {
+          await supabaseAdmin.from('ticket_history').insert(changes)
+          console.log('✅ Histórico registrado:', changes.length, 'mudança(s)')
+        } else {
+          console.log('⚠️ Registro duplicado detectado - não inserido')
+        }
 
         // Enviar notificações baseadas nas mudanças
         try {
