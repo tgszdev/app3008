@@ -14,6 +14,34 @@ export function getBrazilTimestamp(): string {
 }
 
 /**
+ * Formata data que JÁ ESTÁ em horário do Brasil (gravada com getBrazilTimestamp)
+ * NÃO faz conversão de timezone
+ */
+export function formatBrazilTimestampDirect(date: string | Date | null | undefined): string {
+  try {
+    const dateObj = parseDate(date)
+    
+    if (!dateObj) {
+      return 'N/A'
+    }
+    
+    // Formatar SEM conversão de timezone (data já está em horário do Brasil)
+    const formatted = dateObj.toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+    
+    return formatted.replace(',', ' às')
+  } catch (error) {
+    console.error('formatBrazilTimestampDirect erro:', error)
+    return 'N/A'
+  }
+}
+
+/**
  * Função auxiliar mais simples para converter qualquer formato de data
  */
 function parseDate(date: string | Date | null | undefined): Date | null {
