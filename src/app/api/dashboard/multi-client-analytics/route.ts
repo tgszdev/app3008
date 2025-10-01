@@ -138,6 +138,7 @@ export async function GET(request: NextRequest) {
           .eq('context_id', contextId)
           .gte('created_at', `${startDate}T00:00:00`)
           .lte('created_at', `${endDate}T23:59:59.999`)
+          .order('created_at', { ascending: false }) // Mais recente primeiro
 
         // Filtro por usuário se especificado
         if (userId) {
