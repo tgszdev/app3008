@@ -903,13 +903,13 @@ export default function HybridDashboard() {
           {/* Seletor de Clientes (apenas para matriz) */}
           {isMatrixUser && (
             <div className="relative">
-              {/* Botão principal com bordas animadas */}
+              {/* Botão principal */}
               <button
                 onClick={() => setShowClientPopup(!showClientPopup)}
-                className="w-full sm:w-auto sm:min-w-[180px] h-10 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 flex items-center justify-center gap-2 relative overflow-hidden whitespace-nowrap"
+                className="w-full sm:w-auto sm:min-w-[180px] h-10 px-3 sm:px-4 bg-gray-700 dark:bg-gray-700 text-white rounded-2xl hover:bg-gray-600 dark:hover:bg-gray-600 transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap font-medium"
               >
                 <Building className="w-4 h-4 flex-shrink-0" />
-                <span className="text-sm font-medium">
+                <span className="text-sm">
                   {selectedClients.length === 0 
                     ? 'Selecionar Clientes' 
                     : selectedClients.length === 1 
@@ -918,8 +918,6 @@ export default function HybridDashboard() {
                   }
                 </span>
                 <ChevronDown className="w-4 h-4 flex-shrink-0" />
-                {/* Bordas animadas */}
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-blue-500/20 to-transparent animate-pulse"></div>
               </button>
               
               {/* Popup de seleção de clientes */}
@@ -1012,54 +1010,48 @@ export default function HybridDashboard() {
             </div>
           )}
 
-          {/* Botão Meus Tickets com bordas animadas */}
+          {/* Botão Meus Tickets */}
           <button
             onClick={toggleMyTickets}
-            className={`w-full sm:w-auto sm:min-w-[180px] h-10 flex items-center justify-center gap-2 px-3 sm:px-4 border rounded-xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
+            className={`w-full sm:w-auto sm:min-w-[180px] h-10 flex items-center justify-center gap-2 px-3 sm:px-4 rounded-2xl transition-all duration-300 whitespace-nowrap font-medium ${
               myTicketsOnly 
-                ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
-                : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                : 'bg-gray-700 dark:bg-gray-700 text-white hover:bg-gray-600 dark:hover:bg-gray-600'
             }`}
           >
             <User className="h-4 w-4 flex-shrink-0" />
-            <span className="text-sm font-medium">Meus Tickets</span>
-            {/* Bordas animadas */}
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+            <span className="text-sm">Meus Tickets</span>
           </button>
           
-          {/* Botão Filtro de Data com bordas animadas */}
+          {/* Botão Filtro de Data */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="w-full sm:w-auto sm:min-w-[240px] h-10 flex items-center justify-center gap-2 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
+            className="w-full sm:w-auto sm:min-w-[240px] h-10 flex items-center justify-center gap-2 px-3 sm:px-4 bg-gray-700 dark:bg-gray-700 text-white rounded-2xl hover:bg-gray-600 dark:hover:bg-gray-600 transition-all duration-300 whitespace-nowrap font-medium"
           >
             <Calendar className="h-4 w-4 flex-shrink-0" />
-            <span className="text-sm font-medium">
+            <span className="text-sm">
               {periodFilter.start_date && periodFilter.end_date
                 ? `${formatDateShort(periodFilter.start_date)} - ${formatDateShort(periodFilter.end_date)}`
                 : 'Selecionar Período'
               }
             </span>
             <Filter className="h-4 w-4 flex-shrink-0" />
-            {/* Bordas animadas */}
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-yellow-500/20 to-transparent animate-pulse"></div>
           </button>
           
-          {/* Botão Export PDF com bordas animadas */}
+          {/* Botão Export PDF */}
           <button
             onClick={handleExportPDF}
             disabled={isGeneratingPDF}
-            className="w-full sm:w-auto sm:min-w-[180px] h-10 flex items-center justify-center gap-2 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden whitespace-nowrap"
+            className="w-full sm:w-auto sm:min-w-[180px] h-10 flex items-center justify-center gap-2 px-3 sm:px-4 bg-gray-700 dark:bg-gray-700 text-white rounded-2xl hover:bg-gray-600 dark:hover:bg-gray-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap font-medium"
           >
             {isGeneratingPDF ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <FileDown className="h-4 w-4 flex-shrink-0" />
             )}
-            <span className="text-sm font-medium">
+            <span className="text-sm">
               {isGeneratingPDF ? 'Gerando...' : 'Exportar PDF'}
             </span>
-            {/* Bordas animadas */}
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-purple-500/20 to-transparent animate-pulse"></div>
           </button>
         </div>
       </div>
