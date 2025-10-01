@@ -584,7 +584,7 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                                   ></div>
                                   
                                   {/* Tooltip instantâneo - responsivo */}
-                                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-0 pointer-events-none z-[9999] whitespace-nowrap">
+                                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-0 pointer-events-none z-[9999] whitespace-nowrap">
                                     <div className="font-semibold">{historyItem.status}</div>
                                     <div className="text-gray-300">
                                       {formatDate(historyItem.created_at)}
