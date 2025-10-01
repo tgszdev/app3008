@@ -639,15 +639,16 @@ export default function TicketDetailsPage() {
                       toast.error('Você não tem permissão para alterar o status deste ticket')
                     }
                   }}
-                  className={`min-w-[140px] h-10 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
+                  className={`min-w-[140px] h-10 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border rounded-2xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
                     canEditThisTicket && 
                     (ticket.status !== 'cancelled' || canDeleteTickets) 
                       ? 'hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer' 
                       : 'cursor-default opacity-75'
                   }`}
+                  style={{ borderColor: statusConfig.color }}
                   disabled={!canEditThisTicket}
                 >
-                  <StatusIcon size={16} className="flex-shrink-0" />
+                  <StatusIcon size={16} className="flex-shrink-0" style={{ color: statusConfig.color }} />
                   <span className="text-sm font-medium text-gray-900 dark:text-white">{statusConfig.label}</span>
                   {/* Animação sutil */}
                   <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-blue-500/10 to-transparent animate-pulse"></div>
@@ -691,14 +692,15 @@ export default function TicketDetailsPage() {
                     setNewPriority(ticket.priority)
                   }
                 }}
-                className={`min-w-[140px] h-10 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
+                className={`min-w-[140px] h-10 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border rounded-2xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
                   canChangePriority 
                     ? 'hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer' 
                     : 'cursor-default opacity-75'
                 }`}
+                style={{ borderColor: getPriorityBorderColor(ticket.priority) }}
                 disabled={!canChangePriority}
               >
-                <PriorityIcon size={16} className="flex-shrink-0" />
+                <PriorityIcon size={16} className="flex-shrink-0" style={{ color: getPriorityBorderColor(ticket.priority) }} />
                 <span className="text-sm font-medium text-gray-900 dark:text-white">{priorityConfig[ticket.priority].label}</span>
                 {/* Animação sutil */}
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-blue-500/10 to-transparent animate-pulse"></div>
