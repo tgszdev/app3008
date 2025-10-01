@@ -809,15 +809,6 @@ export default function TicketDetailsPage() {
             </div>
           )}
 
-          {/* Linha do Tempo */}
-          {canViewHistory && (
-            <TicketTimeline 
-              ticketId={ticket.id} 
-              className="mb-6" 
-              initiallyCollapsed={true}
-            />
-          )}
-
           {/* Histórico do Ticket */}
           {canViewHistory && (
             <TicketHistory 
@@ -910,6 +901,12 @@ export default function TicketDetailsPage() {
             )}
           </div>
 
+          {/* Linha do Tempo - Por último */}
+          <TicketTimeline 
+            ticketId={ticket.id} 
+            className="mb-6" 
+            initiallyCollapsed={true}
+          />
 
         </div>
 
