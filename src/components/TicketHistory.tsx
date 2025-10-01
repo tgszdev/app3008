@@ -199,7 +199,7 @@ export default function TicketHistory({ ticketId, className = '', initiallyColla
   const visibleHistory = expanded ? history : history.slice(0, 3)
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 ${className}`}>
+    <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 ${className}`}>
       {/* Cabeçalho Clicável */}
       <div 
         className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
@@ -233,7 +233,7 @@ export default function TicketHistory({ ticketId, className = '', initiallyColla
           <div className="p-6">
             {/* Aviso se histórico não está configurado */}
             {history.length > 0 && history[0]?.metadata?.fallback && (
-              <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+              <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-2xl">
                 <div className="flex items-center">
                   <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mr-2" />
                   <p className="text-sm text-yellow-800 dark:text-yellow-200">
