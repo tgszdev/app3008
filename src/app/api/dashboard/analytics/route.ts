@@ -74,8 +74,8 @@ export async function GET(request: Request) {
           email
         )
       `)
-      .gte('created_at', startDate.toISOString())
-      .lte('created_at', endDate.toISOString())
+      .gte('created_at', startDate.toISOString().split('T')[0] + 'T00:00:00')
+      .lte('created_at', endDate.toISOString().split('T')[0] + 'T23:59:59.999')
 
     // Apply multi-tenant filter
     if (userType === 'context' && userContextId) {
@@ -127,8 +127,8 @@ export async function GET(request: Request) {
     let previousTicketsQuery = supabaseAdmin
       .from('tickets')
       .select('*')
-      .gte('created_at', previousStartDate.toISOString())
-      .lte('created_at', previousEndDate.toISOString())
+      .gte('created_at', previousStartDate.toISOString().split('T')[0] + 'T00:00:00')
+      .lte('created_at', previousEndDate.toISOString().split('T')[0] + 'T23:59:59.999')
 
     if (userType === 'context' && userContextId) {
       previousTicketsQuery = previousTicketsQuery.eq('context_id', userContextId)

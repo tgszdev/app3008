@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
           created_at
         )
       `)
-      .gte('created_at', startDate.toISOString())
+      .gte('created_at', startDate.toISOString().split('T')[0] + 'T00:00:00')
       .order('created_at', { ascending: false })
 
     if (currentError) {
@@ -59,8 +59,8 @@ export async function GET(request: NextRequest) {
     const { data: previousRatings, error: previousError } = await supabaseAdmin
       .from('ticket_ratings')
       .select('rating')
-      .gte('created_at', previousStartDate.toISOString())
-      .lt('created_at', startDate.toISOString())
+      .gte('created_at', previousStartDate.toISOString().split('T')[0] + 'T00:00:00')
+      .lt('created_at', startDate.toISOString().split('T')[0] + 'T00:00:00')
 
     if (previousError) {
       console.error('Error fetching previous ratings:', previousError)
