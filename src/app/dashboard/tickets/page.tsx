@@ -933,6 +933,24 @@ export default function TicketsPage() {
             }
 
             const statusHistory = getStatusHistory()
+            
+            // No mobile (< 640px), mostrar sempre os últimos 5 steps
+            const [isMobile, setIsMobile] = useState(false)
+            
+            useEffect(() => {
+              const checkMobile = () => {
+                setIsMobile(window.innerWidth < 640)
+              }
+              
+              checkMobile()
+              window.addEventListener('resize', checkMobile)
+              
+              return () => window.removeEventListener('resize', checkMobile)
+            }, [])
+            
+            const displayStatusHistory = isMobile && statusHistory.length > 5
+              ? statusHistory.slice(-5) 
+              : statusHistory
 
             const getPriorityColor = (priority: string) => {
               switch (priority) {
@@ -1016,11 +1034,11 @@ export default function TicketsPage() {
                   
                   {/* Steps horizontais - baseados no histórico real */}
                   <div 
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 ml-[10%] sm:ml-0"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    {statusHistory.map((historyItem, index) => {
-                      const isLast = index === statusHistory.length - 1
+                    {displayStatusHistory.map((historyItem, index) => {
+                      const isLast = index === displayStatusHistory.length - 1
                       const isCurrent = isLast
                       
                       const historyStatusInfo = availableStatuses.find(s => s.slug === historyItem.status)
@@ -1049,7 +1067,7 @@ export default function TicketsPage() {
                           ></div>
                           
                           {/* Tooltip instantâneo */}
-                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-0 pointer-events-none whitespace-nowrap z-50">
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-0 pointer-events-none whitespace-nowrap z-[9999]">
                             <div className="font-semibold">{historyItem.status}</div>
                             <div className="text-gray-300">
                               {formatDate(historyItem.created_at)}
