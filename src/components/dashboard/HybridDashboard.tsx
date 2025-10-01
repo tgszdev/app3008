@@ -566,12 +566,12 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                                   ></div>
                                   
                                   {/* Tooltip instantâneo */}
-                                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-0 pointer-events-none whitespace-nowrap z-50">
-                                    <div className="font-semibold">{historyItem.status}</div>
-                                    <div className="text-gray-300">
+                                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-0 pointer-events-none z-50 min-w-[160px] max-w-[90vw] sm:max-w-xs">
+                                    <div className="font-semibold truncate">{historyItem.status}</div>
+                                    <div className="text-gray-300 text-[10px] sm:text-xs">
                                       {formatDate(historyItem.created_at)}
                                     </div>
-                                    <div className="text-gray-400">
+                                    <div className="text-gray-400 text-[10px] sm:text-xs truncate">
                                       por {historyItem.user?.name || 'Sistema'}
                                     </div>
                                     {/* Seta do tooltip */}
