@@ -35,12 +35,14 @@ export async function GET(request: NextRequest) {
     const endDate = searchParams.get('end_date')
     const contextIds = searchParams.get('context_ids')?.split(',').filter(Boolean) || []
     const userId = searchParams.get('user_id')
+    const myTicketsUserId = searchParams.get('myTickets') // Filtro "Meus Tickets"
 
     console.log('🔍 Multi-client analytics request:', {
       startDate,
       endDate,
       contextIds,
       userId,
+      myTicketsUserId,
       userEmail: session.user.email,
       currentUserId,
       userRole,
@@ -144,11 +146,17 @@ export async function GET(request: NextRequest) {
         if (userId) {
           ticketsQuery = ticketsQuery.or(`created_by.eq.${userId},assigned_to.eq.${userId}`)
         }
+
+        // Filtro "Meus Tickets" (criador OU responsável)
+        if (myTicketsUserId) {
+          ticketsQuery = ticketsQuery.or(`created_by.eq.${myTicketsUserId},assigned_to.eq.${myTicketsUserId}`)
+        }
         
         console.log(`🔍 Query para contexto ${context.name}:`)
         console.log(`  - Context ID: ${contextId}`)
         console.log(`  - Período: ${startDate} até ${endDate}`)
         console.log(`  - User ID: ${userId || 'não especificado'}`)
+        console.log(`  - Meus Tickets User ID: ${myTicketsUserId || 'não especificado'}`)
 
         const { data: tickets, error: ticketsError } = await ticketsQuery
 

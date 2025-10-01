@@ -758,7 +758,7 @@ export default function HybridDashboard() {
         setLoading(false)
       }
     }
-  }, [mounted, contextLoading, selectedClients, periodFilter, availableContexts])
+  }, [mounted, contextLoading, selectedClients, periodFilter, myTicketsOnly, availableContexts])
 
   const fetchMultiClientData = async () => {
     try {
@@ -769,6 +769,12 @@ export default function HybridDashboard() {
         end_date: periodFilter.end_date,
         context_ids: selectedClients.join(',')
       })
+
+      // Adicionar filtro "Meus Tickets" se ativo
+      if (myTicketsOnly && session?.user?.id) {
+        params.append('myTickets', session.user.id)
+        console.log('🔍 Filtrando por meus tickets (criador OU responsável):', session.user.id)
+      }
       
       console.log('🔄 Buscando dados multi-client com context_ids:', selectedClients)
       console.log('🔄 URL da API:', `/api/dashboard/multi-client-analytics?${params}`)
