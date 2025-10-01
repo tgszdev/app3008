@@ -637,16 +637,18 @@ export default function TicketDetailsPage() {
                       toast.error('Você não tem permissão para alterar o status deste ticket')
                     }
                   }}
-                  className={`min-w-[140px] flex items-center justify-center gap-2 px-4 py-2 rounded-2xl text-white ${statusConfig.color} ${
+                  className={`min-w-[140px] h-10 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
                     canEditThisTicket && 
                     (ticket.status !== 'cancelled' || canDeleteTickets) 
-                      ? 'hover:opacity-90 cursor-pointer transition-all duration-300' 
-                      : 'cursor-default'
-                  } font-medium`}
+                      ? 'hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer' 
+                      : 'cursor-default opacity-75'
+                  }`}
                   disabled={!canEditThisTicket}
                 >
-                  <StatusIcon size={16} />
-                  {statusConfig.label}
+                  <StatusIcon size={16} className="flex-shrink-0" />
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{statusConfig.label}</span>
+                  {/* Animação sutil */}
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-blue-500/10 to-transparent animate-pulse"></div>
                 </button>
               )}
             </div>
@@ -678,20 +680,25 @@ export default function TicketDetailsPage() {
                 </button>
               </div>
             ) : (
-              <div className={`min-w-[140px] flex items-center justify-center gap-2 px-4 py-2 rounded-2xl text-white ${priorityConfig[ticket.priority].color} ${canChangePriority ? 'cursor-pointer hover:opacity-90 transition-all duration-300' : ''} font-medium`}
+              <button
                 onClick={() => {
                   if (canChangePriority) {
                     setEditingPriority(true)
                     setNewPriority(ticket.priority)
                   }
                 }}
+                className={`min-w-[140px] h-10 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
+                  canChangePriority 
+                    ? 'hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer' 
+                    : 'cursor-default opacity-75'
+                }`}
+                disabled={!canChangePriority}
               >
-                <PriorityIcon size={16} />
-                {priorityConfig[ticket.priority].label}
-                {canChangePriority && (
-                  <Edit size={14} className="ml-1 opacity-70" />
-                )}
-              </div>
+                <PriorityIcon size={16} className="flex-shrink-0" />
+                <span className="text-sm font-medium text-gray-900 dark:text-white">{priorityConfig[ticket.priority].label}</span>
+                {/* Animação sutil */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-blue-500/10 to-transparent animate-pulse"></div>
+              </button>
             )}
           </div>
         </div>
