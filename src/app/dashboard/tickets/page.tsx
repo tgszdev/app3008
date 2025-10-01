@@ -1034,7 +1034,7 @@ export default function TicketsPage() {
                   
                   {/* Steps horizontais - baseados no histórico real */}
                   <div 
-                    className="flex items-center gap-2 ml-[10%] sm:ml-0"
+                    className="flex items-center gap-2 ml-[10%]"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {displayStatusHistory.map((historyItem, index) => {
