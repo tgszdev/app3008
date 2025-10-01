@@ -527,7 +527,7 @@ export default function TicketDetailsPage() {
         <h2 className="text-2xl font-bold mb-4">Chamado não encontrado</h2>
         <button
           onClick={() => router.push('/dashboard/tickets')}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700"
         >
           Voltar para Chamados
         </button>
@@ -592,7 +592,7 @@ export default function TicketDetailsPage() {
                   <select
                     value={newStatus}
                     onChange={(e) => setNewStatus(e.target.value)}
-                    className="px-3 py-1 rounded-lg border dark:bg-gray-700"
+                    className="px-3 py-1 rounded-2xl border dark:bg-gray-700"
                   >
                     {availableStatuses.map((status) => {
                       // Filter internal statuses for non-admin users
@@ -612,13 +612,13 @@ export default function TicketDetailsPage() {
                   </select>
                   <button
                     onClick={handleStatusUpdate}
-                    className="px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                    className="px-3 py-1 bg-green-600 text-white rounded-2xl hover:bg-green-700"
                   >
                     Salvar
                   </button>
                   <button
                     onClick={() => setEditingStatus(false)}
-                    className="px-3 py-1 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                    className="px-3 py-1 bg-gray-600 text-white rounded-2xl hover:bg-gray-700"
                   >
                     Cancelar
                   </button>
@@ -637,7 +637,7 @@ export default function TicketDetailsPage() {
                       toast.error('Você não tem permissão para alterar o status deste ticket')
                     }
                   }}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white ${statusConfig.color} ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-white ${statusConfig.color} ${
                     canEditThisTicket && 
                     (ticket.status !== 'cancelled' || canDeleteTickets) 
                       ? 'hover:opacity-90 cursor-pointer' 
@@ -657,7 +657,7 @@ export default function TicketDetailsPage() {
                 <select
                   value={newPriority}
                   onChange={(e) => setNewPriority(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
                 >
                   <option value="low">Baixa</option>
                   <option value="medium">Média</option>
@@ -666,19 +666,19 @@ export default function TicketDetailsPage() {
                 </select>
                 <button
                   onClick={handlePriorityUpdate}
-                  className="px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                  className="px-3 py-1 bg-green-600 text-white rounded-2xl hover:bg-green-700"
                 >
                   Salvar
                 </button>
                 <button
                   onClick={() => setEditingPriority(false)}
-                  className="px-3 py-1 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                  className="px-3 py-1 bg-gray-600 text-white rounded-2xl hover:bg-gray-700"
                 >
                   Cancelar
                 </button>
               </div>
             ) : (
-              <div className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white ${priorityConfig[ticket.priority].color} ${canChangePriority ? 'cursor-pointer hover:opacity-80' : ''}`}
+              <div className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-white ${priorityConfig[ticket.priority].color} ${canChangePriority ? 'cursor-pointer hover:opacity-80' : ''}`}
                 onClick={() => {
                   if (canChangePriority) {
                     setEditingPriority(true)
@@ -701,7 +701,7 @@ export default function TicketDetailsPage() {
         {/* Main Content - Order 2 on mobile, Order 1 on desktop */}
         <div className="order-2 lg:order-1 lg:col-span-2 space-y-4 sm:space-y-6">
           {/* Ticket Details */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold mb-4 break-words">{ticket.title.toUpperCase()}</h2>
             
             <div className="prose dark:prose-invert max-w-none">
@@ -710,7 +710,7 @@ export default function TicketDetailsPage() {
             </div>
 
             {ticket.resolution_notes && (
-              <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-2xl">
                 <h3 className="text-sm font-semibold text-green-800 dark:text-green-400 mb-2">Notas de Resolução</h3>
                 <p className="text-green-700 dark:text-green-300">{ticket.resolution_notes}</p>
               </div>
@@ -719,7 +719,7 @@ export default function TicketDetailsPage() {
 
           {/* Attachments */}
           {attachments.length > 0 && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
               <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                 <Paperclip size={20} />
                 Anexos ({attachments.length})
@@ -736,7 +736,7 @@ export default function TicketDetailsPage() {
                   return (
                     <div
                       key={attachment.id}
-                      className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900"
+                      className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-900"
                     >
                       <div className="flex items-center gap-3">
                         {isImage ? (
@@ -794,7 +794,7 @@ export default function TicketDetailsPage() {
           )}
 
           {/* Comments */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
               <MessageSquare size={20} />
               Comentários
@@ -829,7 +829,7 @@ export default function TicketDetailsPage() {
             {/* Add Comment Form - Disabled for cancelled tickets unless has delete permission */}
             {ticket.status === 'cancelled' && !canDeleteTickets ? (
               <div className="border-t pt-4">
-                <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg text-center">
+                <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-2xl text-center">
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     🔒 Este ticket está cancelado. Apenas administradores podem adicionar comentários.
                   </p>
@@ -841,7 +841,7 @@ export default function TicketDetailsPage() {
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   placeholder="Adicionar comentário..."
-                  className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 resize-none"
+                  className="w-full px-3 py-2 border rounded-2xl dark:bg-gray-700 dark:border-gray-600 resize-none"
                   rows={3}
                   disabled={ticket.status === 'cancelled' && !canDeleteTickets}
                 />
@@ -865,7 +865,7 @@ export default function TicketDetailsPage() {
                     <button
                       type="submit"
                       disabled={submittingComment || !comment.trim() || (ticket.status === 'cancelled' && !canDeleteTickets)}
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Send size={16} />
                       {isInternalComment ? 'Enviar Interno' : 'Enviar'}
@@ -882,7 +882,7 @@ export default function TicketDetailsPage() {
         {/* Sidebar - Order 1 on mobile, Order 2 on desktop */}
         <div className="order-1 lg:order-2 space-y-4 sm:space-y-6">
           {/* Ticket Info */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold mb-4">Informações</h2>
             
             <div className="space-y-4">
@@ -901,7 +901,7 @@ export default function TicketDetailsPage() {
                     <select
                       value={newAssignee}
                       onChange={(e) => setNewAssignee(e.target.value)}
-                      className="w-full px-3 py-1 rounded-lg border dark:bg-gray-700"
+                      className="w-full px-3 py-1 rounded-2xl border dark:bg-gray-700"
                     >
                       <option value="">Não atribuído</option>
                       {users.map((user) => (
@@ -971,7 +971,7 @@ export default function TicketDetailsPage() {
                     return (
                       <div className="flex items-center gap-2">
                         <div
-                          className="w-6 h-6 rounded-lg flex items-center justify-center"
+                          className="w-6 h-6 rounded-2xl flex items-center justify-center"
                           style={{ backgroundColor: category.color + '20', color: category.color }}
                         >
                           <Icon size={14} />
@@ -1007,7 +1007,7 @@ export default function TicketDetailsPage() {
           </div>
 
           {/* Actions */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
             <h2 className="text-xl font-bold mb-4">Ações</h2>
             
             <div className="space-y-2">
@@ -1017,14 +1017,14 @@ export default function TicketDetailsPage() {
                 <>
                   <button
                     onClick={() => setEditingStatus(true)}
-                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700"
                   >
                     Alterar Status
                   </button>
                   
                   <button
                     onClick={() => setEditingAssignee(true)}
-                    className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                    className="w-full px-4 py-2 bg-gray-600 text-white rounded-2xl hover:bg-gray-700"
                   >
                     Atribuir Responsável
                   </button>
@@ -1033,7 +1033,7 @@ export default function TicketDetailsPage() {
               
               {/* File Upload - Disabled for cancelled tickets unless has delete permission */}
               {ticket.status === 'cancelled' && !canDeleteTickets ? (
-                <div className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
+                <div className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
                   <Paperclip size={16} />
                   <span className="text-gray-600 dark:text-gray-400">Anexos bloqueados</span>
                 </div>
@@ -1046,7 +1046,7 @@ export default function TicketDetailsPage() {
                     className="hidden"
                     accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.txt,.zip,.rar"
                   />
-                  <div className={`w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2 cursor-pointer ${uploadingFile ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                  <div className={`w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center gap-2 cursor-pointer ${uploadingFile ? 'opacity-50 cursor-not-allowed' : ''}`}>
                     <Paperclip size={16} />
                     {uploadingFile ? 'Enviando...' : 'Adicionar Anexo'}
                   </div>
@@ -1057,7 +1057,7 @@ export default function TicketDetailsPage() {
               {canDeleteTickets && (
                 <button
                   onClick={handleDelete}
-                  className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-2"
+                  className="w-full px-4 py-2 bg-red-600 text-white rounded-2xl hover:bg-red-700 flex items-center justify-center gap-2"
                 >
                   <Trash2 size={16} />
                   Excluir Chamado
@@ -1066,7 +1066,7 @@ export default function TicketDetailsPage() {
               
               {/* Mensagem especial para tickets cancelados */}
               {ticket.status === 'cancelled' && session?.user?.role !== 'admin' && (
-                <div className="p-4 bg-red-100 dark:bg-red-900/20 rounded-lg text-center border border-red-300 dark:border-red-800">
+                <div className="p-4 bg-red-100 dark:bg-red-900/20 rounded-2xl text-center border border-red-300 dark:border-red-800">
                   <p className="text-sm text-red-800 dark:text-red-300 font-semibold">
                     🔒 Ticket Cancelado - Acesso Restrito
                   </p>
@@ -1087,7 +1087,7 @@ export default function TicketDetailsPage() {
               
               {/* Mensagem para usuários sem permissão */}
               {session?.user?.role === 'user' && ticket.status !== 'cancelled' && (
-                <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-center">
+                <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-2xl text-center">
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Você pode adicionar comentários e anexos ao chamado.
                   </p>
@@ -1101,7 +1101,7 @@ export default function TicketDetailsPage() {
 
           {/* Rating Component - Show only for resolved tickets and ticket creator */}
           {ticket.status === 'resolved' && ticket.created_by_user?.id === session?.user?.id && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
               <TicketRating
                 ticketId={ticket.id}
                 ticketNumber={ticket.ticket_number.toString()}
@@ -1118,7 +1118,7 @@ export default function TicketDetailsPage() {
       {/* Modal de Cancelamento */}
       {showCancelModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <h2 className="text-lg sm:text-xl font-bold mb-4">Cancelar Ticket</h2>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               Para cancelar este ticket, você deve informar o motivo do cancelamento.
@@ -1127,7 +1127,7 @@ export default function TicketDetailsPage() {
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
               placeholder="Digite o motivo do cancelamento..."
-              className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 resize-none"
+              className="w-full px-3 py-2 border rounded-2xl dark:bg-gray-700 dark:border-gray-600 resize-none"
               rows={4}
               autoFocus
             />
@@ -1137,14 +1137,14 @@ export default function TicketDetailsPage() {
                   setShowCancelModal(false)
                   setCancelReason('')
                 }}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleCancelTicket}
                 disabled={!cancelReason.trim()}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-red-600 text-white rounded-2xl hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Confirmar Cancelamento
               </button>
@@ -1156,7 +1156,7 @@ export default function TicketDetailsPage() {
       {/* Modal de Reativação */}
       {showReactivateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <h2 className="text-lg sm:text-xl font-bold mb-4">Reativar Ticket</h2>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               Para reativar este ticket cancelado, você deve informar o motivo da reativação.
@@ -1165,7 +1165,7 @@ export default function TicketDetailsPage() {
               value={reactivateReason}
               onChange={(e) => setReactivateReason(e.target.value)}
               placeholder="Digite o motivo da reativação..."
-              className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 resize-none"
+              className="w-full px-3 py-2 border rounded-2xl dark:bg-gray-700 dark:border-gray-600 resize-none"
               rows={4}
               autoFocus
             />
@@ -1176,14 +1176,14 @@ export default function TicketDetailsPage() {
                   setReactivateReason('')
                   setNewStatus('')
                 }}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleReactivateTicket}
                 disabled={!reactivateReason.trim()}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Confirmar Reativação
               </button>
