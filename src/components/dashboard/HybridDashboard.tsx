@@ -447,8 +447,21 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
 
                   const statusHistory = getStatusHistory()
                   
-                  // No mobile, mostrar apenas os últimos 5 steps
-                  const displayStatusHistory = typeof window !== 'undefined' && window.innerWidth < 640 
+                  // No mobile (< 640px), mostrar sempre os últimos 5 steps
+                  const [isMobile, setIsMobile] = useState(false)
+                  
+                  useEffect(() => {
+                    const checkMobile = () => {
+                      setIsMobile(window.innerWidth < 640)
+                    }
+                    
+                    checkMobile()
+                    window.addEventListener('resize', checkMobile)
+                    
+                    return () => window.removeEventListener('resize', checkMobile)
+                  }, [])
+                  
+                  const displayStatusHistory = isMobile && statusHistory.length > 5
                     ? statusHistory.slice(-5) 
                     : statusHistory
 
