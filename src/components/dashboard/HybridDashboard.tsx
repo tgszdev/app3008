@@ -565,17 +565,17 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                                     }}
                                   ></div>
                                   
-                                  {/* Tooltip instantâneo */}
-                                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-0 pointer-events-none z-50 min-w-[160px] max-w-[90vw] sm:max-w-xs">
-                                    <div className="font-semibold truncate">{historyItem.status}</div>
-                                    <div className="text-gray-300 text-[10px] sm:text-xs">
-                                      {formatDate(historyItem.created_at)}
+                                  {/* Tooltip instantâneo - responsivo */}
+                                  <div className="absolute bottom-full left-0 sm:left-1/2 sm:-translate-x-1/2 mb-2 px-2 py-1.5 bg-gray-900 dark:bg-gray-700 text-white rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-0 pointer-events-none z-50 w-[140px] sm:w-auto sm:min-w-[160px] sm:max-w-xs">
+                                    <div className="font-semibold text-[10px] sm:text-xs line-clamp-1">{historyItem.status}</div>
+                                    <div className="text-gray-300 text-[9px] sm:text-[10px] mt-0.5">
+                                      {new Date(historyItem.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
                                     </div>
-                                    <div className="text-gray-400 text-[10px] sm:text-xs truncate">
-                                      por {historyItem.user?.name || 'Sistema'}
+                                    <div className="text-gray-400 text-[9px] sm:text-[10px] line-clamp-1">
+                                      {(historyItem.user?.name || 'Sistema').split(' ')[0]}
                                     </div>
                                     {/* Seta do tooltip */}
-                                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+                                    <div className="absolute top-full left-4 sm:left-1/2 sm:-translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
                                   </div>
                                   
                                   {!isLast && (
