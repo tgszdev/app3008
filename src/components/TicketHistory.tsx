@@ -23,7 +23,6 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react'
-import { format, formatInTimeZone } from 'date-fns-tz'
 import { ptBR } from 'date-fns/locale'
 import axios from 'axios'
 import toast from 'react-hot-toast'
@@ -162,12 +161,21 @@ export default function TicketHistory({ ticketId, className = '', initiallyColla
                 <div className="flex items-center space-x-1">
                   <Clock className="h-3 w-3 text-gray-400" />
                   <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {entry.created_at ? formatInTimeZone(
-                      new Date(entry.created_at), 
-                      'America/Sao_Paulo',
-                      "dd/MM/yyyy 'às' HH:mm",
-                      { locale: ptBR }
-                    ) : 'Agora'}
+                    {entry.created_at ? (() => {
+                      // Extrair data/hora diretamente do string sem conversão de timezone
+                      const dateStr = entry.created_at
+                      const date = new Date(dateStr)
+                      
+                      // Pegar os componentes da data SEM conversão de timezone
+                      // Como gravamos com getBrazilTimestamp, a hora UTC é a hora do Brasil
+                      const year = date.getUTCFullYear()
+                      const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+                      const day = String(date.getUTCDate()).padStart(2, '0')
+                      const hours = String(date.getUTCHours()).padStart(2, '0')
+                      const minutes = String(date.getUTCMinutes()).padStart(2, '0')
+                      
+                      return `${day}/${month}/${year} às ${hours}:${minutes}`
+                    })() : 'Agora'}
                   </span>
                 </div>
               </div>

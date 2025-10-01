@@ -1,4 +1,5 @@
 import { format, parseISO, isValid, differenceInMinutes, differenceInHours, differenceInDays } from 'date-fns'
+import { formatInTimeZone } from 'date-fns-tz'
 import { ptBR } from 'date-fns/locale'
 
 const BRAZIL_TIMEZONE = 'America/Sao_Paulo'
@@ -153,27 +154,23 @@ function toBrazilTime(date: Date): Date {
  */
 export function formatBrazilDateTime(date: string | Date | null | undefined): string {
   try {
-    const dateObj = parseDate(date)
+    if (!date) return 'N/A'
     
-    if (!dateObj) {
-      if (date) {
-        console.debug('formatBrazilDateTime: Não conseguiu converter:', date)
-      }
+    const dateObj = new Date(date)
+    
+    if (isNaN(dateObj.getTime())) {
       return 'N/A'
     }
     
-    // NÃO converter timezone - o banco já tem horário do Brasil
-    // Apenas formatar a data sem conversão
-    const formatted = dateObj.toLocaleString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
+    // Extrair componentes UTC (que representam o horário do Brasil)
+    // Como gravamos com getBrazilTimestamp, a hora UTC é a hora do Brasil
+    const year = dateObj.getUTCFullYear()
+    const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0')
+    const day = String(dateObj.getUTCDate()).padStart(2, '0')
+    const hours = String(dateObj.getUTCHours()).padStart(2, '0')
+    const minutes = String(dateObj.getUTCMinutes()).padStart(2, '0')
     
-    // Substituir vírgula por "às"
-    return formatted.replace(',', ' às')
+    return `${day}/${month}/${year} às ${hours}:${minutes}`
   } catch (error) {
     console.error('formatBrazilDateTime erro:', error)
     return 'N/A'
