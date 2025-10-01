@@ -906,10 +906,10 @@ export default function HybridDashboard() {
               {/* Botão principal com bordas animadas */}
               <button
                 onClick={() => setShowClientPopup(!showClientPopup)}
-                className="w-40 h-10 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 flex items-center gap-2 relative overflow-hidden whitespace-nowrap"
+                className="w-full sm:w-auto sm:min-w-[180px] h-10 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 flex items-center justify-center gap-2 relative overflow-hidden whitespace-nowrap"
               >
-                <Building className="w-4 h-4" />
-                <span className="text-xs font-medium">
+                <Building className="w-4 h-4 flex-shrink-0" />
+                <span className="text-sm font-medium">
                   {selectedClients.length === 0 
                     ? 'Selecionar Clientes' 
                     : selectedClients.length === 1 
@@ -917,7 +917,7 @@ export default function HybridDashboard() {
                       : `${selectedClients.length} clientes`
                   }
                 </span>
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="w-4 h-4 flex-shrink-0" />
                 {/* Bordas animadas */}
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-blue-500/20 to-transparent animate-pulse"></div>
               </button>
