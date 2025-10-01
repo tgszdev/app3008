@@ -566,16 +566,18 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                                   ></div>
                                   
                                   {/* Tooltip instantâneo - responsivo */}
-                                  <div className="absolute bottom-full left-0 right-0 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-0 pointer-events-none z-50 mx-auto w-max max-w-[calc(100vw-2rem)] sm:max-w-xs">
-                                    <div className="font-semibold">{historyItem.status}</div>
-                                    <div className="text-gray-300">
-                                      {formatDate(historyItem.created_at)}
+                                  <div className="absolute bottom-full inset-x-0 mb-2 flex justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-0 pointer-events-none z-50">
+                                    <div className="px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-lg max-w-[95%] sm:max-w-xs">
+                                      <div className="font-semibold truncate">{historyItem.status}</div>
+                                      <div className="text-gray-300 truncate">
+                                        {formatDate(historyItem.created_at)}
+                                      </div>
+                                      <div className="text-gray-400 truncate">
+                                        por {historyItem.user?.name || 'Sistema'}
+                                      </div>
+                                      {/* Seta do tooltip */}
+                                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
                                     </div>
-                                    <div className="text-gray-400">
-                                      por {historyItem.user?.name || 'Sistema'}
-                                    </div>
-                                    {/* Seta do tooltip */}
-                                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
                                   </div>
                                   
                                   {!isLast && (
