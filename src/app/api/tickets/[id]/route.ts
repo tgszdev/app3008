@@ -41,6 +41,7 @@ export async function GET(
         created_by_user:users!tickets_created_by_fkey(id, name, email),
         assigned_to_user:users!tickets_assigned_to_fkey(id, name, email),
         category_info:categories!tickets_category_id_fkey(id, name, slug, color, icon),
+        context_info:contexts!tickets_context_id_fkey(id, name, slug),
         comments:ticket_comments(
           id,
           content,
