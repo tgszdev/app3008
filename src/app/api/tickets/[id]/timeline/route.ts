@@ -19,23 +19,38 @@ export async function GET(
 
     const ticketId = params.id
 
+    console.log('[Timeline API] Buscando timeline para ticket:', ticketId)
+
     // Buscar histórico do ticket com informações do status
     const { data: historyData, error: historyError } = await supabaseAdmin
       .from('ticket_history')
       .select(`
         *,
-        user:users(id, name, email),
-        status_info:ticket_statuses!ticket_history_new_status_fkey(id, name, color, slug)
+        user:users(id, name, email)
       `)
       .eq('ticket_id', ticketId)
       .order('created_at', { ascending: true })
 
     if (historyError) {
-      console.error('Erro ao buscar histórico:', historyError)
+      console.error('[Timeline API] Erro ao buscar histórico:', historyError)
       return NextResponse.json(
-        { error: 'Erro ao buscar histórico' },
+        { error: 'Erro ao buscar histórico', details: historyError.message },
         { status: 500 }
       )
+    }
+
+    console.log('[Timeline API] Histórico encontrado:', historyData?.length || 0, 'registros')
+
+    // Buscar informações dos status separadamente
+    const { data: statusesData } = await supabaseAdmin
+      .from('ticket_statuses')
+      .select('slug, name, color')
+
+    const statusMap = new Map()
+    if (statusesData) {
+      statusesData.forEach(status => {
+        statusMap.set(status.slug, status)
+      })
     }
 
     if (!historyData || historyData.length === 0) {
@@ -74,9 +89,10 @@ export async function GET(
         }
       }
 
-      // Pegar cor do status
-      const statusColor = (current as any).status_info?.color || '#6b7280'
-      const statusName = (current as any).status_info?.name || current.new_status || 'Desconhecido'
+      // Pegar cor do status usando o mapa
+      const statusInfo = statusMap.get(current.new_status)
+      const statusColor = statusInfo?.color || '#6b7280'
+      const statusName = statusInfo?.name || current.new_status || 'Desconhecido'
 
       processedTimeline.push({
         status: statusName,
@@ -106,14 +122,16 @@ export async function GET(
       }
     }
 
+    console.log('[Timeline API] Timeline processada com sucesso:', processedTimeline.length, 'etapas')
+
     return NextResponse.json({
       timeline: processedTimeline,
       totalDuration
     })
-  } catch (error) {
-    console.error('Erro ao processar timeline:', error)
+  } catch (error: any) {
+    console.error('[Timeline API] Erro ao processar timeline:', error)
     return NextResponse.json(
-      { error: 'Erro interno do servidor' },
+      { error: 'Erro interno do servidor', details: error?.message || 'Erro desconhecido' },
       { status: 500 }
     )
   }
