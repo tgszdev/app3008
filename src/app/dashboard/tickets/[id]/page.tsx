@@ -1064,7 +1064,7 @@ export default function TicketDetailsPage() {
                   <span className="text-gray-600 dark:text-gray-400">Anexos bloqueados</span>
                 </div>
               ) : (
-                <label className="w-full">
+                <label className="w-full block">
                   <input
                     type="file"
                     onChange={handleFileUpload}
