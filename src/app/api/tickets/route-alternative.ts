@@ -250,8 +250,10 @@ export async function PUT(request: NextRequest) {
         })
       }
 
+      // Histórico gerenciado automaticamente por TRIGGER no banco
+      // Removido insert manual para evitar duplicação
       if (changes.length > 0) {
-        await supabaseAdmin.from('ticket_history').insert(changes)
+        console.log('📝 Mudanças detectadas (histórico via trigger):', changes.length)
       }
     }
 

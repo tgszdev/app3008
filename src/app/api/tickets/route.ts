@@ -475,31 +475,12 @@ async function handleUpdate(request: NextRequest) {
         }
       })
 
+      // Histórico gerenciado automaticamente por TRIGGER no banco
+      // Removido insert manual para evitar duplicação
+      
       if (changes.length > 0) {
-        // Verificar se já existe um registro idêntico recente (evitar duplicatas)
-        const fiveSecondsAgo = new Date(Date.now() - 5000)
-        const fiveSecondsAgoBrazil = new Date(fiveSecondsAgo.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' })).toISOString()
+        console.log('📝 Mudanças detectadas (histórico via trigger):', changes.length)
         
-        const { data: recentHistory } = await supabaseAdmin
-          .from('ticket_history')
-          .select('*')
-          .eq('ticket_id', id)
-          .gte('created_at', fiveSecondsAgoBrazil) // Últimos 5 segundos
-          .order('created_at', { ascending: false })
-          .limit(1)
-        
-        // Se houver registro idêntico recente, não inserir
-        const isDuplicate = recentHistory && recentHistory.length > 0 && 
-          recentHistory[0].field_changed === changes[0].field_changed &&
-          recentHistory[0].new_value === changes[0].new_value
-        
-        if (!isDuplicate) {
-          await supabaseAdmin.from('ticket_history').insert(changes)
-          console.log('✅ Histórico registrado:', changes.length, 'mudança(s)')
-        } else {
-          console.log('⚠️ Registro duplicado detectado - não inserido')
-        }
-
         // Enviar notificações baseadas nas mudanças
         try {
           // Notificar se o ticket foi atribuído a alguém
