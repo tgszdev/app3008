@@ -749,12 +749,3 @@ function Prototype10() {
   )
 }
 
-// Protótipos 4, 5 reutilizando estilos diferentes
-const Prototype4 = Prototype4
-const Prototype5 = Prototype5
-const Prototype6 = Prototype6
-const Prototype7 = Prototype7
-const Prototype8 = Prototype8
-const Prototype9 = Prototype9
-const Prototype10 = Prototype10
-
