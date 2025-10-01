@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
     const userContextId = (session.user as any).context_id
     
     const body = await request.json()
-    const { title, description, priority, category, category_id, created_by, assigned_to, due_date, is_internal } = body
+    const { title, description, priority, category, category_id, created_by, assigned_to, due_date, is_internal, context_id } = body
 
     // Validação básica
     if (!title || !description || !created_by) {
@@ -192,6 +192,10 @@ export async function POST(request: NextRequest) {
     console.log(`🎯 Status padrão definido: ${defaultStatusSlug}`)
 
     // CRIAR TICKET COM SEQUENCE (SEM RETRY - SEQUENCE É ATÔMICO)
+    // Usar fuso horário de São Paulo para created_at
+    const nowBrazil = new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' })
+    const createdAtBrazil = new Date(nowBrazil).toISOString()
+    
     const ticketData: any = {
       title,
       description,
@@ -201,10 +205,11 @@ export async function POST(request: NextRequest) {
       created_by,
       assigned_to,
       due_date,
-      is_internal: is_internal || false, // Adicionar campo is_internal
-      context_id: userContextId, // Adicionar contexto do usuário
-      ticket_number: ticketNumber, // ADICIONAR TICKET_NUMBER GERADO
-      // Deixar o Supabase gerenciar as datas automaticamente
+      is_internal: is_internal || false,
+      // Para usuários matriz, usar context_id do body; para usuários de contexto, usar da sessão
+      context_id: context_id || userContextId,
+      ticket_number: ticketNumber,
+      created_at: createdAtBrazil, // Data/hora no fuso de São Paulo
     }
 
     // Adicionar category_id se fornecido
