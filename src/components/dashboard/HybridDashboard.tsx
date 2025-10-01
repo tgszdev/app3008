@@ -649,12 +649,14 @@ export default function HybridDashboard() {
   const [showFilters, setShowFilters] = useState(false)
   const [myTicketsOnly, setMyTicketsOnly] = useState(false)
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
-  // Filtros de período
-  const getCurrentMonthDates = () => {
-    // Usar mês atual do primeiro ao último dia
+  
+  // Filtros de período - últimos 2 meses completos
+  const getLast2MonthsDates = () => {
     const now = new Date()
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1) // Primeiro dia do mês atual
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0) // Último dia do mês atual
+    // Pegar mês anterior (início)
+    const firstDay = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+    // Pegar último dia do mês atual (fim)
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0)
     
     return {
       start_date: firstDay.toISOString().split('T')[0],
@@ -662,8 +664,8 @@ export default function HybridDashboard() {
     }
   }
   
-  const [periodFilter, setPeriodFilter] = useState(getCurrentMonthDates())
-  const [tempFilter, setTempFilter] = useState<{start_date: string, end_date: string}>(getCurrentMonthDates())
+  const [periodFilter, setPeriodFilter] = useState(getLast2MonthsDates())
+  const [tempFilter, setTempFilter] = useState<{start_date: string, end_date: string}>(getLast2MonthsDates())
 
   // Carregar seleções do localStorage na inicialização
   useEffect(() => {
@@ -810,11 +812,11 @@ export default function HybridDashboard() {
   }
 
   const handleResetFilter = () => {
-    const currentMonth = getCurrentMonthDates()
-    setTempFilter(currentMonth)
-    setPeriodFilter(currentMonth)
+    const last2Months = getLast2MonthsDates()
+    setTempFilter(last2Months)
+    setPeriodFilter(last2Months)
     setShowFilters(false)
-    console.log('🔄 Filtro resetado para mês atual')
+    console.log('🔄 Filtro resetado para últimos 2 meses')
   }
 
   const handleExportPDF = async () => {
@@ -1008,7 +1010,7 @@ export default function HybridDashboard() {
           {/* Botão Meus Tickets com bordas animadas */}
           <button
             onClick={toggleMyTickets}
-            className={`w-40 h-10 flex items-center justify-center gap-2 px-4 border rounded-xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
+            className={`w-full sm:w-auto sm:min-w-[180px] h-10 flex items-center justify-center gap-2 px-3 sm:px-4 border rounded-xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
               myTicketsOnly 
                 ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
                 : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
@@ -1023,14 +1025,13 @@ export default function HybridDashboard() {
           {/* Botão Filtro de Data com bordas animadas */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="w-40 h-10 flex items-center justify-center gap-2 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
+            className="w-full sm:w-auto sm:min-w-[240px] h-10 flex items-center justify-center gap-2 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
           >
             <Calendar className="h-4 w-4 flex-shrink-0" />
             <span className="text-sm font-medium">
-              {periodFilter.start_date === getCurrentMonthDates().start_date && 
-               periodFilter.end_date === getCurrentMonthDates().end_date
-                ? 'Mês Atual'
-                : `${formatDateShort(periodFilter.start_date)} - ${formatDateShort(periodFilter.end_date)}`
+              {periodFilter.start_date && periodFilter.end_date
+                ? `${formatDateShort(periodFilter.start_date)} - ${formatDateShort(periodFilter.end_date)}`
+                : 'Selecionar Período'
               }
             </span>
             <Filter className="h-4 w-4 flex-shrink-0" />
@@ -1042,7 +1043,7 @@ export default function HybridDashboard() {
           <button
             onClick={handleExportPDF}
             disabled={isGeneratingPDF}
-            className="w-40 h-10 flex items-center justify-center gap-2 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden whitespace-nowrap"
+            className="w-full sm:w-auto sm:min-w-[180px] h-10 flex items-center justify-center gap-2 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden whitespace-nowrap"
           >
             {isGeneratingPDF ? (
               <Loader2 className="h-4 w-4 animate-spin" />
