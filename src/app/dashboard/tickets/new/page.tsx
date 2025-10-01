@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { usePermissions } from '@/hooks/usePermissions'
+import { useOrganization } from '@/contexts/OrganizationContext'
 import {
   ArrowLeft,
   Send,
@@ -19,6 +20,7 @@ import {
   Upload,
   File,
   Trash2,
+  Building2,
 } from 'lucide-react'
 import { getIcon } from '@/lib/icons'
 import Link from 'next/link'
@@ -46,6 +48,7 @@ interface Category {
 export default function NewTicketPage() {
   const router = useRouter()
   const { data: session } = useSession()
+  const { isMatrixUser, availableContexts } = useOrganization()
   const [loading, setLoading] = useState(false)
   const [analysts, setAnalysts] = useState<UserData[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -60,6 +63,7 @@ export default function NewTicketPage() {
     assigned_to: '',
     due_date: '',
     is_internal: false,
+    context_id: '', // Adicionar campo para selecionar cliente
   })
   
   // Estados para upload de arquivos
@@ -158,6 +162,12 @@ export default function NewTicketPage() {
       return
     }
 
+    // Validar seleção de cliente para usuários matriz
+    if (isMatrixUser && availableContexts.length > 0 && !formData.context_id) {
+      toast.error('Por favor, selecione o cliente para este chamado!')
+      return
+    }
+
     if (!session?.user?.id) {
       toast.error('Você precisa estar logado para criar um chamado')
       return
@@ -174,6 +184,7 @@ export default function NewTicketPage() {
         created_by: session.user.id,
         assigned_to: formData.assigned_to || null,
         due_date: formData.due_date || null,
+        context_id: formData.context_id || null, // Incluir context_id selecionado
       }
 
       const response = await axios.post('/api/tickets', ticketData)
@@ -367,6 +378,31 @@ export default function NewTicketPage() {
                 </select>
               )}
             </div>
+
+            {/* Client Selector - Only for matrix users with multi-client access */}
+            {isMatrixUser && availableContexts && availableContexts.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <Building2 className="inline h-4 w-4 mr-1" />
+                  Cliente *
+                </label>
+                <select
+                  value={formData.context_id}
+                  onChange={(e) => setFormData({ ...formData, context_id: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                >
+                  <option value="">Selecione o cliente...</option>
+                  {availableContexts
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((context) => (
+                      <option key={context.id} value={context.id}>
+                        {context.name} {context.type === 'organization' ? '(Cliente)' : '(Dept)'}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            )}
 
             {/* Assigned To - Only visible for users with permission */}
             {canAssignTickets && (
