@@ -683,6 +683,23 @@ export default function TicketsPage() {
         </div>
       </div>
 
+      {/* Barra de Informações do Período */}
+      <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 dark:from-blue-950 dark:via-blue-900 dark:to-blue-950 rounded-2xl p-4 border border-blue-700 dark:border-blue-800 shadow-lg">
+        <div className="flex flex-wrap items-center justify-center gap-2 text-white text-sm font-medium">
+          <span>
+            Período analisado: {
+              periodFilter.start_date && periodFilter.end_date
+                ? `${new Date(periodFilter.start_date + 'T00:00:00').toLocaleDateString('pt-BR')} até ${new Date(periodFilter.end_date + 'T00:00:00').toLocaleDateString('pt-BR')}`
+                : 'Mês Atual'
+            }
+          </span>
+          <span>•</span>
+          <span>{filteredTickets.length} tickets no período</span>
+          <span>•</span>
+          <span>{selectedClients.length} {selectedClients.length === 1 ? 'cliente selecionado' : 'clientes selecionados'}</span>
+        </div>
+      </div>
+
       {/* Filtros de Período */}
       {showDateFilters && (
         <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
