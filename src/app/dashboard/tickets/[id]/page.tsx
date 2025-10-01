@@ -612,15 +612,17 @@ export default function TicketDetailsPage() {
                   </select>
                   <button
                     onClick={handleStatusUpdate}
-                    className="min-w-[100px] px-4 py-2 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-all duration-300 font-medium"
+                    className="min-w-[100px] h-10 px-4 py-2 bg-green-600 text-white border border-green-600 rounded-2xl hover:bg-green-700 hover:border-green-700 transition-all duration-300 font-medium relative overflow-hidden"
                   >
-                    Salvar
+                    <span className="relative z-10">Salvar</span>
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
                   </button>
                   <button
                     onClick={() => setEditingStatus(false)}
-                    className="min-w-[100px] px-4 py-2 bg-gray-600 text-white rounded-2xl hover:bg-gray-700 transition-all duration-300 font-medium"
+                    className="min-w-[100px] h-10 px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 font-medium relative overflow-hidden"
                   >
-                    Cancelar
+                    <span className="relative z-10">Cancelar</span>
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-gray-500/10 to-transparent animate-pulse"></div>
                   </button>
                 </div>
               ) : (
@@ -668,15 +670,17 @@ export default function TicketDetailsPage() {
                 </select>
                 <button
                   onClick={handlePriorityUpdate}
-                  className="min-w-[100px] px-4 py-2 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-all duration-300 font-medium"
+                  className="min-w-[100px] h-10 px-4 py-2 bg-green-600 text-white border border-green-600 rounded-2xl hover:bg-green-700 hover:border-green-700 transition-all duration-300 font-medium relative overflow-hidden"
                 >
-                  Salvar
+                  <span className="relative z-10">Salvar</span>
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
                 </button>
                 <button
                   onClick={() => setEditingPriority(false)}
-                  className="min-w-[100px] px-4 py-2 bg-gray-600 text-white rounded-2xl hover:bg-gray-700 transition-all duration-300 font-medium"
+                  className="min-w-[100px] h-10 px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 font-medium relative overflow-hidden"
                 >
-                  Cancelar
+                  <span className="relative z-10">Cancelar</span>
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-gray-500/10 to-transparent animate-pulse"></div>
                 </button>
               </div>
             ) : (
