@@ -91,7 +91,8 @@ export async function GET(request: NextRequest) {
     // Filtro por período
     if (startDate && endDate) {
       console.log('🔍 Filtrando por período:', { startDate, endDate })
-      query = query.gte('created_at', startDate).lte('created_at', endDate + 'T23:59:59.999Z')
+      // Não usar 'Z' (UTC) - deixar o banco usar seu timezone configurado (America/Sao_Paulo)
+      query = query.gte('created_at', startDate + 'T00:00:00').lte('created_at', endDate + 'T23:59:59.999')
     }
 
     // Filtro "Meus Chamados" (criador OU responsável)
