@@ -282,7 +282,7 @@ export default function TicketsPage() {
         try {
           const parsed = JSON.parse(savedPeriodFilter)
           setPeriodFilter(parsed)
-          setTempFilter(parsed)
+          // Não preencher tempFilter - deixar vazio para o usuário escolher
         } catch (e) {
           console.error('Erro ao parsear periodFilter:', e)
         }
