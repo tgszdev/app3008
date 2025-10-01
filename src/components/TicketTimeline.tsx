@@ -76,11 +76,11 @@ export default function TicketTimeline({
   }
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden ${className}`}>
+    <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-lg ${className}`}>
       {/* Header - sempre visível */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        className={`w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${isCollapsed ? 'rounded-2xl' : 'rounded-t-2xl'}`}
         aria-expanded={!isCollapsed}
         aria-label={isCollapsed ? 'Expandir linha do tempo' : 'Recolher linha do tempo'}
       >
@@ -111,7 +111,7 @@ export default function TicketTimeline({
 
       {/* Conteúdo - colapsável */}
       {!isCollapsed && (
-        <div className="px-6 pb-6 pt-2">
+        <div className="px-6 pb-6 pt-2 rounded-b-2xl">
           {/* Tempo total (mobile) */}
           {totalDuration && (
             <div className="sm:hidden mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-2xl">
