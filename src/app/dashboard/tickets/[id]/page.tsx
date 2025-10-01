@@ -15,7 +15,7 @@ import { usePermissions } from '@/hooks/usePermissions'
 import { TicketRating } from '@/components/tickets/TicketRating'
 import { RatingModal } from '@/components/tickets/RatingModal'
 import { useStatuses } from '@/hooks/useStatuses'
-import TicketTimelineProgress from '@/components/TicketTimelineProgress'
+import TicketHistory from '@/components/TicketHistory'
 
 interface User {
   id: string
@@ -808,9 +808,9 @@ export default function TicketDetailsPage() {
             </div>
           )}
 
-          {/* Linha do Tempo do Ticket */}
+          {/* Histórico do Ticket */}
           {canViewHistory && (
-            <TicketTimelineProgress 
+            <TicketHistory 
               ticketId={ticket.id} 
               className="mb-6" 
               initiallyCollapsed={true}
