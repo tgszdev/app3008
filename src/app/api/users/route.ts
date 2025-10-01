@@ -193,8 +193,7 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
-    // Adicionar updated_at
-    updateData.updated_at = new Date().toISOString()
+    // updated_at gerenciado automaticamente pelo Supabase
 
     const { data: updatedUser, error } = await supabaseAdmin
       .from('users')
