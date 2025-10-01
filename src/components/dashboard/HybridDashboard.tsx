@@ -665,7 +665,7 @@ export default function HybridDashboard() {
   }
   
   const [periodFilter, setPeriodFilter] = useState(getLast2MonthsDates())
-  const [tempFilter, setTempFilter] = useState<{start_date: string, end_date: string}>(getLast2MonthsDates())
+  const [tempFilter, setTempFilter] = useState<{start_date: string, end_date: string}>({ start_date: '', end_date: '' })
 
   // Carregar seleções do localStorage na inicialização
   useEffect(() => {

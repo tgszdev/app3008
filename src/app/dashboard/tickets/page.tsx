@@ -188,7 +188,7 @@ export default function TicketsPage() {
   }
   
   const [periodFilter, setPeriodFilter] = useState(getLast2MonthsDates())
-  const [tempFilter, setTempFilter] = useState(periodFilter)
+  const [tempFilter, setTempFilter] = useState({ start_date: '', end_date: '' })
   const [showDateFilters, setShowDateFilters] = useState(false)
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
   const clientSelectorRef = useRef<HTMLDivElement>(null)
