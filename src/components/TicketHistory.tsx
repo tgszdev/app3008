@@ -23,7 +23,7 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react'
-import { formatDistanceToNow } from 'date-fns'
+import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import axios from 'axios'
 import toast from 'react-hot-toast'
@@ -162,8 +162,7 @@ export default function TicketHistory({ ticketId, className = '', initiallyColla
                 <div className="flex items-center space-x-1">
                   <Clock className="h-3 w-3 text-gray-400" />
                   <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {entry.created_at ? formatDistanceToNow(new Date(entry.created_at), { 
-                      addSuffix: true, 
+                    {entry.created_at ? format(new Date(entry.created_at), "dd/MM/yyyy 'às' HH:mm", { 
                       locale: ptBR 
                     }) : 'Agora'}
                   </span>
