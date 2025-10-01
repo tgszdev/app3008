@@ -982,6 +982,14 @@ export default function TicketDetailsPage() {
                 )}
               </div>
 
+              {/* Cliente */}
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Cliente</p>
+                <p className="font-semibold text-gray-900 dark:text-white">
+                  {(ticket as any).context_info?.name || 'Não definido'}
+                </p>
+              </div>
+
               {/* Categoria */}
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Categoria</p>
