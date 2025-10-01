@@ -135,8 +135,8 @@ export async function POST(request: NextRequest) {
         created_by,
         assigned_to,
         due_date,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        // created_at gerenciado automaticamente pelo Supabase
+        // updated_at gerenciado automaticamente pelo Supabase
       })
       .select('*')
       .single()
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
         ticket_id: newTicket.id,
         user_id: created_by,
         action: 'created',
-        created_at: new Date().toISOString(),
+        // created_at gerenciado automaticamente pelo Supabase
       })
 
     return NextResponse.json(ticketWithUsers)
@@ -192,7 +192,7 @@ export async function PUT(request: NextRequest) {
       .from('tickets')
       .update({
         ...updateData,
-        updated_at: new Date().toISOString(),
+        // updated_at gerenciado automaticamente pelo Supabase
       })
       .eq('id', id)
       .select('*')

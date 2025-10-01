@@ -276,7 +276,7 @@ async function executeActions(actions: any, ticket: TicketData): Promise<boolean
 
     // Atualizar ticket se houver mudanças
     if (shouldUpdate) {
-      updateData.updated_at = new Date().toISOString()
+      // updated_at gerenciado automaticamente pelo Supabase
       
       const { error: updateError } = await supabaseAdmin
         .from('tickets')
