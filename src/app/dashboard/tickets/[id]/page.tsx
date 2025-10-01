@@ -656,10 +656,10 @@ export default function TicketDetailsPage() {
                       ? 'hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer' 
                       : 'cursor-default opacity-75'
                   }`}
-                  style={{ borderColor: statusConfig.color }}
+                  style={{ borderColor: currentStatusData?.color || '#6b7280' }}
                   disabled={!canEditThisTicket}
                 >
-                  <StatusIcon size={16} className="flex-shrink-0" style={{ color: statusConfig.color }} />
+                  <StatusIcon size={16} className="flex-shrink-0" style={{ color: currentStatusData?.color || '#6b7280' }} />
                   <span className="text-sm font-medium text-gray-900 dark:text-white">{statusConfig.label}</span>
                   {/* Animação sutil */}
                   <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-blue-500/10 to-transparent animate-pulse"></div>
