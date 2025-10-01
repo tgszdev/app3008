@@ -434,10 +434,13 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                       // Evitar duplicatas - só adicionar se for diferente do último status
                       const lastStatus = history[history.length - 1]?.status
                       if (change.new_value !== lastStatus) {
+                        // Buscar informações do usuário da mudança
+                        const userInfo = change.user || null
+                        
                         history.push({
                           status: change.new_value,
                           created_at: change.created_at,
-                          user: change.user
+                          user: userInfo
                         })
                       }
                     })
@@ -595,7 +598,17 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                                       {formatDate(historyItem.created_at)}
                                     </div>
                                     <div className="text-gray-400">
-                                      por {historyItem.user?.name || 'Sistema'}
+                                      {(() => {
+                                        // Debug: verificar estrutura do user
+                                        if (typeof historyItem.user === 'object' && historyItem.user?.name) {
+                                          return `por ${historyItem.user.name}`
+                                        }
+                                        // Tentar pegar de created_by_user se for o primeiro registro
+                                        if (!historyItem.user && (ticket as any).created_by_user?.name) {
+                                          return `por ${(ticket as any).created_by_user.name}`
+                                        }
+                                        return 'por Sistema'
+                                      })()}
                                     </div>
                                     {/* Seta do tooltip */}
                                     <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
