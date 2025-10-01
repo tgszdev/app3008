@@ -40,6 +40,11 @@ export async function GET(
 
     console.log('[Timeline API] Histórico encontrado:', historyData?.length || 0, 'registros')
 
+    // Debug: mostrar estrutura do primeiro registro
+    if (historyData && historyData.length > 0) {
+      console.log('[Timeline API] Primeiro registro:', JSON.stringify(historyData[0], null, 2))
+    }
+
     // Buscar informações dos status separadamente
     const { data: statusesData } = await supabaseAdmin
       .from('ticket_statuses')
@@ -50,6 +55,7 @@ export async function GET(
       statusesData.forEach(status => {
         statusMap.set(status.slug, status)
       })
+      console.log('[Timeline API] Status carregados:', statusesData.length)
     }
 
     if (!historyData || historyData.length === 0) {
@@ -89,9 +95,11 @@ export async function GET(
       }
 
       // Pegar cor do status usando o mapa
-      const statusInfo = statusMap.get(current.new_status)
+      // Se for mudança de status, usar new_value, senão usar action_type
+      const statusSlug = current.field_changed === 'status' ? current.new_value : current.action_type
+      const statusInfo = statusMap.get(statusSlug)
       const statusColor = statusInfo?.color || '#6b7280'
-      const statusName = statusInfo?.name || current.new_status || 'Desconhecido'
+      const statusName = statusInfo?.name || current.new_value || current.action_type || 'Desconhecido'
 
       processedTimeline.push({
         status: statusName,
