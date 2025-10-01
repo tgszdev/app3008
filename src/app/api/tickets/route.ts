@@ -193,10 +193,7 @@ export async function POST(request: NextRequest) {
     console.log(`🎯 Status padrão definido: ${defaultStatusSlug}`)
 
     // CRIAR TICKET COM SEQUENCE (SEM RETRY - SEQUENCE É ATÔMICO)
-    // Usar fuso horário de São Paulo para created_at
-    const nowBrazil = new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' })
-    const createdAtBrazil = new Date(nowBrazil).toISOString()
-    
+    // Com banco configurado em America/Sao_Paulo, usar new Date() diretamente
     const ticketData: any = {
       title,
       description,
@@ -210,7 +207,7 @@ export async function POST(request: NextRequest) {
       // Para usuários matriz, usar context_id do body; para usuários de contexto, usar da sessão
       context_id: context_id || userContextId,
       ticket_number: ticketNumber,
-      created_at: createdAtBrazil, // Data/hora no fuso de São Paulo
+      // Deixar Supabase gerenciar created_at automaticamente (usa timezone do banco)
     }
 
     // Adicionar category_id se fornecido
@@ -238,7 +235,8 @@ export async function POST(request: NextRequest) {
     console.log('ID:', newTicket.id)
     console.log('Título:', newTicket.title)
 
-    // Criar registro inicial no histórico com data correta
+    // Criar registro inicial no histórico
+    // Deixar Supabase gerenciar created_at automaticamente (mesma data do ticket)
     try {
       await supabaseAdmin
         .from('ticket_history')
@@ -249,7 +247,7 @@ export async function POST(request: NextRequest) {
           field_changed: 'status',
           old_value: '',
           new_value: defaultStatusSlug,
-          created_at: createdAtBrazil // Usar mesma data do ticket
+          // created_at gerenciado automaticamente pelo Supabase
         })
       console.log('✅ Histórico inicial criado com sucesso')
     } catch (historyError) {
