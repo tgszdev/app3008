@@ -809,15 +809,6 @@ export default function TicketDetailsPage() {
             </div>
           )}
 
-          {/* Histórico do Ticket */}
-          {canViewHistory && (
-            <TicketHistory 
-              ticketId={ticket.id} 
-              className="mb-6" 
-              initiallyCollapsed={true}
-            />
-          )}
-
           {/* Comments */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
@@ -901,12 +892,21 @@ export default function TicketDetailsPage() {
             )}
           </div>
 
-          {/* Linha do Tempo - Por último */}
+          {/* Linha do Tempo */}
           <TicketTimeline 
             ticketId={ticket.id} 
             className="mb-6" 
             initiallyCollapsed={true}
           />
+
+          {/* Histórico do Ticket - Por último */}
+          {canViewHistory && (
+            <TicketHistory 
+              ticketId={ticket.id} 
+              className="mb-6" 
+              initiallyCollapsed={true}
+            />
+          )}
 
         </div>
 
