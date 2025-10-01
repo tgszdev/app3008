@@ -912,10 +912,10 @@ export default function HybridDashboard() {
               </span>
             </div>
         
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           {/* Seletor de Clientes (apenas para matriz) */}
           {isMatrixUser && (
-            <div className="relative">
+            <div className="relative w-full sm:w-auto">
               {/* Botão principal com bordas animadas */}
               <button
                 onClick={() => setShowClientPopup(!showClientPopup)}
