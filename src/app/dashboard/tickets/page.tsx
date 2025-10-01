@@ -183,6 +183,19 @@ export default function TicketsPage() {
   const [showDateFilters, setShowDateFilters] = useState(false)
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
   const clientSelectorRef = useRef<HTMLDivElement>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Detectar mobile para limitar steps
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Mapeamento removido - agora usa slugs direto do banco de dados
   // Os status no dropdown já vêm com os slugs corretos do banco
@@ -935,19 +948,6 @@ export default function TicketsPage() {
             const statusHistory = getStatusHistory()
             
             // No mobile (< 640px), mostrar sempre os últimos 5 steps
-            const [isMobile, setIsMobile] = useState(false)
-            
-            useEffect(() => {
-              const checkMobile = () => {
-                setIsMobile(window.innerWidth < 640)
-              }
-              
-              checkMobile()
-              window.addEventListener('resize', checkMobile)
-              
-              return () => window.removeEventListener('resize', checkMobile)
-            }, [])
-            
             const displayStatusHistory = isMobile && statusHistory.length > 5
               ? statusHistory.slice(-5) 
               : statusHistory
