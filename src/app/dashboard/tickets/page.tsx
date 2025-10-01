@@ -1076,7 +1076,17 @@ export default function TicketsPage() {
                               {formatDate(historyItem.created_at)}
                             </div>
                             <div className="text-gray-400">
-                              por {historyItem.user?.name || 'Sistema'}
+                              {(() => {
+                                // Verificar estrutura do user
+                                if (typeof historyItem.user === 'object' && historyItem.user?.name) {
+                                  return `por ${historyItem.user.name}`
+                                }
+                                // Fallback para created_by_user se for o primeiro registro
+                                if (!historyItem.user && ticket.created_by_user?.name) {
+                                  return `por ${ticket.created_by_user.name}`
+                                }
+                                return 'por Sistema'
+                              })()}
                             </div>
                             <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
                           </div>
