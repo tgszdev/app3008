@@ -77,34 +77,8 @@ export async function PATCH(
       return NextResponse.json({ error: 'Erro ao alterar prioridade' }, { status: 500 })
     }
 
-    // Buscar dados do usuário para o histórico manual (caso o trigger não funcione)
-    const { data: user } = await supabaseAdmin
-      .from('users')
-      .select('name')
-      .eq('id', userId)
-      .single()
-
-    // Inserir registro no histórico manualmente (backup caso trigger falhe)
-    const { error: historyError } = await supabaseAdmin
-      .from('ticket_history')
-      .insert({
-        ticket_id: ticketId,
-        user_id: userId,
-        action_type: 'priority_changed',
-        field_changed: 'priority',
-        old_value: currentTicket.priority,
-        new_value: priority,
-        description: `Prioridade alterada de "${currentTicket.priority}" para "${priority}" por ${user?.name || 'usuário'}`,
-        metadata: {
-          user_name: user?.name,
-          ticket_title: currentTicket.title
-        }
-      })
-
-    if (historyError) {
-      console.warn('Erro ao inserir histórico manualmente:', historyError)
-      // Não falhar a operação por causa do histórico
-    }
+    // Histórico gerenciado automaticamente por TRIGGER no banco de dados
+    // Removido insert manual para evitar duplicação
 
     // Buscar ticket atualizado
     const { data: updatedTicket, error: refetchError } = await supabaseAdmin
