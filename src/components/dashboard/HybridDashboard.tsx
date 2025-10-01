@@ -446,6 +446,11 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                   }
 
                   const statusHistory = getStatusHistory()
+                  
+                  // No mobile, mostrar apenas os últimos 5 steps
+                  const displayStatusHistory = typeof window !== 'undefined' && window.innerWidth < 640 
+                    ? statusHistory.slice(-5) 
+                    : statusHistory
 
 
                   const getPriorityColor = (priority: string) => {
@@ -530,11 +535,11 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                           
                           {/* Steps horizontais - baseados no histórico real */}
                           <div 
-                            className="flex items-center gap-2"
+                            className="flex items-center gap-2 pl-0 sm:pl-0 ml-[20%] sm:ml-0"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            {statusHistory.map((historyItem, index) => {
-                              const isLast = index === statusHistory.length - 1
+                            {displayStatusHistory.map((historyItem, index) => {
+                              const isLast = index === displayStatusHistory.length - 1
                               const isCurrent = isLast
                               
                               // Buscar cor do status no cadastro
