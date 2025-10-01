@@ -637,12 +637,12 @@ export default function TicketDetailsPage() {
                       toast.error('Você não tem permissão para alterar o status deste ticket')
                     }
                   }}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-white ${statusConfig.color} ${
+                  className={`min-w-[140px] flex items-center justify-center gap-2 px-4 py-2 rounded-2xl text-white ${statusConfig.color} ${
                     canEditThisTicket && 
                     (ticket.status !== 'cancelled' || canDeleteTickets) 
-                      ? 'hover:opacity-90 cursor-pointer' 
+                      ? 'hover:opacity-90 cursor-pointer transition-all duration-300' 
                       : 'cursor-default'
-                  }`}
+                  } font-medium`}
                   disabled={!canEditThisTicket}
                 >
                   <StatusIcon size={16} />
@@ -678,7 +678,7 @@ export default function TicketDetailsPage() {
                 </button>
               </div>
             ) : (
-              <div className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-white ${priorityConfig[ticket.priority].color} ${canChangePriority ? 'cursor-pointer hover:opacity-80' : ''}`}
+              <div className={`min-w-[140px] flex items-center justify-center gap-2 px-4 py-2 rounded-2xl text-white ${priorityConfig[ticket.priority].color} ${canChangePriority ? 'cursor-pointer hover:opacity-90 transition-all duration-300' : ''} font-medium`}
                 onClick={() => {
                   if (canChangePriority) {
                     setEditingPriority(true)
