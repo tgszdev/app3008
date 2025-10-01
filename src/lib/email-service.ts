@@ -182,7 +182,7 @@ Este é um email automático do sistema de escalação.
             provider: 'smtp',
             error_message: result.success ? null : (result.error || 'Unknown error'),
             metadata: result.success ? { messageId: result.messageId, accepted: result.accepted } : null,
-            created_at: new Date().toISOString()
+            // created_at gerenciado automaticamente pelo Supabase
           })
       }
     } catch (logError) {

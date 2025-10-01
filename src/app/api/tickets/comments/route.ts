@@ -24,8 +24,7 @@ export async function POST(request: NextRequest) {
         user_id,
         content,
         is_internal: is_internal || false,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        // created_at e updated_at gerenciados automaticamente pelo Supabase
       })
       .select(`
         *,
@@ -65,12 +64,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    // Atualizar updated_at do ticket
-    await supabaseAdmin
-      .from('tickets')
-      .update({ updated_at: new Date().toISOString() })
-      .eq('id', ticket_id)
-
     // Adicionar ao histórico
     await supabaseAdmin
       .from('ticket_history')
@@ -78,7 +71,7 @@ export async function POST(request: NextRequest) {
         ticket_id,
         user_id,
         action: 'comment_added',
-        created_at: new Date().toISOString()
+        // created_at gerenciado automaticamente pelo Supabase
       })
 
     // Buscar informações do ticket e usuário para notificação

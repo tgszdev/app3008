@@ -40,7 +40,7 @@ export async function PUT(
         display_name,
         description,
         permissions,
-        updated_at: new Date().toISOString()
+        // updated_at gerenciado automaticamente pelo Supabase
       })
       .eq('id', params.id)
       .select()
@@ -54,7 +54,7 @@ export async function PUT(
         return NextResponse.json({
           ...body,
           id: params.id,
-          updated_at: new Date().toISOString()
+          // updated_at gerenciado automaticamente pelo Supabase
         })
       }
       

@@ -123,8 +123,8 @@ export async function POST(request: NextRequest) {
         settings: settings || {},
         sla_hours: 24,
         is_active: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        // created_at gerenciado automaticamente pelo Supabase
+        // updated_at gerenciado automaticamente pelo Supabase
       })
       .select()
       .single()

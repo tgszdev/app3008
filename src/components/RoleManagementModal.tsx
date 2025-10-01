@@ -258,8 +258,8 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
             description: 'Acesso total ao sistema',
             permissions: systemRolesPermissions.admin,
             is_system: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            // created_at gerenciado automaticamente pelo Supabase
+            // updated_at gerenciado automaticamente pelo Supabase
           },
           {
             id: '2',
@@ -268,8 +268,8 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
             description: 'Desenvolvimento e Correções',
             permissions: systemRolesPermissions.developer,
             is_system: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            // created_at gerenciado automaticamente pelo Supabase
+            // updated_at gerenciado automaticamente pelo Supabase
           },
           {
             id: '3',
@@ -278,8 +278,8 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
             description: 'Pode gerenciar tickets e criar conteúdo',
             permissions: systemRolesPermissions.analyst,
             is_system: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            // created_at gerenciado automaticamente pelo Supabase
+            // updated_at gerenciado automaticamente pelo Supabase
           },
           {
             id: '4',
@@ -288,8 +288,8 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
             description: 'Pode criar tickets e visualizar conteúdo',
             permissions: systemRolesPermissions.user,
             is_system: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            // created_at gerenciado automaticamente pelo Supabase
+            // updated_at gerenciado automaticamente pelo Supabase
           }
         ]
         setRoles(defaultRoles)
@@ -359,8 +359,8 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
           description: 'Acesso total ao sistema',
           permissions: systemRolesPermissions.admin,
           is_system: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          // created_at gerenciado automaticamente pelo Supabase
+          // updated_at gerenciado automaticamente pelo Supabase
         },
         {
           id: '2',
@@ -369,8 +369,8 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
           description: 'Desenvolvimento e Correções',
           permissions: systemRolesPermissions.developer,
           is_system: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          // created_at gerenciado automaticamente pelo Supabase
+          // updated_at gerenciado automaticamente pelo Supabase
         },
         {
           id: '3',
@@ -379,8 +379,8 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
           description: 'Pode gerenciar tickets e criar conteúdo',
           permissions: systemRolesPermissions.analyst,
           is_system: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          // created_at gerenciado automaticamente pelo Supabase
+          // updated_at gerenciado automaticamente pelo Supabase
         },
         {
           id: '4',
@@ -389,8 +389,8 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
           description: 'Pode criar tickets e visualizar conteúdo',
           permissions: systemRolesPermissions.user,
           is_system: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          // created_at gerenciado automaticamente pelo Supabase
+          // updated_at gerenciado automaticamente pelo Supabase
         }
       ]
       setRoles(defaultRoles)
@@ -460,8 +460,8 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
         description: newRole.description || '',
         permissions: newRole.permissions!,
         is_system: false,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        // created_at gerenciado automaticamente pelo Supabase
+        // updated_at gerenciado automaticamente pelo Supabase
       }
       setRoles(prev => [...prev, localRole])
       setIsCreating(false)

@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     // Atualizar timestamp da sessão
     await supabaseAdmin
       .from('sessions')
-      .update({ updated_at: new Date().toISOString() })
+      .update({ /* updated_at automático */ })
       .eq('id', session.id)
     
     return NextResponse.json({ 

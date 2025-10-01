@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
         .update({
           can_submit: can_submit ?? existing.can_submit,
           can_approve: can_approve ?? existing.can_approve,
-          updated_at: new Date().toISOString()
+          // updated_at gerenciado automaticamente pelo Supabase
         })
         .eq('user_id', user_id)
         .select()

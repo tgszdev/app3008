@@ -59,11 +59,12 @@ export async function POST(request: NextRequest, context: RouteParams) {
 
       // Se não tem primeira resposta e o comentário não é do criador do ticket
       if (ticket && !ticket.first_response_at && ticket.created_by !== session.user?.id) {
+        const now = new Date().toISOString()
         await supabaseAdmin
           .from('tickets')
           .update({ 
-            first_response_at: new Date().toISOString(),
-            updated_at: new Date().toISOString() 
+            first_response_at: now,
+            // updated_at gerenciado automaticamente pelo Supabase
           })
           .eq('id', params.id)
 
@@ -74,7 +75,7 @@ export async function POST(request: NextRequest, context: RouteParams) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               action: 'first_response',
-              timestamp: new Date().toISOString()
+              timestamp: now
             })
           })
         } catch (slaError) {

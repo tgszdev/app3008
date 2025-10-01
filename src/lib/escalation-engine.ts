@@ -869,8 +869,8 @@ async function addEscalationComment(ticket: TicketData, comment: string): Promis
         user_id: ticket.created_by, // Sistema usa o criador do ticket como autor
         content: comment,
         is_internal: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        // created_at gerenciado automaticamente pelo Supabase
+        // updated_at gerenciado automaticamente pelo Supabase
       })
 
     if (error) {

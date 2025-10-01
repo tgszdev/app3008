@@ -300,8 +300,8 @@ async function executeActions(actions: any, ticket: TicketData): Promise<boolean
           user_id: ticket.created_by, // Sistema usa o criador do ticket como autor
           content: actions.add_comment,
           is_internal: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          // created_at gerenciado automaticamente pelo Supabase
+          // updated_at gerenciado automaticamente pelo Supabase
         })
 
       if (commentError) {

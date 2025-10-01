@@ -124,8 +124,8 @@ export async function POST(request: NextRequest) {
       role: enumRole, // Usar role válida para o ENUM
       role_name: role, // Armazenar a role real (customizada ou não)
       is_active: true,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      // created_at gerenciado automaticamente pelo Supabase
+      // updated_at gerenciado automaticamente pelo Supabase
     }
     
     // Adicionar campos opcionais apenas se fornecidos

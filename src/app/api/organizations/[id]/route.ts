@@ -140,7 +140,7 @@ export async function PUT(
         slug,
         type,
         settings: settings || {},
-        updated_at: new Date().toISOString()
+        // updated_at gerenciado automaticamente pelo Supabase
       })
       .eq('id', id)
       .select()

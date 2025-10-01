@@ -108,7 +108,7 @@ async function registerSession(userId: string, sessionToken: string) {
         user_id: userId,
         sessionToken,
         expires: expires.toISOString(),
-        created_at: new Date().toISOString(),
+        // created_at gerenciado automaticamente pelo Supabase
       })
   } catch (error) {
     console.error('Erro ao registrar sessão:', error)

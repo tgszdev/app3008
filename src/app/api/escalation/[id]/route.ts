@@ -35,7 +35,7 @@ export async function PATCH(
       .from('escalation_rules')
       .update({
         ...body,
-        updated_at: new Date().toISOString()
+        // updated_at gerenciado automaticamente pelo Supabase
       })
       .eq('id', id)
       .select()

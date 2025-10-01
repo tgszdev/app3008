@@ -55,7 +55,7 @@ export async function POST(
         .update({
           helpful,
           comment,
-          updated_at: new Date().toISOString()
+          // updated_at gerenciado automaticamente pelo Supabase
         })
         .eq('id', existingFeedback.id)
 

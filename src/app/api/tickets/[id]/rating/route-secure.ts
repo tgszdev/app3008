@@ -156,7 +156,7 @@ export async function POST(
         .update({
           rating,
           comment: comment || null,
-          updated_at: new Date().toISOString()
+          // updated_at gerenciado automaticamente pelo Supabase
         })
         .eq('id', existingRating.id)
         .select()

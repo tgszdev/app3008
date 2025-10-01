@@ -133,7 +133,7 @@ export async function GET() {
                 .from('tickets')
                 .update({ 
                   priority: newPriority,
-                  updated_at: new Date().toISOString()
+                  // updated_at gerenciado automaticamente pelo Supabase
                 })
                 .eq('id', ticket.id)
               
@@ -154,7 +154,7 @@ export async function GET() {
                 user_id: '00000000-0000-0000-0000-000000000000',
                 content: commentText,
                 is_internal: true,
-                created_at: new Date().toISOString()
+                // created_at gerenciado automaticamente pelo Supabase
               })
             
             console.log(`   💬 Comentário adicionado`)

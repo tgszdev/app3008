@@ -51,7 +51,7 @@ export async function validateDatabaseSession(sessionToken: string) {
     // Atualizar último acesso
     await supabaseAdmin
       .from('sessions')
-      .update({ updated_at: new Date().toISOString() })
+      .update({ /* updated_at automático */ })
       .eq('id', session.id)
     
     return session

@@ -208,8 +208,8 @@ async function registerSession(userId: string, sessionToken: string) {
         sessionToken: sessionToken,
         userId: userId,
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 horas
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        // created_at gerenciado automaticamente pelo Supabase
+        // updated_at gerenciado automaticamente pelo Supabase
       }, {
         onConflict: 'sessionToken'
       })

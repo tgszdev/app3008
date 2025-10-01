@@ -65,7 +65,7 @@ export async function PUT(request: NextRequest) {
       .from('users')
       .update({ 
         password_hash,
-        updated_at: new Date().toISOString()
+        // updated_at gerenciado automaticamente pelo Supabase
       })
       .eq('id', userId)
 

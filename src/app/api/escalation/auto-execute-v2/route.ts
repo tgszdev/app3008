@@ -66,7 +66,7 @@ export async function GET() {
               .from('tickets')
               .update({ 
                 priority: 'high',
-                updated_at: new Date().toISOString()
+                // updated_at gerenciado automaticamente pelo Supabase
               })
               .eq('id', ticket.id)
             

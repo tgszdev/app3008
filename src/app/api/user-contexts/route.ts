@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
         user_id,
         context_id,
         can_manage,
-        created_at: new Date().toISOString()
+        // created_at gerenciado automaticamente pelo Supabase
       })
       .select(`
         *,

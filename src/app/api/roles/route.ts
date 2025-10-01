@@ -67,8 +67,8 @@ export async function GET(request: NextRequest) {
               system_logs: true
             },
             is_system: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            // created_at gerenciado automaticamente pelo Supabase
+            // updated_at gerenciado automaticamente pelo Supabase
           },
           {
             id: '2',
@@ -102,8 +102,8 @@ export async function GET(request: NextRequest) {
               system_logs: false
             },
             is_system: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            // created_at gerenciado automaticamente pelo Supabase
+            // updated_at gerenciado automaticamente pelo Supabase
           },
           {
             id: '3',
@@ -138,8 +138,8 @@ export async function GET(request: NextRequest) {
               system_logs: false
             },
             is_system: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            // created_at gerenciado automaticamente pelo Supabase
+            // updated_at gerenciado automaticamente pelo Supabase
           }
         ])
       }
@@ -255,8 +255,8 @@ export async function POST(request: NextRequest) {
           description: description || '',
           permissions: permissions || {},
           is_system: false,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
+          // created_at gerenciado automaticamente pelo Supabase
+          // updated_at gerenciado automaticamente pelo Supabase
           warning: 'Role criada temporariamente. Execute o script de migração no Supabase para persistir.'
         }, { status: 201 })
       }

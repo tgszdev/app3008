@@ -442,8 +442,8 @@ async function addEscalationCommentSimple(ticket: any, comment: string): Promise
         user_id: userId,
         content: comment,
         is_internal: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        // created_at gerenciado automaticamente pelo Supabase
+        // updated_at gerenciado automaticamente pelo Supabase
       })
 
     if (error) {

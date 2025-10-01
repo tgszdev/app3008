@@ -173,7 +173,7 @@ ALTER TABLE kb_role_permissions DISABLE ROW LEVEL SECURITY;
         .upsert({
           role,
           allowed_categories: categories,
-          updated_at: new Date().toISOString()
+          // updated_at gerenciado automaticamente pelo Supabase
         }, {
           onConflict: 'role'
         })

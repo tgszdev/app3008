@@ -166,7 +166,7 @@ CREATE INDEX IF NOT EXISTS idx_system_settings_key ON system_settings(key);
         key: 'email_config',
         value: configToSave,
         description: 'Configurações de email SMTP',
-        updated_at: new Date().toISOString(),
+        // updated_at gerenciado automaticamente pelo Supabase
         updated_by: session.user.id
       }, {
         onConflict: 'key'

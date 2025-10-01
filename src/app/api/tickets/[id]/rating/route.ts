@@ -129,7 +129,7 @@ export async function POST(
         .update({
           rating,
           comment: comment || null,
-          updated_at: new Date().toISOString()
+          // updated_at gerenciado automaticamente pelo Supabase
         })
         .eq('id', existingRating.id)
         .select()
@@ -139,13 +139,14 @@ export async function POST(
       result = data
     } else {
       // Create new rating
-      const { data, error } = await supabaseAdmin
+      const { data, error} = await supabaseAdmin
         .from('ticket_ratings')
         .insert({
           ticket_id: ticketId,
           user_id: currentUserId,
           rating,
-          comment: comment || null
+          comment: comment || null,
+          // created_at gerenciado automaticamente pelo Supabase
         })
         .select()
         .single()
@@ -171,7 +172,7 @@ export async function POST(
         user_id: userId || 'mock-user',
         rating: body.rating || 5,
         comment: body.comment || 'Mock rating - table not created yet',
-        created_at: new Date().toISOString()
+        // created_at será gerado automaticamente quando a tabela existir
       })
     }
     

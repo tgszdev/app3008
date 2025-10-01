@@ -127,7 +127,7 @@ export async function PUT(
       is_faq,
       meta_title: meta_title || title,
       meta_description: meta_description || excerpt,
-      updated_at: new Date().toISOString()
+      // updated_at gerenciado automaticamente pelo Supabase
     }
 
     // Se o status está mudando para published e ainda não tem published_at

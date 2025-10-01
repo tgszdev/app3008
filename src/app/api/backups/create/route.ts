@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     const backupData: any = {
       metadata: {
         version: '1.0.0',
-        created_at: new Date().toISOString(),
+        // created_at gerenciado automaticamente pelo Supabase
         created_by: session.user.id,
         includes
       }

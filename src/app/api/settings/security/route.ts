@@ -91,7 +91,7 @@ export async function POST(request: Request) {
         .update({
           settings_data: body,
           updated_by: session.user.id,
-          updated_at: new Date().toISOString()
+          // updated_at gerenciado automaticamente pelo Supabase
         })
         .eq('setting_type', 'security')
 

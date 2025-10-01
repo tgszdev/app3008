@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
         file_type: file.type,
         file_url: urlData.publicUrl,
         storage_path: fileName,
-        created_at: new Date().toISOString()
+        // created_at gerenciado automaticamente pelo Supabase
       })
       .select()
       .single()

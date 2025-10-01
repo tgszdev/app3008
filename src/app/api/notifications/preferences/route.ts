@@ -63,7 +63,7 @@ export async function PATCH(request: NextRequest) {
     
     // Atualizar apenas os campos enviados
     const updateData: any = {
-      updated_at: new Date().toISOString()
+      // updated_at gerenciado automaticamente pelo Supabase
     }
 
     // Campos permitidos para atualização

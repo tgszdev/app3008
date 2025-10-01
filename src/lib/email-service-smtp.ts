@@ -149,7 +149,7 @@ async function sendViaSMTP(config: EmailConfig, options: EmailOptions): Promise<
             body: options.html,
             status: 'sent',
             provider: 'smtp',
-            created_at: new Date().toISOString(),
+            // created_at gerenciado automaticamente pelo Supabase
             metadata: {
               messageId: info.messageId,
               response: info.response
@@ -178,7 +178,7 @@ async function sendViaSMTP(config: EmailConfig, options: EmailOptions): Promise<
             status: 'failed',
             provider: 'smtp',
             error_message: error.message,
-            created_at: new Date().toISOString()
+            // created_at gerenciado automaticamente pelo Supabase
           })
       } catch (logError) {
         console.error('⚠️ Erro ao registrar log de erro:', logError)

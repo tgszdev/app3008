@@ -123,7 +123,7 @@ export async function PUT(
     // Preparar dados para atualização - filtrar campos vazios
     const updateData = {
       ...body,
-      updated_at: new Date().toISOString(),
+      // updated_at gerenciado automaticamente pelo Supabase
       updated_by: session.user.id
     }
     
