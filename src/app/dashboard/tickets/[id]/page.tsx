@@ -588,11 +588,11 @@ export default function TicketDetailsPage() {
             {/* Status - Baseado em permissões */}
             <div className="relative">
               {editingStatus && canEditThisTicket ? (
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <select
                     value={newStatus}
                     onChange={(e) => setNewStatus(e.target.value)}
-                    className="px-3 py-1 rounded-2xl border dark:bg-gray-700"
+                    className="min-w-[180px] px-3 py-2 rounded-2xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
                     {availableStatuses.map((status) => {
                       // Filter internal statuses for non-admin users
@@ -612,13 +612,13 @@ export default function TicketDetailsPage() {
                   </select>
                   <button
                     onClick={handleStatusUpdate}
-                    className="px-3 py-1 bg-green-600 text-white rounded-2xl hover:bg-green-700"
+                    className="min-w-[100px] px-4 py-2 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-all duration-300 font-medium"
                   >
                     Salvar
                   </button>
                   <button
                     onClick={() => setEditingStatus(false)}
-                    className="px-3 py-1 bg-gray-600 text-white rounded-2xl hover:bg-gray-700"
+                    className="min-w-[100px] px-4 py-2 bg-gray-600 text-white rounded-2xl hover:bg-gray-700 transition-all duration-300 font-medium"
                   >
                     Cancelar
                   </button>
@@ -653,11 +653,11 @@ export default function TicketDetailsPage() {
             
             {/* Priority */}
             {editingPriority ? (
-              <div className="flex items-center gap-2">
+              <div className="flex gap-2 flex-wrap">
                 <select
                   value={newPriority}
                   onChange={(e) => setNewPriority(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                  className="min-w-[180px] px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="low">Baixa</option>
                   <option value="medium">Média</option>
@@ -666,13 +666,13 @@ export default function TicketDetailsPage() {
                 </select>
                 <button
                   onClick={handlePriorityUpdate}
-                  className="px-3 py-1 bg-green-600 text-white rounded-2xl hover:bg-green-700"
+                  className="min-w-[100px] px-4 py-2 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-all duration-300 font-medium"
                 >
                   Salvar
                 </button>
                 <button
                   onClick={() => setEditingPriority(false)}
-                  className="px-3 py-1 bg-gray-600 text-white rounded-2xl hover:bg-gray-700"
+                  className="min-w-[100px] px-4 py-2 bg-gray-600 text-white rounded-2xl hover:bg-gray-700 transition-all duration-300 font-medium"
                 >
                   Cancelar
                 </button>
