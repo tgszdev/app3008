@@ -570,7 +570,7 @@ export default function TicketDetailsPage() {
           <div>
             <div className="flex items-center gap-3 mb-2">
               <h1 className="text-xl sm:text-2xl md:text-3xl font-bold break-all">
-                Chamado #{ticket.ticket_number?.toString().padStart(10, '0') || ticket.id.slice(0, 8)}
+                Chamado #{ticket.ticket_number || ticket.id.slice(0, 8)}
               </h1>
               {ticket.is_internal && (
                 <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">
