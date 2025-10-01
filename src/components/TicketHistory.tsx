@@ -162,17 +162,14 @@ export default function TicketHistory({ ticketId, className = '', initiallyColla
                   <Clock className="h-3 w-3 text-gray-400" />
                   <span className="text-xs text-gray-500 dark:text-gray-400">
                     {entry.created_at ? (() => {
-                      // Extrair data/hora diretamente do string sem conversão de timezone
-                      const dateStr = entry.created_at
-                      const date = new Date(dateStr)
+                      const date = new Date(entry.created_at)
                       
-                      // Pegar os componentes da data SEM conversão de timezone
-                      // Como gravamos com getBrazilTimestamp, a hora UTC é a hora do Brasil
-                      const year = date.getUTCFullYear()
-                      const month = String(date.getUTCMonth() + 1).padStart(2, '0')
-                      const day = String(date.getUTCDate()).padStart(2, '0')
-                      const hours = String(date.getUTCHours()).padStart(2, '0')
-                      const minutes = String(date.getUTCMinutes()).padStart(2, '0')
+                      // Com banco em America/Sao_Paulo, usar getters locais
+                      const year = date.getFullYear()
+                      const month = String(date.getMonth() + 1).padStart(2, '0')
+                      const day = String(date.getDate()).padStart(2, '0')
+                      const hours = String(date.getHours()).padStart(2, '0')
+                      const minutes = String(date.getMinutes()).padStart(2, '0')
                       
                       return `${day}/${month}/${year} às ${hours}:${minutes}`
                     })() : 'Agora'}

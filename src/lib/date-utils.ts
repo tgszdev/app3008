@@ -162,13 +162,13 @@ export function formatBrazilDateTime(date: string | Date | null | undefined): st
       return 'N/A'
     }
     
-    // Extrair componentes UTC (que representam o horário do Brasil)
-    // Como gravamos com getBrazilTimestamp, a hora UTC é a hora do Brasil
-    const year = dateObj.getUTCFullYear()
-    const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0')
-    const day = String(dateObj.getUTCDate()).padStart(2, '0')
-    const hours = String(dateObj.getUTCHours()).padStart(2, '0')
-    const minutes = String(dateObj.getUTCMinutes()).padStart(2, '0')
+    // Com o banco configurado para America/Sao_Paulo, as datas vêm com offset -03:00
+    // Usar getters locais para respeitar o offset
+    const year = dateObj.getFullYear()
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0')
+    const day = String(dateObj.getDate()).padStart(2, '0')
+    const hours = String(dateObj.getHours()).padStart(2, '0')
+    const minutes = String(dateObj.getMinutes()).padStart(2, '0')
     
     return `${day}/${month}/${year} às ${hours}:${minutes}`
   } catch (error) {
