@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
+import { getBrazilTimestamp } from '@/lib/date-utils'
 
 type RouteParams = {
   params: Promise<{ id: string }>
@@ -45,12 +46,12 @@ export async function PUT(request: NextRequest, context: RouteParams) {
     // Preparar dados de atualização
     const updateData: any = {
       status,
-      updated_at: new Date().toISOString()
+      updated_at: getBrazilTimestamp()
     }
 
     // Se está resolvendo ou fechando, adicionar timestamp e notas
     if (status === 'RESOLVIDO' || status === 'FECHADO') {
-      updateData.resolved_at = new Date().toISOString()
+      updateData.resolved_at = getBrazilTimestamp()
       if (resolution_notes) {
         updateData.resolution_notes = resolution_notes
       }
@@ -58,7 +59,7 @@ export async function PUT(request: NextRequest, context: RouteParams) {
 
     // Se está fechando, adicionar timestamp de fechamento
     if (status === 'FECHADO') {
-      updateData.closed_at = new Date().toISOString()
+      updateData.closed_at = getBrazilTimestamp()
     }
 
     // Atualizar o ticket

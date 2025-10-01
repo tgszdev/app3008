@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth'
 import { createAndSendNotification } from '@/lib/notifications'
 import { executeWorkflowsForTicket } from '@/lib/workflow-engine'
 import { executeEscalationForTicketSimple } from '@/lib/escalation-engine-simple'
+import { getBrazilTimestamp } from '@/lib/date-utils'
 
 // GET - Listar todos os tickets
 export async function GET(request: NextRequest) {
@@ -410,14 +411,14 @@ async function handleUpdate(request: NextRequest) {
 
     // Adicionar timestamps de resolução/fechamento se necessário
     if (updateData.status === 'resolved' && currentTicket?.status !== 'resolved') {
-      updateData.resolved_at = new Date().toISOString()
+      updateData.resolved_at = getBrazilTimestamp()
     }
     if (updateData.status === 'closed' && currentTicket?.status !== 'closed') {
-      updateData.closed_at = new Date().toISOString()
+      updateData.closed_at = getBrazilTimestamp()
     }
 
     // Adicionar updated_at
-    updateData.updated_at = new Date().toISOString()
+    updateData.updated_at = getBrazilTimestamp()
 
     const { data: updatedTicket, error } = await supabaseAdmin
       .from('tickets')
@@ -477,11 +478,14 @@ async function handleUpdate(request: NextRequest) {
 
       if (changes.length > 0) {
         // Verificar se já existe um registro idêntico recente (evitar duplicatas)
+        const fiveSecondsAgo = new Date(Date.now() - 5000)
+        const fiveSecondsAgoBrazil = new Date(fiveSecondsAgo.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' })).toISOString()
+        
         const { data: recentHistory } = await supabaseAdmin
           .from('ticket_history')
           .select('*')
           .eq('ticket_id', id)
-          .gte('created_at', new Date(Date.now() - 5000).toISOString()) // Últimos 5 segundos
+          .gte('created_at', fiveSecondsAgoBrazil) // Últimos 5 segundos
           .order('created_at', { ascending: false })
           .limit(1)
         

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { auth } from '@/lib/auth'
 import { userHasPermission } from '@/lib/permissions'
+import { getBrazilTimestamp } from '@/lib/date-utils'
 
 // PATCH - Alterar prioridade do ticket
 export async function PATCH(
@@ -66,7 +67,7 @@ export async function PATCH(
       .from('tickets')
       .update({ 
         priority,
-        updated_at: new Date().toISOString(),
+        updated_at: getBrazilTimestamp(),
         updated_by: userId
       })
       .eq('id', ticketId)

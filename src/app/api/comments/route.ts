@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
+import { getBrazilTimestamp } from '@/lib/date-utils'
 
 export async function GET(request: NextRequest) {
   try {
@@ -260,7 +261,7 @@ export async function POST(request: NextRequest) {
     // Atualizar o updated_at do ticket
     await supabaseAdmin
       .from('tickets')
-      .update({ updated_at: new Date().toISOString() })
+      .update({ updated_at: getBrazilTimestamp() })
       .eq('id', ticket_id)
 
     return NextResponse.json(comment)

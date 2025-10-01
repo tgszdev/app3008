@@ -5,6 +5,15 @@ const BRAZIL_TIMEZONE = 'America/Sao_Paulo'
 const BRAZIL_OFFSET = -3 // UTC-3
 
 /**
+ * Retorna timestamp atual no fuso horário de São Paulo
+ * Use esta função para TODOS os inserts/updates no banco
+ */
+export function getBrazilTimestamp(): string {
+  const nowBrazil = new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' })
+  return new Date(nowBrazil).toISOString()
+}
+
+/**
  * Função auxiliar mais simples para converter qualquer formato de data
  */
 function parseDate(date: string | Date | null | undefined): Date | null {
@@ -125,9 +134,9 @@ export function formatBrazilDateTime(date: string | Date | null | undefined): st
       return 'N/A'
     }
     
-    // Usar toLocaleString como fallback
+    // NÃO converter timezone - o banco já tem horário do Brasil
+    // Apenas formatar a data sem conversão
     const formatted = dateObj.toLocaleString('pt-BR', {
-      timeZone: BRAZIL_TIMEZONE,
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
