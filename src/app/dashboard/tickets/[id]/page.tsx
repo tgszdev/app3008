@@ -729,8 +729,8 @@ export default function TicketDetailsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        {/* Main Content - Order 2 on mobile, Order 1 on desktop */}
-        <div className="order-2 lg:order-1 lg:col-span-2 space-y-4 sm:space-y-6">
+        {/* Main Content - Order 1 on mobile, Order 1 on desktop */}
+        <div className="order-1 lg:order-1 lg:col-span-2 space-y-4 sm:space-y-6">
           {/* Ticket Details */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold mb-4 break-words">{ticket.title.toUpperCase()}</h2>
@@ -919,8 +919,8 @@ export default function TicketDetailsPage() {
 
         </div>
 
-        {/* Sidebar - Order 1 on mobile, Order 2 on desktop */}
-        <div className="order-1 lg:order-2 space-y-4 sm:space-y-6">
+        {/* Sidebar - Order 2 on mobile, Order 2 on desktop */}
+        <div className="order-2 lg:order-2 space-y-4 sm:space-y-6">
           {/* Ticket Info */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold mb-4">Informações</h2>
