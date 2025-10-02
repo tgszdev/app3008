@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import axios from 'axios'
 import { formatBrazilDateTime, formatRelativeTime } from '@/lib/date-utils'
-import { ArrowLeft, Clock, User, Tag, AlertCircle, MessageSquare, Paperclip, Edit, Trash2, Send, CheckCircle, XCircle, AlertTriangle, ChevronDown, Lock, Eye, EyeOff, Image as ImageIcon, Activity } from 'lucide-react'
+import { ArrowLeft, Clock, User, Tag, AlertCircle, MessageSquare, Paperclip, Edit, Trash2, Send, CheckCircle, XCircle, AlertTriangle, ChevronDown, ChevronUp, Lock, Eye, EyeOff, Image as ImageIcon, Activity } from 'lucide-react'
 import { getIcon } from '@/lib/icons'
 import toast from 'react-hot-toast'
 import { useSession } from 'next-auth/react'
@@ -137,6 +137,7 @@ export default function TicketDetailsPage() {
   const [submittingComment, setSubmittingComment] = useState(false)
   const [isInternalComment, setIsInternalComment] = useState(false)
   const [editorKey, setEditorKey] = useState(0) // Key para forçar reset do editor
+  const [attachmentsCollapsed, setAttachmentsCollapsed] = useState(true) // Anexos colapsados por padrão
   const [editingStatus, setEditingStatus] = useState(false)
   const [newStatus, setNewStatus] = useState<string>('')
   const [users, setUsers] = useState<User[]>([])
