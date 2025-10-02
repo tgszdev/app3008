@@ -1,15 +1,16 @@
 'use client'
 
-import { useEditor, EditorContent } from '@tiptap/react'
+import { useEditor, EditorContent, BubbleMenu, FloatingMenu } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import { 
   Bold, Italic, List, ListOrdered, Link as LinkIcon, 
-  Image as ImageIcon, Undo, Redo, X, Loader2 
+  Image as ImageIcon, Heading1, Heading2, Code, Quote,
+  Loader2, AlertCircle, Check, X
 } from 'lucide-react'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
@@ -24,29 +25,40 @@ interface RichTextEditorProps {
 export default function RichTextEditor({
   content,
   onChange,
-  placeholder = 'Descreva o problema detalhadamente...',
+  placeholder = 'Digite / para comandos ou cole imagens diretamente...',
   className = '',
   minHeight = '300px'
 }: RichTextEditorProps) {
   const [isUploading, setIsUploading] = useState(false)
-  const [showAltTextModal, setShowAltTextModal] = useState(false)
-  const [altText, setAltText] = useState('')
-  const [pendingImageUrl, setPendingImageUrl] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Configuração customizada de Image com suporte a paste
+  const CustomImage = Image.extend({
+    addProseMirrorPlugins() {
+      return [
+        ...(this.parent?.() || []),
+      ]
+    },
+  })
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
-      Image.configure({
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3],
+        },
+      }),
+      CustomImage.configure({
         inline: true,
-        allowBase64: false,
+        allowBase64: true, // Temporário durante upload
         HTMLAttributes: {
-          class: 'rounded-xl max-w-full h-auto my-2',
+          class: 'rounded-xl max-w-full h-auto my-2 cursor-pointer hover:shadow-lg transition-shadow',
         },
       }),
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-blue-600 hover:text-blue-800 underline',
+          class: 'text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline cursor-pointer',
         },
       }),
       Placeholder.configure({
@@ -56,7 +68,39 @@ export default function RichTextEditor({
     content,
     editorProps: {
       attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none max-w-none p-4',
+        class: 'prose prose-sm sm:prose lg:prose-lg dark:prose-invert max-w-none focus:outline-none px-4 py-3',
+      },
+      handleDrop: (view, event, slice, moved) => {
+        // Handle image drops
+        if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length > 0) {
+          const files = Array.from(event.dataTransfer.files)
+          const imageFiles = files.filter(file => file.type.startsWith('image/'))
+          
+          if (imageFiles.length > 0) {
+            event.preventDefault()
+            imageFiles.forEach(file => handleImageUpload(file))
+            return true
+          }
+        }
+        return false
+      },
+      handlePaste: (view, event) => {
+        // Handle image paste
+        const items = event.clipboardData?.items
+        if (!items) return false
+
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i]
+          if (item.type.startsWith('image/')) {
+            event.preventDefault()
+            const file = item.getAsFile()
+            if (file) {
+              handleImageUpload(file)
+            }
+            return true
+          }
+        }
+        return false
       },
     },
     onUpdate: ({ editor }) => {
@@ -82,6 +126,19 @@ export default function RichTextEditor({
 
     setIsUploading(true)
 
+    // Criar preview temporário com base64
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (reader.result && editor) {
+        // Inserir imagem temporária
+        editor.chain().focus().setImage({ 
+          src: reader.result as string,
+          alt: 'Carregando...'
+        }).run()
+      }
+    }
+    reader.readAsDataURL(file)
+
     try {
       const formData = new FormData()
       formData.append('file', file)
@@ -94,43 +151,50 @@ export default function RichTextEditor({
 
       const { url } = response.data
 
-      // Abrir modal para alt text
-      setPendingImageUrl(url)
-      setShowAltTextModal(true)
+      // Substituir imagem temporária pela URL real
+      const { state } = editor
+      const { doc } = state
+      
+      // Encontrar e substituir a última imagem base64 pela URL real
+      let foundImage = false
+      doc.descendants((node, pos) => {
+        if (foundImage) return false
+        if (node.type.name === 'image' && node.attrs.src?.startsWith('data:')) {
+          editor.commands.setNodeSelection(pos)
+          editor.commands.updateAttributes('image', {
+            src: url,
+            alt: file.name
+          })
+          foundImage = true
+          return false
+        }
+      })
 
+      toast.success('Imagem adicionada com sucesso!')
     } catch (error: any) {
       console.error('Erro ao fazer upload:', error)
       toast.error(error.response?.data?.error || 'Erro ao fazer upload da imagem')
+      
+      // Remover imagem temporária em caso de erro
+      const { state } = editor
+      const { doc } = state
+      
+      doc.descendants((node, pos) => {
+        if (node.type.name === 'image' && node.attrs.src?.startsWith('data:')) {
+          editor.commands.setNodeSelection(pos)
+          editor.commands.deleteSelection()
+        }
+      })
     } finally {
       setIsUploading(false)
     }
   }, [editor])
-
-  const insertImageWithAlt = () => {
-    if (!editor || !pendingImageUrl) return
-
-    editor
-      .chain()
-      .focus()
-      .setImage({ 
-        src: pendingImageUrl,
-        alt: altText || 'Imagem do ticket'
-      })
-      .run()
-
-    // Limpar
-    setShowAltTextModal(false)
-    setPendingImageUrl('')
-    setAltText('')
-    toast.success('Imagem adicionada com sucesso!')
-  }
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       handleImageUpload(file)
     }
-    // Limpar input para permitir upload do mesmo arquivo
     e.target.value = ''
   }
 
@@ -150,174 +214,239 @@ export default function RichTextEditor({
   }
 
   return (
-    <div className={`border border-gray-300 dark:border-gray-600 rounded-2xl overflow-hidden ${className}`}>
-      {/* Toolbar */}
-      <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600 p-2 flex flex-wrap items-center gap-1">
-        {/* Text formatting */}
+    <div className={`relative border border-gray-300 dark:border-gray-600 rounded-2xl overflow-hidden bg-white dark:bg-gray-900 ${className}`}>
+      {/* Bubble Menu - Aparece ao selecionar texto (estilo ClickUp) */}
+      <BubbleMenu 
+        editor={editor}
+        tippyOptions={{ duration: 100 }}
+        className="flex items-center gap-1 bg-gray-900 dark:bg-gray-800 shadow-xl rounded-xl p-1 border border-gray-700"
+      >
         <button
-          type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ${
-            editor.isActive('bold') ? 'bg-gray-200 dark:bg-gray-700' : ''
+          className={`p-2 rounded-lg transition-colors ${
+            editor.isActive('bold') 
+              ? 'bg-blue-600 text-white' 
+              : 'text-gray-300 hover:bg-gray-700 hover:text-white'
           }`}
-          title="Negrito (Ctrl+B)"
+          title="Negrito"
         >
           <Bold className="w-4 h-4" />
         </button>
 
         <button
-          type="button"
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ${
-            editor.isActive('italic') ? 'bg-gray-200 dark:bg-gray-700' : ''
+          className={`p-2 rounded-lg transition-colors ${
+            editor.isActive('italic') 
+              ? 'bg-blue-600 text-white' 
+              : 'text-gray-300 hover:bg-gray-700 hover:text-white'
           }`}
-          title="Itálico (Ctrl+I)"
+          title="Itálico"
         >
           <Italic className="w-4 h-4" />
         </button>
 
-        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+        <div className="w-px h-6 bg-gray-600 mx-1" />
 
-        {/* Lists */}
         <button
-          type="button"
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ${
-            editor.isActive('bulletList') ? 'bg-gray-200 dark:bg-gray-700' : ''
+          onClick={addLink}
+          className={`p-2 rounded-lg transition-colors ${
+            editor.isActive('link') 
+              ? 'bg-blue-600 text-white' 
+              : 'text-gray-300 hover:bg-gray-700 hover:text-white'
           }`}
-          title="Lista com marcadores"
+          title="Adicionar Link"
+        >
+          <LinkIcon className="w-4 h-4" />
+        </button>
+      </BubbleMenu>
+
+      {/* Floating Menu - Aparece em linha vazia (estilo ClickUp) */}
+      <FloatingMenu 
+        editor={editor}
+        tippyOptions={{ duration: 100 }}
+        className="flex items-center gap-1 bg-white dark:bg-gray-800 shadow-lg rounded-xl p-1 border border-gray-200 dark:border-gray-700"
+      >
+        <button
+          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+          className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          title="Título 1"
+        >
+          <Heading1 className="w-4 h-4" />
+        </button>
+
+        <button
+          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+          className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          title="Título 2"
+        >
+          <Heading2 className="w-4 h-4" />
+        </button>
+
+        <button
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          title="Lista"
         >
           <List className="w-4 h-4" />
         </button>
 
         <button
-          type="button"
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={`p-2 rounded-lg hover:bg-gray-200 dark:bg-gray-700 transition-colors ${
-            editor.isActive('orderedList') ? 'bg-gray-200 dark:bg-gray-700' : ''
-          }`}
-          title="Lista numerada"
+          onClick={() => fileInputRef.current?.click()}
+          className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          title="Adicionar Imagem"
         >
-          <ListOrdered className="w-4 h-4" />
+          <ImageIcon className="w-4 h-4" />
         </button>
+      </FloatingMenu>
 
-        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+      {/* Input oculto para upload de imagem */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        onChange={handleFileInput}
+        className="hidden"
+        disabled={isUploading}
+        capture="environment" // Suporte para câmera no mobile
+      />
 
-        {/* Link */}
-        <button
-          type="button"
-          onClick={addLink}
-          className={`p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ${
-            editor.isActive('link') ? 'bg-gray-200 dark:bg-gray-700' : ''
-          }`}
-          title="Adicionar link"
-        >
-          <LinkIcon className="w-4 h-4" />
-        </button>
+      {/* Indicador de upload */}
+      {isUploading && (
+        <div className="absolute top-2 right-2 z-10 flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-xl shadow-lg">
+          <Loader2 className="w-4 h-4 animate-spin" />
+          <span className="text-sm font-medium">Fazendo upload...</span>
+        </div>
+      )}
 
-        {/* Image */}
-        <label className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer relative">
-          <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
-            onChange={handleFileInput}
-            className="hidden"
-            disabled={isUploading}
-          />
-          {isUploading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <ImageIcon className="w-4 h-4" />
-          )}
-        </label>
-
-        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
-
-        {/* Undo/Redo */}
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().undo().run()}
-          disabled={!editor.can().undo()}
-          className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          title="Desfazer (Ctrl+Z)"
-        >
-          <Undo className="w-4 h-4" />
-        </button>
-
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().redo().run()}
-          disabled={!editor.can().redo()}
-          className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          title="Refazer (Ctrl+Y)"
-        >
-          <Redo className="w-4 h-4" />
-        </button>
-      </div>
-
-      {/* Editor */}
+      {/* Editor - Área principal */}
       <div 
-        className="bg-white dark:bg-gray-900 overflow-y-auto" 
+        className="overflow-y-auto" 
         style={{ minHeight }}
       >
         <EditorContent editor={editor} />
       </div>
 
-      {/* Modal para Alt Text */}
-      {showAltTextModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                Descrição da Imagem (Alt Text)
-              </h3>
-              <button
-                onClick={() => {
-                  setShowAltTextModal(false)
-                  setPendingImageUrl('')
-                  setAltText('')
-                }}
-                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              Por favor, descreva a imagem para acessibilidade. Isso ajuda usuários com deficiência visual a entenderem o conteúdo.
-            </p>
-
-            <input
-              type="text"
-              value={altText}
-              onChange={(e) => setAltText(e.target.value)}
-              placeholder="Ex: Captura de tela do erro no sistema"
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4"
-              autoFocus
-            />
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setShowAltTextModal(false)
-                  setPendingImageUrl('')
-                  setAltText('')
-                }}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={insertImageWithAlt}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
-              >
-                Adicionar Imagem
-              </button>
-            </div>
+      {/* Dica de uso - Footer minimalista */}
+      <div className="border-t border-gray-200 dark:border-gray-700 px-4 py-2 bg-gray-50 dark:bg-gray-800/50">
+        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1">
+              <ImageIcon className="w-3 h-3" />
+              Arraste ou cole imagens
+            </span>
+            <span className="hidden sm:flex items-center gap-1">
+              <Code className="w-3 h-3" />
+              Selecione texto para formatar
+            </span>
           </div>
+          {isUploading && (
+            <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+              <Loader2 className="w-3 h-3 animate-spin" />
+              Processando...
+            </span>
+          )}
         </div>
-      )}
+      </div>
+
+      {/* Estilos customizados para parecer com ClickUp */}
+      <style jsx global>{`
+        .ProseMirror {
+          min-height: ${minHeight};
+        }
+
+        .ProseMirror:focus {
+          outline: none;
+        }
+
+        .ProseMirror p.is-editor-empty:first-child::before {
+          content: attr(data-placeholder);
+          float: left;
+          color: #9ca3af;
+          pointer-events: none;
+          height: 0;
+        }
+
+        .ProseMirror img {
+          border-radius: 12px;
+          max-width: 100%;
+          height: auto;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .ProseMirror img:hover {
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+          transform: scale(1.01);
+        }
+
+        .ProseMirror img.ProseMirror-selectednode {
+          outline: 3px solid #3b82f6;
+          outline-offset: 2px;
+        }
+
+        /* Estilo ClickUp para listas */
+        .ProseMirror ul,
+        .ProseMirror ol {
+          padding-left: 1.5rem;
+          margin: 0.5rem 0;
+        }
+
+        .ProseMirror li {
+          margin: 0.25rem 0;
+        }
+
+        /* Estilo ClickUp para headings */
+        .ProseMirror h1 {
+          font-size: 2em;
+          font-weight: 700;
+          margin: 1rem 0 0.5rem;
+          line-height: 1.2;
+        }
+
+        .ProseMirror h2 {
+          font-size: 1.5em;
+          font-weight: 600;
+          margin: 0.75rem 0 0.5rem;
+          line-height: 1.3;
+        }
+
+        .ProseMirror h3 {
+          font-size: 1.25em;
+          font-weight: 600;
+          margin: 0.5rem 0 0.25rem;
+          line-height: 1.4;
+        }
+
+        /* Estilo para código inline */
+        .ProseMirror code {
+          background-color: rgba(135, 131, 120, 0.15);
+          color: #eb5757;
+          padding: 0.2em 0.4em;
+          border-radius: 0.25rem;
+          font-size: 0.9em;
+          font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+        }
+
+        /* Estilo para blockquote */
+        .ProseMirror blockquote {
+          border-left: 3px solid #3b82f6;
+          padding-left: 1rem;
+          margin: 1rem 0;
+          color: #6b7280;
+          font-style: italic;
+        }
+
+        /* Dark mode adjustments */
+        .dark .ProseMirror code {
+          background-color: rgba(255, 255, 255, 0.1);
+          color: #ff6b6b;
+        }
+
+        .dark .ProseMirror blockquote {
+          border-left-color: #60a5fa;
+          color: #9ca3af;
+        }
+      `}</style>
     </div>
   )
 }
-
