@@ -901,22 +901,6 @@ export default function TicketDetailsPage() {
             )}
           </div>
 
-          {/* Linha do Tempo */}
-          <TicketTimeline 
-            ticketId={ticket.id} 
-            className="mb-6" 
-            initiallyCollapsed={true}
-          />
-
-          {/* Histórico do Ticket - Por último */}
-          {canViewHistory && (
-            <TicketHistory 
-              ticketId={ticket.id} 
-              className="mb-6" 
-              initiallyCollapsed={true}
-            />
-          )}
-
         </div>
 
         {/* Sidebar - Order 2 on mobile, Order 2 on desktop */}
@@ -1165,6 +1149,26 @@ export default function TicketDetailsPage() {
             </div>
           )}
         </div>
+
+        {/* Linha do Tempo - Order 3 mobile (no final) */}
+        <div className="order-3 lg:order-3 lg:col-span-2">
+          <TicketTimeline 
+            ticketId={ticket.id} 
+            className="" 
+            initiallyCollapsed={true}
+          />
+        </div>
+
+        {/* Histórico do Ticket - Order 3 mobile (no final) */}
+        {canViewHistory && (
+          <div className="order-3 lg:order-3 lg:col-span-2">
+            <TicketHistory 
+              ticketId={ticket.id} 
+              className="" 
+              initiallyCollapsed={true}
+            />
+          </div>
+        )}
       </div>
 
       {/* Modal de Cancelamento */}
