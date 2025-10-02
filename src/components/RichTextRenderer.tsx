@@ -22,13 +22,9 @@ export default function RichTextRenderer({ content, className = '' }: RichTextRe
   return (
     <>
       <div
-        className={`prose prose-sm sm:prose lg:prose-lg xl:prose-xl dark:prose-invert max-w-none ${className}`}
+        className={`prose prose-sm sm:prose lg:prose-lg xl:prose-xl dark:prose-invert max-w-none overflow-hidden break-words ${className}`}
         dangerouslySetInnerHTML={{ __html: content }}
         onClick={handleImageClick}
-        style={{
-          // Estilos para imagens
-          cursor: 'pointer',
-        }}
       />
 
       {/* Lightbox */}
@@ -61,12 +57,19 @@ export default function RichTextRenderer({ content, className = '' }: RichTextRe
       )}
 
       <style jsx global>{`
+        .prose {
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+        }
+
         .prose img {
           cursor: pointer;
           transition: all 0.3s ease;
           border-radius: 12px;
-          max-width: 100%;
-          height: auto;
+          max-width: 100% !important;
+          width: auto !important;
+          height: auto !important;
+          display: block;
         }
         
         .prose img:hover {
