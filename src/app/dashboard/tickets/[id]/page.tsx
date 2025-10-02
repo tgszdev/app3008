@@ -748,9 +748,12 @@ export default function TicketDetailsPage() {
             )}
           </div>
 
-          {/* Attachments */}
-          {attachments.length > 0 && (
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
+        </div>
+
+        {/* Attachments - Order 3 mobile (após sidebar) */}
+        {attachments.length > 0 && (
+          <div className="order-3 lg:order-3 lg:col-span-2">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6">
               <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                 <Paperclip size={20} />
                 Anexos ({attachments.length})
@@ -813,10 +816,12 @@ export default function TicketDetailsPage() {
                 })}
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Comments */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
+        {/* Comments - Order 1 (parte do Main Content) */}
+        <div className="order-1 lg:order-1 lg:col-span-2">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
               <MessageSquare size={20} />
               Comentários
@@ -900,7 +905,6 @@ export default function TicketDetailsPage() {
               </form>
             )}
           </div>
-
         </div>
 
         {/* Sidebar - Order 2 on mobile, Order 2 on desktop */}
@@ -1150,8 +1154,8 @@ export default function TicketDetailsPage() {
           )}
         </div>
 
-        {/* Linha do Tempo - Order 3 mobile (após sidebar) */}
-        <div className="order-3 lg:order-3 lg:col-span-2">
+        {/* Linha do Tempo - Order 4 mobile (após anexos) */}
+        <div className="order-4 lg:order-4 lg:col-span-2">
           <TicketTimeline 
             ticketId={ticket.id} 
             className="" 
@@ -1159,9 +1163,9 @@ export default function TicketDetailsPage() {
           />
         </div>
 
-        {/* Histórico do Ticket - Order 4 mobile (último) */}
+        {/* Histórico do Ticket - Order 5 mobile (último) */}
         {canViewHistory && (
-          <div className="order-4 lg:order-4 lg:col-span-2">
+          <div className="order-5 lg:order-5 lg:col-span-2">
             <TicketHistory 
               ticketId={ticket.id} 
               className="" 
