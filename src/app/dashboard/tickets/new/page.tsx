@@ -27,6 +27,7 @@ import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import RichTextEditor from '@/components/RichTextEditor'
 
 interface UserData {
   id: string
@@ -307,21 +308,20 @@ export default function NewTicketPage() {
             />
           </div>
 
-          {/* Description */}
+          {/* Description - Rich Text Editor */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Descrição Detalhada *
             </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={8}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-              placeholder="Forneça o máximo de detalhes possível sobre o problema ou solicitação..."
-              required
+            <RichTextEditor
+              content={formData.description}
+              onChange={(content) => setFormData({ ...formData, description: content })}
+              placeholder="Forneça o máximo de detalhes possível sobre o problema ou solicitação... Você pode adicionar imagens, links e formatação!"
+              minHeight="300px"
             />
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Quanto mais detalhes você fornecer, mais rápido poderemos ajudar
+            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+              <FileText className="w-3 h-3" />
+              Você pode adicionar imagens, usar formatação e incluir links para melhor descrever o problema
             </p>
           </div>
 

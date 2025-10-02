@@ -17,6 +17,7 @@ import { RatingModal } from '@/components/tickets/RatingModal'
 import { useStatuses } from '@/hooks/useStatuses'
 import TicketHistory from '@/components/TicketHistory'
 import TicketTimeline from '@/components/TicketTimeline'
+import RichTextRenderer from '@/components/RichTextRenderer'
 
 interface User {
   id: string
@@ -729,9 +730,9 @@ export default function TicketDetailsPage() {
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold mb-4 break-words">{ticket.title.toUpperCase()}</h2>
             
-            <div className="prose dark:prose-invert max-w-none">
-              <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Descrição</h3>
-              <p className="whitespace-pre-wrap">{ticket.description}</p>
+            <div>
+              <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-3">Descrição</h3>
+              <RichTextRenderer content={ticket.description} />
             </div>
 
             {ticket.resolution_notes && (
