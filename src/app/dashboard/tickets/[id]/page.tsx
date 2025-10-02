@@ -603,9 +603,9 @@ export default function TicketDetailsPage() {
             </p>
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             {/* Status - Baseado em permissões */}
-            <div className="relative">
+            <div className="relative w-full sm:w-auto">
               {editingStatus && canEditThisTicket ? (
                 <div className="flex gap-2 flex-wrap">
                   <select
