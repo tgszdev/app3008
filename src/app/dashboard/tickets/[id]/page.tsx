@@ -728,9 +728,10 @@ export default function TicketDetailsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        {/* Main Content - Order 1 on mobile, Order 1 on desktop */}
-        <div className="order-1 lg:order-1 lg:col-span-2 space-y-4 sm:space-y-6">
+      {/* Desktop: 2 colunas principais | Mobile: 1 coluna com order customizada */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+        {/* COLUNA PRINCIPAL (Conteúdo) - Desktop: 8 colunas | Mobile: ordem 1 */}
+        <div className="order-1 lg:order-1 lg:col-span-8 space-y-4 sm:space-y-6">
           {/* Ticket Details */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold mb-4 break-words">{ticket.title.toUpperCase()}</h2>
@@ -750,9 +751,9 @@ export default function TicketDetailsPage() {
 
         </div>
 
-        {/* Attachments - Order 3 mobile (após sidebar) - Colapsável */}
+        {/* ANEXOS - Desktop: largura total abaixo | Mobile: ordem 3 */}
         {attachments.length > 0 && (
-          <div className="order-3 lg:order-3 lg:col-span-2">
+          <div className="order-3 lg:order-3 lg:col-span-12">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow overflow-hidden">
               {/* Header colapsável */}
               <button
@@ -833,8 +834,8 @@ export default function TicketDetailsPage() {
           </div>
         )}
 
-        {/* Comments - Order 1 (parte do Main Content) */}
-        <div className="order-1 lg:order-1 lg:col-span-2">
+        {/* COMENTÁRIOS - Desktop: largura total abaixo | Mobile: ordem 1 (já está no Main Content) */}
+        <div className="order-1 lg:order-1 lg:col-span-12">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
               <MessageSquare size={20} />
@@ -922,7 +923,8 @@ export default function TicketDetailsPage() {
         </div>
 
         {/* Sidebar - Order 2 on mobile, Order 2 on desktop */}
-        <div className="order-2 lg:order-2 space-y-4 sm:space-y-6">
+        {/* SIDEBAR (Informações e Ações) - Desktop: 4 colunas | Mobile: ordem 2 */}
+        <div className="order-2 lg:order-2 lg:col-span-4 space-y-4 sm:space-y-6">
           {/* Ticket Info */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold mb-4">Informações</h2>
@@ -1168,8 +1170,8 @@ export default function TicketDetailsPage() {
           )}
         </div>
 
-        {/* Linha do Tempo - Order 4 mobile (após anexos) */}
-        <div className="order-4 lg:order-4 lg:col-span-2">
+        {/* LINHA DO TEMPO - Desktop: metade da largura (6 colunas) | Mobile: ordem 4 */}
+        <div className="order-4 lg:order-4 lg:col-span-6">
           <TicketTimeline 
             ticketId={ticket.id} 
             className="" 
@@ -1177,9 +1179,9 @@ export default function TicketDetailsPage() {
           />
         </div>
 
-        {/* Histórico do Ticket - Order 5 mobile (último) */}
+        {/* HISTÓRICO - Desktop: metade da largura (6 colunas, ao lado da Linha do Tempo) | Mobile: ordem 5 */}
         {canViewHistory && (
-          <div className="order-5 lg:order-5 lg:col-span-2">
+          <div className="order-5 lg:order-5 lg:col-span-6">
             <TicketHistory 
               ticketId={ticket.id} 
               className="" 
