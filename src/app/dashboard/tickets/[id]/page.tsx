@@ -1055,8 +1055,8 @@ export default function TicketDetailsPage() {
           </div>
 
           {/* Actions */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
-            <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">Ações</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-gray-900 dark:text-white">Ações</h2>
             
             <div className="space-y-3">
               {/* Botões de Ação - Baseado em permissões */}
@@ -1065,17 +1065,17 @@ export default function TicketDetailsPage() {
                 <>
                   <button
                     onClick={() => setEditingStatus(true)}
-                    className="w-full h-12 px-4 py-3 bg-blue-600 text-white border border-blue-600 rounded-2xl hover:bg-blue-700 hover:border-blue-700 transition-all duration-300 font-medium text-sm relative overflow-hidden"
+                    className="w-full h-12 px-3 sm:px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded-2xl hover:bg-blue-700 hover:border-blue-700 transition-all duration-300 font-medium text-sm relative overflow-hidden"
                   >
-                    <span className="relative z-10">Alterar Status</span>
+                    <span className="relative z-10 truncate">Alterar Status</span>
                     <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
                   </button>
                   
                   <button
                     onClick={() => setEditingAssignee(true)}
-                    className="w-full h-12 px-4 py-3 bg-gray-700 dark:bg-gray-700 text-white border border-gray-700 rounded-2xl hover:bg-gray-600 hover:border-gray-600 transition-all duration-300 font-medium text-sm relative overflow-hidden"
+                    className="w-full h-12 px-3 sm:px-4 py-2 bg-gray-700 dark:bg-gray-700 text-white border border-gray-700 rounded-2xl hover:bg-gray-600 hover:border-gray-600 transition-all duration-300 font-medium text-sm relative overflow-hidden"
                   >
-                    <span className="relative z-10">Atribuir Responsável</span>
+                    <span className="relative z-10 truncate">Atribuir Responsável</span>
                     <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
                   </button>
                 </>
@@ -1096,9 +1096,9 @@ export default function TicketDetailsPage() {
                     className="hidden"
                     accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.txt,.zip,.rar"
                   />
-                  <div className={`w-full h-12 px-4 py-3 bg-gray-700 dark:bg-gray-700 text-white border border-gray-700 rounded-2xl hover:bg-gray-600 hover:border-gray-600 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer font-medium text-sm relative overflow-hidden ${uploadingFile ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                  <div className={`w-full h-12 px-3 sm:px-4 py-2 bg-gray-700 dark:bg-gray-700 text-white border border-gray-700 rounded-2xl hover:bg-gray-600 hover:border-gray-600 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer font-medium text-sm relative overflow-hidden ${uploadingFile ? 'opacity-50 cursor-not-allowed' : ''}`}>
                     <Paperclip size={16} className="relative z-10 flex-shrink-0" />
-                    <span className="relative z-10">{uploadingFile ? 'Enviando...' : 'Adicionar Anexo'}</span>
+                    <span className="relative z-10 truncate">{uploadingFile ? 'Enviando...' : 'Adicionar Anexo'}</span>
                     <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
                   </div>
                 </label>
@@ -1108,10 +1108,10 @@ export default function TicketDetailsPage() {
               {canDeleteTickets && (
                 <button
                   onClick={handleDelete}
-                  className="w-full h-12 px-4 py-3 bg-red-600 text-white border border-red-600 rounded-2xl hover:bg-red-700 hover:border-red-700 transition-all duration-300 flex items-center justify-center gap-2 font-medium text-sm relative overflow-hidden"
+                  className="w-full h-12 px-3 sm:px-4 py-2 bg-red-600 text-white border border-red-600 rounded-2xl hover:bg-red-700 hover:border-red-700 transition-all duration-300 flex items-center justify-center gap-2 font-medium text-sm relative overflow-hidden"
                 >
                   <Trash2 size={16} className="relative z-10 flex-shrink-0" />
-                  <span className="relative z-10">Excluir Chamado</span>
+                  <span className="relative z-10 truncate">Excluir Chamado</span>
                   <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
                 </button>
               )}
