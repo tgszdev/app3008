@@ -136,6 +136,7 @@ export default function TicketDetailsPage() {
   const [comment, setComment] = useState('')
   const [submittingComment, setSubmittingComment] = useState(false)
   const [isInternalComment, setIsInternalComment] = useState(false)
+  const [editorKey, setEditorKey] = useState(0) // Key para forçar reset do editor
   const [editingStatus, setEditingStatus] = useState(false)
   const [newStatus, setNewStatus] = useState<string>('')
   const [users, setUsers] = useState<User[]>([])
@@ -501,9 +502,12 @@ export default function TicketDetailsPage() {
       })
       
       toast.success(isInternalComment ? 'Comentário interno adicionado!' : 'Comentário adicionado!')
-      setComment('')
+      setComment('') // Limpar o estado
       setIsInternalComment(false)
-      fetchTicket()
+      setEditorKey(prev => prev + 1) // Forçar reset do editor mudando a key
+      
+      // Recarregar ticket para mostrar novo comentário
+      await fetchTicket()
     } catch (error) {
       console.error('Erro ao adicionar comentário:', error)
       toast.error('Erro ao adicionar comentário')
@@ -859,6 +863,7 @@ export default function TicketDetailsPage() {
               <form onSubmit={handleAddComment} className="border-t pt-4">
                 <div className="mb-3">
                   <RichTextEditor
+                    key={editorKey}
                     content={comment}
                     onChange={setComment}
                     placeholder="Adicionar comentário... Você pode adicionar imagens, formatação e links!"
