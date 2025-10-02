@@ -580,9 +580,6 @@ export default function TicketDetailsPage() {
             <span className="hidden sm:inline">Voltar para Chamados</span>
             <span className="sm:hidden">Voltar</span>
           </button>
-          
-          {/* Botão Gerar PDF - Disponível para todos */}
-          <PrintButton ticket={ticket} loading={loading} />
         </div>
         
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -603,7 +600,9 @@ export default function TicketDetailsPage() {
             </p>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col gap-2 w-full sm:w-auto">
+            {/* Botão Gerar PDF */}
+            <PrintButton ticket={ticket} loading={loading} />
             {/* Status - Baseado em permissões */}
             <div className="relative w-full sm:w-auto">
               {editingStatus && canEditThisTicket ? (
