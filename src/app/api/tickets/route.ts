@@ -216,14 +216,11 @@ export async function POST(request: NextRequest) {
       ticketData.category_id = category_id
     }
 
+    // ⚡ OTIMIZAÇÃO: Select simplificado (sem joins desnecessários para response rápido)
     const { data: newTicket, error } = await supabaseAdmin
       .from('tickets')
       .insert(ticketData)
-      .select(`
-        *,
-        created_by_user:users!tickets_created_by_fkey(id, name, email),
-        assigned_to_user:users!tickets_assigned_to_fkey(id, name, email)
-      `)
+      .select('*')
       .single()
 
     if (error) {
@@ -261,7 +258,7 @@ export async function POST(request: NextRequest) {
         await createAndSendNotification({
           user_id: assigned_to,
           title: `Novo Chamado #${newTicket.ticket_number || newTicket.id.substring(0, 8)}`,
-          message: `${newTicket.created_by_user?.name || 'Usuário'} criou um novo chamado: ${title}`,
+          message: `Novo chamado criado: ${title}`,
           type: 'ticket_assigned',
           severity: 'info',
           data: {
@@ -285,20 +282,23 @@ export async function POST(request: NextRequest) {
         .neq('id', created_by)
 
       if (admins && admins.length > 0) {
-        for (const admin of admins) {
-          await createAndSendNotification({
-            user_id: admin.id,
-            title: `Novo Chamado #${newTicket.ticket_number || newTicket.id.substring(0, 8)}`,
-            message: `${newTicket.created_by_user?.name || 'Usuário'} criou um novo chamado: ${title}`,
-            type: 'ticket_created',
-            severity: 'info',
-            data: {
-              ticket_id: newTicket.id,
-              ticket_number: newTicket.ticket_number
-            },
-            action_url: `/dashboard/tickets/${newTicket.id}`
-          })
-        }
+        // ⚡ OTIMIZAÇÃO: Notificar admins em PARALELO (não sequencial)
+        await Promise.all(
+          admins.map(admin =>
+            createAndSendNotification({
+              user_id: admin.id,
+              title: `Novo Chamado #${newTicket.ticket_number || newTicket.id.substring(0, 8)}`,
+              message: `Novo chamado criado: ${title}`,
+              type: 'ticket_created',
+              severity: 'info',
+              data: {
+                ticket_id: newTicket.id,
+                ticket_number: newTicket.ticket_number
+              },
+              action_url: `/dashboard/tickets/${newTicket.id}`
+            }).catch(err => console.log('Erro ao notificar admin (ignorado):', err))
+          )
+        )
       }
     } catch (notificationError) {
       console.log('Erro ao notificar admins (ignorado):', notificationError)
@@ -313,37 +313,34 @@ export async function POST(request: NextRequest) {
       console.log('Erro ao executar workflows (ignorado):', workflowError)
     }
 
-    // Executar escalação automática (versão simplificada)
-    try {
-      console.log(`🚨 Executando escalação para ticket ${newTicket.id}...`)
-      const escalationResult = await executeEscalationForTicketSimple(newTicket.id)
-      console.log(`✅ Escalação executada:`, escalationResult)
-      
-      // Processar e-mails de escalação automaticamente
-      if (escalationResult.success && escalationResult.executedRules.length > 0) {
-        try {
+    // ⚡ OTIMIZAÇÃO: Escalação em BACKGROUND (não bloqueia response)
+    console.log(`🚨 Iniciando escalação em background para ticket ${newTicket.id}...`)
+    executeEscalationForTicketSimple(newTicket.id)
+      .then(escalationResult => {
+        console.log(`✅ Escalação executada:`, escalationResult)
+        
+        if (escalationResult.success && escalationResult.executedRules.length > 0) {
           console.log(`📧 Processando e-mails de escalação para ticket ${newTicket.id}...`)
-          const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://www.ithostbr.tech'}/api/escalation/process-emails`, {
+          return fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://www.ithostbr.tech'}/api/escalation/process-emails`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'User-Agent': 'Auto-Escalation-Integration/1.0'
             }
           })
-          
-          if (emailResponse.ok) {
-            const emailResult = await emailResponse.json()
-            console.log(`✅ E-mails de escalação processados:`, emailResult.message)
-          } else {
-            console.error(`❌ Erro ao processar e-mails de escalação: HTTP ${emailResponse.status}`)
-          }
-        } catch (emailError) {
-          console.error('Erro ao processar e-mails de escalação (ignorado):', emailError)
         }
-      }
-    } catch (escalationError) {
-      console.log('Erro ao executar escalação (ignorado):', escalationError)
-    }
+      })
+      .then(emailResponse => {
+        if (emailResponse?.ok) {
+          return emailResponse.json()
+        }
+      })
+      .then(emailResult => {
+        if (emailResult) {
+          console.log(`✅ E-mails de escalação processados:`, emailResult.message)
+        }
+      })
+      .catch(err => console.log('Erro na escalação em background (ignorado):', err))
 
     return NextResponse.json(newTicket, { status: 201 })
   } catch (error: any) {
