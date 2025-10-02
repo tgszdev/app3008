@@ -1,6 +1,6 @@
 'use client'
 
-import { useEditor, EditorContent, BubbleMenu, FloatingMenu } from '@tiptap/react'
+import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
@@ -32,15 +32,6 @@ export default function RichTextEditor({
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Configuração customizada de Image com suporte a paste
-  const CustomImage = Image.extend({
-    addProseMirrorPlugins() {
-      return [
-        ...(this.parent?.() || []),
-      ]
-    },
-  })
-
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -48,7 +39,7 @@ export default function RichTextEditor({
           levels: [1, 2, 3],
         },
       }),
-      CustomImage.configure({
+      Image.configure({
         inline: true,
         allowBase64: true, // Temporário durante upload
         HTMLAttributes: {
@@ -108,7 +99,7 @@ export default function RichTextEditor({
     },
   })
 
-  const handleImageUpload = useCallback(async (file: File) => {
+  const handleImageUpload = async (file: File) => {
     if (!editor) return
 
     // Validações básicas
@@ -188,7 +179,7 @@ export default function RichTextEditor({
     } finally {
       setIsUploading(false)
     }
-  }, [editor])
+  }
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -215,89 +206,91 @@ export default function RichTextEditor({
 
   return (
     <div className={`relative border border-gray-300 dark:border-gray-600 rounded-2xl overflow-hidden bg-white dark:bg-gray-900 ${className}`}>
-      {/* Bubble Menu - Aparece ao selecionar texto (estilo ClickUp) */}
-      <BubbleMenu 
-        editor={editor}
-        tippyOptions={{ duration: 100 }}
-        className="flex items-center gap-1 bg-gray-900 dark:bg-gray-800 shadow-xl rounded-xl p-1 border border-gray-700"
-      >
+      {/* Toolbar Minimalista - Estilo ClickUp */}
+      <div className="border-b border-gray-200 dark:border-gray-700 px-3 py-2 bg-gray-50/50 dark:bg-gray-800/50 flex items-center gap-1 flex-wrap">
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`p-2 rounded-lg transition-colors ${
+          className={`p-1.5 rounded-lg transition-all duration-200 ${
             editor.isActive('bold') 
-              ? 'bg-blue-600 text-white' 
-              : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+              ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
           }`}
-          title="Negrito"
+          title="Negrito (Ctrl+B)"
         >
           <Bold className="w-4 h-4" />
         </button>
 
         <button
+          type="button"
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`p-2 rounded-lg transition-colors ${
+          className={`p-1.5 rounded-lg transition-all duration-200 ${
             editor.isActive('italic') 
-              ? 'bg-blue-600 text-white' 
-              : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+              ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
           }`}
-          title="Itálico"
+          title="Itálico (Ctrl+I)"
         >
           <Italic className="w-4 h-4" />
         </button>
 
-        <div className="w-px h-6 bg-gray-600 mx-1" />
+        <div className="w-px h-5 bg-gray-300 dark:bg-gray-600 mx-1" />
 
         <button
-          onClick={addLink}
-          className={`p-2 rounded-lg transition-colors ${
-            editor.isActive('link') 
-              ? 'bg-blue-600 text-white' 
-              : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-          }`}
-          title="Adicionar Link"
-        >
-          <LinkIcon className="w-4 h-4" />
-        </button>
-      </BubbleMenu>
-
-      {/* Floating Menu - Aparece em linha vazia (estilo ClickUp) */}
-      <FloatingMenu 
-        editor={editor}
-        tippyOptions={{ duration: 100 }}
-        className="flex items-center gap-1 bg-white dark:bg-gray-800 shadow-lg rounded-xl p-1 border border-gray-200 dark:border-gray-700"
-      >
-        <button
-          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          title="Título 1"
-        >
-          <Heading1 className="w-4 h-4" />
-        </button>
-
-        <button
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          title="Título 2"
-        >
-          <Heading2 className="w-4 h-4" />
-        </button>
-
-        <button
+          type="button"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          className={`p-1.5 rounded-lg transition-all duration-200 ${
+            editor.isActive('bulletList') 
+              ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+          }`}
           title="Lista"
         >
           <List className="w-4 h-4" />
         </button>
 
         <button
-          onClick={() => fileInputRef.current?.click()}
-          className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          title="Adicionar Imagem"
+          type="button"
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          className={`p-1.5 rounded-lg transition-all duration-200 ${
+            editor.isActive('orderedList') 
+              ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+          }`}
+          title="Lista Numerada"
         >
-          <ImageIcon className="w-4 h-4" />
+          <ListOrdered className="w-4 h-4" />
         </button>
-      </FloatingMenu>
+
+        <div className="w-px h-5 bg-gray-300 dark:bg-gray-600 mx-1" />
+
+        <button
+          type="button"
+          onClick={addLink}
+          className={`p-1.5 rounded-lg transition-all duration-200 ${
+            editor.isActive('link') 
+              ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+          }`}
+          title="Adicionar Link"
+        >
+          <LinkIcon className="w-4 h-4" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="p-1.5 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+          title="Adicionar Imagem"
+          disabled={isUploading}
+        >
+          {isUploading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <ImageIcon className="w-4 h-4" />
+          )}
+        </button>
+      </div>
 
       {/* Input oculto para upload de imagem */}
       <input
