@@ -18,6 +18,7 @@ import { useStatuses } from '@/hooks/useStatuses'
 import TicketHistory from '@/components/TicketHistory'
 import TicketTimeline from '@/components/TicketTimeline'
 import RichTextRenderer from '@/components/RichTextRenderer'
+import RichTextEditor from '@/components/RichTextEditor'
 
 interface User {
   id: string
@@ -835,7 +836,9 @@ export default function TicketDetailsPage() {
                         </span>
                       )}
                     </div>
-                    <p className="mt-2">{comment.content}</p>
+                    <div className="mt-2">
+                      <RichTextRenderer content={comment.content} />
+                    </div>
                   </div>
                 ))
               ) : (
@@ -854,15 +857,15 @@ export default function TicketDetailsPage() {
               </div>
             ) : (
               <form onSubmit={handleAddComment} className="border-t pt-4">
-                <textarea
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  placeholder="Adicionar comentário..."
-                  className="w-full px-3 py-2 border rounded-2xl dark:bg-gray-700 dark:border-gray-600 resize-none"
-                  rows={3}
-                  disabled={ticket.status === 'cancelled' && !canDeleteTickets}
-                />
-                <div className="flex justify-between items-center mt-2">
+                <div className="mb-3">
+                  <RichTextEditor
+                    content={comment}
+                    onChange={setComment}
+                    placeholder="Adicionar comentário... Você pode adicionar imagens, formatação e links!"
+                    minHeight="150px"
+                  />
+                </div>
+                <div className="flex justify-between items-center">
                   {/* Checkbox para comentário interno - baseado em permissões */}
                   {(canEditAllTickets || canAssignTickets) && (
                     <label className="flex items-center gap-2 cursor-pointer">
