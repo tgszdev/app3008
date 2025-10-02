@@ -147,7 +147,7 @@ export function SimplePrintButton({ ticket, loading }: SimplePrintButtonProps) {
     <button
       onClick={handlePrint}
       disabled={loading || !ticket}
-      className="min-w-[140px] h-10 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded-2xl hover:bg-blue-700 hover:border-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium relative overflow-hidden whitespace-nowrap"
+      className="w-full sm:w-auto sm:min-w-[140px] h-10 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded-2xl hover:bg-blue-700 hover:border-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium relative overflow-hidden whitespace-nowrap"
       title="Gerar PDF do Ticket"
     >
       <FileDown size={16} className="flex-shrink-0" />
