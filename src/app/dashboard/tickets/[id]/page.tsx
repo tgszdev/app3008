@@ -750,16 +750,28 @@ export default function TicketDetailsPage() {
 
         </div>
 
-        {/* Attachments - Order 3 mobile (após sidebar) */}
+        {/* Attachments - Order 3 mobile (após sidebar) - Colapsável */}
         {attachments.length > 0 && (
           <div className="order-3 lg:order-3 lg:col-span-2">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6">
-              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                <Paperclip size={20} />
-                Anexos ({attachments.length})
-              </h2>
-              
-              <div className="space-y-2">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow overflow-hidden">
+              {/* Header colapsável */}
+              <button
+                onClick={() => setAttachmentsCollapsed(!attachmentsCollapsed)}
+                className="w-full px-4 sm:px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <Paperclip className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Anexos</h2>
+                  <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-semibold">
+                    {attachments.length}
+                  </span>
+                </div>
+                {attachmentsCollapsed ? <ChevronDown className="h-5 w-5 text-gray-400" /> : <ChevronUp className="h-5 w-5 text-gray-400" />}
+              </button>
+
+              {!attachmentsCollapsed && (
+                <div className="px-4 sm:px-6 pb-6 pt-2">
+                  <div className="space-y-2">
                 {attachments.map((attachment) => {
                   // Verificar se é uma imagem
                   const isImage = isImageFile(attachment.file_name, attachment.file_type)
@@ -814,7 +826,9 @@ export default function TicketDetailsPage() {
                     </div>
                   )
                 })}
-              </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
