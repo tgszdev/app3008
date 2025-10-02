@@ -1150,7 +1150,7 @@ export default function TicketDetailsPage() {
           )}
         </div>
 
-        {/* Linha do Tempo - Order 3 mobile (no final) */}
+        {/* Linha do Tempo - Order 3 mobile (após sidebar) */}
         <div className="order-3 lg:order-3 lg:col-span-2">
           <TicketTimeline 
             ticketId={ticket.id} 
@@ -1159,9 +1159,9 @@ export default function TicketDetailsPage() {
           />
         </div>
 
-        {/* Histórico do Ticket - Order 3 mobile (no final) */}
+        {/* Histórico do Ticket - Order 4 mobile (último) */}
         {canViewHistory && (
-          <div className="order-3 lg:order-3 lg:col-span-2">
+          <div className="order-4 lg:order-4 lg:col-span-2">
             <TicketHistory 
               ticketId={ticket.id} 
               className="" 
