@@ -27,6 +27,7 @@ import {
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import { formatBrazilDateTime, formatRelativeTime } from '@/lib/date-utils'
+import RichTextRenderer from '@/components/RichTextRenderer'
 
 interface User {
   id: string
@@ -456,9 +457,7 @@ export default function CommentsPage() {
 
                     {/* Conteúdo do comentário */}
                     <div className="mt-3">
-                      <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">
-                        {comment.content}
-                      </p>
+                      <RichTextRenderer content={comment.content} />
                     </div>
 
                     {/* Anexos */}
