@@ -43,12 +43,14 @@ export function EnhancedSidebarSection({
   // Determine section color class
   const sectionColorClass = 
     section.title === 'OPERAÇÕES' ? 'sidebar-section-operations' :
+    section.title === 'APONTAMENTOS' ? 'sidebar-section-timesheets' :
     section.title === 'ANÁLISES' ? 'sidebar-section-analytics' :
     section.title === 'RECURSOS' ? 'sidebar-section-resources' :
     section.title === 'ADMINISTRAÇÃO' ? 'sidebar-section-admin' : ''
   
   const iconColorClass = 
     section.title === 'OPERAÇÕES' ? 'sidebar-icon-operations' :
+    section.title === 'APONTAMENTOS' ? 'sidebar-icon-timesheets' :
     section.title === 'ANÁLISES' ? 'sidebar-icon-analytics' :
     section.title === 'RECURSOS' ? 'sidebar-icon-resources' :
     section.title === 'ADMINISTRAÇÃO' ? 'sidebar-icon-admin' : ''

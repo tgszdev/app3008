@@ -71,12 +71,20 @@ const navigationSections: NavigationSection[] = [
     ]
   },
   {
+    title: 'APONTAMENTOS',
+    icon: Clock,
+    items: [
+      { name: 'Apontamentos', href: '/dashboard/timesheets', icon: Clock },
+      { name: 'Aprovação de Horas', href: '/dashboard/timesheets/admin', icon: CheckCircle, adminOnly: true },
+      { name: 'Analytics de Horas', href: '/dashboard/timesheets/analytics', icon: PieChart, adminOnly: true },
+    ]
+  },
+  {
     title: 'ANÁLISES',
     icon: BarChart3,
     items: [
       { name: 'Estatísticas', href: '/dashboard/analytics', icon: BarChart3 },
       { name: 'Multi-Cliente', href: '/dashboard/multi-client', icon: Building, adminOnly: true },
-      { name: 'Analytics de Horas', href: '/dashboard/timesheets/analytics', icon: PieChart, adminOnly: true },
       { name: 'Relatórios', href: '/dashboard/reports', icon: FileText },
       { name: 'Satisfação', href: '/dashboard/satisfaction', icon: Star },
     ]
@@ -94,7 +102,6 @@ const navigationSections: NavigationSection[] = [
     adminOnly: true,
     items: [
       { name: 'Organizações', href: '/dashboard/organizations', icon: Building },
-      { name: 'Aprovação de Horas', href: '/dashboard/timesheets/admin', icon: CheckCircle },
       { name: 'Usuários', href: '/dashboard/users', icon: Users },
       { name: 'Permissões', href: '/dashboard/timesheets/permissions', icon: Lock },
       { name: 'SLA', href: '/dashboard/sla', icon: Gauge },
@@ -180,7 +187,7 @@ export default function DashboardLayout({
             <Link
               href="/dashboard"
               className={cn(
-                "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors",
+                "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors mb-4",
                 pathname === '/dashboard'
                   ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
                   : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
@@ -189,21 +196,6 @@ export default function DashboardLayout({
             >
               <Home className="mr-3 h-5 w-5" />
               Dashboard
-            </Link>
-            
-            {/* Apontamentos Link */}
-            <Link
-              href="/dashboard/timesheets"
-              className={cn(
-                "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors mb-4",
-                pathname.startsWith('/dashboard/timesheets')
-                  ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
-                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-              )}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <Clock className="mr-3 h-5 w-5" />
-              Apontamentos
             </Link>
             
             {/* Navigation Sections */}
@@ -318,24 +310,6 @@ export default function DashboardLayout({
                 title="Dashboard"
               >
                 <Home className="h-5 w-5" />
-              </Link>
-            </div>
-            
-            <div className="mx-4 h-px bg-gray-200 dark:bg-gray-700" />
-            
-            {/* Apontamentos Link */}
-            <div className="px-2 pt-2 pb-2">
-              <Link
-                href="/dashboard/timesheets"
-                className={cn(
-                  "flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200",
-                  pathname.startsWith('/dashboard/timesheets')
-                    ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400"
-                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                )}
-                title="Apontamentos"
-              >
-                <Clock className="h-5 w-5" />
               </Link>
             </div>
             

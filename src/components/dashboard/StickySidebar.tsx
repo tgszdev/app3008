@@ -49,6 +49,13 @@ export function StickySidebar({ sections, isAdmin }: StickySidebarProps) {
           border: 'border-emerald-500',
           hover: 'hover:bg-emerald-100 dark:hover:bg-emerald-900/30'
         }
+      case 'APONTAMENTOS':
+        return {
+          icon: 'text-blue-500 dark:text-blue-400',
+          bg: 'bg-blue-50 dark:bg-blue-900/20',
+          border: 'border-blue-500',
+          hover: 'hover:bg-blue-100 dark:hover:bg-blue-900/30'
+        }
       case 'ANÁLISES':
         return {
           icon: 'text-violet-500 dark:text-violet-400',

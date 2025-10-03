@@ -48,6 +48,13 @@
   padding: 2px;
 }
 
+.sidebar-section-timesheets {
+  border-left: 3px solid #3B82F6;
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.08) 0%, transparent 100%);
+  margin: 0 2px;
+  padding: 2px;
+}
+
 .sidebar-section-analytics {
   border-left: 3px solid #8B5CF6;
   background: linear-gradient(90deg, rgba(139, 92, 246, 0.08) 0%, transparent 100%);
@@ -74,6 +81,10 @@
   background: linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, transparent 100%);
 }
 
+.dark .sidebar-section-timesheets {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
+}
+
 .dark .sidebar-section-analytics {
   background: linear-gradient(90deg, rgba(139, 92, 246, 0.1) 0%, transparent 100%);
 }
@@ -88,11 +99,13 @@
 
 /* Icon group indicators with better visibility */
 .sidebar-icon-operations { color: #10B981 !important; }
+.sidebar-icon-timesheets { color: #3B82F6 !important; }
 .sidebar-icon-analytics { color: #8B5CF6 !important; }
 .sidebar-icon-resources { color: #F59E0B !important; }
 .sidebar-icon-admin { color: #EF4444 !important; }
 
 .dark .sidebar-icon-operations { color: #34D399 !important; }
+.dark .sidebar-icon-timesheets { color: #60A5FA !important; }
 .dark .sidebar-icon-analytics { color: #A78BFA !important; }
 .dark .sidebar-icon-resources { color: #FBB6CE !important; }
 .dark .sidebar-icon-admin { color: #F87171 !important; }
