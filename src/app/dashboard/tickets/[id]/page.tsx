@@ -728,10 +728,10 @@ export default function TicketDetailsPage() {
         </div>
       </div>
 
-      {/* Desktop: 2 colunas principais | Mobile: 1 coluna com order customizada */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
-        {/* COLUNA PRINCIPAL (Conteúdo) - Desktop: 8 colunas | Mobile: ordem 1 */}
-        <div className="order-1 lg:order-1 lg:col-span-8 space-y-4 sm:space-y-6">
+      {/* Desktop: 3 colunas (2+1) | Mobile: 1 coluna com order customizada */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        {/* COLUNA PRINCIPAL (Conteúdo) - Desktop: 2 colunas (66%) | Mobile: ordem 1 */}
+        <div className="order-1 lg:order-1 lg:col-span-2 space-y-4 sm:space-y-6">
           {/* Ticket Details */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold mb-4 break-words">{ticket.title.toUpperCase()}</h2>
@@ -751,9 +751,9 @@ export default function TicketDetailsPage() {
 
         </div>
 
-        {/* ANEXOS - Desktop: largura total abaixo | Mobile: ordem 3 */}
+        {/* ANEXOS - Desktop: dentro da coluna principal | Mobile: ordem 3 */}
         {attachments.length > 0 && (
-          <div className="order-3 lg:order-3 lg:col-span-12">
+          <div className="order-3 lg:order-1 lg:col-span-2">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow overflow-hidden">
               {/* Header colapsável */}
               <button
@@ -834,8 +834,8 @@ export default function TicketDetailsPage() {
           </div>
         )}
 
-        {/* COMENTÁRIOS - Desktop: largura total abaixo | Mobile: ordem 1 (já está no Main Content) */}
-        <div className="order-1 lg:order-1 lg:col-span-12">
+        {/* COMENTÁRIOS - Desktop: dentro da coluna principal | Mobile: ordem 1 */}
+        <div className="order-1 lg:order-1 lg:col-span-2">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
               <MessageSquare size={20} />
@@ -922,9 +922,8 @@ export default function TicketDetailsPage() {
           </div>
         </div>
 
-        {/* Sidebar - Order 2 on mobile, Order 2 on desktop */}
-        {/* SIDEBAR (Informações e Ações) - Desktop: 4 colunas | Mobile: ordem 2 */}
-        <div className="order-2 lg:order-2 lg:col-span-4 space-y-4 sm:space-y-6">
+        {/* SIDEBAR (Informações e Ações) - Desktop: 1 coluna (33%) | Mobile: ordem 2 */}
+        <div className="order-2 lg:order-2 lg:col-span-1 space-y-4 sm:space-y-6">
           {/* Ticket Info */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold mb-4">Informações</h2>
@@ -1170,8 +1169,8 @@ export default function TicketDetailsPage() {
           )}
         </div>
 
-        {/* LINHA DO TEMPO - Desktop: largura total | Mobile: ordem 4 */}
-        <div className="order-4 lg:order-4 lg:col-span-12">
+        {/* LINHA DO TEMPO - Desktop: dentro da coluna principal | Mobile: ordem 4 */}
+        <div className="order-4 lg:order-1 lg:col-span-2">
           <TicketTimeline 
             ticketId={ticket.id} 
             className="" 
@@ -1179,9 +1178,9 @@ export default function TicketDetailsPage() {
           />
         </div>
 
-        {/* HISTÓRICO - Desktop: largura total | Mobile: ordem 5 */}
+        {/* HISTÓRICO - Desktop: dentro da coluna principal | Mobile: ordem 5 */}
         {canViewHistory && (
-          <div className="order-5 lg:order-5 lg:col-span-12">
+          <div className="order-5 lg:order-1 lg:col-span-2">
             <TicketHistory 
               ticketId={ticket.id} 
               className="" 
