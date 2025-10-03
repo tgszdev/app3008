@@ -127,10 +127,10 @@ export default function TicketTimeline({
             {timeline.map((item, index) => (
               <div 
                 key={index} 
-                className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4 hover:shadow-md transition-shadow"
+                className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4 hover:shadow-md transition-shadow overflow-hidden"
               >
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-start justify-between gap-2 mb-1.5">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
                     <div 
                       className="w-6 h-6 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg flex-shrink-0"
                       style={{ backgroundColor: item.statusColor }}
@@ -138,7 +138,7 @@ export default function TicketTimeline({
                     >
                       {index + 1}
                     </div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <h3 className="font-bold text-sm text-gray-900 dark:text-white truncate">{item.status}</h3>
                       <p className="text-[10px] text-gray-500 dark:text-gray-400 flex items-center gap-0.5 mt-0.5">
                         <Calendar className="h-2.5 w-2.5 flex-shrink-0" />
@@ -150,7 +150,7 @@ export default function TicketTimeline({
                   </div>
                   
                   {item.duration && (
-                    <div className="text-right flex-shrink-0 ml-2">
+                    <div className="text-right flex-shrink-0">
                       <span className="font-bold text-sm text-gray-900 dark:text-white whitespace-nowrap">
                         {item.duration}
                       </span>
