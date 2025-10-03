@@ -211,7 +211,7 @@ export default function KnowledgeBasePage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-900 rounded-lg shadow-lg p-4 md:p-8 text-white">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-900 rounded-2xl shadow-lg p-4 md:p-8 text-white">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
           <div className="flex items-start md:items-center space-x-3">
             <BookOpen className="h-8 w-8 md:h-10 md:w-10 flex-shrink-0 mt-1 md:mt-0" />
@@ -227,7 +227,7 @@ export default function KnowledgeBasePage() {
             {(canManageCategories || isAdmin) && (
               <button
                 onClick={() => router.push('/dashboard/knowledge-base/categories')}
-                className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-white/20 backdrop-blur border border-white/30 rounded-lg text-sm md:text-base text-white hover:bg-white/30 transition-colors"
+                className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-white/20 backdrop-blur border border-white/30 rounded-2xl text-sm md:text-base text-white hover:bg-white/30 transition-colors"
               >
                 <Grid className="h-4 w-4 md:h-5 md:w-5 mr-1 md:mr-2" />
                 <span className="hidden sm:inline">Nova Categoria</span>
@@ -238,7 +238,7 @@ export default function KnowledgeBasePage() {
             {(canCreate || canEdit || isAdmin) && (
               <button
                 onClick={createNewArticle}
-                className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-white/20 backdrop-blur border border-white/30 rounded-lg text-sm md:text-base text-white hover:bg-white/30 transition-colors"
+                className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-white/20 backdrop-blur border border-white/30 rounded-2xl text-sm md:text-base text-white hover:bg-white/30 transition-colors"
               >
                 <Plus className="h-4 w-4 md:h-5 md:w-5 mr-1 md:mr-2" />
                 <span className="hidden sm:inline">Novo Artigo</span>
@@ -249,7 +249,7 @@ export default function KnowledgeBasePage() {
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-white/20 backdrop-blur border border-white/30 rounded-lg text-sm md:text-base text-white hover:bg-white/30 transition-colors"
+              className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-white/20 backdrop-blur border border-white/30 rounded-2xl text-sm md:text-base text-white hover:bg-white/30 transition-colors"
             >
               <RefreshCw className={`h-4 w-4 md:h-5 md:w-5 mr-1 md:mr-2 ${refreshing ? 'animate-spin' : ''}`} />
               Atualizar
@@ -265,14 +265,14 @@ export default function KnowledgeBasePage() {
             placeholder="Buscar artigos, tutoriais, soluções..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-white/20 backdrop-blur border border-white/30 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-white/50"
+            className="w-full pl-12 pr-4 py-3 bg-white/20 backdrop-blur border border-white/30 rounded-2xl text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-white/50"
           />
         </div>
 
         {/* Estatísticas Rápidas */}
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mt-6">
-            <div className="bg-white/10 backdrop-blur rounded-lg p-2 md:p-3">
+            <div className="bg-white/10 backdrop-blur rounded-2xl p-2 md:p-3">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-blue-100 text-xs md:text-sm">Artigos</p>
@@ -282,7 +282,7 @@ export default function KnowledgeBasePage() {
               </div>
             </div>
             
-            <div className="bg-white/10 backdrop-blur rounded-lg p-2 md:p-3">
+            <div className="bg-white/10 backdrop-blur rounded-2xl p-2 md:p-3">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-blue-100 text-xs md:text-sm">Categorias</p>
@@ -292,7 +292,7 @@ export default function KnowledgeBasePage() {
               </div>
             </div>
             
-            <div className="bg-white/10 backdrop-blur rounded-lg p-2 md:p-3">
+            <div className="bg-white/10 backdrop-blur rounded-2xl p-2 md:p-3">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-blue-100 text-xs md:text-sm">Visualizações</p>
@@ -302,7 +302,7 @@ export default function KnowledgeBasePage() {
               </div>
             </div>
             
-            <div className="bg-white/10 backdrop-blur rounded-lg p-2 md:p-3">
+            <div className="bg-white/10 backdrop-blur rounded-2xl p-2 md:p-3">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-blue-100 text-xs md:text-sm">Taxa de Ajuda</p>
@@ -316,14 +316,14 @@ export default function KnowledgeBasePage() {
       </div>
 
       {/* Filtros e Controles */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
           {/* Filtro de Categoria */}
           <div className="flex items-center space-x-4">
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Todas as Categorias</option>
               {categories.map((category) => (
@@ -381,11 +381,11 @@ export default function KnowledgeBasePage() {
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3 md:p-4 hover:shadow-md transition-shadow text-left"
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-3 md:p-4 hover:shadow-md transition-shadow text-left"
               >
                 <div className="flex items-start space-x-3">
                   <div
-                    className="p-1.5 md:p-2 rounded-lg flex-shrink-0"
+                    className="p-1.5 md:p-2 rounded-2xl flex-shrink-0"
                     style={{ backgroundColor: `${category.color}20` }}
                   >
                     <Icon className="h-5 w-5 md:h-6 md:w-6" style={{ color: category.color }} />
@@ -417,7 +417,7 @@ export default function KnowledgeBasePage() {
               <div
                 key={article.id}
                 onClick={() => navigateToArticle(article.slug)}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:p-6 hover:shadow-md transition-shadow cursor-pointer"
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:p-6 hover:shadow-md transition-shadow cursor-pointer"
               >
                 <div className="flex items-start justify-between mb-3">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400">
@@ -445,7 +445,7 @@ export default function KnowledgeBasePage() {
       )}
 
       {/* Lista de Artigos */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
             {showFaqOnly ? 'Perguntas Frequentes' : 'Todos os Artigos'}
@@ -487,12 +487,12 @@ export default function KnowledgeBasePage() {
                 <div
                   key={article.id}
                   onClick={() => navigateToArticle(article.slug)}
-                  className="border border-gray-200 dark:border-gray-700 rounded-lg p-3 md:p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
+                  className="border border-gray-200 dark:border-gray-700 rounded-2xl p-3 md:p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
                 >
                   <div className="flex items-start space-x-3 md:space-x-4">
                     {article.category && (
                       <div
-                        className="p-1.5 md:p-2 rounded-lg flex-shrink-0"
+                        className="p-1.5 md:p-2 rounded-2xl flex-shrink-0"
                         style={{ backgroundColor: `${article.category.color}20` }}
                       >
                         <CategoryIcon 
@@ -604,7 +604,7 @@ export default function KnowledgeBasePage() {
 
       {/* FAQ Rápido */}
       {faqArticles.length > 0 && !showFaqOnly && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:p-6">
           <div className="flex items-center justify-between mb-3 md:mb-4">
             <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white flex items-center">
               <HelpCircle className="h-4 w-4 md:h-5 md:w-5 mr-2 text-blue-500" />
@@ -623,7 +623,7 @@ export default function KnowledgeBasePage() {
               <div
                 key={article.id}
                 onClick={() => navigateToArticle(article.slug)}
-                className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
+                className="flex items-center justify-between p-3 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
               >
                 <div className="flex items-center space-x-3">
                   <MessageCircle className="h-4 w-4 text-gray-400" />
