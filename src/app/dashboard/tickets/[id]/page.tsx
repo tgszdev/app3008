@@ -749,11 +749,8 @@ export default function TicketDetailsPage() {
             )}
           </div>
 
-        </div>
-
-        {/* ANEXOS - Desktop: dentro da coluna principal | Mobile: ordem 3 */}
-        {attachments.length > 0 && (
-          <div className="order-3 lg:order-1 lg:col-span-2">
+          {/* ANEXOS */}
+          {attachments.length > 0 && (
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow overflow-hidden">
               {/* Header colapsável */}
               <button
@@ -831,11 +828,9 @@ export default function TicketDetailsPage() {
                 </div>
               )}
             </div>
-          </div>
-        )}
+          )}
 
-        {/* COMENTÁRIOS - Desktop: dentro da coluna principal | Mobile: ordem 1 */}
-        <div className="order-1 lg:order-1 lg:col-span-2">
+          {/* COMENTÁRIOS */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
               <MessageSquare size={20} />
@@ -1167,27 +1162,23 @@ export default function TicketDetailsPage() {
               />
             </div>
           )}
-        </div>
 
-        {/* LINHA DO TEMPO - Desktop: dentro da coluna principal | Mobile: ordem 4 */}
-        <div className="order-4 lg:order-1 lg:col-span-2">
+          {/* LINHA DO TEMPO */}
           <TicketTimeline 
             ticketId={ticket.id} 
             className="" 
             initiallyCollapsed={true}
           />
-        </div>
 
-        {/* HISTÓRICO - Desktop: dentro da coluna principal | Mobile: ordem 5 */}
-        {canViewHistory && (
-          <div className="order-5 lg:order-1 lg:col-span-2">
+          {/* HISTÓRICO */}
+          {canViewHistory && (
             <TicketHistory 
               ticketId={ticket.id} 
               className="" 
               initiallyCollapsed={true}
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Modal de Cancelamento */}
