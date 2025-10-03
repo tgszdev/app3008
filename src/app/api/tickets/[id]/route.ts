@@ -54,7 +54,6 @@ export async function GET(
       .single()
 
     if (error) {
-      console.error('Erro ao buscar ticket:', error)
       return NextResponse.json(
         { error: 'Erro ao buscar ticket', details: error.message },
         { status: 500 }
@@ -110,7 +109,6 @@ export async function GET(
     return NextResponse.json(formattedTicket)
 
   } catch (error: any) {
-    console.error('Erro no endpoint de ticket individual:', error)
     return NextResponse.json(
       { 
         error: 'Erro interno do servidor',

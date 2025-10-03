@@ -169,12 +169,6 @@ export default function TicketDetailsPage() {
   // Debug: Log permissions para verificar se estão sendo carregadas corretamente
   useEffect(() => {
     if (!permissionsLoading && permissions) {
-      console.log('=== DEBUG PERMISSÕES ===');
-      console.log('Usuário:', session?.user?.email);
-      console.log('Role:', (session?.user as any)?.role_name || (session?.user as any)?.role);
-      console.log('Permissões carregadas:', permissions);
-      console.log('tickets_delete:', permissions.tickets_delete);
-      console.log('canDeleteTickets:', canDeleteTickets);
     }
   }, [permissions, permissionsLoading, canDeleteTickets, session])
   
@@ -192,19 +186,14 @@ export default function TicketDetailsPage() {
 
   const fetchTicket = async () => {
     try {
-      console.log('=== DEBUG PÁGINA TICKET ===')
-      console.log('Buscando ticket com ID:', ticketId)
       
       const response = await axios.get(`/api/tickets/${ticketId}`)
       
-      console.log('Resposta da API:', response.data)
-      console.log('Título recebido:', response.data.title)
       
       setTicket(response.data)
       setNewStatus(response.data.status)
       setNewAssignee(response.data.assigned_to || '')
     } catch (error) {
-      console.error('Erro ao buscar ticket:', error)
       toast.error('Erro ao carregar ticket')
       router.push('/dashboard/tickets')
     } finally {
@@ -217,9 +206,7 @@ export default function TicketDetailsPage() {
       // Buscar usuários que têm permissão para atribuir tickets
       const response = await axios.get('/api/users/with-permission?permission=tickets_assign')
       setUsers(response.data)
-      console.log('Usuários com permissão tickets_assign:', response.data)
     } catch (error) {
-      console.error('Erro ao buscar usuários:', error)
       // Fallback: buscar todos os usuários se o novo endpoint falhar
       try {
         const fallbackResponse = await axios.get('/api/users')
@@ -228,7 +215,6 @@ export default function TicketDetailsPage() {
         )
         setUsers(assignableUsers)
       } catch (fallbackError) {
-        console.error('Erro no fallback:', fallbackError)
       }
     }
   }
@@ -238,7 +224,6 @@ export default function TicketDetailsPage() {
       const response = await axios.get(`/api/tickets/upload?ticketId=${ticketId}`)
       setAttachments(response.data)
     } catch (error) {
-      console.error('Erro ao buscar anexos:', error)
     }
   }
 
@@ -280,7 +265,6 @@ export default function TicketDetailsPage() {
         toast(response.data.warning, { icon: '⚠️' })
       }
     } catch (error: any) {
-      console.error('Erro ao fazer upload:', error)
       toast.error(error.response?.data?.error || 'Erro ao enviar arquivo')
     } finally {
       setUploadingFile(false)
@@ -330,10 +314,6 @@ export default function TicketDetailsPage() {
     }
 
     try {
-      console.log('=== DEBUG UPDATE STATUS ===')
-      console.log('ID do ticket:', ticket.id)
-      console.log('Novo status:', newStatus)
-      console.log('User ID:', session?.user?.id)
       
       const response = await axios.put('/api/tickets', {
         id: ticket.id,
@@ -341,7 +321,6 @@ export default function TicketDetailsPage() {
         updated_by: session?.user?.id
       })
       
-      console.log('Resposta da atualização:', response.data)
       
       toast.success('Status atualizado com sucesso!')
       setEditingStatus(false)
@@ -355,8 +334,6 @@ export default function TicketDetailsPage() {
       
       fetchTicket()
     } catch (error: any) {
-      console.error('Erro ao atualizar status:', error)
-      console.error('Detalhes do erro:', error.response?.data)
       toast.error(error.response?.data?.error || 'Erro ao atualizar status')
     }
   }
@@ -368,23 +345,16 @@ export default function TicketDetailsPage() {
     }
 
     try {
-      console.log('=== DEBUG UPDATE PRIORITY ===')
-      console.log('ID do ticket:', ticket.id)
-      console.log('Nova prioridade:', newPriority)
-      console.log('User ID:', session?.user?.id)
       
       const response = await axios.patch(`/api/tickets/${ticket.id}/priority`, {
         priority: newPriority
       })
       
-      console.log('Resposta da atualização de prioridade:', response.data)
       
       toast.success('Prioridade atualizada com sucesso!')
       setEditingPriority(false)
       fetchTicket()
     } catch (error: any) {
-      console.error('Erro ao atualizar prioridade:', error)
-      console.error('Detalhes do erro:', error.response?.data)
       toast.error(error.response?.data?.error || 'Erro ao atualizar prioridade')
     }
   }
@@ -416,7 +386,6 @@ export default function TicketDetailsPage() {
       setCancelReason('')
       fetchTicket()
     } catch (error: any) {
-      console.error('Erro ao cancelar ticket:', error)
       toast.error('Erro ao cancelar ticket')
     }
   }
@@ -449,7 +418,6 @@ export default function TicketDetailsPage() {
       setNewStatus('')
       fetchTicket()
     } catch (error: any) {
-      console.error('Erro ao reativar ticket:', error)
       toast.error('Erro ao reativar ticket')
     }
   }
@@ -478,7 +446,6 @@ export default function TicketDetailsPage() {
       setEditingAssignee(false)
       fetchTicket()
     } catch (error) {
-      console.error('Erro ao atualizar responsável:', error)
       toast.error('Erro ao atualizar responsável')
     }
   }
@@ -510,7 +477,6 @@ export default function TicketDetailsPage() {
       // Recarregar ticket para mostrar novo comentário
       await fetchTicket()
     } catch (error) {
-      console.error('Erro ao adicionar comentário:', error)
       toast.error('Erro ao adicionar comentário')
     } finally {
       setSubmittingComment(false)
@@ -527,7 +493,6 @@ export default function TicketDetailsPage() {
       toast.success('Chamado excluído com sucesso!')
       router.push('/dashboard/tickets')
     } catch (error) {
-      console.error('Erro ao excluir chamado:', error)
       toast.error('Erro ao excluir chamado')
     }
   }

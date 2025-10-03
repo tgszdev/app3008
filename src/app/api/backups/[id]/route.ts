@@ -28,7 +28,6 @@ export async function DELETE(
       .eq('id', backupId)
 
     if (error) {
-      console.error('Error deleting backup:', error)
       return NextResponse.json({ error: 'Failed to delete backup' }, { status: 500 })
     }
 
@@ -47,7 +46,6 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Backup DELETE error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

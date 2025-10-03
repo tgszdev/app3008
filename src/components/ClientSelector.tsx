@@ -47,7 +47,6 @@ export function ClientSelector({
           setClients(response.data)
         }
       } catch (error) {
-        console.error('Erro ao carregar clientes:', error)
       } finally {
         setIsLoading(false)
       }

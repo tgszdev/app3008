@@ -100,7 +100,6 @@ export async function GET(request: NextRequest) {
     const { data: comments, error } = await query
 
     if (error) {
-      console.error('Erro ao buscar comentários:', error)
       return NextResponse.json(
         { 
           error: 'Erro ao buscar comentários',
@@ -184,7 +183,6 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error: any) {
-    console.error('Erro no endpoint de comentários:', error)
     return NextResponse.json(
       { 
         error: 'Erro interno do servidor',
@@ -248,7 +246,6 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Erro ao criar comentário:', error)
       return NextResponse.json(
         { 
           error: 'Erro ao criar comentário',
@@ -267,7 +264,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(comment)
 
   } catch (error: any) {
-    console.error('Erro ao criar comentário:', error)
     return NextResponse.json(
       { 
         error: 'Erro interno do servidor',
@@ -345,7 +341,6 @@ export async function DELETE(request: NextRequest) {
       .eq('id', commentId)
 
     if (error) {
-      console.error('Erro ao deletar comentário:', error)
       return NextResponse.json(
         { 
           error: 'Erro ao deletar comentário',
@@ -358,7 +353,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: true })
 
   } catch (error: any) {
-    console.error('Erro ao deletar comentário:', error)
     return NextResponse.json(
       { 
         error: 'Erro interno do servidor',

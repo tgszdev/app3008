@@ -33,7 +33,6 @@ export function SessionMonitor({
         const data = await response.json()
         
         if (!data.valid) {
-          console.log('Sessão inválida detectada:', data.reason)
           // Fazer logout imediato
           await signOut({ 
             callbackUrl: '/login',
@@ -41,7 +40,6 @@ export function SessionMonitor({
           })
         }
       } catch (error) {
-        console.error('Erro ao verificar sessão:', error)
       } finally {
         setIsChecking(false)
       }
@@ -98,7 +96,6 @@ export function useSessionMonitor(options?: SessionMonitorProps) {
           await signOut({ callbackUrl: '/login' })
         }
       } catch (error) {
-        console.error('Erro ao verificar sessão:', error)
       }
     }
     

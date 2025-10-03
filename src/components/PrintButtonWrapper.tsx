@@ -16,17 +16,14 @@ export default function PrintButtonWrapper({ ticket, loading }: PrintButtonProps
   const componentRef = useRef<HTMLDivElement>(null)
 
   const handleBeforePrint = useCallback(() => {
-    console.log('Preparando impressão...')
     return Promise.resolve()
   }, [])
 
   const handleAfterPrint = useCallback(() => {
-    console.log('Impressão finalizada')
     return Promise.resolve()
   }, [])
 
   const handlePrintError = useCallback((errorLocation: string, error: Error) => {
-    console.error('Erro na impressão:', errorLocation, error)
     toast.error('Erro ao gerar PDF')
   }, [])
 

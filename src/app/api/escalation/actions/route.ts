@@ -17,13 +17,11 @@ export async function GET(request: NextRequest) {
       .order('display_name', { ascending: true })
 
     if (error) {
-      console.error('Erro ao buscar ações de escalação:', error)
       return NextResponse.json({ error: 'Erro ao buscar ações' }, { status: 500 })
     }
 
     return NextResponse.json(actions || [])
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }

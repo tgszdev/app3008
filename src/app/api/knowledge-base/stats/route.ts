@@ -19,7 +19,6 @@ export async function GET(request: NextRequest) {
 
     // Se a tabela não existir, retornar valores padrão
     if (articlesError) {
-      console.error('Erro ao buscar artigos (tabela pode não existir):', articlesError)
       return NextResponse.json({
         total_articles: 0,
         total_categories: 0,
@@ -101,7 +100,6 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro ao buscar estatísticas:', error)
     return NextResponse.json(
       { error: 'Erro ao buscar estatísticas' },
       { status: 500 }

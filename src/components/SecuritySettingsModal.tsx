@@ -88,7 +88,6 @@ export default function SecuritySettingsModal({ isOpen, onClose }: SecuritySetti
         }
       }
     } catch (error) {
-      console.error('Erro ao carregar configurações:', error)
     } finally {
       setLoading(false)
     }
@@ -114,7 +113,6 @@ export default function SecuritySettingsModal({ isOpen, onClose }: SecuritySetti
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'Erro ao salvar configurações de segurança' })
-      console.error('Erro:', error)
     } finally {
       setSaving(false)
     }

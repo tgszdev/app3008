@@ -34,7 +34,6 @@ export async function GET(request: NextRequest) {
     const { data: notifications, error } = await query
 
     if (error) {
-      console.error('Error fetching notifications:', error)
       return NextResponse.json({ error: 'Failed to fetch notifications' }, { status: 500 })
     }
 
@@ -52,7 +51,6 @@ export async function GET(request: NextRequest) {
       offset
     })
   } catch (error) {
-    console.error('Error in notifications GET:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -93,7 +91,6 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Error creating notification:', error)
       return NextResponse.json({ error: 'Failed to create notification' }, { status: 500 })
     }
 
@@ -116,20 +113,17 @@ export async function POST(request: NextRequest) {
 
         if (subscriptions && subscriptions.length > 0) {
           // Enviar push notification (implementaremos depois)
-          console.log('Would send push notification to', subscriptions.length, 'devices')
         }
       }
 
       // Verificar se deve enviar email
       if (preferences.email_enabled && preferences[type]?.email) {
         // Enviar email (implementaremos depois)
-        console.log('Would send email notification')
       }
     }
 
     return NextResponse.json(notification)
   } catch (error) {
-    console.error('Error in notifications POST:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -154,7 +148,6 @@ export async function PATCH(request: NextRequest) {
         .eq('is_read', false)
 
       if (error) {
-        console.error('Error marking all notifications as read:', error)
         return NextResponse.json({ error: 'Failed to update notifications' }, { status: 500 })
       }
 
@@ -168,7 +161,6 @@ export async function PATCH(request: NextRequest) {
         .eq('user_id', session.user.id)
 
       if (error) {
-        console.error('Error marking notification as read:', error)
         return NextResponse.json({ error: 'Failed to update notification' }, { status: 500 })
       }
 
@@ -177,7 +169,6 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   } catch (error) {
-    console.error('Error in notifications PATCH:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -204,13 +195,11 @@ export async function DELETE(request: NextRequest) {
       .eq('user_id', session.user.id)
 
     if (error) {
-      console.error('Error deleting notification:', error)
       return NextResponse.json({ error: 'Failed to delete notification' }, { status: 500 })
     }
 
     return NextResponse.json({ message: 'Notification deleted' })
   } catch (error) {
-    console.error('Error in notifications DELETE:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

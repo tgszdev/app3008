@@ -24,7 +24,6 @@ export async function GET(request: Request) {
       .single()
 
     if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
-      console.error('Error fetching security settings:', error)
       return NextResponse.json({ error: 'Failed to fetch settings' }, { status: 500 })
     }
 
@@ -53,7 +52,6 @@ export async function GET(request: Request) {
 
     return NextResponse.json(settings.settings_data)
   } catch (error) {
-    console.error('Security settings GET error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -96,7 +94,6 @@ export async function POST(request: Request) {
         .eq('setting_type', 'security')
 
       if (updateError) {
-        console.error('Error updating security settings:', updateError)
         return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 })
       }
     } else {
@@ -111,7 +108,6 @@ export async function POST(request: Request) {
         })
 
       if (insertError) {
-        console.error('Error creating security settings:', insertError)
         return NextResponse.json({ error: 'Failed to create settings' }, { status: 500 })
       }
     }
@@ -131,7 +127,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Security settings POST error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

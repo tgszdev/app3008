@@ -13,7 +13,6 @@ export async function POST(request: NextRequest) {
 
     // Obter email de forma segura
     const userEmail = requireUserEmail(session)
-    console.log('Testando envio de email para:', userEmail)
 
     // Enviar email de teste
     const result = await sendNotificationEmail({
@@ -35,7 +34,6 @@ export async function POST(request: NextRequest) {
         }
       })
     } else {
-      console.error('Erro ao enviar email:', result.error)
       return NextResponse.json({ 
         success: false, 
         error: result.error,
@@ -44,7 +42,6 @@ export async function POST(request: NextRequest) {
       }, { status: 500 })
     }
   } catch (error: any) {
-    console.error('Erro no endpoint de teste:', error)
     return NextResponse.json({ 
       error: 'Erro ao processar requisição',
       message: error.message,
@@ -125,7 +122,6 @@ export async function GET(request: NextRequest) {
         : 'Email não configurado. Configure em Configurações > Email ou defina SMTP_USER e SMTP_PASS no .env.local'
     })
   } catch (error: any) {
-    console.error('Erro ao verificar configuração:', error)
     return NextResponse.json({ 
       error: 'Erro ao verificar configuração',
       message: error.message

@@ -19,13 +19,11 @@ export async function GET(request: NextRequest) {
       .order('priority', { ascending: true })
 
     if (error) {
-      console.error('Erro ao buscar regras de escalação:', error)
       return NextResponse.json({ error: 'Erro ao buscar regras' }, { status: 500 })
     }
 
     return NextResponse.json(rules || [])
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
@@ -100,13 +98,11 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (createError) {
-      console.error('Erro ao criar regra de escalação:', createError)
       return NextResponse.json({ error: 'Erro ao criar regra' }, { status: 500 })
     }
 
     return NextResponse.json(rule, { status: 201 })
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }

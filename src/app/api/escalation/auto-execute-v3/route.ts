@@ -7,7 +7,6 @@ export async function GET() {
   const MAX_EXECUTION_TIME = 8000 // 8 segundos máximo
   
   try {
-    console.log('🔄 [ESCALATION-V3] Iniciando execução baseada em regras do banco...')
     
     // 1. BUSCAR REGRAS ATIVAS DO BANCO
     const { data: activeRules, error: rulesError } = await supabaseAdmin
@@ -17,7 +16,6 @@ export async function GET() {
       .order('priority', { ascending: true })
     
     if (rulesError || !activeRules || activeRules.length === 0) {
-      console.log('ℹ️ [ESCALATION-V3] Nenhuma regra ativa encontrada')
       return NextResponse.json({
         success: true,
         message: 'Nenhuma regra de escalação ativa',
@@ -25,7 +23,6 @@ export async function GET() {
       })
     }
     
-    console.log(`📋 [ESCALATION-V3] ${activeRules.length} regra(s) ativa(s) encontrada(s)`)
     
     const allResults = []
     let totalEscalated = 0
@@ -33,11 +30,9 @@ export async function GET() {
     // 2. PROCESSAR CADA REGRA
     for (const rule of activeRules) {
       if (Date.now() - startTime > MAX_EXECUTION_TIME) {
-        console.log('⏱️ Timeout preventivo atingido')
         break
       }
       
-      console.log(`🔍 [ESCALATION-V3] Processando regra: ${rule.name}`)
       
       // Calcular tempo threshold em minutos
       let thresholdMinutes = rule.time_threshold
@@ -81,16 +76,13 @@ export async function GET() {
       const { data: candidateTickets, error: ticketsError } = await ticketQuery
       
       if (ticketsError) {
-        console.error(`❌ Erro ao buscar tickets para regra ${rule.name}:`, ticketsError)
         continue
       }
       
       if (!candidateTickets || candidateTickets.length === 0) {
-        console.log(`ℹ️ Nenhum ticket encontrado para regra: ${rule.name}`)
         continue
       }
       
-      console.log(`📊 ${candidateTickets.length} ticket(s) candidato(s) para: ${rule.name}`)
       
       // Processar cada ticket candidato
       for (const ticket of candidateTickets) {
@@ -109,11 +101,9 @@ export async function GET() {
             .limit(1)
           
           if (recentLog && recentLog.length > 0) {
-            console.log(`⏭️ Ticket #${ticket.ticket_number} já foi escalado recentemente`)
             continue
           }
           
-          console.log(`⚡ Escalando ticket #${ticket.ticket_number}: ${ticket.title}`)
           
           // EXECUTAR AÇÕES DA REGRA
           
@@ -137,7 +127,6 @@ export async function GET() {
                 })
                 .eq('id', ticket.id)
               
-              console.log(`   📈 Prioridade aumentada: ${ticket.priority} → ${newPriority}`)
             }
           }
           
@@ -157,7 +146,6 @@ export async function GET() {
                 // created_at gerenciado automaticamente pelo Supabase
               })
             
-            console.log(`   💬 Comentário adicionado`)
           }
           
           // 3. Enviar notificações por email
@@ -194,12 +182,10 @@ export async function GET() {
                       rule.name,
                       emails
                     )
-                    console.log(`   📧 Email enviado para ${emails.length} destinatário(s)`)
                   }
                 }
               }
             } catch (emailError: any) {
-              console.error(`   ⚠️ Erro ao enviar email:`, emailError.message)
             }
           }
           
@@ -225,10 +211,8 @@ export async function GET() {
             escalated_at: new Date().toISOString()
           })
           
-          console.log(`   ✅ Escalação concluída para #${ticket.ticket_number}`)
           
         } catch (ticketError: any) {
-          console.error(`❌ Erro ao escalar ticket ${ticket.ticket_number}:`, ticketError.message)
         }
       }
     }
@@ -247,7 +231,6 @@ export async function GET() {
     })
     
   } catch (error: any) {
-    console.error('❌ [ESCALATION-V3] Erro geral:', error)
     return NextResponse.json({
       success: false,
       error: 'Erro na execução',

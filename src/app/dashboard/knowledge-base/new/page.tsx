@@ -82,7 +82,6 @@ export default function NewArticlePage() {
       const response = await axios.get('/api/knowledge-base/categories')
       setCategories(response.data.categories || [])
     } catch (error) {
-      console.error('Erro ao buscar categorias:', error)
       toast.error('Erro ao carregar categorias')
     }
   }
@@ -194,7 +193,6 @@ export default function NewArticlePage() {
       toast.success('Artigo criado com sucesso!')
       router.push(`/dashboard/knowledge-base/article/${response.data.slug}`)
     } catch (error: any) {
-      console.error('Erro ao criar artigo:', error)
       toast.error(error.response?.data?.error || 'Erro ao criar artigo')
     } finally {
       setLoading(false)

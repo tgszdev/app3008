@@ -29,7 +29,6 @@ export async function POST(request: NextRequest) {
       success: result.success
     })
   } catch (error: any) {
-    console.error('Erro ao executar escalação:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
@@ -66,7 +65,6 @@ export async function PUT(request: NextRequest) {
       details: result.details
     })
   } catch (error: any) {
-    console.error('Erro ao executar escalação em massa:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }

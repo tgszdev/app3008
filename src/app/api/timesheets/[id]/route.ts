@@ -54,7 +54,6 @@ export async function GET(
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Timesheet GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -108,7 +107,6 @@ export async function PATCH(
       .single();
 
     if (error) {
-      console.error('Error updating timesheet:', error);
       return NextResponse.json({ error: 'Failed to update timesheet' }, { status: 500 });
     }
 
@@ -125,7 +123,6 @@ export async function PATCH(
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Timesheet PATCH error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -176,7 +173,6 @@ async function handleApproval(
     .single();
 
   if (error) {
-    console.error('Error approving timesheet:', error);
     return NextResponse.json({ error: 'Failed to update timesheet' }, { status: 500 });
   }
 
@@ -233,13 +229,11 @@ export async function DELETE(
       .eq('id', id);
 
     if (error) {
-      console.error('Error deleting timesheet:', error);
       return NextResponse.json({ error: 'Failed to delete timesheet' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Timesheet DELETE error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

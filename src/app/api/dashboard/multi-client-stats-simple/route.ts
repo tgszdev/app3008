@@ -3,7 +3,6 @@ import { supabaseAdmin } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🧪 API MULTI-CLIENT SIMPLES - TESTE')
     
     // Obter parâmetros da query
     const { searchParams } = new URL(request.url)
@@ -61,11 +60,9 @@ export async function GET(request: NextRequest) {
       .lte('created_at', `${defaultEndDate}T23:59:59`)
 
     if (ticketsError) {
-      console.error('❌ Erro ao buscar tickets:', ticketsError)
       return NextResponse.json({ error: 'Failed to fetch tickets' }, { status: 500 })
     }
 
-    console.log('📊 Tickets encontrados:', tickets?.length || 0)
 
     // Calcular estatísticas
     const totalTickets = tickets?.length || 0
@@ -100,7 +97,6 @@ export async function GET(request: NextRequest) {
       .limit(5)
 
     if (recentError) {
-      console.error('❌ Erro ao buscar tickets recentes:', recentError)
       return NextResponse.json({ error: 'Failed to fetch recent tickets' }, { status: 500 })
     }
 
@@ -144,7 +140,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(response)
 
   } catch (error) {
-    console.error('❌ Erro na API multi-client simples:', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }

@@ -94,7 +94,6 @@ export default function TimesheetsAdminPage() {
       const response = await apiClient.get(`/api/timesheets?${params.toString()}`)
       setTimesheets(response.data || [])
     } catch (error) {
-      console.error('Error fetching data:', error)
       toast.error('Erro ao carregar apontamentos')
     } finally {
       setLoading(false)
@@ -115,7 +114,6 @@ export default function TimesheetsAdminPage() {
         ))
       }
     } catch (error: any) {
-      console.error('Error approving timesheet:', error)
       toast.error(error.response?.data?.error || 'Erro ao aprovar apontamento')
     }
   }
@@ -138,7 +136,6 @@ export default function TimesheetsAdminPage() {
         ))
       }
     } catch (error: any) {
-      console.error('Error rejecting timesheet:', error)
       toast.error(error.response?.data?.error || 'Erro ao rejeitar apontamento')
     }
   }

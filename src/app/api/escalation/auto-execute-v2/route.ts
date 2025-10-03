@@ -7,7 +7,6 @@ export async function GET() {
   const MAX_EXECUTION_TIME = 8000 // 8 segundos máximo
   
   try {
-    console.log('🔄 [ESCALATION-V2] Iniciando execução automática otimizada...')
     
     // 1. Buscar apenas tickets críticos (não atribuídos ou antigos)
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString()
@@ -23,7 +22,6 @@ export async function GET() {
       .limit(10) // Processar no máximo 10 por vez
     
     if (unassignedError) {
-      console.error('❌ Erro ao buscar tickets não atribuídos:', unassignedError)
     }
     
     // Verificar tempo de execução
@@ -41,7 +39,6 @@ export async function GET() {
     
     // Processar tickets não atribuídos
     if (unassignedTickets && unassignedTickets.length > 0) {
-      console.log(`📋 Encontrados ${unassignedTickets.length} tickets não atribuídos`)
       
       for (const ticket of unassignedTickets) {
         // Verificar timeout a cada iteração
@@ -100,11 +97,9 @@ export async function GET() {
                     'Ticket não atribuído (1 hora)',
                     emails
                   )
-                  console.log(`📧 Email de escalação enviado para ${emails.length} destinatários`)
                 }
               }
             } catch (emailError: any) {
-              console.error(`⚠️ Erro ao enviar email de escalação:`, emailError.message)
             }
             
             // 4. Registrar log
@@ -126,10 +121,8 @@ export async function GET() {
               escalation: '1h não atribuído'
             })
             
-            console.log(`✅ Ticket ${ticket.id} escalado`)
           }
         } catch (error: any) {
-          console.error(`❌ Erro ao escalar ticket ${ticket.id}:`, error.message)
         }
       }
     }
@@ -148,7 +141,6 @@ export async function GET() {
     })
     
   } catch (error: any) {
-    console.error('❌ [ESCALATION-V2] Erro geral:', error)
     return NextResponse.json({
       success: false,
       error: 'Erro na execução',

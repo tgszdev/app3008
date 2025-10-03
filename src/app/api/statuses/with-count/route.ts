@@ -15,7 +15,6 @@ export async function GET(request: NextRequest) {
       .order('order_index', { ascending: true })
 
     if (statusError) {
-      console.error('Error fetching statuses:', statusError)
       return NextResponse.json(
         { error: 'Failed to fetch statuses' },
         { status: 500 }
@@ -28,7 +27,6 @@ export async function GET(request: NextRequest) {
       .select('id, status')
 
     if (ticketsError) {
-      console.error('Error fetching tickets:', ticketsError)
       return NextResponse.json(
         { error: 'Failed to fetch tickets' },
         { status: 500 }
@@ -49,7 +47,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(statusesWithCount)
   } catch (error) {
-    console.error('API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

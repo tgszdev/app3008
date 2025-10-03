@@ -24,7 +24,6 @@ export async function GET(request: NextRequest) {
       .select('*')
     
     if (error) {
-      console.log('Erro ao buscar permissões (tabela pode não existir):', error)
       // Se a tabela não existir, retornar permissões padrão
       return NextResponse.json({ 
         permissions: [
@@ -47,7 +46,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ permissions: formattedPermissions })
 
   } catch (error) {
-    console.error('Erro ao buscar permissões:', error)
     return NextResponse.json(
       { error: 'Erro ao buscar permissões' },
       { status: 500 }
@@ -79,7 +77,6 @@ export async function DELETE(request: NextRequest) {
       .neq('role', '')
     
     if (error) {
-      console.error('Erro ao deletar permissões:', error)
     }
 
     return NextResponse.json({ 
@@ -88,7 +85,6 @@ export async function DELETE(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro ao resetar permissões:', error)
     return NextResponse.json(
       { error: 'Erro ao resetar permissões' },
       { status: 500 }
@@ -145,7 +141,6 @@ export async function POST(request: NextRequest) {
       })
       
       if (createTableError) {
-        console.error('Erro ao criar tabela:', createTableError)
         return NextResponse.json({
           error: 'Tabela de permissões não existe. Execute o script SQL abaixo no Supabase:',
           sql: `
@@ -179,7 +174,6 @@ ALTER TABLE kb_role_permissions DISABLE ROW LEVEL SECURITY;
         })
       
       if (error) {
-        console.error(`Erro ao salvar permissões para ${role}:`, error)
       }
     }
 
@@ -189,7 +183,6 @@ ALTER TABLE kb_role_permissions DISABLE ROW LEVEL SECURITY;
     })
 
   } catch (error) {
-    console.error('Erro ao salvar permissões:', error)
     return NextResponse.json(
       { error: 'Erro ao salvar permissões' },
       { status: 500 }

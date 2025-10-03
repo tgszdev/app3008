@@ -190,7 +190,6 @@ export default function AnalyticsPage() {
       const response = await axios.get(`/api/dashboard/analytics?range=${dateRange}`)
       setAnalyticsData(response.data)
     } catch (error) {
-      console.error('Error fetching analytics:', error)
       toast.error('Erro ao carregar análises')
     } finally {
       setLoading(false)

@@ -48,7 +48,6 @@ export function usePushNotifications(): UsePushNotificationsReturn {
         toast.success('Notificações push ativadas!')
       }
     } catch (error) {
-      console.error('Failed to subscribe:', error)
       toast.error('Erro ao ativar notificações push')
     } finally {
       setIsLoading(false)
@@ -73,7 +72,6 @@ export function usePushNotifications(): UsePushNotificationsReturn {
         toast.success('Notificações push desativadas')
       }
     } catch (error) {
-      console.error('Failed to unsubscribe:', error)
       toast.error('Erro ao desativar notificações push')
     } finally {
       setIsLoading(false)
@@ -92,7 +90,6 @@ export function usePushNotifications(): UsePushNotificationsReturn {
         await subscribe()
       }
     } catch (error) {
-      console.error('Failed to request permission:', error)
       toast.error('Erro ao solicitar permissão')
     } finally {
       setIsLoading(false)
@@ -105,7 +102,6 @@ export function usePushNotifications(): UsePushNotificationsReturn {
     try {
       await pushManager.testNotification()
     } catch (error) {
-      console.error('Failed to test notification:', error)
       toast.error('Erro ao testar notificação')
     } finally {
       setIsLoading(false)

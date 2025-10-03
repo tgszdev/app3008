@@ -41,7 +41,6 @@ export function SatisfactionWidget() {
       const response = await axios.get(`/api/dashboard/satisfaction?period=${period}`)
       setData(response.data)
     } catch (error) {
-      console.error('Error fetching satisfaction data:', error)
       // Se houver erro, mostrar dados vazios
       setData({
         averageRating: 0,

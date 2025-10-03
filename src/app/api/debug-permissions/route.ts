@@ -4,7 +4,6 @@ import { supabaseAdmin } from '@/lib/supabase'
 // Debug direto da função getUsersWithPermission
 export async function GET(request: NextRequest) {
   try {
-    console.log('=== DEBUG PERMISSIONS API ===')
     
     // Testar conexão com o banco
     const { data: testConnection, error: connectionError } = await supabaseAdmin
@@ -12,14 +11,12 @@ export async function GET(request: NextRequest) {
       .select('count')
       .limit(1)
     
-    console.log('Test connection:', { data: testConnection, error: connectionError })
     
     // Buscar todos os usuários
     const { data: users, error: usersError } = await supabaseAdmin
       .from('users')
       .select('id, name, email, role, role_name, is_active')
     
-    console.log('Users query:', { count: users?.length, error: usersError })
     
     // Buscar apenas usuários ativos
     const { data: activeUsers, error: activeError } = await supabaseAdmin
@@ -27,14 +24,12 @@ export async function GET(request: NextRequest) {
       .select('id, name, email, role, role_name')
       .eq('is_active', true)
     
-    console.log('Active users query:', { count: activeUsers?.length, error: activeError })
     
     // Buscar roles customizadas
     const { data: customRoles, error: rolesError } = await supabaseAdmin
       .from('roles')
       .select('name, permissions')
     
-    console.log('Custom roles query:', { count: customRoles?.length, error: rolesError })
     
     // Simular as permissões padrão
     const defaultPermissions = {
@@ -49,7 +44,6 @@ export async function GET(request: NextRequest) {
     const usersWithPermission = activeUsers?.filter(user => {
       const userRole = user.role_name || user.role
       const hasPermission = defaultPermissions[userRole as keyof typeof defaultPermissions]?.tickets_assign
-      console.log(`User ${user.name} (${userRole}): ${hasPermission}`)
       return hasPermission
     }) || []
     
@@ -66,7 +60,6 @@ export async function GET(request: NextRequest) {
     })
     
   } catch (error) {
-    console.error('Debug error:', error)
     return NextResponse.json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',

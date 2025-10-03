@@ -33,13 +33,11 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Error fetching permissions:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json(permissions || [])
   } catch (error) {
-    console.error('Error fetching all permissions:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

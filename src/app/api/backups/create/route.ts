@@ -112,7 +112,6 @@ export async function POST(request: Request) {
       .single()
 
     if (insertError) {
-      console.error('Error creating backup:', insertError)
       
       // Se a tabela não existir, retornar erro apropriado
       if (insertError.code === '42P01') {
@@ -144,7 +143,6 @@ export async function POST(request: Request) {
       message: 'Backup created successfully'
     })
   } catch (error) {
-    console.error('Backup creation error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

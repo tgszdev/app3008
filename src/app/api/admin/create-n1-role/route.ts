@@ -76,7 +76,6 @@ export async function POST() {
       .single()
 
     if (error) {
-      console.error('Erro ao criar role N1:', error)
       return NextResponse.json(
         { error: 'Erro ao criar role N1', details: error.message },
         { status: 500 }
@@ -92,7 +91,6 @@ export async function POST() {
       role: newRole
     })
   } catch (error) {
-    console.error('Erro ao criar role N1:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }

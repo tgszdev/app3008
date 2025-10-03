@@ -11,7 +11,6 @@ export function AppInitializer() {
   useEffect(() => {
     // Inicializar aplicação apenas no cliente
     if (typeof window !== 'undefined') {
-      console.log('🚀 Inicializando serviços da aplicação...');
       initializeApp();
     }
   }, []);

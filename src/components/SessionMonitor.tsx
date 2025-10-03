@@ -29,7 +29,6 @@ export function SessionMonitor() {
       if (currentSession) {
         // Se há uma sessão válida no banco mas não é a nossa, fazer logout
         if (currentToken && currentSession.sessionToken !== currentToken) {
-          console.log('Sessão invalidada - outro login detectado')
           
           // Mostrar notificação antes do logout
           const notification = document.createElement('div')
@@ -62,7 +61,6 @@ export function SessionMonitor() {
         }
       } else if (currentToken) {
         // Se não há sessão válida no banco mas temos token, verificar se expirou
-        console.log('Nenhuma sessão válida encontrada no banco')
         
         // Fazer logout imediatamente se não há sessão válida
         signOut({ callbackUrl: '/login?reason=session_invalid' })
@@ -70,7 +68,6 @@ export function SessionMonitor() {
       
       lastCheckRef.current = new Date()
     } catch (error) {
-      console.error('Erro ao verificar sessão:', error)
     }
   }, [session])
   

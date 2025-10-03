@@ -86,7 +86,6 @@ export function ClientTabsSelector({
           setClients(clientsWithCounts)
         }
       } catch (error) {
-        console.error('Erro ao carregar clientes:', error)
       } finally {
         setIsLoading(false)
       }

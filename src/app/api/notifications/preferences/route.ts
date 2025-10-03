@@ -22,7 +22,6 @@ export async function GET(request: NextRequest) {
       .single()
 
     if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-      console.error('Error fetching preferences:', error)
       return NextResponse.json({ error: 'Failed to fetch preferences' }, { status: 500 })
     }
 
@@ -37,7 +36,6 @@ export async function GET(request: NextRequest) {
         .single()
 
       if (createError) {
-        console.error('Error creating preferences:', createError)
         return NextResponse.json({ error: 'Failed to create preferences' }, { status: 500 })
       }
 
@@ -46,7 +44,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(preferences)
   } catch (error) {
-    console.error('Error in preferences GET:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -100,20 +97,17 @@ export async function PATCH(request: NextRequest) {
           .single()
 
         if (createError) {
-          console.error('Error creating preferences:', createError)
           return NextResponse.json({ error: 'Failed to create preferences' }, { status: 500 })
         }
 
         return NextResponse.json(newPreferences)
       }
 
-      console.error('Error updating preferences:', error)
       return NextResponse.json({ error: 'Failed to update preferences' }, { status: 500 })
     }
 
     return NextResponse.json(preferences)
   } catch (error) {
-    console.error('Error in preferences PATCH:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -49,7 +49,6 @@ export function useStatusesWithCount() {
       
       setStatuses(sortedStatuses)
     } catch (error) {
-      console.error('Error fetching statuses with count:', error)
       setError('Erro ao carregar status')
       
       // Fallback to regular statuses API without count
@@ -67,7 +66,6 @@ export function useStatusesWithCount() {
           setStatuses(statusesWithZeroCount)
         }
       } catch (fallbackError) {
-        console.error('Fallback also failed:', fallbackError)
         setStatuses([])
       }
     } finally {

@@ -54,7 +54,6 @@ export default function NotificationsPage() {
       
       setHasMore(response.data.notifications.length === limit)
     } catch (error) {
-      console.error('Error fetching notifications:', error)
       toast.error('Erro ao carregar notificações')
     } finally {
       setLoading(false)
@@ -76,7 +75,6 @@ export default function NotificationsPage() {
       
       toast.success('Notificação marcada como lida')
     } catch (error) {
-      console.error('Error marking as read:', error)
       toast.error('Erro ao marcar como lida')
     }
   }
@@ -89,7 +87,6 @@ export default function NotificationsPage() {
       setNotifications(prev => prev.map(n => ({ ...n, is_read: true })))
       toast.success('Todas as notificações foram marcadas como lidas')
     } catch (error) {
-      console.error('Error marking all as read:', error)
       toast.error('Erro ao marcar todas como lidas')
     }
   }
@@ -104,7 +101,6 @@ export default function NotificationsPage() {
       
       toast.success('Notificação removida')
     } catch (error) {
-      console.error('Error deleting notification:', error)
       toast.error('Erro ao remover notificação')
     }
   }
@@ -129,7 +125,6 @@ export default function NotificationsPage() {
       
       toast.success(`${selectedNotifications.length} notificações removidas`)
     } catch (error) {
-      console.error('Error deleting notifications:', error)
       toast.error('Erro ao remover notificações')
     }
   }

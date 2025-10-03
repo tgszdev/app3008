@@ -93,7 +93,6 @@ export default function NewTicketPage() {
       )
       setAnalysts(analystUsers)
     } catch (error) {
-      console.error('Erro ao buscar analistas:', error)
     }
   }
 
@@ -107,7 +106,6 @@ export default function NewTicketPage() {
         setFormData(prev => ({ ...prev, category_id: response.data[0].id }))
       }
     } catch (error) {
-      console.error('Erro ao buscar categorias:', error)
       toast.error('Erro ao carregar categorias')
     } finally {
       setLoadingCategories(false)
@@ -223,7 +221,6 @@ export default function NewTicketPage() {
             toast.error(`${failCount} arquivo(s) falharam no upload`)
           }
         } catch (uploadError) {
-          console.error('Erro ao fazer upload de arquivos:', uploadError)
           toast.error('Alguns arquivos não puderam ser anexados, mas o ticket foi criado')
         }
       }
@@ -231,7 +228,6 @@ export default function NewTicketPage() {
       toast.success('Chamado criado com sucesso!')
       router.push(`/dashboard/tickets/${ticketId}`)
     } catch (error: any) {
-      console.error('Erro ao criar chamado:', error)
       toast.error(error.response?.data?.error || 'Erro ao criar chamado')
     } finally {
       setLoading(false)

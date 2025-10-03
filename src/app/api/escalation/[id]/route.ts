@@ -42,7 +42,6 @@ export async function PATCH(
       .single()
 
     if (updateError) {
-      console.error('Erro ao atualizar regra de escalação:', updateError)
       return NextResponse.json({ error: 'Erro ao atualizar regra' }, { status: 500 })
     }
 
@@ -52,7 +51,6 @@ export async function PATCH(
 
     return NextResponse.json(rule)
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
@@ -82,13 +80,11 @@ export async function DELETE(
       .eq('id', id)
 
     if (deleteError) {
-      console.error('Erro ao deletar regra de escalação:', deleteError)
       return NextResponse.json({ error: 'Erro ao deletar regra' }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }

@@ -163,7 +163,6 @@ export default function RichTextEditor({
 
       toast.success('Imagem adicionada com sucesso!')
     } catch (error: any) {
-      console.error('Erro ao fazer upload:', error)
       toast.error(error.response?.data?.error || 'Erro ao fazer upload da imagem')
       
       // Remover imagem temporária em caso de erro

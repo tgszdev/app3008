@@ -507,7 +507,6 @@ export default function HybridDashboardAlternativa3() {
         setRecentTickets(allTickets.slice(0, 10))
       }
     } catch (error: any) {
-      console.error('Error fetching client tickets:', error)
       toast.error('Erro ao carregar tickets por cliente')
       
       if (error.response?.status === 401) {
@@ -541,7 +540,6 @@ export default function HybridDashboardAlternativa3() {
         setCategoryStats(response.data)
       }
     } catch (error) {
-      console.error('Error fetching category stats:', error)
       toast.error('Erro ao carregar estatísticas por categoria')
     }
   }
@@ -595,7 +593,6 @@ export default function HybridDashboardAlternativa3() {
       setIsGeneratingPDF(true)
       toast.success('Funcionalidade de PDF será implementada em breve!')
     } catch (error) {
-      console.error('Error generating PDF:', error)
       toast.error('Erro ao gerar PDF')
     } finally {
       setIsGeneratingPDF(false)

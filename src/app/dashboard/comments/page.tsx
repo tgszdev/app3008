@@ -162,14 +162,12 @@ export default function CommentsPage() {
       const response = await axios.get(`/api/comments?${params}`)
       
       if (response.data.error) {
-        console.error('Erro da API:', response.data)
         toast.error(response.data.error + (response.data.details ? ': ' + response.data.details : ''))
       } else {
         setComments(response.data.comments || [])
         setTotalComments(response.data.total || 0)
       }
     } catch (error: any) {
-      console.error('Erro ao buscar comentários:', error)
       const errorMessage = error.response?.data?.error || error.response?.data?.message || 'Erro ao carregar comentários'
       toast.error(errorMessage)
     } finally {

@@ -20,13 +20,11 @@ export async function GET(request: NextRequest) {
       .order('priority', { ascending: true })
 
     if (error) {
-      console.error('Erro ao buscar configurações SLA:', error)
       return NextResponse.json({ error: 'Erro ao buscar configurações' }, { status: 500 })
     }
 
     return NextResponse.json(data || [])
   } catch (error) {
-    console.error('Erro no GET /api/sla/configurations:', error)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }
@@ -107,13 +105,11 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Erro ao criar configuração SLA:', error)
       return NextResponse.json({ error: 'Erro ao criar configuração' }, { status: 500 })
     }
 
     return NextResponse.json(data)
   } catch (error) {
-    console.error('Erro no POST /api/sla/configurations:', error)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }

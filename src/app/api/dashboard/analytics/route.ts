@@ -100,7 +100,6 @@ export async function GET(request: Request) {
     const { data: tickets, error: ticketsError } = await ticketsQuery
 
     if (ticketsError) {
-      console.error('Error fetching tickets:', ticketsError)
       return NextResponse.json({ error: 'Failed to fetch tickets' }, { status: 500 })
     }
 
@@ -491,7 +490,6 @@ export async function GET(request: Request) {
 
     return NextResponse.json(analyticsData)
   } catch (error) {
-    console.error('Analytics error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch analytics data' },
       { status: 500 }

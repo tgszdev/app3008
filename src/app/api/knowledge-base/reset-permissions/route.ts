@@ -18,7 +18,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Apenas administradores podem resetar permissões' }, { status: 403 })
     }
 
-    console.log('Resetando permissões da base de conhecimento...')
 
     // Primeiro, buscar todas as categorias
     const { data: allCategories } = await supabaseAdmin
@@ -27,7 +26,6 @@ export async function GET(request: NextRequest) {
     
     const allCategoryIds = allCategories?.map(cat => cat.id) || []
     
-    console.log(`Encontradas ${allCategoryIds.length} categorias`)
 
     // Deletar todas as permissões existentes
     const { error: deleteError } = await supabaseAdmin
@@ -36,12 +34,10 @@ export async function GET(request: NextRequest) {
       .neq('role', '')
     
     if (deleteError) {
-      console.log('Erro ao deletar permissões antigas (pode não existir):', deleteError.message)
     }
 
     // Não criar nenhuma permissão - sem registros significa sem acesso
     // Quando o admin configurar, ele definirá as permissões específicas
-    console.log('Permissões resetadas - nenhuma categoria permitida até ser configurado')
 
     return NextResponse.json({ 
       success: true,
@@ -51,7 +47,6 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro ao resetar permissões:', error)
     return NextResponse.json(
       { error: 'Erro ao resetar permissões' },
       { status: 500 }

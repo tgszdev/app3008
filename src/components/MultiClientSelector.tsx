@@ -63,7 +63,6 @@ export function MultiClientSelector({
         slug: context.slug,
         isSelected: selectedClients.includes(context.id)
       }))
-      console.log('🔄 Atualizando opções do seletor:', { selectedClients, options })
       setClientOptions(options)
     }
   }, [availableContexts, selectedClients])
@@ -102,32 +101,25 @@ export function MultiClientSelector({
 
   const handleToggleClient = (clientId: string) => {
     try {
-      console.log('🔄 handleToggleClient chamado:', { clientId, selectedClients })
-      console.log('🔄 availableContexts:', availableContexts.length)
       
       let newSelection: string[]
       
       if (selectedClients.includes(clientId)) {
         // Remover da seleção
         newSelection = selectedClients.filter(id => id !== clientId)
-        console.log('🔄 Removendo da seleção:', newSelection)
       } else {
         // Adicionar à seleção (respeitando limite máximo)
         if (selectedClients.length >= maxSelections) {
-          console.warn(`Limite máximo de ${maxSelections} seleções atingido`)
           return // Não permitir mais seleções
         }
         newSelection = [...selectedClients, clientId]
-        console.log('🔄 Adicionando à seleção:', newSelection)
       }
       
-      console.log('🔄 Nova seleção:', newSelection)
       
       // Chamar callback
       onSelectionChange?.(newSelection)
       
     } catch (error) {
-      console.error('Erro ao alternar cliente:', error)
     }
   }
 
@@ -137,7 +129,6 @@ export function MultiClientSelector({
       const newSelection = allIds.slice(0, maxSelections) // Respeitar limite
       onSelectionChange?.(newSelection)
     } catch (error) {
-      console.error('Erro ao selecionar todos:', error)
     }
   }
 
@@ -146,32 +137,26 @@ export function MultiClientSelector({
       const newSelection: string[] = []
       onSelectionChange?.(newSelection)
     } catch (error) {
-      console.error('Erro ao limpar seleção:', error)
     }
   }
 
   const getSelectedClientsInfo = () => {
-    console.log('🔄 getSelectedClientsInfo chamado:', { selectedClients, availableContexts: availableContexts.length })
     
     if (selectedClients.length === 0) {
-      console.log('🔄 Retornando: "Selecionar clientes..."')
       return "Selecionar clientes..."
     }
     
     if (selectedClients.length === availableContexts.length) {
-      console.log('🔄 Retornando: "Todos os clientes"')
       return "Todos os clientes"
     }
     
     if (selectedClients.length === 1) {
       const selected = availableContexts.find(c => c.id === selectedClients[0])
       const result = selected?.name || "Cliente selecionado"
-      console.log('🔄 Retornando:', result)
       return result
     }
     
     const result = `${selectedClients.length} clientes selecionados`
-    console.log('🔄 Retornando:', result)
     return result
   }
 

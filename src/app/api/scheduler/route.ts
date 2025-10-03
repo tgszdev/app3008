@@ -16,7 +16,6 @@ export async function GET() {
       message: 'Status do scheduler obtido com sucesso'
     });
   } catch (error: any) {
-    console.error('Erro ao obter status do scheduler:', error);
     return NextResponse.json({
       success: false,
       error: error.message,
@@ -103,7 +102,6 @@ export async function POST(request: NextRequest) {
         }, { status: 400 });
     }
   } catch (error: any) {
-    console.error('Erro ao controlar scheduler:', error);
     return NextResponse.json({
       success: false,
       error: error.message,

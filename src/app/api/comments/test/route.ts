@@ -89,7 +89,6 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error: any) {
-    console.error('Erro no teste:', error)
     return NextResponse.json(
       { 
         error: 'Erro no teste',

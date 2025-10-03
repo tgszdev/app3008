@@ -114,7 +114,6 @@ export default function ArticlePage() {
       await axios.post(`/api/knowledge-base/article/${slug}/view`)
       
     } catch (error: any) {
-      console.error('Erro ao buscar artigo:', error)
       toast.error('Erro ao carregar artigo')
       router.push('/dashboard/knowledge-base')
     } finally {
@@ -153,7 +152,6 @@ export default function ArticlePage() {
         }
       }
     } catch (error: any) {
-      console.error('Erro ao enviar feedback:', error)
       toast.error('Erro ao enviar feedback')
     }
   }
@@ -181,7 +179,6 @@ export default function ArticlePage() {
       toast.success('Artigo excluído com sucesso')
       router.push('/dashboard/knowledge-base')
     } catch (error: any) {
-      console.error('Erro ao excluir artigo:', error)
       toast.error('Erro ao excluir artigo')
     }
   }

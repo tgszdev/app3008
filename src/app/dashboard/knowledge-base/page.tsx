@@ -143,7 +143,6 @@ export default function KnowledgeBasePage() {
 
       // Buscar categorias
       const categoriesResponse = await axios.get('/api/knowledge-base/categories')
-      console.log('Categorias recebidas:', categoriesResponse.data)
       setCategories(categoriesResponse.data.categories || [])
 
       // Buscar artigos
@@ -164,7 +163,6 @@ export default function KnowledgeBasePage() {
       setSetupNeeded(false)
 
     } catch (error: any) {
-      console.error('Erro ao buscar base de conhecimento:', error)
       // Não mostrar toast de erro, pois pode ser apenas tabelas não criadas
       setSetupNeeded(true)
     } finally {

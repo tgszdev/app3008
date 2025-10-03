@@ -53,7 +53,6 @@ export default function EmailConfigModal({ isOpen, onClose, onSqlError }: EmailC
         setEmailConfig(data)
       }
     } catch (error) {
-      console.error('Erro ao carregar configurações de email:', error)
     } finally {
       setLoading(false)
     }
@@ -103,7 +102,6 @@ export default function EmailConfigModal({ isOpen, onClose, onSqlError }: EmailC
         toast.error(data.error || 'Erro ao salvar configuração')
       }
     } catch (error) {
-      console.error('Erro ao salvar:', error)
       toast.error('Erro ao salvar configuração')
     } finally {
       setSaving(false)

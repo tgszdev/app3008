@@ -250,7 +250,6 @@ export default function TimesheetsAnalyticsPage() {
       setTimesheets(enrichedData)
       calculateAnalytics(enrichedData, ticketsData, allEnrichedData)
     } catch (error) {
-      console.error('Error fetching data:', error)
       toast.error('Erro ao carregar dados')
     } finally {
       setLoading(false)

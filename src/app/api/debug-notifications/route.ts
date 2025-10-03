@@ -175,7 +175,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(diagnostics)
   } catch (error: any) {
-    console.error('Erro no diagnóstico:', error)
     return NextResponse.json({ 
       error: 'Erro ao executar diagnóstico',
       details: error.message 

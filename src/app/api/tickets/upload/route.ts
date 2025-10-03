@@ -44,7 +44,6 @@ export async function POST(request: NextRequest) {
       })
 
     if (uploadError) {
-      console.error('Erro no upload:', uploadError)
       
       // Se o bucket não existir, tentar criar
       if (uploadError.message?.includes('Bucket not found')) {
@@ -56,7 +55,6 @@ export async function POST(request: NextRequest) {
           })
         
         if (bucketError) {
-          console.error('Erro ao criar bucket:', bucketError)
           return NextResponse.json(
             { error: 'Erro ao configurar armazenamento. Configure o bucket "ticket-attachments" no Supabase.' },
             { status: 500 }
@@ -109,7 +107,6 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (dbError) {
-      console.error('Erro ao salvar no banco:', dbError)
       
       // Se a tabela não existir, retornar instrução
       if (dbError.message?.includes('relation') && dbError.message?.includes('does not exist')) {
@@ -141,7 +138,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }
@@ -172,7 +168,6 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Erro ao buscar anexos:', error)
       
       // Se for erro de foreign key, buscar sem a relação
       if (error.message?.includes('relationship')) {
@@ -190,7 +185,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(attachments || [])
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }
@@ -220,7 +214,6 @@ export async function DELETE(request: NextRequest) {
         .remove([storagePath])
 
       if (storageError) {
-        console.error('Erro ao excluir do storage:', storageError)
       }
     }
 
@@ -231,7 +224,6 @@ export async function DELETE(request: NextRequest) {
       .eq('id', attachmentId)
 
     if (dbError) {
-      console.error('Erro ao excluir do banco:', dbError)
       return NextResponse.json(
         { error: 'Erro ao excluir anexo' },
         { status: 500 }
@@ -240,7 +232,6 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }

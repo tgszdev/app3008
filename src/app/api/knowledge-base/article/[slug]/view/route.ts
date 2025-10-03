@@ -30,7 +30,6 @@ export async function POST(
       .eq('id', article.id)
 
     if (updateError) {
-      console.error('Erro ao incrementar visualizações:', updateError)
       return NextResponse.json(
         { error: 'Erro ao atualizar visualizações' },
         { status: 500 }
@@ -40,7 +39,6 @@ export async function POST(
     return NextResponse.json({ success: true })
 
   } catch (error: any) {
-    console.error('Erro ao incrementar visualizações:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor', message: error.message },
       { status: 500 }

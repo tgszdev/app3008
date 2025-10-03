@@ -23,7 +23,6 @@ export default function FixRolesPage() {
         toast.error('Role já existe ou erro ao criar')
       }
     } catch (error: any) {
-      console.error('Erro:', error)
       toast.error('Erro ao criar role desenvolvedor')
       setResult({ error: error.message })
     } finally {
@@ -43,7 +42,6 @@ export default function FixRolesPage() {
         toast.error('Role N1 já existe ou erro ao criar')
       }
     } catch (error: any) {
-      console.error('Erro:', error)
       toast.error('Erro ao criar role N1')
       setResult({ error: error.message })
     } finally {

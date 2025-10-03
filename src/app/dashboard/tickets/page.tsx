@@ -253,7 +253,6 @@ export default function TicketsPage() {
   }
 
   const handleClientSelectionChange = (clientIds: string[]) => {
-    console.log('🔄 Mudança de seleção de clientes:', clientIds)
     setSelectedClients(clientIds)
   }
 
@@ -268,7 +267,6 @@ export default function TicketsPage() {
             setSelectedClients(parsed)
           }
         } catch (e) {
-          console.error('Erro ao parsear selectedClients:', e)
         }
       }
 
@@ -284,7 +282,6 @@ export default function TicketsPage() {
           setPeriodFilter(parsed)
           // Não preencher tempFilter - deixar vazio para o usuário escolher
         } catch (e) {
-          console.error('Erro ao parsear periodFilter:', e)
         }
       }
     }
@@ -295,10 +292,8 @@ export default function TicketsPage() {
     if (typeof window !== 'undefined') {
       if (selectedClients.length > 0) {
         localStorage.setItem('selectedClients', JSON.stringify(selectedClients))
-        console.log('🔄 Salvando seleções no localStorage:', selectedClients)
       } else {
         localStorage.removeItem('selectedClients')
-        console.log('🔄 Removendo seleções do localStorage (lista vazia)')
       }
     }
   }, [selectedClients])
@@ -342,20 +337,17 @@ export default function TicketsPage() {
       // Filtro de clientes
       if (selectedClients.length > 0) {
         params.append('context_ids', selectedClients.join(','))
-        console.log('🔍 Filtrando por clientes:', selectedClients)
       }
 
       // Filtro de "Meus Chamados" (criador OU responsável)
       if (myTicketsOnly && session?.user?.id) {
         params.append('myTickets', session.user.id)
-        console.log('🔍 Filtrando por meus chamados (criador OU responsável):', session.user.id)
       }
 
       // Filtro de período
       if (periodFilter.start_date && periodFilter.end_date) {
         params.append('start_date', periodFilter.start_date)
         params.append('end_date', periodFilter.end_date)
-        console.log('🔍 Filtrando por período:', periodFilter)
       }
 
       // Filtro de status
@@ -369,13 +361,10 @@ export default function TicketsPage() {
       }
 
       const url = `/api/tickets?${params.toString()}`
-      console.log('🔍 Fetching tickets with URL:', url)
 
       const response = await axios.get(url)
-      console.log('✅ Tickets received:', response.data.length)
       setTickets(response.data)
     } catch (error: any) {
-      console.error('Erro ao buscar tickets:', error)
       toast.error('Erro ao carregar tickets')
     } finally {
       setLoading(false)
@@ -411,12 +400,9 @@ export default function TicketsPage() {
         url += `?${queryString}`
       }
 
-      console.log('📊 Fetching all tickets for cards with URL:', url)
       const response = await axios.get(url)
-      console.log('📊 All tickets for cards:', response.data.length)
       setAllTickets(response.data)
     } catch (error: any) {
-      console.error('Erro ao buscar todos os tickets:', error)
     }
   }
 
@@ -424,11 +410,9 @@ export default function TicketsPage() {
     // IMPORTANTE: Só buscar tickets se houver clientes selecionados
     // Se não tiver nenhum cliente selecionado, não deve mostrar nada
     if (selectedClients.length > 0) {
-      console.log('✅ Clientes selecionados:', selectedClients)
       fetchTickets()
       fetchAllTickets()
     } else {
-      console.log('⚠️ Nenhum cliente selecionado - limpando lista de tickets')
       setTickets([])
       setAllTickets([])
       setLoading(false)
@@ -443,7 +427,6 @@ export default function TicketsPage() {
       toast.success('Chamado excluído com sucesso!')
       fetchTickets(false)
     } catch (error: any) {
-      console.error('Erro ao excluir ticket:', error)
       
       // Verificar se há uma mensagem específica sobre apontamentos
       if (error.response?.data?.error) {
@@ -463,7 +446,6 @@ export default function TicketsPage() {
       toast.success('Status atualizado com sucesso!')
       fetchTickets(false)
     } catch (error: any) {
-      console.error('Erro ao atualizar status:', error)
       toast.error('Erro ao atualizar status')
     }
   }
@@ -480,16 +462,13 @@ export default function TicketsPage() {
 
   const getTimeAgo = (date: string) => {
     if (!date) {
-      console.warn('getTimeAgo: Data vazia ou nula recebida')
       return 'N/A'
     }
     // Debug temporário para ver o formato da data
     if (process.env.NODE_ENV === 'development') {
-      console.log('getTimeAgo recebeu:', date, 'tipo:', typeof date)
     }
     const result = formatRelativeTime(date)
     if (result === 'N/A' && process.env.NODE_ENV === 'development') {
-      console.error('formatRelativeTime retornou N/A para:', date)
     }
     return result
   }

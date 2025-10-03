@@ -65,7 +65,6 @@ export async function POST(request: NextRequest) {
     const { data: tickets, error: ticketsError } = await query
 
     if (ticketsError) {
-      console.error('Error fetching tickets:', ticketsError)
       throw ticketsError
     }
 
@@ -173,7 +172,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(reportData)
   } catch (error) {
-    console.error('Error generating report:', error)
     return NextResponse.json(
       { error: 'Erro ao gerar relatório' },
       { status: 500 }

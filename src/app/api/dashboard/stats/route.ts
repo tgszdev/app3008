@@ -13,7 +13,6 @@ export async function GET(request: NextRequest) {
     // Obter contexto selecionado dos parâmetros da URL
     const { searchParams } = new URL(request.url)
     const selectedContextId = searchParams.get('context_id')
-    console.log('🔍 Contexto selecionado via parâmetro:', selectedContextId)
 
     // Obter dados do usuário e contexto multi-tenant
     const { data: userData, error: userError } = await supabaseAdmin
@@ -58,7 +57,6 @@ export async function GET(request: NextRequest) {
     if (selectedContextId) {
       // Filtrar por contexto específico selecionado
       query = query.eq('context_id', selectedContextId)
-      console.log(`✅ Query principal filtrada por contexto selecionado: ${selectedContextId}`)
     } else if (userType === 'context' && userContextId) {
       // Usuários de contexto só veem tickets do seu contexto
       query = query.eq('context_id', userContextId)
@@ -86,13 +84,11 @@ export async function GET(request: NextRequest) {
     const { data: tickets, error: ticketsError } = await query
 
     if (ticketsError) {
-      console.error('Error fetching tickets:', ticketsError)
       return NextResponse.json({ error: 'Failed to fetch tickets' }, { status: 500 })
     }
 
     // Usar tickets já filtrados pela query principal
     let filteredTicketsForStats = tickets || []
-    console.log(`✅ Usando tickets já filtrados pela query principal: ${filteredTicketsForStats.length} tickets`)
 
     // Filtrar tickets internos para usuários comuns
     let filteredTickets = tickets || []
@@ -186,8 +182,6 @@ export async function GET(request: NextRequest) {
 
     
     if (recentError) {
-      console.error('Error fetching recent tickets:', recentError)
-      console.log('🔄 Entrando no fallback da query simples...')
       
       // If there's an error with the foreign key, try a simpler query
       let simpleQuery = supabaseAdmin
@@ -202,7 +196,6 @@ export async function GET(request: NextRequest) {
       if (selectedContextId) {
         // Filtrar por contexto específico selecionado
         simpleQuery = simpleQuery.eq('context_id', selectedContextId)
-        console.log(`✅ Query simples filtrada por contexto selecionado: ${selectedContextId}`)
       } else if (userType === 'context' && userContextId) {
         simpleQuery = simpleQuery.eq('context_id', userContextId)
       } else if (userType === 'matrix') {
@@ -314,7 +307,6 @@ export async function GET(request: NextRequest) {
       recentTickets: formattedRecentTickets
     })
   } catch (error) {
-    console.error('Dashboard stats error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

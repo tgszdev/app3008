@@ -83,28 +83,24 @@ export async function GET(request: NextRequest) {
     if (contextIds) {
       const contextIdArray = contextIds.split(',').filter(Boolean)
       if (contextIdArray.length > 0) {
-        console.log('🔍 Filtrando por context_ids:', contextIdArray)
         query = query.in('context_id', contextIdArray)
       }
     }
 
     // Filtro por período
     if (startDate && endDate) {
-      console.log('🔍 Filtrando por período:', { startDate, endDate })
       // Não usar 'Z' (UTC) - deixar o banco usar seu timezone configurado (America/Sao_Paulo)
       query = query.gte('created_at', startDate + 'T00:00:00').lte('created_at', endDate + 'T23:59:59.999')
     }
 
     // Filtro "Meus Chamados" (criador OU responsável)
     if (myTickets) {
-      console.log('🔍 Filtrando "Meus Chamados" (criador OU responsável):', myTickets)
       query = query.or(`created_by.eq.${myTickets},assigned_to.eq.${myTickets}`)
     }
 
     const { data: tickets, error } = await query
 
     if (error) {
-      console.error('Erro ao buscar tickets:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -129,7 +125,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(formattedTickets)
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
@@ -170,17 +165,14 @@ export async function POST(request: NextRequest) {
 
     // GERAR TICKET_NUMBER ÚNICO GLOBALMENTE - USANDO SEQUENCE
     // Usar sequence do PostgreSQL para garantir unicidade e atomicidade
-    console.log(`🎫 Gerando ticket_number usando SEQUENCE...`)
     
     const { data: ticketNumber, error: sequenceError } = await supabaseAdmin
       .rpc('get_next_ticket_number')
     
     if (sequenceError) {
-      console.error('❌ Erro ao gerar número do ticket via sequence:', sequenceError)
       return NextResponse.json({ error: 'Erro ao gerar número do ticket' }, { status: 500 })
     }
     
-    console.log(`✅ Ticket_number gerado via SEQUENCE: ${ticketNumber}`)
 
     // BUSCAR STATUS PADRÃO DA TABELA
     const { data: defaultStatus } = await supabaseAdmin
@@ -191,7 +183,6 @@ export async function POST(request: NextRequest) {
       .single()
     
     const defaultStatusSlug = defaultStatus?.slug || 'ABERTO'
-    console.log(`🎯 Status padrão definido: ${defaultStatusSlug}`)
 
     // CRIAR TICKET COM SEQUENCE (SEM RETRY - SEQUENCE É ATÔMICO)
     // Com banco configurado em America/Sao_Paulo, usar new Date() diretamente
@@ -224,14 +215,9 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Erro ao criar ticket:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    console.log('=== DEBUG API CREATE TICKET ===')
-    console.log('Ticket criado:', newTicket)
-    console.log('ID:', newTicket.id)
-    console.log('Título:', newTicket.title)
 
     // Criar registro inicial no histórico
     // Deixar Supabase gerenciar created_at automaticamente (mesma data do ticket)
@@ -247,9 +233,7 @@ export async function POST(request: NextRequest) {
           new_value: defaultStatusSlug,
           // created_at gerenciado automaticamente pelo Supabase
         })
-      console.log('✅ Histórico inicial criado com sucesso')
     } catch (historyError) {
-      console.log('⚠️ Erro ao criar histórico (ignorado):', historyError)
     }
 
     // Enviar notificação para o responsável (se houver)
@@ -268,7 +252,6 @@ export async function POST(request: NextRequest) {
           action_url: `/dashboard/tickets/${newTicket.id}`
         })
       } catch (notificationError) {
-        console.log('Erro ao enviar notificação (ignorado):', notificationError)
       }
     }
 
@@ -301,26 +284,19 @@ export async function POST(request: NextRequest) {
         )
       }
     } catch (notificationError) {
-      console.log('Erro ao notificar admins (ignorado):', notificationError)
     }
 
     // Executar workflows automáticos
     try {
-      console.log(`🔄 Executando workflows para ticket ${newTicket.id}...`)
       const workflowResult = await executeWorkflowsForTicket(newTicket.id)
-      console.log(`✅ Workflows executados:`, workflowResult)
     } catch (workflowError) {
-      console.log('Erro ao executar workflows (ignorado):', workflowError)
     }
 
     // ⚡ OTIMIZAÇÃO: Escalação em BACKGROUND (não bloqueia response)
-    console.log(`🚨 Iniciando escalação em background para ticket ${newTicket.id}...`)
     executeEscalationForTicketSimple(newTicket.id)
       .then(escalationResult => {
-        console.log(`✅ Escalação executada:`, escalationResult)
         
         if (escalationResult.success && escalationResult.executedRules.length > 0) {
-          console.log(`📧 Processando e-mails de escalação para ticket ${newTicket.id}...`)
           return fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://www.ithostbr.tech'}/api/escalation/process-emails`, {
             method: 'POST',
             headers: {
@@ -337,14 +313,12 @@ export async function POST(request: NextRequest) {
       })
       .then(emailResult => {
         if (emailResult) {
-          console.log(`✅ E-mails de escalação processados:`, emailResult.message)
         }
       })
       .catch(err => console.log('Erro na escalação em background (ignorado):', err))
 
     return NextResponse.json(newTicket, { status: 201 })
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
@@ -428,7 +402,6 @@ async function handleUpdate(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Erro ao atualizar ticket:', error)
       
       // Se for erro de foreign key, tentar atualizar sem as relações
       if (error.message.includes('relationship')) {
@@ -440,7 +413,6 @@ async function handleUpdate(request: NextRequest) {
           .single()
         
         if (simpleError) {
-          console.error('Erro ao atualizar (simples):', simpleError)
           return NextResponse.json({ error: simpleError.message }, { status: 500 })
         }
         
@@ -476,7 +448,6 @@ async function handleUpdate(request: NextRequest) {
       // Removido insert manual para evitar duplicação
       
       if (changes.length > 0) {
-        console.log('📝 Mudanças detectadas (histórico via trigger):', changes.length)
         
         // Enviar notificações baseadas nas mudanças
         try {
@@ -562,30 +533,23 @@ async function handleUpdate(request: NextRequest) {
             })
           }
         } catch (notificationError) {
-          console.log('Erro ao enviar notificações (ignorado):', notificationError)
         }
       }
 
       // Executar workflows automáticos após atualização
       if (changes.length > 0) {
         try {
-          console.log(`🔄 Executando workflows para ticket atualizado ${id}...`)
           const workflowResult = await executeWorkflowsForTicket(id)
-          console.log(`✅ Workflows executados após atualização:`, workflowResult)
         } catch (workflowError) {
-          console.log('Erro ao executar workflows após atualização (ignorado):', workflowError)
         }
 
         // Executar escalação automática após atualização (versão simplificada)
         try {
-          console.log(`🚨 Executando escalação para ticket atualizado ${id}...`)
           const escalationResult = await executeEscalationForTicketSimple(id)
-          console.log(`✅ Escalação executada após atualização:`, escalationResult)
           
           // Processar e-mails de escalação automaticamente
           if (escalationResult.success && escalationResult.executedRules.length > 0) {
             try {
-              console.log(`📧 Processando e-mails de escalação para ticket atualizado ${id}...`)
               const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://www.ithostbr.tech'}/api/escalation/process-emails`, {
                 method: 'POST',
                 headers: {
@@ -596,23 +560,18 @@ async function handleUpdate(request: NextRequest) {
               
               if (emailResponse.ok) {
                 const emailResult = await emailResponse.json()
-                console.log(`✅ E-mails de escalação processados após atualização:`, emailResult.message)
               } else {
-                console.error(`❌ Erro ao processar e-mails de escalação após atualização: HTTP ${emailResponse.status}`)
               }
             } catch (emailError) {
-              console.error('Erro ao processar e-mails de escalação após atualização (ignorado):', emailError)
             }
           }
         } catch (escalationError) {
-          console.log('Erro ao executar escalação após atualização (ignorado):', escalationError)
         }
       }
     }
 
     return NextResponse.json(updatedTicket)
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
@@ -663,7 +622,6 @@ export async function DELETE(request: NextRequest) {
       .in('status', ['pending', 'approved'])
 
     if (timesheetsError) {
-      console.error('Erro ao verificar apontamentos:', timesheetsError)
       return NextResponse.json(
         { error: 'Erro ao verificar apontamentos do ticket' },
         { status: 500 }
@@ -708,13 +666,11 @@ export async function DELETE(request: NextRequest) {
       .eq('id', id)
 
     if (error) {
-      console.error('Erro ao excluir ticket:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }

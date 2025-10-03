@@ -35,7 +35,6 @@ export async function GET(request: NextRequest) {
     if (!notifError) {
       tests.notifications = true
     } else {
-      console.error('Notifications table error:', notifError)
     }
 
     // Testar tabela user_notification_preferences
@@ -47,7 +46,6 @@ export async function GET(request: NextRequest) {
     if (!prefError) {
       tests.preferences = true
     } else {
-      console.error('Preferences table error:', prefError)
     }
 
     // Testar tabela user_push_subscriptions
@@ -59,7 +57,6 @@ export async function GET(request: NextRequest) {
     if (!pushError) {
       tests.push_subscriptions = true
     } else {
-      console.error('Push subscriptions table error:', pushError)
     }
 
     // Tentar criar uma notificação de teste
@@ -92,7 +89,6 @@ export async function GET(request: NextRequest) {
         : 'Tabelas de notificação não encontradas. Execute o script SQL no Supabase.'
     })
   } catch (error: any) {
-    console.error('Error in notification test:', error)
     return NextResponse.json({ 
       error: 'Internal server error',
       details: error.message

@@ -29,7 +29,6 @@ export async function GET(request: NextRequest) {
       .order('display_name', { ascending: true })
 
     if (error) {
-      console.error('Error fetching roles:', error)
       
       // Se a tabela não existir, retornar roles padrão
       if (error.code === '42P01') {
@@ -149,7 +148,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(roles || [])
   } catch (error) {
-    console.error('Error in GET /api/roles:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -196,11 +194,9 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Error creating role:', error)
       
       // Se a tabela não existir, tentar criar
       if (error.code === '42P01') {
-        console.log('Tabela roles não existe. Tentando criar...')
         
         // Tentar criar a tabela
         try {
@@ -220,7 +216,6 @@ export async function POST(request: NextRequest) {
             `
           })
           
-          console.log('Tabela roles criada com sucesso!')
           
           // Tentar inserir novamente
           const { data: retryRole, error: retryError } = await supabaseAdmin
@@ -242,7 +237,6 @@ export async function POST(request: NextRequest) {
             return NextResponse.json(retryRole, { status: 201 })
           }
         } catch (createTableError) {
-          console.error('Erro ao criar tabela roles:', createTableError)
         }
         
         // Se não conseguir criar a tabela, retornar sucesso simulado
@@ -269,7 +263,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(newRole, { status: 201 })
   } catch (error) {
-    console.error('Error in POST /api/roles:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

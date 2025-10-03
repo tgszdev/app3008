@@ -39,7 +39,6 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Error saving push subscription:', error)
       return NextResponse.json({ error: 'Failed to save subscription' }, { status: 500 })
     }
 
@@ -48,7 +47,6 @@ export async function POST(request: NextRequest) {
       subscription: data 
     })
   } catch (error) {
-    console.error('Error in push subscribe:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -72,7 +70,6 @@ export async function DELETE(request: NextRequest) {
         .eq('user_id', session.user.id)
 
       if (error) {
-        console.error('Error disabling push subscriptions:', error)
         return NextResponse.json({ error: 'Failed to disable subscriptions' }, { status: 500 })
       }
     } else {
@@ -84,14 +81,12 @@ export async function DELETE(request: NextRequest) {
         .eq('endpoint', endpoint)
 
       if (error) {
-        console.error('Error disabling push subscription:', error)
         return NextResponse.json({ error: 'Failed to disable subscription' }, { status: 500 })
       }
     }
 
     return NextResponse.json({ message: 'Push notifications disabled' })
   } catch (error) {
-    console.error('Error in push unsubscribe:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

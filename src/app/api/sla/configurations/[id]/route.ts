@@ -29,13 +29,11 @@ export async function PUT(
       .single()
 
     if (error) {
-      console.error('Erro ao atualizar configuração SLA:', error)
       return NextResponse.json({ error: 'Erro ao atualizar configuração' }, { status: 500 })
     }
 
     return NextResponse.json(data)
   } catch (error) {
-    console.error('Erro no PUT /api/sla/configurations/[id]:', error)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }
@@ -63,13 +61,11 @@ export async function DELETE(
       .single()
 
     if (error) {
-      console.error('Erro ao desativar configuração SLA:', error)
       return NextResponse.json({ error: 'Erro ao desativar configuração' }, { status: 500 })
     }
 
     return NextResponse.json({ message: 'Configuração desativada com sucesso', data })
   } catch (error) {
-    console.error('Erro no DELETE /api/sla/configurations/[id]:', error)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }

@@ -92,7 +92,6 @@ export default function TimesheetsPermissionsPage() {
         setPermissions(defaultPermissions)
       }
     } catch (error) {
-      console.error('Error fetching data:', error)
       toast.error('Erro ao carregar dados')
     } finally {
       setLoading(false)
@@ -123,7 +122,6 @@ export default function TimesheetsPermissionsPage() {
       
       toast.success('Permissão atualizada com sucesso!')
     } catch (error) {
-      console.error('Error updating permission:', error)
       toast.error('Erro ao atualizar permissão')
     } finally {
       setSaving(null)
@@ -151,7 +149,6 @@ export default function TimesheetsPermissionsPage() {
       setPermissions(updates)
       toast.success(`Todas as permissões de submissão foram ${value ? 'ativadas' : 'desativadas'}`)
     } catch (error) {
-      console.error('Error updating permissions:', error)
       toast.error('Erro ao atualizar permissões')
     }
   }

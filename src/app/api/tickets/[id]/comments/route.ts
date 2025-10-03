@@ -44,7 +44,6 @@ export async function POST(request: NextRequest, context: RouteParams) {
       .single()
 
     if (commentError) {
-      console.error('Erro ao criar comentário:', commentError)
       return NextResponse.json({ error: 'Erro ao criar comentário' }, { status: 500 })
     }
 
@@ -79,14 +78,12 @@ export async function POST(request: NextRequest, context: RouteParams) {
             })
           })
         } catch (slaError) {
-          console.error('Erro ao atualizar SLA:', slaError)
         }
       }
     }
 
     return NextResponse.json(comment)
   } catch (error) {
-    console.error('Erro ao adicionar comentário:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
@@ -120,13 +117,11 @@ export async function GET(request: NextRequest, context: RouteParams) {
     const { data, error } = await query
 
     if (error) {
-      console.error('Erro ao buscar comentários:', error)
       return NextResponse.json({ error: 'Erro ao buscar comentários' }, { status: 500 })
     }
 
     return NextResponse.json(data || [])
   } catch (error) {
-    console.error('Erro ao buscar comentários:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }

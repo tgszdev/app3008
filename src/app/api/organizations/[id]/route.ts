@@ -40,7 +40,6 @@ export async function DELETE(
       .limit(1)
 
     if (userError) {
-      console.error('Erro ao verificar usuários:', userError)
       return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
     }
 
@@ -57,7 +56,6 @@ export async function DELETE(
       .eq('id', id)
 
     if (deleteError) {
-      console.error('Erro ao excluir organização:', deleteError)
       return NextResponse.json({ error: 'Erro ao excluir organização' }, { status: 500 })
     }
 
@@ -66,7 +64,6 @@ export async function DELETE(
     })
 
   } catch (error) {
-    console.error('Erro na API de exclusão de organização:', error)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }
@@ -147,7 +144,6 @@ export async function PUT(
       .single()
 
     if (updateError) {
-      console.error('Erro ao atualizar organização:', updateError)
       return NextResponse.json({ error: 'Erro ao atualizar organização' }, { status: 500 })
     }
 
@@ -157,7 +153,6 @@ export async function PUT(
     })
 
   } catch (error) {
-    console.error('Erro na API de atualização de organização:', error)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }

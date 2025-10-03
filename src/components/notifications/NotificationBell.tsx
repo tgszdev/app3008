@@ -34,7 +34,6 @@ export default function NotificationBell() {
       setNotifications(response.data.notifications)
       setUnreadCount(response.data.unreadCount)
     } catch (error) {
-      console.error('Error fetching notifications:', error)
     } finally {
       setLoading(false)
     }
@@ -50,7 +49,6 @@ export default function NotificationBell() {
       )
       setUnreadCount(prev => Math.max(0, prev - 1))
     } catch (error) {
-      console.error('Error marking notification as read:', error)
       toast.error('Erro ao marcar notificação como lida')
     }
   }
@@ -64,7 +62,6 @@ export default function NotificationBell() {
       setUnreadCount(0)
       toast.success('Todas as notificações foram marcadas como lidas')
     } catch (error) {
-      console.error('Error marking all as read:', error)
       toast.error('Erro ao marcar notificações como lidas')
     }
   }
@@ -82,7 +79,6 @@ export default function NotificationBell() {
       
       toast.success('Notificação removida')
     } catch (error) {
-      console.error('Error deleting notification:', error)
       toast.error('Erro ao remover notificação')
     }
   }

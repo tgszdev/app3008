@@ -32,7 +32,6 @@ export async function GET(
 
     return NextResponse.json(category)
   } catch (error) {
-    console.error('Category GET error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -166,7 +165,6 @@ export async function PUT(
       .single()
 
     if (error) {
-      console.error('Error updating category:', error)
       return NextResponse.json({ error: 'Failed to update category' }, { status: 500 })
     }
 
@@ -176,7 +174,6 @@ export async function PUT(
 
     return NextResponse.json(category)
   } catch (error) {
-    console.error('Category PUT error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -220,13 +217,11 @@ export async function DELETE(
       .eq('id', id)
 
     if (error) {
-      console.error('Error deleting category:', error)
       return NextResponse.json({ error: 'Failed to delete category' }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Category DELETE error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

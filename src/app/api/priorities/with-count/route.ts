@@ -14,7 +14,6 @@ export async function GET(request: NextRequest) {
       .select('id, priority')
 
     if (ticketsError) {
-      console.error('Error fetching tickets:', ticketsError)
       return NextResponse.json(
         { error: 'Failed to fetch tickets' },
         { status: 500 }
@@ -57,7 +56,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(prioritiesWithCount)
   } catch (error) {
-    console.error('API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

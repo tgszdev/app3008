@@ -264,7 +264,6 @@ export default function CategoriesPage() {
       const response = await axios.get('/api/knowledge-base/categories')
       setCategories(response.data.categories || [])
     } catch (error: any) {
-      console.error('Erro ao buscar categorias:', error)
       toast.error('Erro ao carregar categorias')
     } finally {
       setLoading(false)
@@ -341,8 +340,6 @@ export default function CategoriesPage() {
       resetForm()
       fetchCategories()
     } catch (error: any) {
-      console.error('Erro ao salvar categoria:', error)
-      console.error('Response:', error.response)
       
       const errorMessage = error.response?.data?.error || 'Erro ao salvar categoria'
       const errorDetails = error.response?.data?.details || ''
@@ -381,7 +378,6 @@ export default function CategoriesPage() {
       toast.success('Categoria excluída com sucesso!')
       fetchCategories()
     } catch (error: any) {
-      console.error('Erro ao excluir categoria:', error)
       toast.error('Erro ao excluir categoria')
     }
   }

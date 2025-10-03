@@ -78,7 +78,6 @@ export default function SLAConfigurationPage() {
       const response = await axios.get('/api/sla/configurations')
       setConfigurations(response.data)
     } catch (error) {
-      console.error('Erro ao buscar configurações:', error)
       toast.error('Erro ao carregar configurações de SLA')
     } finally {
       setLoading(false)
@@ -90,7 +89,6 @@ export default function SLAConfigurationPage() {
       const response = await axios.get('/api/categories')
       setCategories(response.data)
     } catch (error) {
-      console.error('Erro ao buscar categorias:', error)
     }
   }
 

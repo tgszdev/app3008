@@ -45,7 +45,6 @@ export function TicketSLABadge({ ticket }: TicketSLABadgeProps) {
         })
       }
     } catch (error) {
-      console.error('Erro ao buscar SLA:', error)
     } finally {
       setLoading(false)
     }

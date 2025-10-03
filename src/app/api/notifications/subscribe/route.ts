@@ -50,7 +50,6 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Erro ao salvar subscription:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -60,7 +59,6 @@ export async function POST(request: NextRequest) {
       data
     })
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
@@ -84,7 +82,6 @@ export async function DELETE(request: NextRequest) {
         .eq('user_id', session.user.id)
 
       if (error) {
-        console.error('Erro ao deletar subscriptions:', error)
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
     } else {
@@ -96,7 +93,6 @@ export async function DELETE(request: NextRequest) {
         .eq('endpoint', endpoint)
 
       if (error) {
-        console.error('Erro ao deletar subscription:', error)
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
     }
@@ -106,7 +102,6 @@ export async function DELETE(request: NextRequest) {
       message: 'Subscription removida com sucesso'
     })
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
@@ -127,13 +122,11 @@ export async function GET(request: NextRequest) {
       .order('last_used', { ascending: false })
 
     if (error) {
-      console.error('Erro ao buscar subscriptions:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json(subscriptions || [])
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }

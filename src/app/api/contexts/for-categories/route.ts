@@ -19,7 +19,6 @@ export async function GET(request: Request) {
       .order('name', { ascending: true })
 
     if (error) {
-      console.error('Error fetching contexts:', error)
       return NextResponse.json({ error: 'Failed to fetch contexts' }, { status: 500 })
     }
 
@@ -33,7 +32,6 @@ export async function GET(request: Request) {
       all: contexts || []
     })
   } catch (error) {
-    console.error('Contexts for categories GET error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

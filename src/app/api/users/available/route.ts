@@ -49,7 +49,6 @@ export async function GET(request: NextRequest) {
     const { data: users, error } = await query
 
     if (error) {
-      console.error('Erro ao buscar usuários:', error)
       return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
     }
 
@@ -58,7 +57,6 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro na API de usuários disponíveis:', error)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }

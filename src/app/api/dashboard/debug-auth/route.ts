@@ -3,7 +3,6 @@ import { auth } from '@/lib/auth'
 
 export async function GET() {
   try {
-    console.log('🔍 Debug auth endpoint chamado')
     
     const session = await auth()
     
@@ -37,7 +36,6 @@ export async function GET() {
     })
     
   } catch (error: any) {
-    console.error('❌ Erro no debug auth:', error)
     return NextResponse.json({ 
       error: 'Auth error',
       details: error.message,

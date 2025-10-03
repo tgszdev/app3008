@@ -138,7 +138,6 @@ export default function DashboardLayout({
     if (status === 'loading') return // Ainda carregando
     
     if (status === 'unauthenticated') {
-      console.log('Usuário não autenticado, redirecionando para login')
       router.push('/login')
     }
   }, [status, router])
@@ -265,7 +264,6 @@ export default function DashboardLayout({
                   try {
                     await signOut({ callbackUrl: '/login' })
                   } catch (error) {
-                    console.error('Erro ao fazer logout:', error)
                     window.location.href = '/login'
                   }
                 }}
@@ -336,7 +334,6 @@ export default function DashboardLayout({
                   try {
                     await signOut({ callbackUrl: '/login' })
                   } catch (error) {
-                    console.error('Erro ao fazer logout:', error)
                     window.location.href = '/login'
                   }
                 }}

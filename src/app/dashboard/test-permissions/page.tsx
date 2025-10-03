@@ -69,7 +69,6 @@ export default function TestPermissionsPage() {
         toast.success(`Teste concluído! ${data.stats.active}/${data.stats.total} permissões ativas`)
       }
     } catch (error) {
-      console.error('Erro ao executar teste:', error)
       toast.error('Erro ao executar teste de permissões')
     } finally {
       setTesting(false)

@@ -41,9 +41,7 @@ export async function POST(request: NextRequest) {
     // Verificar conexão
     try {
       await transporter.verify()
-      console.log('Conexão SMTP verificada com sucesso')
     } catch (verifyError: any) {
-      console.error('Erro ao verificar conexão:', verifyError)
       
       let errorMessage = 'Falha na conexão com o servidor SMTP'
       
@@ -172,7 +170,6 @@ Enviado em: ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo'
 
     try {
       const info = await transporter.sendMail(mailOptions)
-      console.log('Email de teste enviado:', info.messageId)
       
       return NextResponse.json({
         success: true,
@@ -180,7 +177,6 @@ Enviado em: ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo'
         messageId: info.messageId
       })
     } catch (sendError: any) {
-      console.error('Erro ao enviar email:', sendError)
       
       return NextResponse.json({
         success: false,
@@ -189,7 +185,6 @@ Enviado em: ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo'
       }, { status: 500 })
     }
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ 
       error: 'Erro interno do servidor',
       details: error.message 

@@ -31,7 +31,6 @@ export async function GET(
       .single()
 
     if (error) {
-      console.error('Erro ao buscar artigo:', error)
       return NextResponse.json({ error: 'Erro ao buscar artigo' }, { status: 500 })
     }
 
@@ -48,7 +47,6 @@ export async function GET(
     return NextResponse.json(formattedArticle)
 
   } catch (error) {
-    console.error('Erro ao buscar artigo:', error)
     return NextResponse.json(
       { error: 'Erro ao buscar artigo' },
       { status: 500 }
@@ -72,7 +70,6 @@ export async function PUT(
     const userRole = (session.user as any)?.role
     
     if (userRole !== 'admin' && userRole !== 'analyst') {
-      console.log('Role do usuário:', userRole, 'Email:', session.user.email)
       return NextResponse.json({ error: 'Sem permissão para editar artigos' }, { status: 403 })
     }
 
@@ -151,7 +148,6 @@ export async function PUT(
       .single()
 
     if (updateError) {
-      console.error('Erro ao atualizar artigo:', updateError)
       return NextResponse.json({ error: 'Erro ao atualizar artigo' }, { status: 500 })
     }
 
@@ -200,7 +196,6 @@ export async function PUT(
     })
 
   } catch (error) {
-    console.error('Erro ao atualizar artigo:', error)
     return NextResponse.json(
       { error: 'Erro ao atualizar artigo' },
       { status: 500 }
@@ -224,7 +219,6 @@ export async function DELETE(
     const userRole = (session.user as any)?.role
     
     if (userRole !== 'admin') {
-      console.log('Role do usuário:', userRole, 'Email:', session.user.email)
       return NextResponse.json({ error: 'Apenas administradores podem excluir artigos' }, { status: 403 })
     }
 
@@ -249,14 +243,12 @@ export async function DELETE(
       .eq('id', id)
 
     if (error) {
-      console.error('Erro ao deletar artigo:', error)
       return NextResponse.json({ error: 'Erro ao deletar artigo' }, { status: 500 })
     }
 
     return NextResponse.json({ message: 'Artigo excluído com sucesso' })
 
   } catch (error) {
-    console.error('Erro ao deletar artigo:', error)
     return NextResponse.json(
       { error: 'Erro ao deletar artigo' },
       { status: 500 }

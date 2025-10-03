@@ -60,10 +60,8 @@ export default function MultiClientDashboard() {
           const parsed = JSON.parse(saved)
           if (Array.isArray(parsed)) {
             setSelectedClients(parsed)
-            console.log('🔄 Carregando seleções do localStorage:', parsed)
           }
         } catch (error) {
-          console.error('Erro ao carregar seleções do localStorage:', error)
         }
       }
     }
@@ -73,7 +71,6 @@ export default function MultiClientDashboard() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('selectedClients', JSON.stringify(selectedClients))
-      console.log('🔄 Salvando seleções no localStorage:', selectedClients)
     }
   }, [selectedClients])
 
@@ -99,22 +96,18 @@ export default function MultiClientDashboard() {
   }, [showClientPopup])
 
   const handleClientSelectionChange = (selectedIds: string[]) => {
-    console.log('🔄 Mudança de seleção de clientes:', selectedIds)
     setSelectedClients(selectedIds)
   }
 
   const handleMyTickets = () => {
-    console.log('🔄 Meus Tickets clicado')
     // Implementar funcionalidade de "Meus Tickets"
   }
 
   const handleCurrentMonth = () => {
-    console.log('🔄 Mês Atual clicado')
     // Implementar funcionalidade de filtro de data
   }
 
   const handleExportPDF = () => {
-    console.log('🔄 Exportar PDF clicado')
     // Implementar funcionalidade de exportar PDF
   }
 

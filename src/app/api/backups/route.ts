@@ -30,7 +30,6 @@ export async function GET(request: Request) {
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Error fetching backups:', error)
       // Se a tabela não existir, retornar array vazio
       if (error.code === '42P01') {
         return NextResponse.json([])
@@ -58,7 +57,6 @@ export async function GET(request: Request) {
 
     return NextResponse.json(formattedBackups)
   } catch (error) {
-    console.error('Backups GET error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -93,7 +91,6 @@ export async function DELETE(request: Request) {
       .eq('id', backupId)
 
     if (error) {
-      console.error('Error deleting backup:', error)
       return NextResponse.json({ error: 'Failed to delete backup' }, { status: 500 })
     }
 
@@ -112,7 +109,6 @@ export async function DELETE(request: Request) {
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Backup DELETE error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

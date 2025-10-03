@@ -53,7 +53,6 @@ export function RatingModal({
       toast.success('Obrigado pela sua avaliação!')
       onClose()
     } catch (error: any) {
-      console.error('Error submitting rating:', error)
       toast.error(error.response?.data?.error || 'Erro ao enviar avaliação')
     } finally {
       setLoading(false)

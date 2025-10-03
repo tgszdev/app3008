@@ -58,7 +58,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(users)
   } catch (error: any) {
-    console.error('Erro ao buscar usuários com permissão:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }

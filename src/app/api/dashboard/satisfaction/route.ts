@@ -51,7 +51,6 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
 
     if (currentError) {
-      console.error('Error fetching current ratings:', currentError)
       throw currentError
     }
 
@@ -63,7 +62,6 @@ export async function GET(request: NextRequest) {
       .lt('created_at', startDate.toISOString().split('T')[0] + 'T00:00:00')
 
     if (previousError) {
-      console.error('Error fetching previous ratings:', previousError)
       throw previousError
     }
 
@@ -115,7 +113,6 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error: any) {
-    console.error('Error in satisfaction API:', error)
     console.error('Error details:', {
       message: error.message,
       code: error.code,

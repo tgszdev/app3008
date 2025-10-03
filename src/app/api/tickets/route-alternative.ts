@@ -36,7 +36,6 @@ export async function GET(request: NextRequest) {
     const { data: tickets, error: ticketsError } = await query
 
     if (ticketsError) {
-      console.error('Erro ao buscar tickets:', ticketsError)
       return NextResponse.json({ error: ticketsError.message }, { status: 500 })
     }
 
@@ -58,7 +57,6 @@ export async function GET(request: NextRequest) {
       .in('id', Array.from(userIds))
 
     if (usersError) {
-      console.error('Erro ao buscar usuários:', usersError)
       // Continuar mesmo com erro, apenas sem dados de usuário
       return NextResponse.json(tickets)
     }
@@ -78,7 +76,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(formattedTickets)
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
@@ -142,7 +139,6 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (ticketError) {
-      console.error('Erro ao criar ticket:', ticketError)
       return NextResponse.json({ error: ticketError.message }, { status: 500 })
     }
 
@@ -165,7 +161,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(ticketWithUsers)
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
@@ -199,7 +194,6 @@ export async function PUT(request: NextRequest) {
       .single()
 
     if (updateError) {
-      console.error('Erro ao atualizar ticket:', updateError)
       return NextResponse.json({ error: updateError.message }, { status: 500 })
     }
 
@@ -253,13 +247,11 @@ export async function PUT(request: NextRequest) {
       // Histórico gerenciado automaticamente por TRIGGER no banco
       // Removido insert manual para evitar duplicação
       if (changes.length > 0) {
-        console.log('📝 Mudanças detectadas (histórico via trigger):', changes.length)
       }
     }
 
     return NextResponse.json(ticketWithUsers)
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
@@ -280,13 +272,11 @@ export async function DELETE(request: NextRequest) {
       .eq('id', id)
 
     if (error) {
-      console.error('Erro ao excluir ticket:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }

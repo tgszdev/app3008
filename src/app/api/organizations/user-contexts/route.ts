@@ -26,7 +26,6 @@ export async function GET(request: NextRequest) {
       .eq('user_id', userId)
     
     if (userContextsError) {
-      console.error('Erro ao buscar contextos do usuário:', userContextsError)
       return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
     }
     
@@ -46,7 +45,6 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Erro ao buscar organizações:', error)
       return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
     }
 
@@ -70,7 +68,6 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro na API de organizações do usuário:', error)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }

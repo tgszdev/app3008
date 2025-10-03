@@ -72,7 +72,6 @@ export async function GET(
     })
 
   } catch (error: any) {
-    console.error('Erro ao buscar artigo:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor', message: error.message },
       { status: 500 }

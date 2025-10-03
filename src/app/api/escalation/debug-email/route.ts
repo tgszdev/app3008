@@ -4,7 +4,6 @@ import { clearEmailConfigCache } from '@/lib/email-config'
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔍 [DEBUG-EMAIL] Iniciando debug de configuração de email...')
     
     // 1. Verificar configuração no banco
     const { data: emailConfig, error: configError } = await supabaseAdmin
@@ -39,10 +38,8 @@ export async function GET(request: NextRequest) {
     clearEmailConfigCache()
     
     // Importar com logging
-    console.log('📧 [DEBUG-EMAIL] Importando email-config...')
     const emailConfigModule = await import('@/lib/email-config')
     
-    console.log('📧 [DEBUG-EMAIL] Tentando enviar email de teste...')
     
     // Tentar enviar com logging completo
     const result = await emailConfigModule.sendEmail({
@@ -63,7 +60,6 @@ export async function GET(request: NextRequest) {
       text: `Email de teste enviado em ${new Date().toLocaleString('pt-BR')}`
     })
     
-    console.log('📧 [DEBUG-EMAIL] Resultado do envio:', result)
     
     // 4. Verificar se foi gravado no log
     const { data: newLog } = await supabaseAdmin
@@ -100,10 +96,8 @@ export async function GET(request: NextRequest) {
         }
       })
       
-      console.log('📧 [DEBUG-EMAIL] Verificando transporter...')
       await transporter.verify()
       
-      console.log('📧 [DEBUG-EMAIL] Enviando email direto...')
       const directInfo = await transporter.sendMail({
         from: '"Sistema Debug" <rodrigues220589@gmail.com>',
         to: testEmail,
@@ -149,7 +143,6 @@ export async function GET(request: NextRequest) {
     })
     
   } catch (error: any) {
-    console.error('❌ [DEBUG-EMAIL] Erro:', error)
     return NextResponse.json({
       success: false,
       error: 'Erro no debug',

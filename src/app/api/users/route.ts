@@ -7,7 +7,6 @@ export async function GET(request: NextRequest) {
   try {
     // Verificar se as variáveis de ambiente estão configuradas
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      console.error('Variáveis de ambiente do Supabase não configuradas')
       
       // Retornar erro se Supabase não estiver configurado
       return NextResponse.json(
@@ -22,7 +21,6 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Erro ao buscar usuários:', error)
       
       // Log mais detalhado
       console.error('Detalhes do erro:', {
@@ -47,7 +45,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(sanitizedUsers)
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ 
       error: 'Erro interno do servidor',
       message: error.message,
@@ -59,16 +56,13 @@ export async function GET(request: NextRequest) {
 // POST - Criar novo usuário
 export async function POST(request: NextRequest) {
   try {
-    console.log('🚀 [USERS-API] Iniciando criação de usuário')
     
     const body = await request.json()
     const { name, email, password, role, department, phone } = body
     
-    console.log('📝 [USERS-API] Dados recebidos:', { name, email, role, department })
 
     // Validação básica
     if (!name || !email || !password) {
-      console.log('❌ [USERS-API] Dados obrigatórios faltando')
       return NextResponse.json(
         { error: 'Nome, email e senha são obrigatórios' },
         { status: 400 }
@@ -83,7 +77,6 @@ export async function POST(request: NextRequest) {
       .maybeSingle()
 
     if (checkError) {
-      console.error('Erro ao verificar email existente:', checkError)
       return NextResponse.json(
         { error: 'Erro ao verificar email' },
         { status: 500 }
@@ -98,7 +91,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Hash da senha
-    console.log('🔐 [USERS-API] Gerando hash da senha...')
     const password_hash = await bcrypt.hash(password, 10)
 
     // Mapear roles customizadas para uma role padrão válida no ENUM
@@ -106,7 +98,6 @@ export async function POST(request: NextRequest) {
     const systemRoles = ['admin', 'analyst', 'user']
     const enumRole = systemRoles.includes(role) ? role : 'user'
     
-    console.log('💾 [USERS-API] Criando usuário no banco...')
     console.log('📋 [USERS-API] Dados para inserção:', { 
       name, 
       email, 
@@ -139,14 +130,12 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('❌ [USERS-API] Erro ao criar usuário:', error)
       return NextResponse.json({ 
         error: 'Erro ao criar usuário',
         details: error.message 
       }, { status: 500 })
     }
     
-    console.log('✅ [USERS-API] Usuário criado com sucesso:', newUser?.id)
 
     // Remover password_hash do resultado e ajustar role
     const { password_hash: _, ...sanitizedUser } = newUser
@@ -158,7 +147,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(sanitizedUser, { status: 201 })
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
@@ -203,7 +191,6 @@ export async function PATCH(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Erro ao atualizar usuário:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -217,7 +204,6 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json(sanitizedUser)
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
@@ -255,13 +241,11 @@ export async function DELETE(request: NextRequest) {
       .eq('id', id)
 
     if (error) {
-      console.error('Erro ao excluir usuário:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }

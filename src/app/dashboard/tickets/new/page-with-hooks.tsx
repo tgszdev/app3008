@@ -76,9 +76,6 @@ export default function NewTicketPage() {
   // Debug permissions
   useEffect(() => {
     if (!permissionsLoading) {
-      console.log('=== DEBUG PERMISSIONS ===')
-      console.log('User can assign tickets:', hasPermission('tickets_assign'))
-      console.log('User can edit all tickets:', hasPermission('tickets_edit_all'))
     }
   }, [permissionsLoading, hasPermission])
 
@@ -86,26 +83,16 @@ export default function NewTicketPage() {
     try {
       // Buscar usuários que têm permissão para atribuir tickets
       const response = await axios.get('/api/users/with-permission?permission=tickets_assign')
-      console.log('=== DEBUG FETCH ANALYSTS ===')
-      console.log('Response status:', response.status)
-      console.log('Users with tickets_assign permission:', response.data)
-      console.log('Number of users found:', response.data.length)
       setAnalysts(response.data)
     } catch (error) {
-      console.error('=== ERROR FETCHING ANALYSTS ===')
-      console.error('Error details:', error)
       // Fallback: buscar todos os usuários se o novo endpoint falhar
       try {
         const fallbackResponse = await axios.get('/api/users')
-        console.log('=== FALLBACK USERS ===')
-        console.log('All users:', fallbackResponse.data)
         const analystUsers = fallbackResponse.data.filter((user: UserData) => 
           user.role === 'analyst' || user.role === 'admin'
         )
-        console.log('Filtered analyst users:', analystUsers)
         setAnalysts(analystUsers)
       } catch (fallbackError) {
-        console.error('Erro no fallback:', fallbackError)
       }
     }
   }
@@ -121,7 +108,6 @@ export default function NewTicketPage() {
         setFormData(prev => ({ ...prev, category_id: response.data[0].id }))
       }
     } catch (error) {
-      console.error('Erro ao buscar categorias:', error)
       toast.error('Erro ao carregar categorias')
     } finally {
       setLoadingCategories(false)
@@ -205,9 +191,6 @@ export default function NewTicketPage() {
       const response = await axios.post('/api/tickets', ticketData)
       const ticketId = response.data.id
       
-      console.log('=== DEBUG CRIAÇÃO DE TICKET ===')
-      console.log('Resposta da API:', response.data)
-      console.log('ID do ticket criado:', ticketId)
       
       // Se há arquivos selecionados, fazer upload deles
       if (selectedFiles.length > 0) {
@@ -244,7 +227,6 @@ export default function NewTicketPage() {
             toast.error(`${failCount} arquivo(s) falharam no upload`)
           }
         } catch (uploadError) {
-          console.error('Erro ao fazer upload de arquivos:', uploadError)
           toast.error('Alguns arquivos não puderam ser anexados, mas o ticket foi criado')
         }
       }
@@ -252,7 +234,6 @@ export default function NewTicketPage() {
       toast.success('Chamado criado com sucesso!')
       router.push(`/dashboard/tickets/${ticketId}`)
     } catch (error: any) {
-      console.error('Erro ao criar chamado:', error)
       toast.error(error.response?.data?.error || 'Erro ao criar chamado')
     } finally {
       setLoading(false)

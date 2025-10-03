@@ -63,7 +63,6 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('Erro na API de teste:', error)
     return NextResponse.json({ 
       error: 'Erro interno do servidor na API de teste',
       details: error instanceof Error ? error.message : 'Erro desconhecido'

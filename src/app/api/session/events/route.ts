@@ -17,7 +17,6 @@ export async function GET(request: NextRequest) {
     return new Response('No session token', { status: 401 })
   }
   
-  console.log(`[SSE] Iniciando stream para usuário ${userId}`)
   
   // Criar stream de eventos
   const stream = new ReadableStream({
@@ -45,7 +44,6 @@ export async function GET(request: NextRequest) {
           
           if (error || !currentSession) {
             // Sessão não existe mais
-            console.log(`[SSE] Sessão não encontrada para usuário ${userId}`)
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ 
                 type: 'session_invalidated',
@@ -59,7 +57,6 @@ export async function GET(request: NextRequest) {
           
           // Verificar se foi invalidada
           if (currentSession.invalidated_at) {
-            console.log(`[SSE] Sessão invalidada detectada para usuário ${userId}`)
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ 
                 type: 'session_invalidated',
@@ -77,7 +74,6 @@ export async function GET(request: NextRequest) {
           const expires = new Date(currentSession.expires)
           
           if (expires < now) {
-            console.log(`[SSE] Sessão expirada para usuário ${userId}`)
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ 
                 type: 'session_expired',
@@ -92,7 +88,6 @@ export async function GET(request: NextRequest) {
           // Sessão ainda válida
           return true
         } catch (error) {
-          console.error('[SSE] Erro ao verificar sessão:', error)
           // Em caso de erro, continuar tentando
           return true
         }
@@ -130,14 +125,12 @@ export async function GET(request: NextRequest) {
       
       // Cleanup quando cliente desconectar
       request.signal.addEventListener('abort', () => {
-        console.log(`[SSE] Cliente desconectado - usuário ${userId}`)
         clearInterval(interval)
         controller.close()
       })
       
       // Timeout de segurança (1 hora)
       setTimeout(() => {
-        console.log(`[SSE] Timeout de segurança atingido - usuário ${userId}`)
         controller.enqueue(
           encoder.encode(`data: ${JSON.stringify({ 
             type: 'timeout',

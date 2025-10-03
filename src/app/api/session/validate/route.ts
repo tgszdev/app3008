@@ -77,7 +77,6 @@ export async function GET(request: NextRequest) {
     })
     
   } catch (error: any) {
-    console.error('Error validating session:', error)
     return NextResponse.json({ 
       valid: false, 
       reason: 'internal_error',
@@ -124,7 +123,6 @@ export async function POST(request: NextRequest) {
     })
     
   } catch (error: any) {
-    console.error('Error invalidating session:', error)
     return NextResponse.json({ 
       error: 'Internal server error',
       details: error.message 

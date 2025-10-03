@@ -175,7 +175,6 @@ export default function TimesheetsPage() {
           setPermissions(permResponse.data)
         }
       } catch (permError) {
-        console.log('Usando permissões padrão')
         // Usar permissões padrão se falhar
         setPermissions({ 
           can_submit: true, 
@@ -195,7 +194,6 @@ export default function TimesheetsPage() {
         
         setTickets(userTickets)
       } catch (ticketError) {
-        console.error('Erro ao buscar tickets:', ticketError)
         setTickets([])
       }
       
@@ -215,11 +213,9 @@ export default function TimesheetsPage() {
         }))
         setTimesheets(mappedTimesheets)
       } catch (timesheetError) {
-        console.error('Erro ao buscar apontamentos:', timesheetError)
         setTimesheets([])
       }
     } catch (error) {
-      console.error('Error fetching data:', error)
       toast.error('Erro ao carregar dados')
     } finally {
       setLoading(false)
@@ -300,7 +296,6 @@ export default function TimesheetsPage() {
         setShowAddForm(false)
       }
     } catch (error: any) {
-      console.error('Error submitting timesheet:', error)
       toast.error(error.response?.data?.error || 'Erro ao adicionar apontamento')
     } finally {
       setSubmitting(false)
@@ -326,7 +321,6 @@ export default function TimesheetsPage() {
         ))
       }
     } catch (error: any) {
-      console.error('Error approving timesheet:', error)
       toast.error(error.response?.data?.error || 'Erro ao aprovar apontamento')
     }
   }
@@ -354,7 +348,6 @@ export default function TimesheetsPage() {
         ))
       }
     } catch (error: any) {
-      console.error('Error rejecting timesheet:', error)
       toast.error(error.response?.data?.error || 'Erro ao rejeitar apontamento')
     }
   }
@@ -367,7 +360,6 @@ export default function TimesheetsPage() {
       toast.success('Apontamento excluído')
       setTimesheets(timesheets.filter(t => t.id !== id))
     } catch (error: any) {
-      console.error('Error deleting timesheet:', error)
       toast.error(error.response?.data?.error || 'Erro ao excluir apontamento')
     }
   }

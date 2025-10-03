@@ -184,7 +184,6 @@ export default function ReportsPage() {
         }
       ])
     } catch (error) {
-      console.error('Error fetching saved reports:', error)
     }
   }
 
@@ -205,7 +204,6 @@ export default function ReportsPage() {
       
       toast.success('Relatório gerado com sucesso!')
     } catch (error) {
-      console.error('Error generating report:', error)
       toast.error('Erro ao gerar relatório')
     } finally {
       setGenerating(false)

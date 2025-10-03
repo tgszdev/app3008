@@ -118,7 +118,6 @@ export function ModernClientSelector({
       } else {
         // Adicionar à seleção (respeitando limite máximo)
         if (selectedClients.length >= maxSelections) {
-          console.warn(`Limite máximo de ${maxSelections} seleções atingido`)
           return
         }
         newSelection = [...selectedClients, clientId]
@@ -126,7 +125,6 @@ export function ModernClientSelector({
       
       onSelectionChange?.(newSelection)
     } catch (error) {
-      console.error('Erro ao alternar cliente:', error)
     }
   }
 
@@ -136,7 +134,6 @@ export function ModernClientSelector({
       const newSelection = allIds.slice(0, maxSelections)
       onSelectionChange?.(newSelection)
     } catch (error) {
-      console.error('Erro ao selecionar todos:', error)
     }
   }
 
@@ -144,7 +141,6 @@ export function ModernClientSelector({
     try {
       onSelectionChange?.([])
     } catch (error) {
-      console.error('Erro ao limpar seleção:', error)
     }
   }
 

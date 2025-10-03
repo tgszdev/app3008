@@ -51,7 +51,6 @@ export default function TicketTimeline({
       setTimeline(timelineData)
       setTotalDuration(totalDurationData)
     } catch (error) {
-      console.error('Erro ao buscar timeline:', error)
       setTimeline([])
       setTotalDuration('')
     } finally {

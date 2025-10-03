@@ -57,7 +57,6 @@ export default function ProfileCategorySettings() {
         ])
       }
     } catch (error: any) {
-      console.error('Erro ao buscar dados:', error)
       // Se a API não existir ainda, nenhuma categoria é permitida por padrão
       if (error.response?.status === 404) {
         setPermissions([
@@ -123,7 +122,6 @@ export default function ProfileCategorySettings() {
         toast.error('Erro ao salvar permissões')
       }
     } catch (error: any) {
-      console.error('Erro ao salvar:', error)
       toast.error(error.response?.data?.error || 'Erro ao salvar permissões')
     } finally {
       setSaving(false)

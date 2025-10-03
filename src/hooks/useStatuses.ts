@@ -48,7 +48,6 @@ export function useStatuses() {
       
       setStatuses(sortedStatuses)
     } catch (error) {
-      console.error('Error fetching statuses:', error)
       setError('Erro ao carregar status')
       
       // Fallback to default statuses if API fails

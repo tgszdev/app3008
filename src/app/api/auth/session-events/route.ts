@@ -44,7 +44,6 @@ export async function GET(request: NextRequest) {
             controller.enqueue(encoder.encode('data: {"type":"heartbeat"}\n\n'))
           }
         } catch (error) {
-          console.error('Erro ao verificar sessão:', error)
         }
       }, 2000) // Verifica a cada 2 segundos
       

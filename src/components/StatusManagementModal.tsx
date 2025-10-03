@@ -129,7 +129,6 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
         })))
       }
     } catch (error) {
-      console.error('Error fetching statuses:', error)
       setStatuses(DEFAULT_STATUSES.map((s, index) => ({
         ...s,
         id: `default-${index}`

@@ -206,7 +206,6 @@ export default function TicketsPage() {
       const response = await axios.get(`/api/tickets?${params.toString()}`)
       setTickets(response.data)
     } catch (error) {
-      console.error('Erro ao buscar tickets:', error)
       toast.error('Erro ao carregar tickets')
     } finally {
       setLoading(false)
@@ -220,7 +219,6 @@ export default function TicketsPage() {
       // Implementar geração de PDF
       toast.success('PDF gerado com sucesso!')
     } catch (error) {
-      console.error('Erro ao gerar PDF:', error)
       toast.error('Erro ao gerar PDF')
     } finally {
       setIsGeneratingPDF(false)

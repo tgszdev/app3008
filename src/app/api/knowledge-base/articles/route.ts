@@ -59,7 +59,6 @@ export async function GET(request: NextRequest) {
     const { data: articles, error } = await query
 
     if (error) {
-      console.error('Erro ao buscar artigos (tabela pode não existir):', error)
       // Se a tabela não existir, retornar array vazio
       return NextResponse.json({
         articles: [],
@@ -88,7 +87,6 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error: any) {
-    console.error('Erro na API de artigos:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor', message: error.message },
       { status: 500 }
@@ -110,7 +108,6 @@ export async function POST(request: NextRequest) {
     const userId = (session.user as any)?.id || session.user.email
     
     if (userRole !== 'admin' && userRole !== 'analyst') {
-      console.log('Role do usuário:', userRole, 'Email:', session.user.email)
       return NextResponse.json(
         { error: 'Sem permissão para criar artigos' },
         { status: 403 }
@@ -175,7 +172,6 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (articleError) {
-      console.error('Erro ao criar artigo:', articleError)
       return NextResponse.json(
         { error: 'Erro ao criar artigo', details: articleError.message },
         { status: 500 }
@@ -204,7 +200,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(article)
 
   } catch (error: any) {
-    console.error('Erro ao criar artigo:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor', message: error.message },
       { status: 500 }
@@ -259,7 +254,6 @@ export async function PATCH(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Erro ao atualizar artigo:', error)
       return NextResponse.json(
         { error: 'Erro ao atualizar artigo', details: error.message },
         { status: 500 }
@@ -269,7 +263,6 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json(article)
 
   } catch (error: any) {
-    console.error('Erro ao atualizar artigo:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor', message: error.message },
       { status: 500 }
@@ -317,7 +310,6 @@ export async function DELETE(request: NextRequest) {
       .eq('id', id)
 
     if (error) {
-      console.error('Erro ao excluir artigo:', error)
       return NextResponse.json(
         { error: 'Erro ao excluir artigo', details: error.message },
         { status: 500 }
@@ -327,7 +319,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: true })
 
   } catch (error: any) {
-    console.error('Erro ao excluir artigo:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor', message: error.message },
       { status: 500 }

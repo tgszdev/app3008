@@ -213,7 +213,6 @@ export async function GET(request: NextRequest) {
       tip: 'Adicione ?send=true na URL para enviar notificações de teste reais'
     })
   } catch (error: any) {
-    console.error('Erro no teste:', error)
     return NextResponse.json({ 
       error: 'Erro ao executar teste',
       details: error.message 

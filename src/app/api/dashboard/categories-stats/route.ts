@@ -12,7 +12,6 @@ interface StatusInfo {
 
 export async function GET(request: Request) {
   try {
-    console.log('🔍 API categories-stats chamada')
     
     const session = await auth()
     
@@ -26,8 +25,6 @@ export async function GET(request: Request) {
     const endDate = searchParams.get('end_date')
     const selectedContextId = searchParams.get('context_id')
     const selectedContextIds = searchParams.get('context_ids')
-    console.log('🔍 Contexto selecionado via parâmetro:', selectedContextId)
-    console.log('🔍 Contextos múltiplos via parâmetro:', selectedContextIds)
 
     // Default to current month if no dates provided
     let filterStartDate: string
@@ -44,7 +41,6 @@ export async function GET(request: Request) {
       filterEndDate = endDate
     }
 
-    console.log('Using dates for query:', { filterStartDate, filterEndDate })
 
     // Buscar status dinamicamente da tabela ticket_statuses
     const { data: statuses, error: statusError } = await supabaseAdmin
@@ -53,12 +49,10 @@ export async function GET(request: Request) {
       .order('order_index', { ascending: true })
 
     if (statusError) {
-      console.error('❌ Erro ao buscar status:', statusError)
       return NextResponse.json({ error: 'Erro ao buscar status' }, { status: 500 })
     }
 
     const statusList = statuses || []
-    console.log(`📋 Status dinâmicos carregados:`, statusList.map(s => `${s.name} (${s.slug})`))
 
     // Get all tickets within the date range with category information
     let query = supabaseAdmin
@@ -80,30 +74,24 @@ export async function GET(request: Request) {
       .gte('created_at', `${filterStartDate}T00:00:00`)
       .lte('created_at', `${filterEndDate}T23:59:59`)
     
-    console.log(`🔍 Query base criada para período: ${filterStartDate} até ${filterEndDate}`)
     
     // Apply multi-tenant filter
     if (selectedContextIds) {
       // Múltiplos contextos
       const contextIds = selectedContextIds.split(',').filter(id => id.trim())
       query = query.in('context_id', contextIds)
-      console.log(`✅ Query categories filtrada por múltiplos contextos: ${contextIds}`)
     } else if (selectedContextId) {
       // Contexto único
       query = query.eq('context_id', selectedContextId)
-      console.log(`✅ Query categories filtrada por contexto selecionado: ${selectedContextId}`)
     } else {
-      console.log(`⚠️ Nenhum filtro de contexto aplicado - buscando todos os tickets`)
     }
 
     const { data: tickets, error: ticketsError } = await query
 
     if (ticketsError) {
-      console.error('Error fetching tickets:', ticketsError)
       return NextResponse.json({ error: 'Failed to fetch tickets' }, { status: 500 })
     }
 
-    console.log(`Found ${tickets?.length || 0} tickets for period ${filterStartDate} to ${filterEndDate}`)
 
     // Calculate statistics by category
     const totalTickets = tickets?.length || 0
@@ -228,12 +216,9 @@ export async function GET(request: Request) {
       order_index: number
     }> = []
     
-    console.log(`🔍 Processando ${tickets?.length || 0} tickets para status stats`)
-    console.log(`🔍 Tickets encontrados:`, tickets?.map(t => ({ id: t.id, status: t.status })))
     
     // Primeiro, identificar todos os status únicos dos tickets
     const uniqueTicketStatuses = [...new Set(tickets?.map(t => t.status) || [])]
-    console.log(`🎯 Status únicos dos tickets:`, uniqueTicketStatuses)
     
     // Criar status dinâmicos baseados nos tickets encontrados
     const dynamicStatusStats = uniqueTicketStatuses.map(ticketStatus => {
@@ -268,7 +253,6 @@ export async function GET(request: Request) {
       }
     }).filter(status => status.count > 0) // Só mostrar status com tickets
     
-    console.log(`✅ Status dinâmicos criados:`, dynamicStatusStats.map(s => `${s.name} (${s.slug}): ${s.count}`))
     
     // Aplicar aos arrays de resposta
     dynamicStatusStats.forEach(status => {
@@ -282,8 +266,6 @@ export async function GET(request: Request) {
       })
     })
     
-    console.log(`📊 Status counts finais:`, statusCounts)
-    console.log(`📊 Status detailed finais:`, statusCountsDetailed.map(s => `${s.name}: ${s.count}`))
     
     // Sort status by order_index
     statusCountsDetailed.sort((a, b) => a.order_index - b.order_index)
@@ -313,11 +295,9 @@ export async function GET(request: Request) {
       average_resolution_time: '0h 0m'
     }
 
-    console.log('Returning period:', response.periodo)
 
     return NextResponse.json(response)
   } catch (error) {
-    console.error('Categories stats error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

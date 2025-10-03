@@ -19,7 +19,6 @@ export default function TestProtectedPage() {
     enablePolling: true,
     pollingInterval: 5000, // Verificar a cada 5s se SSE falhar
     onSessionInvalidated: (reason) => {
-      console.log('🔒 Sessão invalidada! Motivo:', reason)
       // Aqui você pode limpar dados locais, cache, etc
     }
   })

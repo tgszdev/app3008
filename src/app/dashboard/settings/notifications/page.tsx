@@ -63,7 +63,6 @@ export default function NotificationSettingsPage() {
       const response = await axios.get('/api/notifications/preferences')
       setPreferences(response.data)
     } catch (error) {
-      console.error('Error fetching preferences:', error)
       toast.error('Erro ao carregar preferências')
     } finally {
       setLoading(false)
@@ -77,7 +76,6 @@ export default function NotificationSettingsPage() {
       await axios.patch('/api/notifications/preferences', preferences)
       toast.success('Preferências salvas com sucesso!')
     } catch (error) {
-      console.error('Error saving preferences:', error)
       toast.error('Erro ao salvar preferências')
     } finally {
       setSaving(false)
@@ -120,7 +118,6 @@ export default function NotificationSettingsPage() {
         action_url: undefined // Sem URL de ação para notificação de teste
       })
       
-      console.log('Test notification response:', response.data)
       toast.success('Notificação de teste enviada!')
       
       // Se push está ativado, enviar também push notification
@@ -128,8 +125,6 @@ export default function NotificationSettingsPage() {
         await testNotification()
       }
     } catch (error: any) {
-      console.error('Error sending test notification:', error)
-      console.error('Error response:', error.response?.data)
       const errorMessage = error.response?.data?.error || 'Erro ao enviar notificação de teste'
       toast.error(errorMessage)
     }
@@ -355,7 +350,6 @@ export default function NotificationSettingsPage() {
                         toast.error(response.data.error || 'Erro ao enviar email de teste')
                       }
                     } catch (error: any) {
-                      console.error('Erro ao testar email:', error)
                       const errorMsg = error.response?.data?.error || 'Erro ao enviar email de teste'
                       const helpMsg = error.response?.data?.help
                       toast.error(helpMsg ? `${errorMsg}\n${helpMsg}` : errorMsg)

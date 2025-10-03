@@ -5,16 +5,13 @@ import { supabaseAdmin } from '@/lib/supabase';
 export async function POST(request: Request) {
   try {
     // Log para debug
-    console.log('POST /api/timesheet-add - Starting');
     
     const session = await auth();
     if (!session?.user) {
-      console.log('POST /api/timesheet-add - No session');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const data = await request.json();
-    console.log('POST /api/timesheet-add - Data received:', data);
 
     // Validate required fields
     if (!data.ticket_id || !data.activity_description || !data.hours_worked || !data.work_date) {
@@ -32,7 +29,6 @@ export async function POST(request: Request) {
       .single();
 
     if (permError) {
-      console.error('Permission check error:', permError);
       // Se não encontrar permissão, assume que pode submeter
     }
 
@@ -57,7 +53,6 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      console.error('Error creating timesheet:', error);
       return NextResponse.json({ 
         error: 'Failed to create timesheet',
         details: error.message 
@@ -75,13 +70,10 @@ export async function POST(request: Request) {
           new_status: 'pending'
         });
     } catch (historyError) {
-      console.log('History insert error (ignored):', historyError);
     }
 
-    console.log('POST /api/timesheet-add - Success:', timesheet);
     return NextResponse.json(timesheet);
   } catch (error) {
-    console.error('POST /api/timesheet-add - Error:', error);
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'

@@ -176,7 +176,6 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
         }
       }
     } catch (error) {
-      console.error('Erro ao carregar configurações:', error)
     } finally {
       setLoading(false)
     }
@@ -202,7 +201,6 @@ export default function NotificationSettingsModal({ isOpen, onClose }: Notificat
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'Erro ao salvar configurações de notificação' })
-      console.error('Erro:', error)
     } finally {
       setSaving(false)
     }

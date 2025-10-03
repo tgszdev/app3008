@@ -80,7 +80,6 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
   // =====================================================
   
   useEffect(() => {
-    console.log('🔄 OrganizationContext useEffect:', { status, hasSession: !!session?.user, userType })
     
     if (status === 'loading') {
       setIsLoading(true)
@@ -88,7 +87,6 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
     }
     
     if (!session?.user) {
-      console.log('⚠️ Sem sessão - parando loading')
       setIsLoading(false)
       return
     }
@@ -99,16 +97,13 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
         
         if (isMatrixUser) {
           // Usuário da matriz: buscar contextos do banco de dados
-          console.log('🔄 Carregando contextos para usuário matrix do banco...')
           
           try {
             const response = await fetch('/api/organizations/user-contexts')
-            console.log('📡 Response status:', response.status)
             
             if (response.ok) {
               const data = await response.json()
               const contexts = data.organizations || []
-              console.log('✅ Contextos carregados do banco:', contexts.length)
               setAvailableContexts(contexts)
               
               // Se tem contextos disponíveis, selecionar o primeiro por padrão
@@ -124,12 +119,10 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
               }
             } else {
               const errorData = await response.json()
-              console.error('❌ Erro ao carregar contextos do banco:', errorData)
               // Fallback para contextos da sessão
               setAvailableContexts(sessionContexts)
             }
           } catch (error) {
-            console.error('❌ Erro ao buscar contextos:', error)
             // Fallback para contextos da sessão
             setAvailableContexts(sessionContexts)
           }
@@ -147,7 +140,6 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
         }
         
       } catch (error) {
-        console.error('Erro ao inicializar contextos:', error)
       } finally {
         setIsLoading(false)
       }
@@ -172,7 +164,6 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
         detail: { context: newContext }
       }))
       
-      console.log('Contexto alterado para:', newContext.name)
     }
   }
   
@@ -201,7 +192,6 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
         }
       }
     } catch (error) {
-      console.error('Erro ao atualizar contextos:', error)
     }
   }
   

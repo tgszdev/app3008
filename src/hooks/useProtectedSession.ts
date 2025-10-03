@@ -69,8 +69,6 @@ export function useProtectedSession(options: UseProtectedSessionOptions = {}) {
       }))
 
       if (!data.valid) {
-        console.log('[useProtectedSession] Sessão inválida detectada:', data.reason)
-        
         if (!isInvalidatingRef.current) {
           isInvalidatingRef.current = true
           
@@ -101,8 +99,7 @@ export function useProtectedSession(options: UseProtectedSessionOptions = {}) {
 
       return true
     } catch (error) {
-      console.error('[useProtectedSession] Erro ao verificar sessão:', error)
-      return true // Em caso de erro, assumir que está válida
+      return true
     }
   }, [session, showNotifications, redirectTo, onSessionInvalidated])
 
@@ -111,8 +108,6 @@ export function useProtectedSession(options: UseProtectedSessionOptions = {}) {
     if (!enableSSE || !session?.user?.id || status !== 'authenticated') {
       return
     }
-
-    console.log('[useProtectedSession] Configurando SSE...')
 
     const setupSSE = () => {
       // Fechar conexão anterior se existir
@@ -124,10 +119,8 @@ export function useProtectedSession(options: UseProtectedSessionOptions = {}) {
       eventSourceRef.current = eventSource
 
       eventSource.onopen = () => {
-        console.log('[useProtectedSession] SSE conectado')
         setState(prev => ({ ...prev, isConnected: true }))
         
-        // Parar polling se estava ativo
         if (pollingIntervalRef.current) {
           clearInterval(pollingIntervalRef.current)
           pollingIntervalRef.current = null
@@ -139,12 +132,10 @@ export function useProtectedSession(options: UseProtectedSessionOptions = {}) {
           const data = JSON.parse(event.data)
           
           if (data.type === 'connected') {
-            console.log('[useProtectedSession] SSE conectado com sucesso')
             if (showNotifications) {
               toast.success('🔒 Proteção de sessão ativada', { duration: 2000 })
             }
           } else if (data.type === 'session_invalidated') {
-            console.log('[useProtectedSession] Sessão invalidada via SSE:', data.reason)
             
             setState(prev => ({
               ...prev,
@@ -173,7 +164,6 @@ export function useProtectedSession(options: UseProtectedSessionOptions = {}) {
               }, 200)
             }
           } else if (data.type === 'session_expired') {
-            console.log('[useProtectedSession] Sessão expirada via SSE')
             
             setState(prev => ({
               ...prev,
@@ -200,22 +190,15 @@ export function useProtectedSession(options: UseProtectedSessionOptions = {}) {
             }
           }
         } catch (error) {
-          console.error('[useProtectedSession] Erro ao processar evento SSE:', error)
+          // Silently handle error
         }
       }
 
       eventSource.onerror = (error) => {
-        console.error('[useProtectedSession] Erro SSE:', error)
         setState(prev => ({ ...prev, isConnected: false }))
         
-        // Se SSE falhar, ativar polling como fallback
         if (enablePolling && !pollingIntervalRef.current) {
-          console.log('[useProtectedSession] Ativando polling como fallback...')
-          
-          // Verificar imediatamente
           checkSessionValidity()
-          
-          // Configurar polling
           pollingIntervalRef.current = setInterval(checkSessionValidity, pollingInterval)
         }
       }
@@ -246,12 +229,7 @@ export function useProtectedSession(options: UseProtectedSessionOptions = {}) {
       return
     }
 
-    console.log('[useProtectedSession] Configurando polling...')
-
-    // Verificar imediatamente
     checkSessionValidity()
-
-    // Configurar intervalo
     pollingIntervalRef.current = setInterval(checkSessionValidity, pollingInterval)
 
     return () => {
@@ -274,7 +252,6 @@ export function useProtectedSession(options: UseProtectedSessionOptions = {}) {
   useEffect(() => {
     const handleFocus = () => {
       if (state.isValid && !state.isConnected && session?.user?.id) {
-        console.log('[useProtectedSession] Janela ganhou foco, verificando sessão...')
         checkSessionValidity()
       }
     }

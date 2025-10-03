@@ -88,7 +88,6 @@ export async function GET() {
     })
     
   } catch (error) {
-    console.error('Erro ao testar permissões:', error)
     return NextResponse.json({ 
       error: 'Erro ao testar permissões',
       details: error instanceof Error ? error.message : 'Erro desconhecido'

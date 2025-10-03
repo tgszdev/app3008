@@ -33,7 +33,6 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Erro ao criar comentário:', error)
       
       // Se a tabela não existir, tentar criá-la
       if (error.message.includes('relation') && error.message.includes('does not exist')) {
@@ -75,10 +74,6 @@ export async function POST(request: NextRequest) {
       })
 
     // Buscar informações do ticket e usuário para notificação
-    console.log('=== PROCESSANDO NOTIFICAÇÕES DE COMENTÁRIO ===')
-    console.log('Ticket ID:', ticket_id)
-    console.log('Usuário comentando:', user_id)
-    console.log('Comentário ID:', comment.id)
     
     try {
       const { data: ticket } = await supabaseAdmin
@@ -119,7 +114,6 @@ export async function POST(request: NextRequest) {
             action_url: `/dashboard/tickets/${ticket.id}#comment-${comment.id}`
           })
           
-          console.log('Resultado da notificação para criador:', notificationResult ? '✅ Sucesso' : '❌ Falhou')
         } else {
           console.log('Criador não notificado porque:', {
             has_creator: !!ticket.created_by,
@@ -149,7 +143,6 @@ export async function POST(request: NextRequest) {
             action_url: `/dashboard/tickets/${ticket.id}#comment-${comment.id}`
           })
           
-          console.log('Resultado da notificação para responsável:', notificationResult ? '✅ Sucesso' : '❌ Falhou')
         } else {
           console.log('Responsável não notificado porque:', {
             has_assignee: !!ticket.assigned_to,
@@ -192,12 +185,10 @@ export async function POST(request: NextRequest) {
         }
       }
     } catch (notificationError) {
-      console.log('Erro ao enviar notificações (ignorado):', notificationError)
     }
 
     return NextResponse.json(comment)
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
@@ -222,13 +213,11 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: true })
 
     if (error) {
-      console.error('Erro ao buscar comentários:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json(comments || [])
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
@@ -249,13 +238,11 @@ export async function DELETE(request: NextRequest) {
       .eq('id', id)
 
     if (error) {
-      console.error('Erro ao excluir comentário:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }

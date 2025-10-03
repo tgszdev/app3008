@@ -71,7 +71,6 @@ export async function PUT(request: NextRequest, context: RouteParams) {
       .single()
 
     if (error) {
-      console.error('Erro ao atualizar status:', error)
       return NextResponse.json({ error: 'Erro ao atualizar status' }, { status: 500 })
     }
 
@@ -91,10 +90,8 @@ export async function PUT(request: NextRequest, context: RouteParams) {
         })
         
         if (!response.ok) {
-          console.error('Erro na resposta do SLA:', await response.text())
         }
       } catch (slaError) {
-        console.error('Erro ao atualizar SLA:', slaError)
       }
     }
 
@@ -114,12 +111,10 @@ export async function PUT(request: NextRequest, context: RouteParams) {
           }
         })
     } catch (logError) {
-      console.error('Erro ao criar log de auditoria:', logError)
     }
 
     return NextResponse.json(ticket)
   } catch (error) {
-    console.error('Erro ao atualizar status:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }

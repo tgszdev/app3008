@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
 
 async function processEmails() {
   try {
-    console.log('📧 [EMAIL-PROCESSOR] Iniciando processamento de e-mails de escalação...');
 
     // 1. Buscar notificações de escalação pendentes
     const { data: notifications, error: notificationsError } = await supabaseAdmin
@@ -26,12 +25,10 @@ async function processEmails() {
       .limit(10);
 
     if (notificationsError) {
-      console.error('Erro ao buscar notificações de escalação:', notificationsError);
       return NextResponse.json({ error: notificationsError.message }, { status: 500 });
     }
 
     if (!notifications || notifications.length === 0) {
-      console.log('✅ [EMAIL-PROCESSOR] Nenhuma notificação de escalação pendente encontrada.');
       return NextResponse.json({ 
         success: true, 
         message: 'Nenhuma notificação de escalação pendente encontrada.',
@@ -40,14 +37,12 @@ async function processEmails() {
       });
     }
 
-    console.log(`📧 [EMAIL-PROCESSOR] Encontradas ${notifications.length} notificações para processar.`);
 
     let sentCount = 0;
     const results = [];
 
     for (const notification of notifications) {
       try {
-        console.log(`📧 [EMAIL-PROCESSOR] Processando notificação ${notification.id}...`);
 
         // 2. Buscar dados do usuário
         const { data: user, error: userError } = await supabaseAdmin
@@ -57,7 +52,6 @@ async function processEmails() {
           .single();
 
         if (userError || !user) {
-          console.error(`❌ [EMAIL-PROCESSOR] Usuário não encontrado para notificação ${notification.id}:`, userError);
           results.push({
             notification_id: notification.id,
             success: false,
@@ -68,7 +62,6 @@ async function processEmails() {
         }
 
         if (!user.email) {
-          console.error(`❌ [EMAIL-PROCESSOR] Usuário ${user.name} não tem e-mail configurado.`);
           results.push({
             notification_id: notification.id,
             success: false,
@@ -83,7 +76,6 @@ async function processEmails() {
         const emailSubject = notification.title || 'Escalação de Ticket';
         const emailMessage = notification.message || 'Ticket escalado automaticamente';
         
-        console.log(`📧 [EMAIL-PROCESSOR] Tentando enviar e-mail para ${user.email}...`);
         
         const emailResult = await sendEmail({
           to: user.email,
@@ -124,7 +116,6 @@ async function processEmails() {
           `
         });
 
-        console.log(`📧 [EMAIL-PROCESSOR] Resultado do sendEmail:`, emailResult, typeof emailResult);
 
         // O email-config.ts retorna um objeto {success: boolean, error?: string}
         const emailSuccess = emailResult && typeof emailResult === 'object' ? emailResult.success : emailResult;
@@ -137,7 +128,6 @@ async function processEmails() {
             .eq('id', notification.id);
 
           sentCount++;
-          console.log(`✅ [EMAIL-PROCESSOR] E-mail enviado com sucesso para ${user.email}`);
           
           results.push({
             notification_id: notification.id,
@@ -151,7 +141,6 @@ async function processEmails() {
             ? emailResult.error 
             : `Falha no envio do e-mail (resultado: ${JSON.stringify(emailResult)})`;
           
-          console.error(`❌ [EMAIL-PROCESSOR] Erro ao enviar e-mail para ${user.email}:`, errorMsg);
           results.push({
             notification_id: notification.id,
             user_email: user.email,
@@ -162,7 +151,6 @@ async function processEmails() {
         }
 
       } catch (error: any) {
-        console.error(`❌ [EMAIL-PROCESSOR] Erro ao processar notificação ${notification.id}:`, error);
         results.push({
           notification_id: notification.id,
           success: false,
@@ -172,7 +160,6 @@ async function processEmails() {
       }
     }
 
-    console.log(`✅ [EMAIL-PROCESSOR] Processamento concluído: ${notifications.length} notificações processadas, ${sentCount} e-mails enviados.`);
     
     return NextResponse.json({
       success: true,
@@ -183,7 +170,6 @@ async function processEmails() {
     });
 
   } catch (error: any) {
-    console.error('Erro no processador de e-mails de escalação:', error);
     return NextResponse.json({ error: 'Erro interno do servidor ao processar e-mails de escalação' }, { status: 500 });
   }
 }

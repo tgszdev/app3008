@@ -18,7 +18,6 @@ export async function GET(request: NextRequest) {
       .eq('is_read', false)
 
     if (error) {
-      console.error('Erro ao verificar notificações:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -27,7 +26,6 @@ export async function GET(request: NextRequest) {
       count: count || 0
     })
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }

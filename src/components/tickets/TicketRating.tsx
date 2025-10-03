@@ -50,7 +50,6 @@ export function TicketRating({
       }
     } catch (error) {
       // Sem avaliação ainda, isso é normal
-      console.log('No rating yet')
     }
   }
 
@@ -88,7 +87,6 @@ export function TicketRating({
         }
       }
     } catch (error: any) {
-      console.error('Error submitting rating:', error)
       toast.error(error.response?.data?.error || 'Erro ao enviar avaliação')
     } finally {
       setLoading(false)

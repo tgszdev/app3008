@@ -40,7 +40,6 @@ export async function GET(request: NextRequest) {
       can_approve: permission.can_approve || userInfo?.role === 'admin'
     })
   } catch (error) {
-    console.error('Error fetching permissions:', error)
     // Retornar permissões padrão em caso de erro
     return NextResponse.json({
       can_submit: true,
@@ -116,7 +115,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result)
   } catch (error) {
-    console.error('Error updating permissions:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

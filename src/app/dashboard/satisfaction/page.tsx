@@ -41,7 +41,6 @@ export default function SatisfactionPage() {
       const response = await axios.get(`/api/dashboard/satisfaction?period=${period}`)
       setData(response.data)
     } catch (error) {
-      console.error('Error fetching satisfaction data:', error)
       toast.error('Erro ao carregar dados de satisfação')
       setData({
         averageRating: 0,

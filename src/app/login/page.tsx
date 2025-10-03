@@ -37,7 +37,6 @@ export default function LoginPage() {
     setIsLoading(true)
     
     try {
-      console.log('Iniciando login...')
       
       const result = await signIn('credentials', {
         email,
@@ -46,18 +45,14 @@ export default function LoginPage() {
         callbackUrl: '/dashboard'
       })
       
-      console.log('Resultado do login:', result)
       
       if (result?.error) {
-        console.error('Erro no login:', result.error)
         toast.error('Email ou senha incorretos')
       } else if (result?.ok) {
-        console.log('Login bem-sucedido!')
         toast.success('Login realizado com sucesso!')
         
         // Usar a URL retornada pelo NextAuth ou fallback para dashboard
         const redirectUrl = result.url || '/dashboard'
-        console.log('Redirecionando para:', redirectUrl)
         
         // Aguardar um pouco e fazer redirecionamento completo
         setTimeout(() => {
@@ -65,7 +60,6 @@ export default function LoginPage() {
         }, 500)
       }
     } catch (error) {
-      console.error('Erro inesperado:', error)
       toast.error('Erro ao fazer login. Tente novamente.')
     } finally {
       setIsLoading(false)

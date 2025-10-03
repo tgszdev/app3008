@@ -53,7 +53,6 @@ export async function GET(request: Request) {
     const { data: timesheets, error } = await query;
 
     if (error) {
-      console.error('Error fetching timesheets:', error);
       return NextResponse.json({ error: 'Failed to fetch statistics' }, { status: 500 });
     }
 
@@ -81,7 +80,6 @@ export async function GET(request: Request) {
       raw_data: timesheets
     });
   } catch (error) {
-    console.error('Statistics GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

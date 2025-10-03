@@ -70,7 +70,6 @@ export async function PUT(request: NextRequest) {
       .eq('id', userId)
 
     if (updateError) {
-      console.error('Erro ao atualizar senha:', updateError)
       return NextResponse.json(
         { error: 'Erro ao atualizar senha' },
         { status: 500 }
@@ -78,7 +77,6 @@ export async function PUT(request: NextRequest) {
     }
 
     // Log da ação
-    console.log(`Senha alterada para usuário ${user.email} por admin ${session.user?.email}`)
 
     return NextResponse.json({ 
       success: true,
@@ -86,7 +84,6 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }

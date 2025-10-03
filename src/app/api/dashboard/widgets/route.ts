@@ -47,7 +47,6 @@ export async function GET(request: NextRequest) {
       .eq('user_id', currentUserId)
 
     if (contextsError) {
-      console.error('Erro ao buscar contextos do usuário:', contextsError)
       return NextResponse.json(
         { error: 'Erro ao buscar contextos do usuário' },
         { status: 500 }
@@ -96,7 +95,6 @@ export async function GET(request: NextRequest) {
     const { data: tickets, error: ticketsError } = await query
 
     if (ticketsError) {
-      console.error('Erro ao buscar tickets:', ticketsError)
       return NextResponse.json(
         { error: 'Erro ao buscar tickets' },
         { status: 500 }
@@ -164,7 +162,6 @@ export async function GET(request: NextRequest) {
         const { data: categoryData, error: categoryError } = await categoryStats
 
         if (categoryError) {
-          console.error('Erro ao buscar categorias:', categoryError)
         }
 
         // Agrupar por categoria
@@ -212,7 +209,6 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro na API widgets:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }

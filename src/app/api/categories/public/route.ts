@@ -4,7 +4,6 @@ import { supabaseAdmin } from '@/lib/supabase'
 // GET - Endpoint público para categorias (FIX TEMPORÁRIO)
 export async function GET(request: Request) {
   try {
-    console.log('🔧 Endpoint público de categorias (FIX TEMPORÁRIO)')
     
     // Parse query parameters
     const { searchParams } = new URL(request.url)
@@ -39,16 +38,13 @@ export async function GET(request: Request) {
     const { data: categories, error } = await query
 
     if (error) {
-      console.error('❌ Erro ao buscar categorias:', error)
       return NextResponse.json({ error: 'Failed to fetch categories' }, { status: 500 })
     }
 
-    console.log('✅ Categorias encontradas (público):', categories?.length || 0)
 
     return NextResponse.json(categories || [])
 
   } catch (error: any) {
-    console.error('❌ Erro no endpoint público:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

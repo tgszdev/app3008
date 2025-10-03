@@ -85,7 +85,6 @@ export async function POST(request: NextRequest) {
           .toBuffer()
       }
     } catch (error) {
-      console.error('Erro ao processar imagem:', error)
       return NextResponse.json(
         { error: 'Erro ao processar imagem' },
         { status: 500 }
@@ -118,7 +117,6 @@ export async function POST(request: NextRequest) {
       })
 
     if (uploadError) {
-      console.error('[Upload API] Error uploading to Supabase:', uploadError)
       return NextResponse.json(
         { error: 'Erro ao fazer upload da imagem' },
         { status: 500 }
@@ -145,7 +143,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error: any) {
-    console.error('[Upload API] Error:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor', details: error?.message || 'Erro desconhecido' },
       { status: 500 }

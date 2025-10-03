@@ -135,7 +135,6 @@ export default function EditArticlePage() {
       setMetaTitle(articleData.meta_title || '')
       setMetaDescription(articleData.meta_description || '')
     } catch (error: any) {
-      console.error('Erro ao buscar dados:', error)
       toast.error('Erro ao carregar artigo')
       router.push('/dashboard/knowledge-base')
     } finally {
@@ -274,7 +273,6 @@ export default function EditArticlePage() {
       toast.success('Artigo atualizado com sucesso!')
       router.push(`/dashboard/knowledge-base/article/${slug}`)
     } catch (error: any) {
-      console.error('Erro ao salvar artigo:', error)
       toast.error(error.response?.data?.error || 'Erro ao salvar artigo')
     } finally {
       setSaving(false)
@@ -292,7 +290,6 @@ export default function EditArticlePage() {
       toast.success('Artigo excluído com sucesso!')
       router.push('/dashboard/knowledge-base')
     } catch (error: any) {
-      console.error('Erro ao excluir artigo:', error)
       toast.error('Erro ao excluir artigo')
     }
   }

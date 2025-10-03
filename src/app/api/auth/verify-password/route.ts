@@ -12,7 +12,6 @@ export async function POST(request: NextRequest) {
     const valid = await bcrypt.compare(password, hashedPassword)
     return NextResponse.json({ valid })
   } catch (error) {
-    console.error('Password verification error:', error)
     return NextResponse.json({ valid: false }, { status: 500 })
   }
 }

@@ -5,7 +5,6 @@ import { clearEmailConfigCache } from '@/lib/email-config'
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🧪 [TEST-EMAIL] Iniciando teste de email de escalação...')
     
     // Obter email de teste dos parâmetros ou usar padrão
     const searchParams = request.nextUrl.searchParams
@@ -30,7 +29,6 @@ export async function GET(request: NextRequest) {
     
     const recipientEmail = testEmail || ''
     
-    console.log(`📧 [TEST-EMAIL] Enviando email de teste para: ${recipientEmail}`)
     
     // Limpar cache de configuração para forçar buscar do banco
     clearEmailConfigCache()
@@ -45,7 +43,6 @@ export async function GET(request: NextRequest) {
     )
     
     if (result) {
-      console.log('✅ [TEST-EMAIL] Email enviado com sucesso!')
       
       // Verificar log no banco
       const { data: logs } = await supabaseAdmin
@@ -63,7 +60,6 @@ export async function GET(request: NextRequest) {
         timestamp: new Date().toISOString()
       })
     } else {
-      console.error('❌ [TEST-EMAIL] Falha ao enviar email')
       
       // Buscar erro no log
       const { data: errorLogs } = await supabaseAdmin
@@ -84,7 +80,6 @@ export async function GET(request: NextRequest) {
     }
     
   } catch (error: any) {
-    console.error('❌ [TEST-EMAIL] Erro:', error)
     return NextResponse.json({
       success: false,
       error: 'Erro ao processar teste',
@@ -106,7 +101,6 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
     
-    console.log(`📧 [TEST-EMAIL-POST] Enviando email de teste para: ${email}`)
     
     // Enviar email de teste
     const result = await sendEscalationEmail(
@@ -125,7 +119,6 @@ export async function POST(request: NextRequest) {
     })
     
   } catch (error: any) {
-    console.error('❌ [TEST-EMAIL-POST] Erro:', error)
     return NextResponse.json({
       success: false,
       error: 'Erro ao processar teste',

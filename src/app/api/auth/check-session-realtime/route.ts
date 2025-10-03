@@ -50,7 +50,6 @@ export async function GET() {
       expires: validSession.expires
     })
   } catch (error) {
-    console.error('Session check error:', error)
     return NextResponse.json({ valid: false, error: 'Check failed' }, { status: 500 })
   }
 }

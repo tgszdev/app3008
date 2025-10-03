@@ -126,11 +126,9 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
       if (res.ok) {
         setRules(data || [])
       } else {
-        console.error('Erro ao carregar regras de escalação:', data?.error)
         toast.error('Erro ao carregar regras de escalação')
       }
     } catch (error) {
-      console.error('Erro ao carregar regras de escalação:', error)
       toast.error('Erro ao carregar regras de escalação')
     } finally {
       setLoading(false)
@@ -144,10 +142,8 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
       if (res.ok) {
         setStatuses(data || [])
       } else {
-        console.error('Erro ao carregar status:', data?.error)
       }
     } catch (error) {
-      console.error('Erro ao carregar status:', error)
     }
   }
 
@@ -158,10 +154,8 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
       if (res.ok) {
         setActions(data || [])
       } else {
-        console.error('Erro ao carregar ações:', data?.error)
       }
     } catch (error) {
-      console.error('Erro ao carregar ações:', error)
     }
   }
 
@@ -176,10 +170,8 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
         )
         setUsers(assignableUsers || [])
       } else {
-        console.error('Erro ao carregar usuários:', data?.error)
       }
     } catch (error) {
-      console.error('Erro ao carregar usuários:', error)
     }
   }
 
@@ -257,7 +249,6 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
         toast.error(data?.error || 'Erro ao criar regra')
       }
     } catch (error) {
-      console.error('Erro ao criar regra:', error)
       toast.error('Erro ao criar regra')
     } finally {
       setLoading(false)
@@ -284,7 +275,6 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
         toast.error(data?.error || 'Erro ao atualizar regra')
       }
     } catch (error) {
-      console.error('Erro ao atualizar regra:', error)
       toast.error('Erro ao atualizar regra')
     } finally {
       setLoading(false)
@@ -308,7 +298,6 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
         toast.error(data?.error || 'Erro ao deletar regra')
       }
     } catch (error) {
-      console.error('Erro ao deletar regra:', error)
       toast.error('Erro ao deletar regra')
     } finally {
       setLoading(false)
@@ -331,7 +320,6 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
         toast.error(data?.error || 'Erro ao alterar status da regra')
       }
     } catch (error) {
-      console.error('Erro ao alterar status da regra:', error)
       toast.error('Erro ao alterar status da regra')
     }
   }

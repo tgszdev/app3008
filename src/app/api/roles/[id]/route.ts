@@ -47,7 +47,6 @@ export async function PUT(
       .single()
 
     if (error) {
-      console.error('Error updating role:', error)
       
       // Se a tabela não existir, retornar sucesso simulado
       if (error.code === '42P01') {
@@ -66,7 +65,6 @@ export async function PUT(
 
     return NextResponse.json(updatedRole)
   } catch (error) {
-    console.error('Error in PUT /api/roles/[id]:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -112,7 +110,6 @@ export async function DELETE(
       .eq('id', params.id)
 
     if (error) {
-      console.error('Error deleting role:', error)
       
       // Se a tabela não existir, retornar sucesso simulado
       if (error.code === '42P01') {
@@ -124,7 +121,6 @@ export async function DELETE(
 
     return NextResponse.json({ message: 'Role deleted successfully' })
   } catch (error) {
-    console.error('Error in DELETE /api/roles/[id]:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -63,7 +63,6 @@ export default function TimesheetPermissionsModal({ isOpen, onClose }: Timesheet
         setDepartments(uniqueDepts);
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
       toast.error('Erro ao carregar dados');
     } finally {
       setLoading(false);
@@ -91,7 +90,6 @@ export default function TimesheetPermissionsModal({ isOpen, onClose }: Timesheet
         toast.error('Erro ao atualizar permissão');
       }
     } catch (error) {
-      console.error('Error updating permission:', error);
       toast.error('Erro ao atualizar permissão');
     }
   };
@@ -121,7 +119,6 @@ export default function TimesheetPermissionsModal({ isOpen, onClose }: Timesheet
         toast.error('Erro ao adicionar usuário');
       }
     } catch (error) {
-      console.error('Error adding user:', error);
       toast.error('Erro ao adicionar usuário');
     }
   };
@@ -161,7 +158,6 @@ export default function TimesheetPermissionsModal({ isOpen, onClose }: Timesheet
         toast.error(error.error || 'Erro ao atualizar permissões');
       }
     } catch (error) {
-      console.error('Error bulk updating:', error);
       toast.error('Erro ao atualizar permissões');
     }
   };
@@ -181,7 +177,6 @@ export default function TimesheetPermissionsModal({ isOpen, onClose }: Timesheet
         toast.error('Erro ao remover permissões');
       }
     } catch (error) {
-      console.error('Error removing permission:', error);
       toast.error('Erro ao remover permissões');
     }
   };

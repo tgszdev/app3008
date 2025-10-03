@@ -3,7 +3,6 @@ import { executeEscalationForTicketSimple } from '@/lib/escalation-engine-simple
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🧪 [TEST-ESCALATION] Iniciando teste de escalação...')
     
     const body = await request.json()
     const { ticket_id } = body
@@ -12,12 +11,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'ticket_id é obrigatório' }, { status: 400 })
     }
 
-    console.log(`🧪 [TEST-ESCALATION] Testando escalação para ticket: ${ticket_id}`)
 
     // Executar escalação
     const result = await executeEscalationForTicketSimple(ticket_id)
 
-    console.log(`🧪 [TEST-ESCALATION] Resultado:`, result)
 
     return NextResponse.json({
       success: true,
@@ -27,7 +24,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error: any) {
-    console.error('🧪 [TEST-ESCALATION] Erro:', error.message)
     return NextResponse.json({
       success: false,
       error: error.message,

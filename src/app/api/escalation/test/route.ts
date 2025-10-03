@@ -4,7 +4,6 @@ import { supabaseAdmin } from '@/lib/supabase'
 // GET - Endpoint de teste simples para verificar se a escalação está funcionando
 export async function GET() {
   try {
-    console.log('🔍 [TEST-ESCALATION] Iniciando teste de escalação...')
     
     // 1. Verificar conexão com Supabase
     const { data: testConnection, error: connError } = await supabaseAdmin
@@ -101,7 +100,6 @@ export async function GET() {
     })
     
   } catch (error: any) {
-    console.error('❌ [TEST-ESCALATION] Erro:', error)
     return NextResponse.json({
       success: false,
       error: 'Erro interno',

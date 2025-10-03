@@ -70,14 +70,12 @@ export async function GET(request: NextRequest) {
         const unauthorizedContexts = contextIds.filter(id => !userContextIds.includes(id))
         
         if (unauthorizedContexts.length > 0) {
-          console.log('❌ Usuário não tem acesso aos contextos:', unauthorizedContexts)
           return NextResponse.json({ error: 'Acesso negado a alguns contextos' }, { status: 403 })
         }
       }
     } else if (userType === 'context') {
       // Para usuários de contexto, só podem acessar seu próprio contexto
       if (contextIds.length > 1 || !contextIds.includes(userContextId)) {
-        console.log('❌ Usuário de contexto tentando acessar contextos não autorizados')
         return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
       }
     }
@@ -95,11 +93,9 @@ export async function GET(request: NextRequest) {
           .single()
 
         if (contextError || !context) {
-          console.error(`❌ Erro ao buscar contexto ${contextId}:`, contextError)
           continue
         }
         
-        console.log(`✅ Contexto encontrado: ${context.name} (${contextId})`)
 
         // Buscar tickets do contexto no período
         let ticketsQuery = supabaseAdmin
@@ -152,27 +148,18 @@ export async function GET(request: NextRequest) {
           ticketsQuery = ticketsQuery.or(`created_by.eq.${myTicketsUserId},assigned_to.eq.${myTicketsUserId}`)
         }
         
-        console.log(`🔍 Query para contexto ${context.name}:`)
-        console.log(`  - Context ID: ${contextId}`)
-        console.log(`  - Período: ${startDate} até ${endDate}`)
-        console.log(`  - User ID: ${userId || 'não especificado'}`)
-        console.log(`  - Meus Tickets User ID: ${myTicketsUserId || 'não especificado'}`)
 
         const { data: tickets, error: ticketsError } = await ticketsQuery
 
         if (ticketsError) {
-          console.error(`❌ Erro ao buscar tickets do contexto ${contextId}:`, ticketsError)
           continue
         }
 
-        console.log(`✅ Contexto ${context.name}: ${tickets?.length || 0} tickets encontrados`)
         
         if (tickets && tickets.length > 0) {
           tickets.forEach(ticket => {
-            console.log(`  - Ticket #${ticket.ticket_number}: ${ticket.title} (status: ${ticket.status})`)
           })
         } else {
-          console.log(`⚠️ Nenhum ticket encontrado para o contexto ${context.name}`)
         }
 
         // Buscar status disponíveis com contagem
@@ -182,18 +169,13 @@ export async function GET(request: NextRequest) {
           .order('order_index', { ascending: true })
 
         if (statusError) {
-          console.error(`❌ Erro ao buscar status:`, statusError)
           continue
         }
 
         // Calcular estatísticas por status - DINÂMICO
-        console.log(`🔍 DEBUG STATUS COMPARISON:`)
-        console.log(`📋 Status disponíveis:`, statuses.map(s => `${s.name} (${s.slug})`))
-        console.log(`🎫 Tickets encontrados:`, tickets?.map(t => `${t.ticket_number}: ${t.status}`) || [])
         
         // Primeiro, identificar todos os status únicos dos tickets
         const uniqueTicketStatuses = [...new Set(tickets?.map(t => t.status) || [])]
-        console.log(`🎯 Status únicos dos tickets:`, uniqueTicketStatuses)
         
         // Criar status dinâmicos baseados nos tickets encontrados
         // Se não existir na tabela, criar um status temporário
@@ -231,12 +213,10 @@ export async function GET(request: NextRequest) {
           }
         }).filter(status => status.count > 0) // Só mostrar status com tickets
         
-        console.log(`✅ Status dinâmicos criados:`, dynamicStatusStats.map(s => `${s.name} (${s.slug}): ${s.count}`))
         
         // Ordenar status por order_index (mesma ordem do cadastro)
         const statusStats = dynamicStatusStats.sort((a, b) => a.order_index - b.order_index)
         
-        console.log(`📊 Status stats finais para ${context.name}:`, statusStats.map(s => `${s.name}: ${s.count}`))
 
         // Calcular estatísticas por categoria
         const categoryMap = new Map()
@@ -306,7 +286,6 @@ export async function GET(request: NextRequest) {
             order_index: status.order_index
           })).filter(status => status.count > 0)
           
-          console.log(`📊 Categoria ${category.name}: ${total} tickets (${percentage.toFixed(2)}%)`)
           
           return {
             ...category,
@@ -315,7 +294,6 @@ export async function GET(request: NextRequest) {
           }
         }).sort((a, b) => b.total - a.total)
         
-        console.log(`📊 Category stats finais para ${context.name}:`, categoryStats.map(c => `${c.name}: ${c.total}`))
 
         // Calcular tempo médio de resolução
         const resolvedTickets = tickets?.filter(ticket => 
@@ -372,7 +350,6 @@ export async function GET(request: NextRequest) {
         })
 
       } catch (error) {
-        console.error(`❌ Erro ao processar contexto ${contextId}:`, error)
         continue
       }
     }
@@ -466,7 +443,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(response)
 
   } catch (error) {
-    console.error('❌ Multi-client analytics error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

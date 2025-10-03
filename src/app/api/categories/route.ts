@@ -56,7 +56,6 @@ export async function GET(request: Request) {
     const { data: categories, error } = await query
 
     if (error) {
-      console.error('Error fetching categories:', error)
       return NextResponse.json({ error: 'Failed to fetch categories' }, { status: 500 })
     }
 
@@ -85,7 +84,6 @@ export async function GET(request: Request) {
 
     return NextResponse.json(finalCategories)
   } catch (error) {
-    console.error('Categories GET error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -202,13 +200,11 @@ export async function POST(request: Request) {
       .single()
 
     if (error) {
-      console.error('Error creating category:', error)
       return NextResponse.json({ error: 'Failed to create category' }, { status: 500 })
     }
 
     return NextResponse.json(category)
   } catch (error) {
-    console.error('Categories POST error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

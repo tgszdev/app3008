@@ -277,7 +277,6 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
       }
       
       const categoriesData = await categoriesResponse.json()
-      console.log('Categories data:', categoriesData)
       
       if (Array.isArray(categoriesData)) {
         setCategories(categoriesData)
@@ -290,15 +289,12 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
       // Processar contextos
       if (contextsResponse.ok) {
         const contextsData = await contextsResponse.json()
-        console.log('Contexts data:', contextsData)
         setContexts(contextsData.all || [])
       } else {
-        console.warn('Erro ao carregar contextos, continuando sem eles')
         setContexts([])
       }
       
     } catch (error: any) {
-      console.error('Erro ao buscar dados:', error)
       
       if (error.message.includes('404') || error.message.includes('Not found')) {
         setCategories([])

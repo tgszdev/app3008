@@ -34,7 +34,6 @@ export function usePrioritiesWithCount() {
       const data = await response.json()
       setPriorities(data || [])
     } catch (error) {
-      console.error('Error fetching priorities with count:', error)
       setError('Erro ao carregar prioridades')
       
       // Fallback to default priorities with zero count

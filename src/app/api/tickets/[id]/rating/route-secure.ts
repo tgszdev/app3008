@@ -76,7 +76,6 @@ export async function GET(
 
     return NextResponse.json(data)
   } catch (error: any) {
-    console.error('Error fetching rating:', error)
     return NextResponse.json(
       { error: 'Erro ao buscar avaliação' },
       { status: 500 }
@@ -112,7 +111,6 @@ export async function POST(
       .single()
     
     if (ticketError || !ticket) {
-      console.error('Ticket not found:', ticketError)
       return NextResponse.json(
         { error: 'Ticket não encontrado' },
         { status: 404 }
@@ -178,7 +176,6 @@ export async function POST(
         .single()
       
       if (error) {
-        console.error('Error creating rating:', error)
         throw error
       }
       result = data
@@ -187,7 +184,6 @@ export async function POST(
     return NextResponse.json(result)
     
   } catch (error: any) {
-    console.error('Error saving rating:', error)
     console.error('Error details:', {
       message: error.message,
       code: error.code,
@@ -232,7 +228,6 @@ export async function DELETE(
     return NextResponse.json({ success: true })
     
   } catch (error: any) {
-    console.error('Error deleting rating:', error)
     return NextResponse.json(
       { error: 'Erro ao remover avaliação' },
       { status: 500 }

@@ -114,10 +114,8 @@ export default function WorkflowManagementModal({ isOpen, onClose }: { isOpen: b
       if (res.ok) {
         setCategories(data || [])
       } else {
-        console.error('Erro ao carregar categorias:', data?.error)
       }
     } catch (error) {
-      console.error('Erro ao carregar categorias:', error)
     }
   }
 
@@ -128,10 +126,8 @@ export default function WorkflowManagementModal({ isOpen, onClose }: { isOpen: b
       if (res.ok) {
         setStatuses(data || [])
       } else {
-        console.error('Erro ao carregar status:', data?.error)
       }
     } catch (error) {
-      console.error('Erro ao carregar status:', error)
     }
   }
 
@@ -146,10 +142,8 @@ export default function WorkflowManagementModal({ isOpen, onClose }: { isOpen: b
         )
         setUsers(assignableUsers || [])
       } else {
-        console.error('Erro ao carregar usuários:', data?.error)
       }
     } catch (error) {
-      console.error('Erro ao carregar usuários:', error)
     }
   }
 

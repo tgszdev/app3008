@@ -3,7 +3,6 @@ import { supabaseAdmin } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔍 [DEBUG-ESCALATION] Iniciando debug completo do sistema de escalação...')
     
     const results: any = {
       timestamp: new Date().toISOString(),
@@ -263,7 +262,6 @@ export async function GET(request: NextRequest) {
       success_rate: `${Math.round((successfulTests / totalTests) * 100)}%`
     }
 
-    console.log(`✅ [DEBUG-ESCALATION] Debug concluído: ${successfulTests}/${totalTests} testes bem-sucedidos`)
 
     return NextResponse.json({
       success: true,
@@ -272,7 +270,6 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error: any) {
-    console.error('❌ [DEBUG-ESCALATION] Erro no debug:', error)
     return NextResponse.json({ 
       success: false,
       error: 'Erro interno do servidor',
@@ -286,7 +283,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { action, ticket_id } = body
 
-    console.log(`🔍 [DEBUG-ESCALATION] Executando ação: ${action}`)
 
     let result: any = {}
 
@@ -346,7 +342,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error: any) {
-    console.error('❌ [DEBUG-ESCALATION] Erro na ação:', error)
     return NextResponse.json({ 
       success: false,
       error: 'Erro interno do servidor',

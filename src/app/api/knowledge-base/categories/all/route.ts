@@ -20,7 +20,6 @@ export async function GET(request: NextRequest) {
       }, { status: 403 })
     }
 
-    console.log('Admin solicitando TODAS as categorias para configuração')
     
     // Buscar TODAS as categorias sem nenhum filtro
     const { data: categories, error } = await supabaseAdmin
@@ -29,7 +28,6 @@ export async function GET(request: NextRequest) {
       .order('display_order', { ascending: true })
     
     if (error) {
-      console.error('Erro ao buscar categorias:', error)
       return NextResponse.json({ 
         categories: [],
         error: error.message 
@@ -59,7 +57,6 @@ export async function GET(request: NextRequest) {
       })
     )
     
-    console.log(`Retornando ${categoriesWithCount.length} categorias para configuração`)
     
     return NextResponse.json({
       categories: categoriesWithCount,
@@ -67,7 +64,6 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro ao buscar todas as categorias:', error)
     return NextResponse.json(
       { error: 'Erro ao buscar categorias' },
       { status: 500 }

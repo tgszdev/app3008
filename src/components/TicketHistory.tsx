@@ -115,7 +115,6 @@ export default function TicketHistory({ ticketId, className = '', initiallyColla
         setError('Erro ao carregar histórico')
       }
     } catch (error: any) {
-      console.error('Erro ao buscar histórico:', error)
       if (error.response?.status === 403) {
         setError('Você não tem permissão para visualizar o histórico')
       } else if (error.response?.status === 404) {

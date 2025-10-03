@@ -21,7 +21,6 @@ export async function POST() {
       message: 'Cache de permissões limpo com sucesso' 
     })
   } catch (error) {
-    console.error('Erro ao limpar cache:', error)
     return NextResponse.json(
       { error: 'Erro ao limpar cache' },
       { status: 500 }

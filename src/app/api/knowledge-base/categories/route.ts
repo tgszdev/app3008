@@ -12,7 +12,6 @@ export async function GET(request: NextRequest) {
     }
 
     const userRole = (session.user as any)?.role || 'user'
-    console.log('Buscando categorias para role:', userRole)
     
     // Primeiro, tentar buscar apenas as categorias sem JOIN e sem ordenação
     let { data: simpleCategories, error: simpleError } = await supabaseAdmin
@@ -21,7 +20,6 @@ export async function GET(request: NextRequest) {
     
     // Se der erro, pode ser por causa de colunas faltantes
     if (simpleError && simpleError.message?.includes('display_order')) {
-      console.log('Coluna display_order não existe, buscando sem ordenação')
       const result = await supabaseAdmin
         .from('kb_categories')
         .select('id, name, slug, description, icon, color, created_at')
@@ -30,11 +28,8 @@ export async function GET(request: NextRequest) {
       simpleError = result.error
     }
     
-    console.log('Categorias simples:', simpleCategories)
-    console.log('Erro simples:', simpleError)
     
     if (simpleError) {
-      console.error('Erro ao buscar categorias simples:', simpleError)
       return NextResponse.json({ 
         categories: [],
         error: simpleError.message 
@@ -72,7 +67,6 @@ export async function GET(request: NextRequest) {
       
       categoriesWithCount = categoriesWithArticleCount
     } catch (countError) {
-      console.error('Erro ao buscar contagem de artigos:', countError)
       // Se falhar, usar as categorias sem contagem (já está com 0)
     }
     
@@ -90,7 +84,6 @@ export async function GET(request: NextRequest) {
         .eq('role', userRole)
         .single()
       
-      console.log('Permissões encontradas para', userRole, ':', rolePermission)
       
       if (rolePermission && rolePermission.allowed_categories && Array.isArray(rolePermission.allowed_categories)) {
         if (rolePermission.allowed_categories.length > 0) {
@@ -98,24 +91,19 @@ export async function GET(request: NextRequest) {
           filteredCategories = categoriesWithCount.filter(cat => 
             rolePermission.allowed_categories.includes(cat.id)
           )
-          console.log('Mostrando categorias permitidas:', filteredCategories.length, 'de', categoriesWithCount.length)
         } else {
           // Se o array está vazio, não mostrar nenhuma categoria
           filteredCategories = []
-          console.log('Nenhuma categoria permitida para o role:', userRole)
         }
       } else {
         // Se não existe registro de permissão, não mostrar nada por padrão (mais seguro)
         filteredCategories = []
-        console.log('Sem registro de permissões para o role:', userRole, '- não mostrando categorias')
       }
     } catch (permError) {
-      console.log('Erro ao buscar permissões (não mostrando categorias por segurança):', permError)
       // Se houver erro, não mostrar categorias por segurança
       filteredCategories = []
     }
     
-    console.log('Categorias finais:', filteredCategories.length)
     
     return NextResponse.json({
       categories: filteredCategories
@@ -124,7 +112,6 @@ export async function GET(request: NextRequest) {
 
 
   } catch (error) {
-    console.error('Erro ao buscar categorias:', error)
     return NextResponse.json(
       { error: 'Erro ao buscar categorias' },
       { status: 500 }
@@ -145,7 +132,6 @@ export async function POST(request: NextRequest) {
     const userRole = (session.user as any)?.role
     
     if (userRole !== 'admin') {
-      console.log('Role do usuário:', userRole, 'Email:', session.user.email)
       return NextResponse.json({ error: 'Apenas administradores podem criar categorias' }, { status: 403 })
     }
 
@@ -175,7 +161,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Criar categoria
-    console.log('Tentando criar categoria:', { name, slug, description, icon, color, display_order })
     
     const { data: category, error } = await supabaseAdmin
       .from('kb_categories')
@@ -191,10 +176,6 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Erro detalhado ao criar categoria:', error)
-      console.error('Mensagem:', error.message)
-      console.error('Detalhes:', error.details)
-      console.error('Hint:', error.hint)
       
       // Retornar erro mais específico
       if (error.message?.includes('duplicate')) {
@@ -218,7 +199,6 @@ export async function POST(request: NextRequest) {
       }, { status: 500 })
     }
 
-    console.log('Categoria criada com sucesso:', category)
     
     return NextResponse.json({
       message: 'Categoria criada com sucesso',
@@ -226,7 +206,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro ao criar categoria:', error)
     return NextResponse.json(
       { error: 'Erro ao criar categoria' },
       { status: 500 }

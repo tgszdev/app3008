@@ -54,7 +54,6 @@ export async function GET(request: NextRequest) {
       .single()
 
     if (error && error.code !== 'PGRST116') { // PGRST116 = não encontrado
-      console.error('Erro ao buscar configurações:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -78,14 +77,12 @@ export async function GET(request: NextRequest) {
       try {
         config.pass = decrypt(config.pass)
       } catch (e) {
-        console.error('Erro ao descriptografar senha:', e)
         config.pass = ''
       }
     }
 
     return NextResponse.json(config)
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
@@ -156,7 +153,6 @@ CREATE INDEX IF NOT EXISTS idx_system_settings_key ON system_settings(key);
         }, { status: 400 })
       }
     } catch (checkErr) {
-      console.error('Erro ao verificar tabela:', checkErr)
     }
 
     // Upsert configurações
@@ -173,7 +169,6 @@ CREATE INDEX IF NOT EXISTS idx_system_settings_key ON system_settings(key);
       })
 
     if (error) {
-      console.error('Erro ao salvar configurações:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -186,7 +181,6 @@ CREATE INDEX IF NOT EXISTS idx_system_settings_key ON system_settings(key);
       message: 'Configurações salvas com sucesso'
     })
   } catch (error: any) {
-    console.error('Erro no servidor:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }

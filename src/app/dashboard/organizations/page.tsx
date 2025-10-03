@@ -53,7 +53,6 @@ export default function OrganizationsPage() {
       const response = await axios.get('/api/organizations')
       setOrganizations(response.data.organizations || [])
     } catch (error) {
-      console.error('Erro ao buscar organizações:', error)
       toast.error('Erro ao carregar organizações')
     } finally {
       setLoading(false)
@@ -70,7 +69,6 @@ export default function OrganizationsPage() {
       toast.success('Cliente excluído com sucesso')
       fetchOrganizations()
     } catch (error: any) {
-      console.error('Erro ao excluir organização:', error)
       toast.error(error.response?.data?.error || 'Erro ao excluir organização')
     }
   }
@@ -111,7 +109,6 @@ export default function OrganizationsPage() {
       setFormData({ name: '', type: 'organization', description: '' })
       fetchOrganizations()
     } catch (error: any) {
-      console.error('Erro ao salvar organização:', error)
       toast.error(error.response?.data?.error || 'Erro ao salvar organização')
     } finally {
       setSubmitting(false)

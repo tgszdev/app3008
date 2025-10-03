@@ -17,9 +17,6 @@ export async function POST(request: NextRequest) {
     // Obter email de forma segura
     const userEmail = requireUserEmail(session)
     
-    console.log('=== TESTE DE NOTIFICAÇÃO POR EMAIL ===')
-    console.log('Usuário:', userEmail)
-    console.log('Tipo:', type || 'ticket_status_changed')
 
     // 1. Verificar preferências do usuário
     const { data: preferences } = await supabaseAdmin
@@ -52,18 +49,15 @@ export async function POST(request: NextRequest) {
         .insert(defaultPrefs)
 
       if (createError) {
-        console.error('Erro ao criar preferências:', createError)
         return NextResponse.json({
           error: 'Erro ao criar preferências de notificação',
           details: createError.message
         }, { status: 500 })
       }
 
-      console.log('✅ Preferências padrão criadas')
     }
 
     // 2. Testar envio direto de email
-    console.log('Tentando enviar email diretamente...')
     
     const emailResult = await sendNotificationEmail({
       to: userEmail,
@@ -73,7 +67,6 @@ export async function POST(request: NextRequest) {
       actionText: 'Ver Chamados'
     })
 
-    console.log('Resultado do envio de email:', emailResult)
 
     // 3. Criar notificação no banco
     const { error: notifError } = await supabaseAdmin
@@ -89,7 +82,6 @@ export async function POST(request: NextRequest) {
       })
 
     if (notifError) {
-      console.error('Erro ao criar notificação no banco:', notifError)
     }
 
     // 4. Verificar configuração de email
@@ -122,7 +114,6 @@ export async function POST(request: NextRequest) {
       ] : []
     })
   } catch (error: any) {
-    console.error('Erro no teste de notificação:', error)
     return NextResponse.json({
       error: 'Erro ao testar notificação',
       details: error.message

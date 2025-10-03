@@ -13,9 +13,6 @@ export async function POST(request: NextRequest) {
 
     const { ticket_id } = await request.json()
     
-    console.log('=== TESTE DE NOTIFICAÇÃO DE COMENTÁRIO ===')
-    console.log('Usuário logado:', session.user.email)
-    console.log('ID do usuário:', session.user.id)
 
     // 1. Buscar um ticket para testar (ou usar o ID fornecido)
     let targetTicket
@@ -89,7 +86,6 @@ export async function POST(request: NextRequest) {
 
       // Criar preferências se não existirem
       if (!creatorPrefs) {
-        console.log('Criando preferências padrão para o criador...')
         await supabaseAdmin
           .from('user_notification_preferences')
           .insert({
@@ -110,7 +106,6 @@ export async function POST(request: NextRequest) {
       }
 
       // Tentar enviar notificação
-      console.log('Enviando notificação para o criador...')
       try {
         const result = await createAndSendNotification({
           user_id: targetTicket.created_by,
@@ -166,7 +161,6 @@ export async function POST(request: NextRequest) {
 
       // Criar preferências se não existirem
       if (!assigneePrefs) {
-        console.log('Criando preferências padrão para o responsável...')
         await supabaseAdmin
           .from('user_notification_preferences')
           .insert({
@@ -187,7 +181,6 @@ export async function POST(request: NextRequest) {
       }
 
       // Tentar enviar notificação
-      console.log('Enviando notificação para o responsável...')
       try {
         const result = await createAndSendNotification({
           user_id: targetTicket.assigned_to,
@@ -273,7 +266,6 @@ export async function POST(request: NextRequest) {
       }
     })
   } catch (error: any) {
-    console.error('Erro no teste de comentário:', error)
     return NextResponse.json({
       error: 'Erro ao testar notificação de comentário',
       details: error.message

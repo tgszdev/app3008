@@ -100,7 +100,6 @@ export default function TimesheetPermissionsModalV2({ isOpen, onClose }: Timeshe
         setDepartments(uniqueDepts);
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
       toast.error('Erro ao carregar dados');
     } finally {
       setLoading(false);
@@ -145,7 +144,6 @@ export default function TimesheetPermissionsModalV2({ isOpen, onClose }: Timeshe
       toast.success('Permissões salvas com sucesso!');
       fetchData();
     } catch (error) {
-      console.error('Error saving permissions:', error);
       toast.error('Erro ao salvar permissões');
     } finally {
       setSaving(false);
@@ -212,7 +210,6 @@ export default function TimesheetPermissionsModalV2({ isOpen, onClose }: Timeshe
         toast.error('Erro ao remover permissões');
       }
     } catch (error) {
-      console.error('Error removing permissions:', error);
       toast.error('Erro ao remover permissões');
     }
   };

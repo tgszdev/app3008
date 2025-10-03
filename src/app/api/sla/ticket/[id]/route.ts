@@ -86,7 +86,6 @@ export async function GET(
         .single()
 
       if (createError) {
-        console.error('Erro ao criar registro de SLA:', createError)
         return NextResponse.json({ error: 'Erro ao criar registro de SLA' }, { status: 500 })
       }
 
@@ -98,7 +97,6 @@ export async function GET(
       tracking: ticketSLA
     })
   } catch (error) {
-    console.error('Erro no GET /api/sla/ticket/[id]:', error)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }
@@ -189,7 +187,6 @@ export async function POST(
       .single()
 
     if (error) {
-      console.error('Erro ao atualizar SLA:', error)
       return NextResponse.json({ error: 'Erro ao atualizar SLA' }, { status: 500 })
     }
 
@@ -220,7 +217,6 @@ export async function POST(
 
     return NextResponse.json(data)
   } catch (error) {
-    console.error('Erro no POST /api/sla/ticket/[id]:', error)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }

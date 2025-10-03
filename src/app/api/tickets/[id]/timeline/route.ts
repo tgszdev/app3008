@@ -18,7 +18,6 @@ export async function GET(
 
     const ticketId = params.id
 
-    console.log('[Timeline API] Buscando timeline para ticket:', ticketId)
 
     // Buscar histórico do ticket com informações do status
     const { data: historyData, error: historyError } = await supabaseAdmin
@@ -31,18 +30,15 @@ export async function GET(
       .order('created_at', { ascending: true })
 
     if (historyError) {
-      console.error('[Timeline API] Erro ao buscar histórico:', historyError)
       return NextResponse.json(
         { error: 'Erro ao buscar histórico', details: historyError.message },
         { status: 500 }
       )
     }
 
-    console.log('[Timeline API] Histórico encontrado:', historyData?.length || 0, 'registros')
 
     // Debug: mostrar estrutura do primeiro registro
     if (historyData && historyData.length > 0) {
-      console.log('[Timeline API] Primeiro registro:', JSON.stringify(historyData[0], null, 2))
     }
 
     // Buscar informações dos status separadamente
@@ -55,7 +51,6 @@ export async function GET(
       statusesData.forEach(status => {
         statusMap.set(status.slug, status)
       })
-      console.log('[Timeline API] Status carregados:', statusesData.length)
     }
 
     if (!historyData || historyData.length === 0) {
@@ -129,14 +124,12 @@ export async function GET(
       }
     }
 
-    console.log('[Timeline API] Timeline processada com sucesso:', processedTimeline.length, 'etapas')
 
     return NextResponse.json({
       timeline: processedTimeline,
       totalDuration
     })
   } catch (error: any) {
-    console.error('[Timeline API] Erro ao processar timeline:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor', details: error?.message || 'Erro desconhecido' },
       { status: 500 }

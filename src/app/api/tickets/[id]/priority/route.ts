@@ -73,7 +73,6 @@ export async function PATCH(
       .eq('id', ticketId)
 
     if (updateError) {
-      console.error('Erro ao atualizar prioridade:', updateError)
       return NextResponse.json({ error: 'Erro ao alterar prioridade' }, { status: 500 })
     }
 
@@ -93,7 +92,6 @@ export async function PATCH(
       .single()
 
     if (refetchError) {
-      console.error('Erro ao buscar ticket atualizado:', refetchError)
       return NextResponse.json({ error: 'Erro ao buscar ticket atualizado' }, { status: 500 })
     }
 
@@ -104,7 +102,6 @@ export async function PATCH(
     })
 
   } catch (error) {
-    console.error('Erro ao alterar prioridade:', error)
     return NextResponse.json({ 
       error: 'Erro interno do servidor' 
     }, { status: 500 })

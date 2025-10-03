@@ -18,7 +18,6 @@ export async function PUT(
     const userRole = (session.user as any)?.role
     
     if (userRole !== 'admin') {
-      console.log('Role do usuário:', userRole, 'Email:', session.user.email)
       return NextResponse.json({ error: 'Apenas administradores podem editar categorias' }, { status: 403 })
     }
 
@@ -65,7 +64,6 @@ export async function PUT(
       .single()
 
     if (error) {
-      console.error('Erro ao atualizar categoria:', error)
       return NextResponse.json({ error: 'Erro ao atualizar categoria' }, { status: 500 })
     }
 
@@ -75,7 +73,6 @@ export async function PUT(
     })
 
   } catch (error) {
-    console.error('Erro ao atualizar categoria:', error)
     return NextResponse.json(
       { error: 'Erro ao atualizar categoria' },
       { status: 500 }
@@ -99,7 +96,6 @@ export async function DELETE(
     const userRole = (session.user as any)?.role
     
     if (userRole !== 'admin') {
-      console.log('Role do usuário:', userRole, 'Email:', session.user.email)
       return NextResponse.json({ error: 'Apenas administradores podem excluir categorias' }, { status: 403 })
     }
 
@@ -125,14 +121,12 @@ export async function DELETE(
       .eq('id', id)
 
     if (error) {
-      console.error('Erro ao deletar categoria:', error)
       return NextResponse.json({ error: 'Erro ao deletar categoria' }, { status: 500 })
     }
 
     return NextResponse.json({ message: 'Categoria excluída com sucesso' })
 
   } catch (error) {
-    console.error('Erro ao deletar categoria:', error)
     return NextResponse.json(
       { error: 'Erro ao deletar categoria' },
       { status: 500 }

@@ -120,7 +120,6 @@ export async function POST(request: NextRequest) {
       .select()
 
     if (insertError) {
-      console.error('Erro ao inserir comentários:', insertError)
       return NextResponse.json({ 
         error: 'Erro ao criar comentários de teste',
         details: insertError.message
@@ -134,7 +133,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error: any) {
-    console.error('Erro ao criar dados de teste:', error)
     return NextResponse.json(
       { 
         error: 'Erro interno do servidor',

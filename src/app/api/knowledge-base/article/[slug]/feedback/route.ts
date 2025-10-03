@@ -60,7 +60,6 @@ export async function POST(
         .eq('id', existingFeedback.id)
 
       if (updateError) {
-        console.error('Erro ao atualizar feedback:', updateError)
         return NextResponse.json({ error: 'Erro ao atualizar feedback' }, { status: 500 })
       }
     } else {
@@ -75,7 +74,6 @@ export async function POST(
         })
 
       if (insertError) {
-        console.error('Erro ao criar feedback:', insertError)
         return NextResponse.json({ error: 'Erro ao criar feedback' }, { status: 500 })
       }
     }
@@ -105,7 +103,6 @@ export async function POST(
     })
 
   } catch (error) {
-    console.error('Erro ao processar feedback:', error)
     return NextResponse.json(
       { error: 'Erro ao processar feedback' },
       { status: 500 }
@@ -158,14 +155,12 @@ export async function GET(
       .single()
 
     if (feedbackError && feedbackError.code !== 'PGRST116') { // PGRST116 = no rows returned
-      console.error('Erro ao buscar feedback:', feedbackError)
       return NextResponse.json({ error: 'Erro ao buscar feedback' }, { status: 500 })
     }
 
     return NextResponse.json(feedback || null)
 
   } catch (error) {
-    console.error('Erro ao buscar feedback:', error)
     return NextResponse.json(
       { error: 'Erro ao buscar feedback' },
       { status: 500 }

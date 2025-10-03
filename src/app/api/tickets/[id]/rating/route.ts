@@ -46,7 +46,6 @@ export async function GET(
 
     return NextResponse.json(data)
   } catch (error: any) {
-    console.error('Error fetching rating:', error)
     
     // Return null if table doesn't exist
     if (error.message?.includes('ticket_ratings') || error.code === '42P01') {
@@ -65,7 +64,6 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    console.log('Rating API called for ticket:', params.id)
     
     // TODO: Adicionar autenticação adequada
     // const session = await getServerSession(authOptions)
@@ -77,7 +75,6 @@ export async function POST(
     const body = await request.json()
     const { rating, comment, userId } = body // Temporariamente recebendo userId do frontend
     
-    console.log('Rating data received:', { ticketId, rating, comment, userId })
 
     // Validate rating
     if (!rating || rating < 1 || rating > 5) {
@@ -157,7 +154,6 @@ export async function POST(
 
     return NextResponse.json(result)
   } catch (error: any) {
-    console.error('Error saving rating:', error)
     console.error('Error details:', {
       message: error.message,
       code: error.code,
@@ -203,7 +199,6 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    console.error('Error deleting rating:', error)
     
     // Return success if table doesn't exist
     if (error.message?.includes('ticket_ratings') || error.code === '42P01') {

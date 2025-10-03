@@ -18,14 +18,12 @@ export async function GET(
     const userId = session.user.id
     const userRole = (session.user as any).role || 'user'
 
-    console.log(`[HISTORY API] Solicitação de histórico para ticket ${ticketId} pelo usuário ${userRole}`)
 
     // Verificar se o usuário tem permissão para ver histórico
     let canViewHistory = false
     try {
       canViewHistory = await userHasPermission(userRole, 'tickets_view_history')
     } catch (permError) {
-      console.error('Erro ao verificar permissões:', permError)
       // Fallback: permitir para admin, analyst, dev
       canViewHistory = ['admin', 'analyst', 'dev'].includes(userRole)
     }
@@ -44,7 +42,6 @@ export async function GET(
       .single()
 
     if (ticketError || !ticket) {
-      console.error('Erro ao buscar ticket:', ticketError)
       return NextResponse.json({ error: 'Ticket não encontrado' }, { status: 404 })
     }
 
@@ -81,7 +78,6 @@ export async function GET(
         .order('created_at', { ascending: false })
 
       if (historyError) {
-        console.error('Erro ao buscar histórico (tabela pode não existir):', historyError)
         
         // Fallback: criar entrada de histórico simulada
         history = [{
@@ -108,7 +104,6 @@ export async function GET(
         history = historyData || []
       }
     } catch (error) {
-      console.error('Exceção ao buscar histórico:', error)
       // Fallback para erro de conexão
       history = [{
         id: 'fallback-created',
@@ -167,7 +162,6 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('Erro ao buscar histórico:', error)
     return NextResponse.json({ 
       error: 'Erro interno do servidor' 
     }, { status: 500 })

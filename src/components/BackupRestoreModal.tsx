@@ -114,7 +114,6 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
         setBackups(data)
       }
     } catch (error) {
-      console.error('Erro ao carregar backups:', error)
     } finally {
       setLoading(false)
     }
@@ -135,7 +134,6 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
         }
       }
     } catch (error) {
-      console.error('Erro ao carregar configurações:', error)
     }
   }
 
@@ -171,7 +169,6 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'Erro ao criar backup' })
-      console.error('Erro:', error)
     } finally {
       setCreatingBackup(false)
     }
@@ -207,7 +204,6 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'Erro ao restaurar backup' })
-      console.error('Erro:', error)
     } finally {
       setRestoring(false)
     }
@@ -232,7 +228,6 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
         document.body.removeChild(a)
       }
     } catch (error) {
-      console.error('Erro ao baixar backup:', error)
       setMessage({ type: 'error', text: 'Erro ao baixar backup' })
     }
   }
@@ -254,7 +249,6 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
         setTimeout(() => setMessage(null), 3000)
       }
     } catch (error) {
-      console.error('Erro ao excluir backup:', error)
       setMessage({ type: 'error', text: 'Erro ao excluir backup' })
     }
   }
@@ -278,7 +272,6 @@ export default function BackupRestoreModal({ isOpen, onClose }: BackupRestoreMod
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'Erro ao salvar configurações' })
-      console.error('Erro:', error)
     }
   }
 

@@ -47,7 +47,6 @@ export async function GET(request: NextRequest) {
     let targetContextIds: string[] = []
     if (contextIds) {
       targetContextIds = contextIds.split(',').filter(id => id.trim())
-      console.log('🎯 API Multi-client recebeu context_ids:', targetContextIds)
     }
 
     // Se não foram fornecidos context_ids, buscar contextos associados ao usuário
@@ -76,15 +75,12 @@ export async function GET(request: NextRequest) {
     if (currentUser.user_type === 'matrix') {
       // Para usuários matrix, usar contextos fornecidos ou associados
       if (targetContextIds.length > 0) {
-        console.log('🎯 Aplicando filtro para contextos:', targetContextIds)
         query = query.in('context_id', targetContextIds)
       } else {
-        console.log('⚠️ Nenhum contexto fornecido, buscando contextos do usuário')
         // Se não tem contextos, não mostrar nenhum ticket
         query = query.eq('context_id', '00000000-0000-0000-0000-000000000000')
       }
     } else {
-      console.log('⚠️ Usuário não é matrix, não mostrando tickets')
       // Fallback: não mostrar nenhum ticket
       query = query.eq('context_id', '00000000-0000-0000-0000-000000000000')
     }
@@ -97,7 +93,6 @@ export async function GET(request: NextRequest) {
     const { data: tickets, error: ticketsError } = await query
 
     if (ticketsError) {
-      console.error('Error fetching tickets:', ticketsError)
       return NextResponse.json({ error: 'Failed to fetch tickets' }, { status: 500 })
     }
 
@@ -163,15 +158,12 @@ export async function GET(request: NextRequest) {
     // Aplicar mesmo filtro multi-tenant para tickets recentes
     if (currentUser.user_type === 'matrix') {
       if (targetContextIds.length > 0) {
-        console.log('🎯 Aplicando filtro para tickets recentes:', targetContextIds)
         recentQuery = recentQuery.in('context_id', targetContextIds)
       } else {
-        console.log('⚠️ Nenhum contexto selecionado - não mostrando tickets recentes')
         // Quando nenhum cliente está selecionado, não mostrar tickets recentes
         recentQuery = recentQuery.eq('context_id', '00000000-0000-0000-0000-000000000000')
       }
     } else {
-      console.log('⚠️ Usuário não é matrix para tickets recentes, não mostrando')
       // Fallback: não mostrar nenhum ticket
       recentQuery = recentQuery.eq('context_id', '00000000-0000-0000-0000-000000000000')
     }
@@ -184,11 +176,9 @@ export async function GET(request: NextRequest) {
     const { data: recentTicketsList, error: recentError } = await recentQuery
 
     if (recentError) {
-      console.error('Error fetching recent tickets:', recentError)
       return NextResponse.json({ error: 'Failed to fetch recent tickets' }, { status: 500 })
     }
 
-    console.log('🎯 Tickets recentes encontrados:', recentTicketsList?.length || 0)
 
     // Filtrar tickets recentes para usuários comuns
     let filteredRecentTickets = recentTicketsList || []
@@ -232,7 +222,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(response)
 
   } catch (error) {
-    console.error('Error in multi-client stats API:', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }

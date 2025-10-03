@@ -231,7 +231,6 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
         canChangePriority = true
       }
       
-      console.log(`🔧 Migrando perfil ${role.display_name}: tickets_change_priority = ${canChangePriority}`)
       
       return {
         ...role,
@@ -349,7 +348,6 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
         setRoles(rolesWithNewPermission)
       }
     } catch (error: any) {
-      console.error('Error fetching roles:', error)
       // Se a API não existir, usar roles padrão com permissões corretas
       const defaultRoles: Role[] = [
         {
@@ -410,7 +408,6 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
         fetchRoles()
       }
     } catch (error: any) {
-      console.error('Error saving role:', error)
       toast.error('Erro ao salvar perfil. As alterações foram salvas localmente.')
       
       // Atualizar localmente
@@ -449,7 +446,6 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
         fetchRoles()
       }
     } catch (error: any) {
-      console.error('Error creating role:', error)
       toast.error('Erro ao criar perfil. O perfil foi salvo localmente.')
       
       // Criar localmente
@@ -490,7 +486,6 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
         fetchRoles()
       }
     } catch (error: any) {
-      console.error('Error deleting role:', error)
       toast.success('Perfil excluído localmente!')
       
       // Excluir localmente

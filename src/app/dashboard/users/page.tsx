@@ -226,10 +226,8 @@ export default function UsersPage() {
       const response = await axios.get('/api/roles')
       if (Array.isArray(response.data)) {
         setRoles(response.data)
-        console.log(`Carregados ${response.data.length} perfis disponíveis`)
       }
     } catch (error: any) {
-      console.error('Erro ao buscar perfis:', error)
       // Se falhar, usar roles padrão como fallback
       setRoles([
         { id: '1', name: 'admin', display_name: 'Administrador', permissions: {}, is_system: true },
@@ -247,21 +245,16 @@ export default function UsersPage() {
       // Verificar se a resposta é um array
       if (Array.isArray(response.data)) {
         setUsers(response.data)
-        console.log(`Carregados ${response.data.length} usuários do banco`)
       } else {
-        console.error('Resposta inválida da API:', response.data)
         toast.error('Formato de dados inválido')
         
         // Tentar debug endpoint
         try {
           const debugResponse = await axios.get('/api/users/debug')
-          console.log('Debug info:', debugResponse.data)
         } catch (debugError) {
-          console.error('Debug endpoint falhou:', debugError)
         }
       }
     } catch (error: any) {
-      console.error('Erro ao buscar usuários:', error)
       
       // Mensagem de erro mais específica
       if (error.response?.status === 500) {
@@ -275,9 +268,7 @@ export default function UsersPage() {
       // Tentar debug endpoint em caso de erro
       try {
         const debugResponse = await axios.get('/api/users/debug')
-        console.log('Debug info após erro:', debugResponse.data)
       } catch (debugError) {
-        console.error('Debug endpoint falhou:', debugError)
       }
     } finally {
       setLoading(false)
@@ -296,7 +287,6 @@ export default function UsersPage() {
       const response = await axios.get('/api/organizations')
       setOrganizations(response.data.organizations || [])
     } catch (error) {
-      console.error('Erro ao buscar organizações:', error)
     }
   }
 
@@ -306,7 +296,6 @@ export default function UsersPage() {
       const response = await axios.get(`/api/user-contexts?user_id=${userId}`)
       setUserAssociations(response.data.associations || [])
     } catch (error) {
-      console.error('Erro ao buscar associações:', error)
       setUserAssociations([])
     }
   }
@@ -320,7 +309,6 @@ export default function UsersPage() {
       const response = await axios.get(url)
       setAvailableUsers(response.data.users || [])
     } catch (error) {
-      console.error('Erro ao buscar usuários disponíveis:', error)
       setAvailableUsers([])
     }
   }
@@ -346,7 +334,6 @@ export default function UsersPage() {
       await fetchUsers()
       toast.success(`Usuário ${currentStatus ? 'desativado' : 'ativado'} com sucesso!`)
     } catch (error: any) {
-      console.error('Erro ao atualizar status:', error)
       toast.error('Erro ao atualizar status do usuário')
     }
   }
@@ -365,7 +352,6 @@ export default function UsersPage() {
         await fetchUsers()
         toast.success('Usuário excluído com sucesso!')
       } catch (error: any) {
-        console.error('Erro ao excluir usuário:', error)
         toast.error(error.response?.data?.error || 'Erro ao excluir usuário')
       }
     }
@@ -436,7 +422,6 @@ export default function UsersPage() {
       setNewPassword('')
       setConfirmPassword('')
     } catch (error: any) {
-      console.error('Erro ao alterar senha:', error)
       toast.error(error.response?.data?.error || 'Erro ao alterar senha')
     } finally {
       setSaving(false)
@@ -479,7 +464,6 @@ export default function UsersPage() {
       fetchUserAssociations(associationUser.id)
       setSelectedContext('')
     } catch (error: any) {
-      console.error('Erro ao associar usuário:', error)
       toast.error(error.response?.data?.error || 'Erro ao associar usuário')
     }
   }
@@ -496,7 +480,6 @@ export default function UsersPage() {
       toast.success('Associação removida com sucesso!')
       fetchUserAssociations(associationUser.id)
     } catch (error: any) {
-      console.error('Erro ao remover associação:', error)
       toast.error(error.response?.data?.error || 'Erro ao remover associação')
     }
   }
@@ -542,7 +525,6 @@ export default function UsersPage() {
         user_type: 'context',
       })
     } catch (error: any) {
-      console.error('Erro ao salvar usuário:', error)
       toast.error(error.response?.data?.error || 'Erro ao salvar usuário')
     } finally {
       setSaving(false)

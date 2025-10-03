@@ -23,19 +23,15 @@ export function SessionMonitorSSE() {
           const data = JSON.parse(event.data)
           
           if (data.type === 'session_invalidated') {
-            console.log('Sessão invalidada - fazendo logout imediato')
             eventSource?.close()
             signOut({ callbackUrl: '/login', redirect: true })
           } else if (data.type === 'connected') {
-            console.log('Monitor de sessão conectado')
           }
         } catch (error) {
-          console.error('Erro ao processar evento:', error)
         }
       }
       
       eventSource.onerror = (error) => {
-        console.error('Erro na conexão SSE:', error)
         eventSource?.close()
         
         // Reconectar após 5 segundos

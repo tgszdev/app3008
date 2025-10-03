@@ -41,7 +41,6 @@ export async function GET(request: Request) {
       expires: session.expires
     })
   } catch (error) {
-    console.error('Session check error:', error)
     return NextResponse.json({ valid: false, error: 'Internal error' }, { status: 500 })
   }
 }

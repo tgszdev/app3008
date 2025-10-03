@@ -30,7 +30,6 @@ export async function POST(request: Request) {
 
       case 'browser':
         // Browser notifications são tratadas no frontend
-        console.log('Browser notification test triggered')
         break
 
       case 'slack':
@@ -83,7 +82,6 @@ export async function POST(request: Request) {
       message: `Notificação de teste enviada via ${channel}`
     })
   } catch (error) {
-    console.error('Notification test error:', error)
     return NextResponse.json(
       { error: 'Failed to send test notification' },
       { status: 500 }

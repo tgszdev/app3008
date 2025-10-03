@@ -40,7 +40,6 @@ export async function GET(request: NextRequest) {
     const { data: associations, error } = await query.order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Erro ao buscar associações:', error)
       return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
     }
 
@@ -49,7 +48,6 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro na API de associações:', error)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }
@@ -105,7 +103,6 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Erro ao criar associação:', error)
       return NextResponse.json({ error: 'Erro ao criar associação' }, { status: 500 })
     }
 
@@ -116,7 +113,6 @@ export async function POST(request: NextRequest) {
       .eq('id', user_id)
 
     if (updateUserError) {
-      console.error('Erro ao sincronizar context_id do usuário:', updateUserError)
       // Não falhar a operação, apenas logar o erro
     }
 
@@ -126,7 +122,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro na API de associações:', error)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }
@@ -162,7 +157,6 @@ export async function DELETE(request: NextRequest) {
       .eq('context_id', context_id)
 
     if (error) {
-      console.error('Erro ao remover associação:', error)
       return NextResponse.json({ error: 'Erro ao remover associação' }, { status: 500 })
     }
 
@@ -174,7 +168,6 @@ export async function DELETE(request: NextRequest) {
       .limit(1)
 
     if (checkError) {
-      console.error('Erro ao verificar associações restantes:', checkError)
     } else {
       // Se não há mais associações, remover context_id do usuário
       if (!remainingAssociations || remainingAssociations.length === 0) {
@@ -184,7 +177,6 @@ export async function DELETE(request: NextRequest) {
           .eq('id', user_id)
 
         if (updateUserError) {
-          console.error('Erro ao sincronizar context_id do usuário:', updateUserError)
           // Não falhar a operação, apenas logar o erro
         }
       }
@@ -195,7 +187,6 @@ export async function DELETE(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro na API de associações:', error)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }

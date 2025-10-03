@@ -26,7 +26,6 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Erro ao buscar organizações:', error)
       return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
     }
 
@@ -50,38 +49,31 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro na API de organizações:', error)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🚀 [ORGANIZATIONS-API] Iniciando criação de organização')
     
     const session = await auth()
     
     if (!session?.user) {
-      console.log('❌ [ORGANIZATIONS-API] Usuário não autenticado')
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
 
     // Verificar se é usuário da matriz
     const userType = (session.user as any).userType
-    console.log('👤 [ORGANIZATIONS-API] Tipo de usuário:', userType)
     
     if (userType !== 'matrix') {
-      console.log('❌ [ORGANIZATIONS-API] Acesso negado - não é usuário da matriz')
       return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
     }
 
     const body = await request.json()
     const { name, type, description, settings } = body
     
-    console.log('📝 [ORGANIZATIONS-API] Dados recebidos:', { name, type, description })
 
     if (!name || !type) {
-      console.log('❌ [ORGANIZATIONS-API] Dados obrigatórios faltando')
       return NextResponse.json({ error: 'Nome e tipo são obrigatórios' }, { status: 400 })
     }
 
@@ -103,7 +95,6 @@ export async function POST(request: NextRequest) {
       .maybeSingle()
 
     if (checkError) {
-      console.error('Erro ao verificar slug existente:', checkError)
       return NextResponse.json({ error: 'Erro ao verificar nome da organização' }, { status: 500 })
     }
 
@@ -112,7 +103,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Criar organização
-    console.log('💾 [ORGANIZATIONS-API] Criando organização no banco...')
     
     const { data: newOrg, error } = await supabaseAdmin
       .from('contexts')
@@ -130,14 +120,12 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('❌ [ORGANIZATIONS-API] Erro ao criar organização:', error)
       return NextResponse.json({ 
         error: 'Erro ao criar organização',
         details: error.message 
       }, { status: 500 })
     }
 
-    console.log('✅ [ORGANIZATIONS-API] Organização criada com sucesso:', newOrg?.id)
     
     return NextResponse.json({
       organization: newOrg,
@@ -145,7 +133,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro na API de organizações:', error)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }
