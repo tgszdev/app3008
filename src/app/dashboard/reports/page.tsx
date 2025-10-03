@@ -104,10 +104,10 @@ const ReportTemplate = ({
 }) => (
   <button
     onClick={onClick}
-    className="group relative bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all hover:border-blue-400 dark:hover:border-blue-600 text-left"
+    className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all hover:border-blue-400 dark:hover:border-blue-600 text-left"
   >
     <div className="flex items-start space-x-4">
-      <div className={`p-3 rounded-lg ${color} group-hover:scale-110 transition-transform`}>
+      <div className={`p-3 rounded-2xl ${color} group-hover:scale-110 transition-transform`}>
         <Icon className="h-6 w-6 text-white" />
       </div>
       <div className="flex-1">
@@ -434,7 +434,7 @@ export default function ReportsPage() {
         <div className="mt-4 sm:mt-0 flex items-center gap-2">
           <button
             onClick={() => fetchSavedReports()}
-            className="p-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             <RefreshCw className="h-4 w-4" />
           </button>
@@ -481,7 +481,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Saved Reports */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
             Relatórios Recentes
@@ -493,7 +493,7 @@ export default function ReportsPage() {
               <div key={report.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                    <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-2xl">
                       <FileText className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                     </div>
                     <div>
@@ -530,7 +530,7 @@ export default function ReportsPage() {
       {/* Configuration Modal */}
       {showConfig && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -538,7 +538,7 @@ export default function ReportsPage() {
                 </h2>
                 <button
                   onClick={() => setShowConfig(false)}
-                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-2xl transition-colors"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -559,7 +559,7 @@ export default function ReportsPage() {
                       ...config,
                       period: { ...config.period, start_date: e.target.value }
                     })}
-                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
+                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700"
                   />
                   <input
                     type="date"
@@ -568,7 +568,7 @@ export default function ReportsPage() {
                       ...config,
                       period: { ...config.period, end_date: e.target.value }
                     })}
-                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
+                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700"
                   />
                 </div>
               </div>
@@ -581,7 +581,7 @@ export default function ReportsPage() {
                 <div className="grid grid-cols-3 gap-4">
                   <button
                     onClick={() => setConfig({ ...config, format: 'preview' })}
-                    className={`p-3 rounded-lg border-2 transition-all ${
+                    className={`p-3 rounded-2xl border-2 transition-all ${
                       config.format === 'preview'
                         ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                         : 'border-gray-300 dark:border-gray-600'
@@ -592,7 +592,7 @@ export default function ReportsPage() {
                   </button>
                   <button
                     onClick={() => setConfig({ ...config, format: 'pdf' })}
-                    className={`p-3 rounded-lg border-2 transition-all ${
+                    className={`p-3 rounded-2xl border-2 transition-all ${
                       config.format === 'pdf'
                         ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                         : 'border-gray-300 dark:border-gray-600'
@@ -603,7 +603,7 @@ export default function ReportsPage() {
                   </button>
                   <button
                     onClick={() => setConfig({ ...config, format: 'excel' })}
-                    className={`p-3 rounded-lg border-2 transition-all ${
+                    className={`p-3 rounded-2xl border-2 transition-all ${
                       config.format === 'excel'
                         ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                         : 'border-gray-300 dark:border-gray-600'
@@ -645,7 +645,7 @@ export default function ReportsPage() {
             <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
               <button
                 onClick={() => setShowConfig(false)}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-2xl transition-colors"
               >
                 Cancelar
               </button>
@@ -655,7 +655,7 @@ export default function ReportsPage() {
                   generateReport()
                 }}
                 disabled={generating}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                className="px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
               >
                 {generating ? (
                   <>
@@ -677,7 +677,7 @@ export default function ReportsPage() {
       {/* Preview Modal */}
       {showPreview && reportData && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -686,20 +686,20 @@ export default function ReportsPage() {
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => exportToPDF(reportData)}
-                    className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="p-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors"
                     title="Exportar PDF"
                   >
                     <FileText className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => exportToExcel(reportData)}
-                    className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    className="p-2 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-colors"
                   >
                     <FileSpreadsheet className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => setShowPreview(false)}
-                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-2xl transition-colors"
                   >
                     <X className="h-5 w-5" />
                   </button>
@@ -716,7 +716,7 @@ export default function ReportsPage() {
                     Resumo Executivo
                   </h3>
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-2xl">
                       <p className="text-2xl font-bold text-gray-900 dark:text-white">
                         {reportData.summary.totalTickets}
                       </p>
@@ -724,7 +724,7 @@ export default function ReportsPage() {
                         Total de Tickets
                       </p>
                     </div>
-                    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-2xl">
                       <p className="text-2xl font-bold text-gray-900 dark:text-white">
                         {reportData.summary.openTickets}
                       </p>
@@ -732,7 +732,7 @@ export default function ReportsPage() {
                         Abertos
                       </p>
                     </div>
-                    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-2xl">
                       <p className="text-2xl font-bold text-gray-900 dark:text-white">
                         {reportData.summary.resolvedTickets}
                       </p>
@@ -740,7 +740,7 @@ export default function ReportsPage() {
                         Resolvidos
                       </p>
                     </div>
-                    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-2xl">
                       <p className="text-2xl font-bold text-gray-900 dark:text-white">
                         {reportData.summary.avgResolutionTime}
                       </p>
@@ -748,7 +748,7 @@ export default function ReportsPage() {
                         Tempo Médio
                       </p>
                     </div>
-                    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-2xl">
                       <p className="text-2xl font-bold text-gray-900 dark:text-white">
                         {reportData.summary.satisfactionRate}%
                       </p>
