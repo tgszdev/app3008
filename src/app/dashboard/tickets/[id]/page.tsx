@@ -600,11 +600,11 @@ export default function TicketDetailsPage() {
             </p>
           </div>
           
-          <div className="flex flex-col gap-2 w-full sm:w-auto">
+          <div className="flex flex-col lg:flex-row gap-2 w-full sm:w-auto">
             {/* Botão Gerar PDF */}
             <PrintButton ticket={ticket} loading={loading} />
             {/* Status - Baseado em permissões */}
-            <div className="relative w-full sm:w-auto">
+            <div className="relative w-full lg:w-auto">
               {editingStatus && canEditThisTicket ? (
                 <div className="flex gap-2 flex-wrap">
                   <select
@@ -657,7 +657,7 @@ export default function TicketDetailsPage() {
                       toast.error('Você não tem permissão para alterar o status deste ticket')
                     }
                   }}
-                  className={`w-full sm:min-w-[140px] h-10 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border rounded-2xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
+                  className={`w-full lg:min-w-[140px] h-10 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border rounded-2xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
                     canEditThisTicket && 
                     (ticket.status !== 'cancelled' || canDeleteTickets) 
                       ? 'hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer' 
@@ -710,7 +710,7 @@ export default function TicketDetailsPage() {
                     setNewPriority(ticket.priority)
                   }
                 }}
-                className={`w-full sm:min-w-[140px] h-10 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border rounded-2xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
+                className={`w-full lg:min-w-[140px] h-10 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border rounded-2xl transition-all duration-300 relative overflow-hidden whitespace-nowrap ${
                   canChangePriority 
                     ? 'hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer' 
                     : 'cursor-default opacity-75'
