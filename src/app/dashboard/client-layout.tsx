@@ -7,7 +7,6 @@ import { usePathname, useRouter } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import { useProtectedSession } from '@/hooks/useProtectedSession'
 import { OrganizationSelector } from '@/components/OrganizationSelector'
-import { OrganizationDebug } from '@/components/debug/OrganizationDebug'
 import {
   Home,
   Ticket,
@@ -394,9 +393,6 @@ export default function DashboardLayout({
           </div>
         </main>
       </div>
-      
-      {/* Debug Component - apenas em desenvolvimento */}
-      <OrganizationDebug />
     </div>
   )
 }

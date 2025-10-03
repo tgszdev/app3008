@@ -694,19 +694,13 @@ export default function HybridDashboard() {
           const parsed = JSON.parse(saved)
           if (Array.isArray(parsed) && parsed.length > 0) {
             setSelectedClients(parsed)
-            console.log('🔄 Carregando seleções do localStorage:', parsed)
           } else {
-            // Se localStorage está vazio ou inválido, não selecionar nada
-            console.log('🔄 localStorage vazio - não selecionando nenhum cliente')
             setSelectedClients([])
           }
         } catch (error) {
-          console.error('Erro ao carregar seleções do localStorage:', error)
           setSelectedClients([])
         }
       } else {
-        // Se não há localStorage, não selecionar nada
-        console.log('🔄 Nenhum localStorage encontrado - não selecionando nenhum cliente')
         setSelectedClients([])
       }
     }
@@ -717,11 +711,8 @@ export default function HybridDashboard() {
     if (typeof window !== 'undefined') {
       if (selectedClients.length > 0) {
         localStorage.setItem('selectedClients', JSON.stringify(selectedClients))
-        console.log('🔄 Salvando seleções no localStorage:', selectedClients)
       } else {
-        // Se não há seleções, remover do localStorage
         localStorage.removeItem('selectedClients')
-        console.log('🔄 Removendo seleções do localStorage (lista vazia)')
       }
     }
   }, [selectedClients])
@@ -753,8 +744,6 @@ export default function HybridDashboard() {
       if (selectedClients.length > 0) {
         fetchMultiClientData()
       } else {
-        // Se não tem seleção, parar loading e mostrar estado vazio
-        console.log('⚠️ Nenhum cliente selecionado - parando loading')
         setLoading(false)
       }
     }
@@ -773,28 +762,15 @@ export default function HybridDashboard() {
       // Adicionar filtro "Meus Tickets" se ativo
       if (myTicketsOnly && session?.user?.id) {
         params.append('myTickets', session.user.id)
-        console.log('🔍 Filtrando por meus tickets (criador OU responsável):', session.user.id)
       }
-      
-      console.log('🔄 Buscando dados multi-client com context_ids:', selectedClients)
-      console.log('🔄 URL da API:', `/api/dashboard/multi-client-analytics?${params}`)
       
       const response = await axios.get(`/api/dashboard/multi-client-analytics?${params}`)
       
-      console.log('🔄 Resposta da API:', response.status, response.data)
-      
       if (response.data) {
         setAnalyticsData(response.data)
-        console.log('✅ Dados multi-client carregados:', response.data)
       }
     } catch (error: any) {
-      console.error('Erro ao buscar dados multi-client:', error)
-      console.error('Status do erro:', error.response?.status)
-      console.error('Dados do erro:', error.response?.data)
-      
-      // Se erro de autenticação, mostrar estado vazio
       if (error.response?.status === 401) {
-        console.log('⚠️ Usuário não autenticado - mostrando estado vazio')
         setAnalyticsData(null)
       } else {
         toast.error('Erro ao carregar dados dos clientes selecionados')
@@ -805,9 +781,8 @@ export default function HybridDashboard() {
   }
 
   const handleClientSelectionChange = (selectedIds: string[]) => {
-    console.log('🔄 Mudança de seleção de clientes:', selectedIds)
     setSelectedClients(selectedIds)
-    setExpandedClients(new Set()) // Reset expanded clients
+    setExpandedClients(new Set())
   }
 
   const toggleClientExpansion = (clientId: string) => {
@@ -826,13 +801,11 @@ export default function HybridDashboard() {
 
   const toggleMyTickets = () => {
     setMyTicketsOnly(!myTicketsOnly)
-    console.log('🔄 Meus Tickets toggled:', !myTicketsOnly)
   }
 
   const handleApplyFilter = () => {
     setPeriodFilter(tempFilter)
     setShowFilters(false)
-    console.log('🔄 Filtro aplicado:', tempFilter)
   }
 
   const handleResetFilter = () => {
@@ -840,21 +813,16 @@ export default function HybridDashboard() {
     setTempFilter(last2Months)
     setPeriodFilter(last2Months)
     setShowFilters(false)
-    console.log('🔄 Filtro resetado para últimos 2 meses')
   }
 
   const handleExportPDF = async () => {
     try {
       setIsGeneratingPDF(true)
-      console.log('🔄 Iniciando exportação PDF...')
       
-      // Simular geração de PDF (implementar funcionalidade real depois)
       await new Promise(resolve => setTimeout(resolve, 2000))
       
       toast.success('PDF exportado com sucesso!')
-      console.log('✅ PDF exportado')
     } catch (error) {
-      console.error('❌ Erro ao exportar PDF:', error)
       toast.error('Erro ao exportar PDF')
     } finally {
       setIsGeneratingPDF(false)
