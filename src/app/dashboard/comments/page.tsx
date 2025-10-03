@@ -384,10 +384,10 @@ export default function CommentsPage() {
         ) : (
           <div className="divide-y divide-gray-200 dark:divide-gray-700">
             {filteredComments.map((comment) => (
-              <div key={comment.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                <div className="flex items-start space-x-4">
+              <div key={comment.id} className="p-3 sm:p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                <div className="flex items-start space-x-2 sm:space-x-4">
                   {/* Avatar */}
-                  <div className="flex-shrink-0">
+                  <div className="flex-shrink-0 hidden sm:block">
                     {comment.user.avatar_url ? (
                       <img
                         src={comment.user.avatar_url}
@@ -406,57 +406,57 @@ export default function CommentsPage() {
                   {/* Conteúdo */}
                   <div className="flex-1 min-w-0">
                     {/* Header do comentário */}
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                           {comment.user.name}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                           {comment.user.email}
                         </p>
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center gap-2 flex-shrink-0">
                         {comment.is_internal && (
                           <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400">
                             Interno
                           </span>
                         )}
-                        <time className="text-xs text-gray-500 dark:text-gray-400">
+                        <time className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
                           {formatRelativeTime(comment.created_at)}
                         </time>
                       </div>
                     </div>
 
                     {/* Informações do Ticket */}
-                    <div className="mt-2 flex items-center space-x-4">
+                    <div className="mt-2 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                       <button
                         onClick={() => navigateToTicket(comment.ticket_id)}
-                        className="inline-flex items-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                        className="inline-flex items-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 min-w-0"
                       >
-                        <Hash className="h-3 w-3 mr-1" />
-                        {comment.ticket.ticket_number}
-                        <span className="ml-2 text-gray-600 dark:text-gray-400">
+                        <Hash className="h-3 w-3 mr-1 flex-shrink-0" />
+                        <span className="flex-shrink-0">{comment.ticket.ticket_number}</span>
+                        <span className="ml-2 text-gray-600 dark:text-gray-400 truncate">
                           {comment.ticket.title}
                         </span>
-                        <ArrowUpRight className="h-3 w-3 ml-1" />
+                        <ArrowUpRight className="h-3 w-3 ml-1 flex-shrink-0" />
                       </button>
                       
-                      <div className="flex items-center space-x-2">
-                        <span className="flex items-center">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="flex items-center gap-1">
                           {getStatusIcon(comment.ticket.status)}
-                          <span className="ml-1 text-xs text-gray-600 dark:text-gray-400">
+                          <span className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
                             {translateStatus(comment.ticket.status)}
                           </span>
                         </span>
                         
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getPriorityColor(comment.ticket.priority)}`}>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap ${getPriorityColor(comment.ticket.priority)}`}>
                           {translatePriority(comment.ticket.priority)}
                         </span>
                       </div>
                     </div>
 
                     {/* Conteúdo do comentário */}
-                    <div className="mt-3">
+                    <div className="mt-3 overflow-hidden break-words">
                       <RichTextRenderer content={comment.content} />
                     </div>
 
@@ -469,11 +469,11 @@ export default function CommentsPage() {
                             href={attachment.file_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 dark:border-gray-600 shadow-sm text-xs font-medium rounded text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 dark:border-gray-600 shadow-sm text-xs font-medium rounded-2xl text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 max-w-full"
                           >
-                            <Paperclip className="h-3 w-3 mr-1" />
-                            {attachment.filename}
-                            <span className="ml-1 text-gray-500">
+                            <Paperclip className="h-3 w-3 mr-1 flex-shrink-0" />
+                            <span className="truncate">{attachment.filename}</span>
+                            <span className="ml-1 text-gray-500 flex-shrink-0">
                               ({formatFileSize(attachment.file_size)})
                             </span>
                           </a>
