@@ -395,12 +395,12 @@ export default function CategoriesPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <button
               onClick={() => router.push('/dashboard/knowledge-base')}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-2xl transition-colors"
             >
               <ArrowLeft className="h-5 w-5 text-gray-600 dark:text-gray-400" />
             </button>
@@ -416,7 +416,7 @@ export default function CategoriesPage() {
           
           <button
             onClick={() => setShowForm(!showForm)}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700"
           >
             {showForm ? (
               <>
@@ -435,7 +435,7 @@ export default function CategoriesPage() {
 
       {/* Form */}
       {showForm && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             {editingCategory ? 'Editar Categoria' : 'Nova Categoria'}
           </h2>
@@ -454,7 +454,7 @@ export default function CategoriesPage() {
                     setSlug(generateSlug(e.target.value))
                   }
                 }}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Ex: Tutoriais"
               />
             </div>
@@ -467,7 +467,7 @@ export default function CategoriesPage() {
                 type="text"
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
                 placeholder="Ex: tutoriais"
               />
             </div>
@@ -480,7 +480,7 @@ export default function CategoriesPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={2}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Breve descrição da categoria"
               />
             </div>
@@ -493,7 +493,7 @@ export default function CategoriesPage() {
                 <button
                   type="button"
                   onClick={() => setShowIconDropdown(!showIconDropdown)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 flex items-center justify-between"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 flex items-center justify-between"
                 >
                   <div className="flex items-center space-x-2">
                     {icon ? (
@@ -549,7 +549,7 @@ export default function CategoriesPage() {
                               placeholder="Buscar ícone..."
                               value={iconSearchTerm}
                               onChange={(e) => setIconSearchTerm(e.target.value)}
-                              className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                              className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
                               autoFocus
                             />
                           </div>
@@ -577,7 +577,7 @@ export default function CategoriesPage() {
                                     setIconSearchTerm('')
                                   }}
                                   className={`
-                                    flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all
+                                    flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all
                                     ${isSelected 
                                       ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
                                       : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
@@ -620,7 +620,7 @@ export default function CategoriesPage() {
                       key={presetColor}
                       type="button"
                       onClick={() => setColor(presetColor)}
-                      className={`h-10 w-full rounded-lg border-2 transition-colors ${
+                      className={`h-10 w-full rounded-2xl border-2 transition-colors ${
                         color === presetColor
                           ? 'border-gray-900 dark:border-white'
                           : 'border-gray-300 dark:border-gray-600'
@@ -636,13 +636,13 @@ export default function CategoriesPage() {
                     type="color"
                     value={color}
                     onChange={(e) => setColor(e.target.value)}
-                    className="h-10 w-full border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer"
+                    className="h-10 w-full border border-gray-300 dark:border-gray-600 rounded-2xl cursor-pointer"
                   />
                   <input
                     type="text"
                     value={color}
                     onChange={(e) => setColor(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm w-32"
+                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm w-32"
                   />
                 </div>
               </div>
@@ -656,7 +656,7 @@ export default function CategoriesPage() {
                 type="number"
                 value={displayOrder}
                 onChange={(e) => setDisplayOrder(parseInt(e.target.value) || 999)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="999"
               />
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
@@ -668,14 +668,14 @@ export default function CategoriesPage() {
           <div className="mt-6 flex justify-end space-x-3">
             <button
               onClick={resetForm}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               Cancelar
             </button>
             <button
               onClick={handleSave}
               disabled={saving}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? (
                 <Loader2 className="h-5 w-5 mr-2 animate-spin" />
@@ -689,7 +689,7 @@ export default function CategoriesPage() {
       )}
 
       {/* Lista de Categorias */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
             Categorias Existentes
@@ -725,7 +725,7 @@ export default function CategoriesPage() {
                     </div>
                     
                     <div
-                      className="p-3 rounded-lg"
+                      className="p-3 rounded-2xl"
                       style={{ backgroundColor: `${category.color}20` }}
                     >
                       <IconComponent 
@@ -751,7 +751,7 @@ export default function CategoriesPage() {
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => handleEdit(category)}
-                      className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                      className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-2xl transition-colors"
                       title="Editar"
                     >
                       <Edit2 className="h-4 w-4" />
@@ -760,7 +760,7 @@ export default function CategoriesPage() {
                     <button
                       onClick={() => handleDelete(category)}
                       disabled={!!category.article_count && category.article_count > 0}
-                      className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-2xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       title={category.article_count && category.article_count > 0 ? 'Categoria possui artigos' : 'Excluir'}
                     >
                       <Trash2 className="h-4 w-4" />

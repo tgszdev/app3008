@@ -203,7 +203,7 @@ export default function ArticlePage() {
       .replace(/^\- (.*$)/gim, '<li class="ml-6 mb-2 list-disc">$1</li>')
       .replace(/^\d+\. (.*$)/gim, '<li class="ml-6 mb-2 list-decimal">$1</li>')
       // Code blocks
-      .replace(/```([^`]+)```/g, '<pre class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto my-4"><code>$1</code></pre>')
+      .replace(/```([^`]+)```/g, '<pre class="bg-gray-100 dark:bg-gray-800 p-4 rounded-2xl overflow-x-auto my-4"><code>$1</code></pre>')
       // Inline code
       .replace(/`([^`]+)`/g, '<code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">$1</code>')
 
@@ -273,7 +273,7 @@ export default function ArticlePage() {
         </nav>
 
         {/* Título e Meta */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
@@ -349,7 +349,7 @@ export default function ArticlePage() {
       {/* Conteúdo */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
             <div 
               className="prose prose-lg max-w-none dark:prose-invert"
               dangerouslySetInnerHTML={renderContent(article.content)}
@@ -357,7 +357,7 @@ export default function ArticlePage() {
           </div>
 
           {/* Feedback */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mt-8">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mt-8">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Este artigo foi útil?
             </h3>
@@ -366,7 +366,7 @@ export default function ArticlePage() {
               <button
                 onClick={() => handleFeedback(true)}
                 disabled={feedback !== null}
-                className={`inline-flex items-center px-4 py-2 rounded-lg border ${
+                className={`inline-flex items-center px-4 py-2 rounded-2xl border ${
                   feedback === 'helpful'
                     ? 'bg-green-50 dark:bg-green-900/20 border-green-500 text-green-700 dark:text-green-400'
                     : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
@@ -379,7 +379,7 @@ export default function ArticlePage() {
               <button
                 onClick={() => handleFeedback(false)}
                 disabled={feedback !== null}
-                className={`inline-flex items-center px-4 py-2 rounded-lg border ${
+                className={`inline-flex items-center px-4 py-2 rounded-2xl border ${
                   feedback === 'not_helpful'
                     ? 'bg-red-50 dark:bg-red-900/20 border-red-500 text-red-700 dark:text-red-400'
                     : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
@@ -401,7 +401,7 @@ export default function ArticlePage() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Ações Rápidas */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Ações
             </h3>
@@ -409,7 +409,7 @@ export default function ArticlePage() {
             <div className="space-y-3">
               <button
                 onClick={copyLink}
-                className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 {copied ? (
                   <>
@@ -428,7 +428,7 @@ export default function ArticlePage() {
 
           {/* Artigos Relacionados */}
           {relatedArticles.length > 0 && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 Artigos Relacionados
               </h3>
@@ -438,7 +438,7 @@ export default function ArticlePage() {
                   <a
                     key={related.id}
                     href={`/dashboard/knowledge-base/article/${related.slug}`}
-                    className="block p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    className="block p-3 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
                     <h4 className="font-medium text-gray-900 dark:text-white text-sm mb-1">
                       {related.title}
@@ -459,14 +459,14 @@ export default function ArticlePage() {
 
           {/* Informações da Categoria */}
           {article.category && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 Categoria
               </h3>
               
               <a
                 href={`/dashboard/knowledge-base?category=${article.category.id}`}
-                className="inline-flex items-center px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className="inline-flex items-center px-4 py-2 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 style={{ backgroundColor: `${article.category.color}20` }}
               >
                 <BookOpen className="h-5 w-5 mr-2" style={{ color: article.category.color }} />
