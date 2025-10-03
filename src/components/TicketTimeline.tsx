@@ -84,20 +84,20 @@ export default function TicketTimeline({
         aria-expanded={!isCollapsed}
         aria-label={isCollapsed ? 'Expandir linha do tempo' : 'Recolher linha do tempo'}
       >
-        <div className="flex items-center gap-3">
-          <Activity className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+        <div className="flex items-center gap-2">
+          <Activity className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white">
             Linha do Tempo
           </h3>
-          <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-semibold">
+          <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-xs font-semibold">
             {timeline.length} {timeline.length === 1 ? 'etapa' : 'etapas'}
           </span>
         </div>
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           {totalDuration && (
-            <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <Timer className="h-4 w-4" />
+            <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+              <Timer className="h-3.5 w-3.5" />
               <span className="font-semibold">Tempo total: {totalDuration}</span>
             </div>
           )}
@@ -114,9 +114,9 @@ export default function TicketTimeline({
         <div className="px-6 pb-6 pt-2 rounded-b-2xl">
           {/* Tempo total (mobile) */}
           {totalDuration && (
-            <div className="sm:hidden mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-2xl">
-              <div className="flex items-center justify-center gap-2 text-sm text-blue-700 dark:text-blue-300">
-                <Timer className="h-4 w-4" />
+            <div className="sm:hidden mb-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-2xl">
+              <div className="flex items-center justify-center gap-1.5 text-xs text-blue-700 dark:text-blue-300">
+                <Timer className="h-3.5 w-3.5" />
                 <span className="font-semibold">Tempo total: {totalDuration}</span>
               </div>
             </div>
@@ -129,19 +129,19 @@ export default function TicketTimeline({
                 key={index} 
                 className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4 hover:shadow-md transition-shadow"
               >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-3">
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-2">
                     <div 
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg flex-shrink-0"
+                      className="w-6 h-6 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg flex-shrink-0"
                       style={{ backgroundColor: item.statusColor }}
                       aria-label={`Etapa ${index + 1}`}
                     >
                       {index + 1}
                     </div>
                     <div className="min-w-0">
-                      <h3 className="font-bold text-gray-900 dark:text-white truncate">{item.status}</h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-0.5">
-                        <Calendar className="h-3 w-3 flex-shrink-0" />
+                      <h3 className="font-bold text-sm text-gray-900 dark:text-white truncate">{item.status}</h3>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400 flex items-center gap-0.5 mt-0.5">
+                        <Calendar className="h-2.5 w-2.5 flex-shrink-0" />
                         <span className="truncate">
                           {format(new Date(item.timestamp), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                         </span>
@@ -151,26 +151,26 @@ export default function TicketTimeline({
                   
                   {item.duration && (
                     <div className="text-right flex-shrink-0 ml-2">
-                      <span className="font-bold text-base sm:text-lg text-gray-900 dark:text-white whitespace-nowrap">
+                      <span className="font-bold text-sm text-gray-900 dark:text-white whitespace-nowrap">
                         {item.duration}
                       </span>
-                      <p className="text-xs text-gray-500 hidden sm:block">duração</p>
+                      <p className="text-[10px] text-gray-500 hidden sm:block">duração</p>
                     </div>
                   )}
                 </div>
 
                 {/* Informação do usuário */}
                 {item.user && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3 ml-11">
-                    <UserIcon className="h-3 w-3 flex-shrink-0" />
+                  <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 mb-2 ml-8">
+                    <UserIcon className="h-2.5 w-2.5 flex-shrink-0" />
                     <span className="truncate">{item.user.name}</span>
                   </div>
                 )}
 
                 {/* Barra de progresso */}
                 {item.durationMs && (
-                  <div className="mt-3 ml-11">
-                    <div className="h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
+                  <div className="mt-2 ml-8">
+                    <div className="h-1.5 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-1000"
                         style={{
