@@ -440,66 +440,20 @@ export default function TimesheetsPage() {
           </p>
         </div>
         
-        <div className="flex gap-2 w-auto">
-          {/* Busca Rápida por Número de Chamado - Design Aprimorado */}
-          <div className="relative group">
-            <div className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl hover:border-blue-400 dark:hover:border-blue-500 focus-within:border-blue-500 dark:focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 dark:focus-within:ring-blue-900/30 transition-all duration-200">
-              <Ticket className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-              <input
-                type="text"
-                placeholder="#chamado"
-                value={quickSearchTicket}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/[^0-9]/g, '')
-                  setQuickSearchTicket(value)
-                  if (value) {
-                    const foundTicket = tickets.find(t => t.ticket_number.toString() === value)
-                    if (foundTicket) {
-                      setFilterTicket(foundTicket.id)
-                    } else {
-                      setFilterTicket('all')
-                    }
-                  } else {
-                    setFilterTicket('all')
-                  }
-                }}
-                className="w-16 sm:w-20 bg-transparent border-none outline-none text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-sm focus:w-24 sm:focus:w-32 transition-all duration-200"
-              />
-              {quickSearchTicket && (
-                <button
-                  onClick={() => {
-                    setQuickSearchTicket('')
-                    setFilterTicket('all')
-                  }}
-                  className="ml-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                  title="Limpar busca"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              )}
-            </div>
-            {/* Tooltip indicativo */}
-            <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-10">
-              <div className="bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-md py-1 px-2 whitespace-nowrap">
-                Buscar por número
-              </div>
-              <div className="absolute left-1/2 -translate-x-1/2 bottom-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-900 dark:border-b-gray-700"></div>
-            </div>
-          </div>
-          
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm sm:text-base"
+            className="w-full sm:w-auto sm:min-w-[140px] h-10 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium"
           >
             <Filter className="h-4 w-4" />
-            <span className="hidden sm:inline">Filtros</span>
+            <span>Filtros</span>
             {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
           
           {permissions.can_submit && (
             <button
               onClick={() => setShowAddForm(!showAddForm)}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors text-sm sm:text-base"
+              className="w-full sm:w-auto sm:min-w-[140px] h-10 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded-2xl hover:bg-blue-700 hover:border-blue-700 transition-colors font-medium"
             >
               <Plus className="h-4 w-4" />
               <span>Adicionar</span>
