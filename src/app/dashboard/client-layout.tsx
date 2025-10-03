@@ -295,7 +295,7 @@ export default function DashboardLayout({
             </div>
           </div>
           
-          <nav className="flex-1 overflow-y-auto">
+          <nav className="flex-1 overflow-hidden">
             {/* Dashboard Link */}
             <div className="px-2 pt-4 pb-2">
               <Link
