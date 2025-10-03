@@ -84,7 +84,6 @@ const navigationSections: NavigationSection[] = [
     icon: BarChart3,
     items: [
       { name: 'Estatísticas', href: '/dashboard/analytics', icon: BarChart3 },
-      { name: 'Multi-Cliente', href: '/dashboard/multi-client', icon: Building, adminOnly: true },
       { name: 'Relatórios', href: '/dashboard/reports', icon: FileText },
       { name: 'Satisfação', href: '/dashboard/satisfaction', icon: Star },
     ]
