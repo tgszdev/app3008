@@ -587,8 +587,7 @@ export default function KnowledgeBasePage() {
                       </span>
                       <span>
                         Atualizado {formatDistanceToNow(new Date(article.updated_at), { 
-                          addSuffix: true, 
-                          locale: ptBR 
+                          addSuffix: true
                         })}
                       </span>
                     </div>
