@@ -443,7 +443,7 @@ export default function TimesheetsPage() {
         <div className="flex gap-2 w-auto">
           {/* Busca Rápida por Número de Chamado - Design Aprimorado */}
           <div className="relative group">
-            <div className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-400 dark:hover:border-blue-500 focus-within:border-blue-500 dark:focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 dark:focus-within:ring-blue-900/30 transition-all duration-200">
+            <div className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl hover:border-blue-400 dark:hover:border-blue-500 focus-within:border-blue-500 dark:focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 dark:focus-within:ring-blue-900/30 transition-all duration-200">
               <Ticket className="h-4 w-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
               <input
                 type="text"
@@ -489,7 +489,7 @@ export default function TimesheetsPage() {
           
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm sm:text-base"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm sm:text-base"
           >
             <Filter className="h-4 w-4" />
             <span className="hidden sm:inline">Filtros</span>
@@ -499,7 +499,7 @@ export default function TimesheetsPage() {
           {permissions.can_submit && (
             <button
               onClick={() => setShowAddForm(!showAddForm)}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors text-sm sm:text-base"
             >
               <Plus className="h-4 w-4" />
               <span>Adicionar</span>
@@ -510,7 +510,7 @@ export default function TimesheetsPage() {
 
       {/* Filtros */}
       {showFilters && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -519,7 +519,7 @@ export default function TimesheetsPage() {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="all">Todos</option>
                 <option value="pending">Pendente</option>
@@ -546,7 +546,7 @@ export default function TimesheetsPage() {
                     setQuickSearchTicket('')
                   }
                 }}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="all">Todos</option>
                 {tickets.map(ticket => (
@@ -565,7 +565,7 @@ export default function TimesheetsPage() {
                 type="date"
                 value={filterStartDate}
                 onChange={(e) => setFilterStartDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
             
@@ -577,7 +577,7 @@ export default function TimesheetsPage() {
                 type="date"
                 value={filterEndDate}
                 onChange={(e) => setFilterEndDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
           </div>
@@ -622,7 +622,7 @@ export default function TimesheetsPage() {
           
           if (ticketsWithTimesheets.length === 0) {
             return (
-              <div className="col-span-full text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="col-span-full text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
                 <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-500 dark:text-gray-400">
                   Nenhum apontamento encontrado
@@ -640,7 +640,7 @@ export default function TimesheetsPage() {
           }
           
           return ticketsWithTimesheets.map(({ ticket, timesheets: ticketTimesheets, totalHours, approvedHours, pendingHours, rejectedHours, percentComplete, approvedCount, pendingCount, rejectedCount }) => (
-            <div key={ticket.id} className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden hover:border-slate-600 transition-colors w-full">
+            <div key={ticket.id} className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden hover:border-slate-600 transition-colors w-full">
               {/* Card Compacto */}
               <div className="p-4">
                 {/* Header Minimalista */}
@@ -731,7 +731,7 @@ export default function TimesheetsPage() {
                     <h4 className="text-xs uppercase tracking-wider text-slate-400 mb-3">HISTÓRICO DE APONTAMENTOS</h4>
                     <div className="space-y-2 max-h-64 overflow-y-auto">
                       {ticketTimesheets.map((timesheet) => (
-                        <div key={timesheet.id} className="bg-slate-900/50 rounded-lg p-4 border border-slate-700">
+                        <div key={timesheet.id} className="bg-slate-900/50 rounded-2xl p-4 border border-slate-700">
                           <div className="flex flex-col sm:flex-row sm:justify-between gap-3">
                             <div className="flex-1 min-w-0">
                               <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -762,7 +762,7 @@ export default function TimesheetsPage() {
                                 <>
                                   <button
                                     onClick={() => handleApprove(timesheet.id)}
-                                    className="p-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors group"
+                                    className="p-2 bg-green-600 hover:bg-green-700 text-white rounded-2xl transition-colors group"
                                     title="Aprovar"
                                     aria-label="Aprovar apontamento"
                                   >
@@ -770,7 +770,7 @@ export default function TimesheetsPage() {
                                   </button>
                                   <button
                                     onClick={() => handleReject(timesheet.id)}
-                                    className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors group"
+                                    className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-2xl transition-colors group"
                                     title="Rejeitar"
                                     aria-label="Rejeitar apontamento"
                                   >
@@ -781,7 +781,7 @@ export default function TimesheetsPage() {
                               {timesheet.status === 'pending' && timesheet.user_id === session?.user?.id && (
                                 <button
                                   onClick={() => handleDelete(timesheet.id)}
-                                  className="p-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg transition-colors group"
+                                  className="p-2 bg-slate-600 hover:bg-slate-700 text-white rounded-2xl transition-colors group"
                                   title="Excluir"
                                   aria-label="Excluir apontamento"
                                 >
@@ -818,7 +818,7 @@ export default function TimesheetsPage() {
       
       {/* Mensagem quando não há chamados */}
       {tickets.length === 0 && (
-        <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
           <Ticket className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-500 dark:text-gray-400">
             Nenhum chamado atribuído a você
@@ -840,7 +840,7 @@ export default function TimesheetsPage() {
             />
             
             {/* Modal panel */}
-            <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+            <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
               <div className="bg-white dark:bg-gray-800 px-6 pt-6 pb-4">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -874,7 +874,7 @@ export default function TimesheetsPage() {
                     }}
                     onFocus={() => setShowTicketSuggestions(true)}
                     placeholder="Digite o número ou título do chamado..."
-                    className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white pr-10 ${
+                    className={`w-full px-3 py-2 border rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white pr-10 ${
                       selectedTicket 
                         ? 'border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/20' 
                         : 'border-gray-300 dark:border-gray-600'
@@ -898,7 +898,7 @@ export default function TimesheetsPage() {
                 
                 {/* Sugestões de chamados */}
                 {showTicketSuggestions && (
-                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-xl max-h-80 overflow-hidden">
+                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-2xl shadow-xl max-h-80 overflow-hidden">
                     {/* Header da lista */}
                     {tickets.length > 0 && (
                       <div className="px-4 py-2 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
@@ -942,7 +942,7 @@ export default function TimesheetsPage() {
                                   #{String(ticket.ticket_number).padStart(3, '0')}
                                 </span>
                                 {/* Tooltip flutuante com título completo */}
-                                <div className="absolute left-16 -top-8 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-[100] whitespace-nowrap max-w-xs">
+                                <div className="absolute left-16 -top-8 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-2xl shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-[100] whitespace-nowrap max-w-xs">
                                   {ticket.title.toUpperCase()}
                                   <div className="absolute left-4 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
                                 </div>
@@ -976,7 +976,7 @@ export default function TimesheetsPage() {
                   value={workDate}
                   onChange={(e) => setWorkDate(e.target.value)}
                   max={format(new Date(), 'yyyy-MM-dd')}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   required
                 />
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -992,7 +992,7 @@ export default function TimesheetsPage() {
                 </label>
                 
                 {/* Campo compacto e elegante para entrada de horas */}
-                <div className="bg-slate-900 dark:bg-slate-950 rounded-lg p-4 border border-slate-700 dark:border-slate-600">
+                <div className="bg-slate-900 dark:bg-slate-950 rounded-2xl p-4 border border-slate-700 dark:border-slate-600">
                   <div className="flex items-center justify-center gap-3">
                     <Clock className="h-5 w-5 text-blue-400" />
                     <input
@@ -1085,7 +1085,7 @@ export default function TimesheetsPage() {
             
             {/* Campos adicionais para Hora Extra */}
             {hourType === 'extra' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-2xl border border-orange-200 dark:border-orange-800">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Solicitante da Hora Extra *
@@ -1095,7 +1095,7 @@ export default function TimesheetsPage() {
                     value={overtimeRequester}
                     onChange={(e) => setOvertimeRequester(e.target.value)}
                     placeholder="Nome do solicitante"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     required={hourType === 'extra'}
                   />
                 </div>
@@ -1108,7 +1108,7 @@ export default function TimesheetsPage() {
                     value={overtimeApprover}
                     onChange={(e) => setOvertimeApprover(e.target.value)}
                     placeholder="Nome do aprovador"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     required={hourType === 'extra'}
                   />
                 </div>
@@ -1125,7 +1125,7 @@ export default function TimesheetsPage() {
                 rows={3}
                 minLength={10}
                 placeholder="Descreva detalhadamente o trabalho realizado (mínimo 10 caracteres)..."
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 required
               />
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -1137,14 +1137,14 @@ export default function TimesheetsPage() {
                   <button
                     type="button"
                     onClick={() => setShowAddForm(false)}
-                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                   >
                     {submitting ? (
                       <>
@@ -1168,7 +1168,7 @@ export default function TimesheetsPage() {
 
       {/* Seção de Resultados Filtrados removida - os resultados já aparecem nos cards acima */}
       {false && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               Resultados Filtrados
@@ -1260,7 +1260,7 @@ export default function TimesheetsPage() {
                 
                 {expandedRows.has(timesheet.id) && (
                   <div className="mt-4 pl-9 space-y-2">
-                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-2xl p-3">
                       <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Descrição do Trabalho:
                       </p>
@@ -1277,7 +1277,7 @@ export default function TimesheetsPage() {
                     )}
                     
                     {timesheet.status === 'rejected' && timesheet.rejection_reason && (
-                      <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3">
+                      <div className="bg-red-50 dark:bg-red-900/20 rounded-2xl p-3">
                         <p className="text-sm font-medium text-red-700 dark:text-red-300 mb-1">
                           Motivo da Rejeição:
                         </p>

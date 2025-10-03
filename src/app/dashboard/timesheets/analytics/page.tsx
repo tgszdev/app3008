@@ -643,7 +643,7 @@ export default function TimesheetsAnalyticsPage() {
         <div className="flex gap-2">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="relative flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="relative flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             <Filter className="h-4 w-4" />
             <span className="hidden sm:inline">Filtros</span>
@@ -658,7 +658,7 @@ export default function TimesheetsAnalyticsPage() {
           
           <button
             onClick={exportToCSV}
-            className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors"
           >
             <Download className="h-4 w-4" />
             <span className="text-xs sm:text-sm">Exportar CSV</span>
@@ -668,7 +668,7 @@ export default function TimesheetsAnalyticsPage() {
 
       {/* Filtros */}
       {showFilters && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -678,7 +678,7 @@ export default function TimesheetsAnalyticsPage() {
                 type="date"
                 value={filterStartDate}
                 onChange={(e) => setFilterStartDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
             
@@ -690,7 +690,7 @@ export default function TimesheetsAnalyticsPage() {
                 type="date"
                 value={filterEndDate}
                 onChange={(e) => setFilterEndDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
             
@@ -701,7 +701,7 @@ export default function TimesheetsAnalyticsPage() {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="all">Todos</option>
                 <option value="approved">Aprovados</option>
@@ -719,7 +719,7 @@ export default function TimesheetsAnalyticsPage() {
                 <select
                   value={filterUser}
                   onChange={(e) => setFilterUser(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="all">Todos</option>
                   {allUsers.map(user => (
@@ -736,7 +736,7 @@ export default function TimesheetsAnalyticsPage() {
               <select
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="all">Todas</option>
                 {/* Usar categorias únicas dos tickets */}
@@ -801,7 +801,7 @@ export default function TimesheetsAnalyticsPage() {
             <div className="space-y-6">
               {/* KPI Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
                   <div className="flex items-center justify-between mb-2">
                     <Clock className="h-8 w-8 text-blue-500" />
                     <span className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -813,7 +813,7 @@ export default function TimesheetsAnalyticsPage() {
                   <div className="absolute top-2 right-2">
                     <div className="group/tooltip relative">
                       <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help" />
-                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
+                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-2xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
                         <p className="font-semibold mb-1">Total de Horas</p>
                         <p>Soma de todas as horas apontadas no período selecionado</p>
                         <div className="absolute top-0 right-2 transform -translate-y-1 w-2 h-2 bg-gray-900 rotate-45"></div>
@@ -831,7 +831,7 @@ export default function TimesheetsAnalyticsPage() {
                   </div>
                 </div>
                 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
                   <div className="flex items-center justify-between mb-2">
                     <Users className="h-8 w-8 text-purple-500" />
                     <span className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -843,7 +843,7 @@ export default function TimesheetsAnalyticsPage() {
                   <div className="absolute top-2 right-2">
                     <div className="group/tooltip relative">
                       <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help" />
-                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
+                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-2xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
                         <p className="font-semibold mb-1">Colaboradores Ativos</p>
                         <p>Número de colaboradores que registraram horas no período</p>
                         <div className="absolute top-0 right-2 transform -translate-y-1 w-2 h-2 bg-gray-900 rotate-45"></div>
@@ -855,7 +855,7 @@ export default function TimesheetsAnalyticsPage() {
                   </p>
                 </div>
                 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
                   <div className="flex items-center justify-between mb-2">
                     <Ticket className="h-8 w-8 text-green-500" />
                     <span className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -867,7 +867,7 @@ export default function TimesheetsAnalyticsPage() {
                   <div className="absolute top-2 right-2">
                     <div className="group/tooltip relative">
                       <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help" />
-                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
+                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-2xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
                         <p className="font-semibold mb-1">Chamados Trabalhados</p>
                         <p>Quantidade de chamados únicos que receberam apontamentos de horas</p>
                         <div className="absolute top-0 right-2 transform -translate-y-1 w-2 h-2 bg-gray-900 rotate-45"></div>
@@ -879,7 +879,7 @@ export default function TimesheetsAnalyticsPage() {
                   </p>
                 </div>
                 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
                   <div className="flex items-center justify-between mb-2">
                     <BarChart3 className="h-8 w-8 text-yellow-500" />
                     <span className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -891,7 +891,7 @@ export default function TimesheetsAnalyticsPage() {
                   <div className="absolute top-2 right-2">
                     <div className="group/tooltip relative">
                       <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help" />
-                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
+                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-2xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
                         <p className="font-semibold mb-1">Média Diária</p>
                         <p>Média de horas trabalhadas por dia útil no período</p>
                         <div className="absolute top-0 right-2 transform -translate-y-1 w-2 h-2 bg-gray-900 rotate-45"></div>
@@ -908,7 +908,7 @@ export default function TimesheetsAnalyticsPage() {
 
               {/* Status Distribution */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Distribuição por Status</h3>
                     <Activity className="h-5 w-5 text-gray-400" />
@@ -917,7 +917,7 @@ export default function TimesheetsAnalyticsPage() {
                   <div className="absolute top-2 right-2">
                     <div className="group/tooltip relative">
                       <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help" />
-                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
+                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-2xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
                         <p className="font-semibold mb-1">Distribuição por Status</p>
                         <p>Percentual de horas por situação de aprovação (aprovado, pendente, rejeitado)</p>
                         <div className="absolute top-0 right-2 transform -translate-y-1 w-2 h-2 bg-gray-900 rotate-45"></div>
@@ -965,7 +965,7 @@ export default function TimesheetsAnalyticsPage() {
                 </div>
 
                 {/* Top Chamados */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 lg:col-span-2 relative">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 lg:col-span-2 relative">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Top 5 Chamados Consumidores de Tempo</h3>
                     <Ticket className="h-5 w-5 text-gray-400" />
@@ -974,7 +974,7 @@ export default function TimesheetsAnalyticsPage() {
                   <div className="absolute top-2 right-2">
                     <div className="group/tooltip relative">
                       <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help" />
-                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
+                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-2xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
                         <p className="font-semibold mb-1">Top Chamados</p>
                         <p>Os 5 chamados que mais consumiram horas no período selecionado</p>
                         <div className="absolute top-0 right-2 transform -translate-y-1 w-2 h-2 bg-gray-900 rotate-45"></div>
@@ -1018,7 +1018,7 @@ export default function TimesheetsAnalyticsPage() {
                     </h3>
                     <div className="group/tooltip relative">
                       <Info className="h-4 w-4 text-slate-500 hover:text-slate-300 cursor-help" />
-                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
+                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-2xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
                         <p className="font-semibold mb-1">Gráfico Polar</p>
                         <p>Visualização da distribuição de horas por categoria em formato polar</p>
                         <div className="absolute top-0 right-2 transform -translate-y-1 w-2 h-2 bg-gray-900 rotate-45"></div>
@@ -1143,7 +1143,7 @@ export default function TimesheetsAnalyticsPage() {
                 </div>
 
                 {/* Horas por Prioridade */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -1156,7 +1156,7 @@ export default function TimesheetsAnalyticsPage() {
                   <div className="absolute top-2 right-2">
                     <div className="group/tooltip relative">
                       <Info className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help" />
-                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
+                      <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-2xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
                         <p className="font-semibold mb-1">Horas por Prioridade</p>
                         <p>Distribuição de horas trabalhadas por nível de prioridade dos chamados</p>
                         <div className="absolute top-0 right-2 transform -translate-y-1 w-2 h-2 bg-gray-900 rotate-45"></div>
@@ -1204,7 +1204,7 @@ export default function TimesheetsAnalyticsPage() {
                       }
                       
                       return (
-                        <div key={index} className={`rounded-lg p-3 border ${getPriorityStyle(priority.priority)}`}>
+                        <div key={index} className={`rounded-2xl p-3 border ${getPriorityStyle(priority.priority)}`}>
                           <div className="flex items-center justify-between mb-1">
                             <span className={`text-sm font-semibold ${getPriorityTextColor(priority.priority)}`}>
                               {translatePriority(priority.priority)}
@@ -1261,7 +1261,7 @@ export default function TimesheetsAnalyticsPage() {
                   </div>
                   <div className="group/tooltip relative">
                     <Info className="h-4 w-4 text-slate-500 hover:text-slate-300 cursor-help" />
-                    <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
+                    <div className="absolute top-6 right-0 w-48 p-2 bg-gray-900 text-white text-xs rounded-2xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 shadow-xl">
                       <p className="font-semibold mb-1">Gráfico de Horas</p>
                       <p>Visualização diária das horas trabalhadas com status de aprovação</p>
                       <div className="absolute top-0 right-2 transform -translate-y-1 w-2 h-2 bg-gray-900 rotate-45"></div>
@@ -1537,7 +1537,7 @@ export default function TimesheetsAnalyticsPage() {
                         <button
                           key={year}
                           onClick={() => setSelectedYear(year)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                          className={`px-3 py-1.5 rounded-2xl text-xs font-medium transition-all ${
                             selectedYear === year
                               ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
                               : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
@@ -1860,7 +1860,7 @@ export default function TimesheetsAnalyticsPage() {
           {/* Tab: Colaboradores */}
           {activeTab === 'users' && (
             <div className="space-y-6">
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
                 <div className="p-6 border-b border-gray-200 dark:border-gray-700">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Total de Horas por Colaborador
@@ -1959,7 +1959,7 @@ export default function TimesheetsAnalyticsPage() {
               </div>
 
               {/* Gráfico de barras horizontal */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                   Distribuição Visual de Horas
                 </h3>
@@ -2006,7 +2006,7 @@ export default function TimesheetsAnalyticsPage() {
           {false && (
             <div className="space-y-6">
               {/* Distribuição por Categoria */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Horas por Categoria
@@ -2016,7 +2016,7 @@ export default function TimesheetsAnalyticsPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="space-y-3">
                     {analytics?.categoryDistribution.map((category, index) => (
-                      <div key={index} className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                      <div key={index} className="p-3 bg-gray-50 dark:bg-gray-900 rounded-2xl">
                         <div className="flex justify-between items-center mb-2">
                           <span className="font-medium text-gray-900 dark:text-white">
                             {category.category}
@@ -2100,7 +2100,7 @@ export default function TimesheetsAnalyticsPage() {
               </div>
 
               {/* Distribuição por Prioridade */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Horas por Prioridade
@@ -2109,7 +2109,7 @@ export default function TimesheetsAnalyticsPage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {analytics?.priorityDistribution.map((priority, index) => (
-                    <div key={index} className={`rounded-lg p-4 ${getPriorityColor(priority.priority)}`}>
+                    <div key={index} className={`rounded-2xl p-4 ${getPriorityColor(priority.priority)}`}>
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-semibold text-lg">
                           {priority.priority}

@@ -251,7 +251,7 @@ export default function TimesheetsAdminPage() {
                 toast.error('Erro ao exportar PDF')
               }
             }}
-            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors"
           >
             <FileDown className="h-4 w-4" />
             <span className="hidden sm:inline">Exportar PDF</span>
@@ -260,7 +260,7 @@ export default function TimesheetsAdminPage() {
           
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             <Filter className="h-4 w-4" />
             <span className="hidden sm:inline">Filtros</span>
@@ -271,7 +271,7 @@ export default function TimesheetsAdminPage() {
 
       {/* Filtros */}
       {showFilters && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -280,7 +280,7 @@ export default function TimesheetsAdminPage() {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="all">Todos</option>
                 <option value="pending">Pendentes</option>
@@ -296,7 +296,7 @@ export default function TimesheetsAdminPage() {
               <select
                 value={filterUser}
                 onChange={(e) => setFilterUser(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="all">Todos</option>
                 {uniqueUsers.map(user => (
@@ -318,7 +318,7 @@ export default function TimesheetsAdminPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Buscar por chamado, usuário ou descrição..."
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
             </div>
@@ -328,7 +328,7 @@ export default function TimesheetsAdminPage() {
 
       {/* Estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-2xl p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">
@@ -342,7 +342,7 @@ export default function TimesheetsAdminPage() {
           </div>
         </div>
 
-        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-2xl p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-green-600 dark:text-green-400 text-sm font-medium">
@@ -356,7 +356,7 @@ export default function TimesheetsAdminPage() {
           </div>
         </div>
 
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-red-600 dark:text-red-400 text-sm font-medium">
@@ -370,7 +370,7 @@ export default function TimesheetsAdminPage() {
           </div>
         </div>
 
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-blue-600 dark:text-blue-400 text-sm font-medium">
@@ -386,7 +386,7 @@ export default function TimesheetsAdminPage() {
       </div>
 
       {/* Lista de Apontamentos */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
             Apontamentos para Aprovação
@@ -455,14 +455,14 @@ export default function TimesheetsAdminPage() {
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() => handleApprove(timesheet.id)}
-                          className="p-1.5 sm:p-2 text-green-600 hover:bg-green-100 dark:text-green-400 dark:hover:bg-green-900/20 rounded-lg transition-colors"
+                          className="p-1.5 sm:p-2 text-green-600 hover:bg-green-100 dark:text-green-400 dark:hover:bg-green-900/20 rounded-2xl transition-colors"
                           title="Aprovar"
                         >
                           <Check className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => handleReject(timesheet.id)}
-                          className="p-1.5 sm:p-2 text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                          className="p-1.5 sm:p-2 text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-red-900/20 rounded-2xl transition-colors"
                           title="Rejeitar"
                         >
                           <X className="h-4 w-4" />
@@ -474,7 +474,7 @@ export default function TimesheetsAdminPage() {
                 
                 {expandedRows.has(timesheet.id) && (
                   <div className="mt-4 pl-12 space-y-2">
-                    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+                    <div className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-3">
                       <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Descrição do Trabalho:
                       </p>
@@ -484,7 +484,7 @@ export default function TimesheetsAdminPage() {
                     </div>
                     
                     {timesheet.status === 'approved' && timesheet.approver && (
-                      <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
+                      <div className="bg-green-50 dark:bg-green-900/20 rounded-2xl p-3">
                         <p className="text-sm text-green-800 dark:text-green-200">
                           <span className="font-medium">Aprovado por:</span> {timesheet.approver.name}
                         </p>
@@ -497,7 +497,7 @@ export default function TimesheetsAdminPage() {
                     )}
                     
                     {timesheet.status === 'rejected' && timesheet.rejection_reason && (
-                      <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3">
+                      <div className="bg-red-50 dark:bg-red-900/20 rounded-2xl p-3">
                         <p className="text-sm text-red-800 dark:text-red-200">
                           <span className="font-medium">Motivo da Rejeição:</span> {timesheet.rejection_reason}
                         </p>

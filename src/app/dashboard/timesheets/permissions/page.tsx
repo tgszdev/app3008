@@ -230,7 +230,7 @@ export default function TimesheetsPermissionsPage() {
               toast.error('Erro ao exportar PDF')
             }
           }}
-          className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors"
         >
           <FileDown className="h-4 w-4" />
           <span className="hidden sm:inline">Exportar PDF</span>
@@ -240,7 +240,7 @@ export default function TimesheetsPermissionsPage() {
 
       {/* Estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+        <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">
@@ -254,7 +254,7 @@ export default function TimesheetsPermissionsPage() {
           </div>
         </div>
 
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-blue-600 dark:text-blue-400 text-sm font-medium">
@@ -268,7 +268,7 @@ export default function TimesheetsPermissionsPage() {
           </div>
         </div>
 
-        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-2xl p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-green-600 dark:text-green-400 text-sm font-medium">
@@ -282,7 +282,7 @@ export default function TimesheetsPermissionsPage() {
           </div>
         </div>
 
-        <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+        <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-2xl p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-purple-600 dark:text-purple-400 text-sm font-medium">
@@ -298,7 +298,7 @@ export default function TimesheetsPermissionsPage() {
       </div>
 
       {/* Controles */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
@@ -308,7 +308,7 @@ export default function TimesheetsPermissionsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Buscar por nome, email, cargo ou departamento..."
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
           </div>
@@ -316,14 +316,14 @@ export default function TimesheetsPermissionsPage() {
           <div className="flex gap-2">
             <button
               onClick={() => toggleAllSubmit(true)}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-colors flex items-center gap-2"
             >
               <Unlock className="h-4 w-4" />
               Liberar Todos
             </button>
             <button
               onClick={() => toggleAllSubmit(false)}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-red-600 text-white rounded-2xl hover:bg-red-700 transition-colors flex items-center gap-2"
             >
               <Lock className="h-4 w-4" />
               Bloquear Todos
@@ -333,7 +333,7 @@ export default function TimesheetsPermissionsPage() {
       </div>
 
       {/* Tabela de Permissões - Desktop */}
-      <div className="hidden md:block bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="hidden md:block bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-700">
@@ -441,7 +441,7 @@ export default function TimesheetsPermissionsPage() {
           if (!user) return null
           
           return (
-            <div key={permission.user_id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+            <div key={permission.user_id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
               <div className="space-y-3">
                 <div>
                   <div className="font-medium text-gray-900 dark:text-white">
@@ -502,7 +502,7 @@ export default function TimesheetsPermissionsPage() {
         })}
         
         {filteredPermissions.length === 0 && (
-          <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg">
+          <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl">
             <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 dark:text-gray-400">
               Nenhum usuário encontrado
@@ -512,7 +512,7 @@ export default function TimesheetsPermissionsPage() {
       </div>
 
       {/* Legenda */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-4">
         <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
           Sobre as Permissões
         </h3>

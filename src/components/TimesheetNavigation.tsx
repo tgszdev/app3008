@@ -51,9 +51,9 @@ export default function TimesheetNavigation() {
   if (loading) {
     return (
       <div className="flex gap-2 flex-wrap mb-6">
-        <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-lg"></div>
-        <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-lg"></div>
-        <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-lg"></div>
+        <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-2xl"></div>
+        <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-2xl"></div>
+        <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-2xl"></div>
       </div>
     )
   }
@@ -70,7 +70,7 @@ export default function TimesheetNavigation() {
           <Link
             key={link.href}
             href={link.href}
-            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg transition-colors ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-2xl transition-colors ${
               isActive
                 ? 'bg-blue-600 text-white'
                 : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
