@@ -139,7 +139,7 @@ const StatCard = ({
   color: string
   subtitle?: string
 }) => (
-  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
     <div className="flex items-center justify-between">
       <div className="flex-1">
         <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -166,7 +166,7 @@ const StatCard = ({
           </p>
         )}
       </div>
-      <div className={`p-3 rounded-lg ${color}`}>
+      <div className={`p-3 rounded-2xl ${color}`}>
         <Icon className="h-6 w-6 text-white" />
       </div>
     </div>
@@ -369,14 +369,14 @@ export default function AnalyticsPage() {
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-800 text-sm"
           >
             <option value="7days">Últimos 7 dias</option>
             <option value="30days">Últimos 30 dias</option>
             <option value="90days">Últimos 90 dias</option>
             <option value="1year">Último ano</option>
           </select>
-          <button className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button className="p-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors">
             <Download className="h-4 w-4" />
           </button>
         </div>
@@ -422,7 +422,7 @@ export default function AnalyticsPage() {
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Tickets Trend */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               Tendência de Tickets
@@ -435,7 +435,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Status Distribution */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               Distribuição por Status
@@ -448,7 +448,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Priority Distribution */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               Distribuição por Prioridade
@@ -461,7 +461,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Category Distribution */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               Tickets por Categoria
@@ -475,7 +475,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Performance Metrics */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
           Métricas de Performance
         </h2>
@@ -530,7 +530,7 @@ export default function AnalyticsPage() {
       {/* Peak Hours & User Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Peak Hours */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               Horários de Pico
@@ -543,7 +543,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Top Users */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               Atividade por Usuário
@@ -600,23 +600,23 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Quick Insights */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow-sm p-6 text-white">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-sm p-6 text-white">
         <div className="flex items-center mb-4">
           <Zap className="h-6 w-6 mr-2" />
           <h2 className="text-lg font-semibold">Insights Rápidos</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white/10 backdrop-blur rounded-lg p-4">
+          <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
             <p className="text-sm opacity-90 mb-1">Melhor dia da semana</p>
             <p className="text-xl font-bold">Segunda-feira</p>
             <p className="text-xs opacity-75 mt-1">Menor volume de tickets</p>
           </div>
-          <div className="bg-white/10 backdrop-blur rounded-lg p-4">
+          <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
             <p className="text-sm opacity-90 mb-1">Categoria mais problemática</p>
             <p className="text-xl font-bold">Hardware</p>
             <p className="text-xs opacity-75 mt-1">35% dos tickets</p>
           </div>
-          <div className="bg-white/10 backdrop-blur rounded-lg p-4">
+          <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
             <p className="text-sm opacity-90 mb-1">Técnico destaque</p>
             <p className="text-xl font-bold">João Silva</p>
             <p className="text-xs opacity-75 mt-1">98% taxa de resolução</p>
