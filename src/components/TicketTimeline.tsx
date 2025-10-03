@@ -139,10 +139,10 @@ export default function TicketTimeline({
                       {index + 1}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-bold text-sm text-gray-900 dark:text-white truncate">{item.status}</h3>
-                      <p className="text-[10px] text-gray-500 dark:text-gray-400 flex items-center gap-0.5 mt-0.5">
+                      <h3 className="font-bold text-sm text-gray-900 dark:text-white break-words">{item.status}</h3>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400 flex items-center gap-0.5 mt-0.5 flex-wrap">
                         <Calendar className="h-2.5 w-2.5 flex-shrink-0" />
-                        <span className="truncate">
+                        <span className="break-all">
                           {format(new Date(item.timestamp), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
                         </span>
                       </p>
