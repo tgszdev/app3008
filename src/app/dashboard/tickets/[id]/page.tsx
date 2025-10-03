@@ -600,7 +600,7 @@ export default function TicketDetailsPage() {
             </p>
           </div>
           
-          <div className="flex flex-col lg:flex-row gap-2 w-full sm:w-auto">
+          <div className="flex flex-col lg:flex-row gap-2 w-full sm:w-auto lg:mt-6">
             {/* Botão Gerar PDF */}
             <PrintButton ticket={ticket} loading={loading} />
             {/* Status - Baseado em permissões */}
