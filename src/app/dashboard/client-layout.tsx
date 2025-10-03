@@ -169,8 +169,8 @@ export default function DashboardLayout({
         mobileMenuOpen ? "block" : "hidden"
       )}>
         <div className="fixed inset-0 bg-gray-900/80" onClick={() => setMobileMenuOpen(false)} />
-        <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white dark:bg-gray-800">
-          <div className="flex h-16 items-center justify-between px-6">
+        <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white dark:bg-gray-800 overflow-hidden">
+          <div className="flex h-16 items-center justify-between px-6 flex-shrink-0">
             <span className="text-xl font-semibold text-gray-900 dark:text-white">
               Suporte
             </span>
@@ -181,7 +181,7 @@ export default function DashboardLayout({
               <X className="h-6 w-6" />
             </button>
           </div>
-          <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto" style={{ paddingBottom: '180px' }}>
+          <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto overflow-x-hidden" style={{ paddingBottom: '180px' }}>
             {/* Dashboard Link */}
             <Link
               href="/dashboard"
