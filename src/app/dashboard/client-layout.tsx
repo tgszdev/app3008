@@ -77,6 +77,7 @@ const navigationSections: NavigationSection[] = [
       { name: 'Apontamentos', href: '/dashboard/timesheets', icon: Clock },
       { name: 'Aprovação de Horas', href: '/dashboard/timesheets/admin', icon: CheckCircle, adminOnly: true },
       { name: 'Analytics de Horas', href: '/dashboard/timesheets/analytics', icon: PieChart, adminOnly: true },
+      { name: 'Permissões', href: '/dashboard/timesheets/permissions', icon: Lock, adminOnly: true },
     ]
   },
   {
@@ -102,7 +103,6 @@ const navigationSections: NavigationSection[] = [
     items: [
       { name: 'Organizações', href: '/dashboard/organizations', icon: Building },
       { name: 'Usuários', href: '/dashboard/users', icon: Users },
-      { name: 'Permissões', href: '/dashboard/timesheets/permissions', icon: Lock },
       { name: 'SLA', href: '/dashboard/sla', icon: Gauge },
       { name: 'Configurações', href: '/dashboard/settings', icon: Settings },
     ]
