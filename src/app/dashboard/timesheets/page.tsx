@@ -441,6 +441,43 @@ export default function TimesheetsPage() {
         </div>
         
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          {/* Busca por Número de Chamado */}
+          <div className="relative flex items-center">
+            <input
+              type="text"
+              placeholder="Buscar por número"
+              value={quickSearchTicket}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9]/g, '')
+                setQuickSearchTicket(value)
+                if (value) {
+                  const foundTicket = tickets.find(t => t.ticket_number.toString() === value)
+                  if (foundTicket) {
+                    setFilterTicket(foundTicket.id)
+                  } else {
+                    setFilterTicket('all')
+                  }
+                } else {
+                  setFilterTicket('all')
+                }
+              }}
+              className="w-full sm:w-auto sm:min-w-[180px] h-10 pl-10 pr-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/30 transition-all"
+            />
+            <Ticket className="absolute left-3 h-4 w-4 text-gray-500 dark:text-gray-400 pointer-events-none" />
+            {quickSearchTicket && (
+              <button
+                onClick={() => {
+                  setQuickSearchTicket('')
+                  setFilterTicket('all')
+                }}
+                className="absolute right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                title="Limpar busca"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
           <button
             onClick={() => setShowFilters(!showFilters)}
             className="w-full sm:w-auto sm:min-w-[140px] h-10 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium"
