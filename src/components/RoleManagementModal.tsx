@@ -652,19 +652,29 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
   const handleSaveRole = async (role: Role) => {
     try {
       setSaving(true)
+      console.log('[ROLES] Salvando perfil:', role.name, role.id)
+      
       const response = await apiClient.put(`/api/roles/${role.id}`, role)
       
       if (response.status === 200) {
+        console.log('[ROLES] ✅ Perfil salvo no banco')
         toast.success('Perfil atualizado com sucesso!')
         setEditingRole(null)
-        fetchRoles()
+        fetchRoles() // Recarregar do banco
       }
     } catch (error: any) {
-      toast.error('Erro ao salvar perfil. As alterações foram salvas localmente.')
+      console.error('[ROLES] ❌ ERRO ao salvar perfil:', error)
+      console.error('[ROLES] Detalhes:', {
+        roleId: role.id,
+        roleName: role.name,
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      })
       
-      // Atualizar localmente
-      setRoles(prev => prev.map(r => r.id === role.id ? role : r))
-      setEditingRole(null)
+      // NÃO salvar localmente! Mostrar erro real
+      toast.error(`ERRO ao salvar perfil: ${error.response?.data?.error || error.message}`)
+      // Manter modal aberto para usuário tentar novamente
     } finally {
       setSaving(false)
     }
@@ -731,17 +741,26 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
 
     try {
       setSaving(true)
+      console.log('[ROLES] Deletando perfil:', roleId)
+      
       const response = await apiClient.delete(`/api/roles/${roleId}`)
       
       if (response.status === 200) {
+        console.log('[ROLES] ✅ Perfil deletado no banco')
         toast.success('Perfil excluído com sucesso!')
-        fetchRoles()
+        fetchRoles() // Recarregar do banco
       }
     } catch (error: any) {
-      toast.success('Perfil excluído localmente!')
+      console.error('[ROLES] ❌ ERRO ao deletar perfil:', error)
+      console.error('[ROLES] Detalhes:', {
+        roleId,
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      })
       
-      // Excluir localmente
-      setRoles(prev => prev.filter(r => r.id !== roleId))
+      // NÃO fazer nada localmente! Mostrar erro real
+      toast.error(`ERRO ao deletar perfil: ${error.response?.data?.error || error.message}`)
     } finally {
       setSaving(false)
     }
