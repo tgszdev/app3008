@@ -578,27 +578,35 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
     }
   }, [isOpen])
 
-  // Função para migrar perfis existentes com novas permissões
+  // Função para migrar perfis existentes com novas permissões (V2.0)
   const migrateRolesPermissions = (roles: Role[]): Role[] => {
     return roles.map(role => {
-      // Verificar se já tem a nova permissão
-      if (role.permissions.tickets_change_priority !== undefined) {
-        return role // Já migrado
-      }
+      // Pegar permissões padrão do perfil do sistema correspondente
+      const systemPermissions = systemRolesPermissions[role.name as keyof typeof systemRolesPermissions] || systemRolesPermissions.user
       
-      // Definir valor padrão baseado no tipo de perfil
-      let canChangePriority = false
-      if (['admin', 'developer', 'analyst'].includes(role.name)) {
-        canChangePriority = true
-      }
+      // Mesclar permissões existentes com novas permissões padrão
+      const updatedPermissions = { ...defaultPermissions } // Começar com todas como false
       
+      // Copiar permissões existentes do perfil
+      Object.keys(role.permissions).forEach(key => {
+        if (role.permissions[key as keyof typeof role.permissions] !== undefined) {
+          updatedPermissions[key as keyof typeof updatedPermissions] = role.permissions[key as keyof typeof role.permissions]
+        }
+      })
+      
+      // Adicionar NOVAS permissões baseado no tipo de perfil
+      // Apenas adiciona se ainda não existir
+      Object.keys(systemPermissions).forEach(key => {
+        if (updatedPermissions[key as keyof typeof updatedPermissions] === undefined || 
+            updatedPermissions[key as keyof typeof updatedPermissions] === false) {
+          // Usar valor padrão do sistema apenas para novas permissões
+          updatedPermissions[key as keyof typeof updatedPermissions] = systemPermissions[key as keyof typeof systemPermissions]
+        }
+      })
       
       return {
         ...role,
-        permissions: {
-          ...role.permissions,
-          tickets_change_priority: canChangePriority
-        }
+        permissions: updatedPermissions
       }
     })
   }
@@ -654,59 +662,22 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
         ]
         setRoles(defaultRoles)
       } else {
-        // Garantir que todos os perfis tenham a nova permissão
-        const rolesWithNewPermission = response.data.map((role: Role) => {
-          const updatedPermissions = { ...role.permissions }
-          
-          // Adicionar timesheets_analytics_full se não existir
-          if (updatedPermissions.timesheets_analytics_full === undefined) {
-            // Definir valor padrão baseado no tipo de perfil
-            if (role.name === 'admin') {
-              updatedPermissions.timesheets_analytics_full = true
-            } else {
-              updatedPermissions.timesheets_analytics_full = false
-            }
-          }
-          
-          // Ajustar permissões do user
-          if (role.name === 'user') {
-            updatedPermissions.timesheets_analytics = false
-            updatedPermissions.timesheets_analytics_full = false
-          }
-          
-          // Ajustar permissões do analyst
-          if (role.name === 'analyst') {
-            updatedPermissions.timesheets_analytics = true
-            updatedPermissions.timesheets_analytics_full = false
-          }
-          
-          // Ajustar permissões do developer
-          if (role.name === 'developer' || role.name === 'dev') {
-            // Garantir que desenvolvedor pode atribuir tickets
-            if (updatedPermissions.tickets_assign === undefined) {
-              updatedPermissions.tickets_assign = true
-            }
-            updatedPermissions.timesheets_analytics = true
-            updatedPermissions.timesheets_analytics_full = false
-          }
-          
-          // Adicionar tickets_change_priority se não existir
-          if (updatedPermissions.tickets_change_priority === undefined) {
-            // Definir valor padrão baseado no tipo de perfil
-            if (['admin', 'developer', 'dev', 'analyst'].includes(role.name)) {
-              updatedPermissions.tickets_change_priority = true
-            } else {
-              updatedPermissions.tickets_change_priority = false
-            }
-          }
-          
-          return {
-            ...role,
-            permissions: updatedPermissions
-          }
+        // Aplicar migration automática para TODAS as novas permissões
+        const migratedRoles = migrateRolesPermissions(response.data)
+        
+        // Log para debug
+        console.log('[ROLES MIGRATION] Perfis migrados:', {
+          total: migratedRoles.length,
+          details: migratedRoles.map(r => ({
+            name: r.name,
+            totalPermissions: Object.keys(r.permissions).length,
+            newPermissions: Object.keys(r.permissions).filter(k => 
+              !response.data.find((orig: Role) => orig.id === r.id)?.permissions[k as keyof typeof r.permissions]
+            ).length
+          }))
         })
         
-        setRoles(rolesWithNewPermission)
+        setRoles(migratedRoles)
       }
     } catch (error: any) {
       // Se a API não existir, usar roles padrão com permissões corretas
@@ -851,6 +822,54 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
       
       // Excluir localmente
       setRoles(prev => prev.filter(r => r.id !== roleId))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleApplyMigration = async () => {
+    if (!confirm('Aplicar migration de permissões para TODOS os perfis no banco de dados?\n\nIsso irá:\n✅ Adicionar as 48 novas permissões\n✅ Manter permissões existentes\n✅ Aplicar valores padrão baseados no tipo de perfil')) {
+      return
+    }
+
+    try {
+      setSaving(true)
+      let successCount = 0
+      let errorCount = 0
+      
+      // Aplicar migration em cada perfil
+      for (const role of roles) {
+        try {
+          const response = await apiClient.put(`/api/roles/${role.id}`, role)
+          if (response.status === 200) {
+            successCount++
+          }
+        } catch (error) {
+          errorCount++
+          console.error(`Erro ao migrar perfil ${role.name}:`, error)
+        }
+      }
+      
+      if (successCount > 0) {
+        toast.success(`Migration aplicada com sucesso! ${successCount} perfis atualizados.`)
+        
+        // Limpar cache automaticamente
+        try {
+          await apiClient.post('/api/admin/clear-cache')
+          toast.success('Cache limpo! Faça logout e login para aplicar as mudanças.')
+        } catch (error) {
+          toast.error('Erro ao limpar cache. Limpe manualmente.')
+        }
+        
+        fetchRoles()
+      }
+      
+      if (errorCount > 0) {
+        toast.error(`${errorCount} perfis falharam ao atualizar. Verifique o console.`)
+      }
+    } catch (error: any) {
+      toast.error('Erro ao aplicar migration')
+      console.error('[MIGRATION ERROR]', error)
     } finally {
       setSaving(false)
     }
@@ -1158,6 +1177,15 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                           >
                             <Plus className="h-5 w-5" />
                             Criar Novo Perfil
+                          </button>
+                          <button
+                            onClick={handleApplyMigration}
+                            disabled={saving}
+                            className="flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-colors disabled:opacity-50"
+                            title="Aplicar migration V2.0 (adiciona 48 novas permissões)"
+                          >
+                            <Shield className="h-5 w-5" />
+                            {saving ? 'Migrando...' : 'Migration V2.0'}
                           </button>
                           <button
                             onClick={async () => {
