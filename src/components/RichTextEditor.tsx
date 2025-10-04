@@ -3,7 +3,6 @@
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
-import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import { 
   Bold, Italic, List, ListOrdered, Link as LinkIcon, 
@@ -40,13 +39,6 @@ export default function RichTextEditor({
         allowBase64: true, // Temporário durante upload
         HTMLAttributes: {
           class: 'rounded-xl max-w-full h-auto my-2 cursor-pointer hover:shadow-lg transition-shadow',
-        },
-      }),
-      Link.configure({
-        openOnClick: false,
-        autolink: true,
-        HTMLAttributes: {
-          class: 'text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline cursor-pointer',
         },
       }),
       Placeholder.configure({
