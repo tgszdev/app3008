@@ -16,10 +16,10 @@ export async function GET(
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    // Obter dados do usuário e role
+    // Obter dados do usuário do BANCO (source of truth)
     const { data: userData, error: userError } = await supabaseAdmin
       .from('users')
-      .select('id, role')
+      .select('id, role, user_type, context_id')
       .eq('email', session.user.email)
       .single()
 
@@ -32,6 +32,8 @@ export async function GET(
 
     const userId = userData.id
     const userRole = userData.role || 'user'
+    const userType = userData.user_type
+    const userContextId = userData.context_id
 
     // Buscar o ticket com todas as informações relacionadas
     const { data: ticket, error } = await supabaseAdmin
@@ -67,12 +69,38 @@ export async function GET(
       )
     }
 
-    // Verificar se o usuário tem permissão para ver este ticket
+    // VALIDAÇÃO MULTI-TENANT: Verificar se o usuário tem acesso ao contexto do ticket
+    if (userType === 'context' && userContextId) {
+      // Usuário de contexto único: só pode ver tickets do seu contexto
+      if (ticket.context_id !== userContextId) {
+        return NextResponse.json(
+          { error: 'Acesso negado. Este ticket pertence a outro cliente.' },
+          { status: 403 }
+        )
+      }
+    } else if (userType === 'matrix') {
+      // Usuário multi-cliente: verificar se tem associação com o contexto do ticket
+      const { data: hasAccess } = await supabaseAdmin
+        .from('user_contexts')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('context_id', ticket.context_id)
+        .single()
+
+      if (!hasAccess) {
+        return NextResponse.json(
+          { error: 'Acesso negado. Você não tem permissão para acessar tickets deste cliente.' },
+          { status: 403 }
+        )
+      }
+    }
+
+    // Verificar se o usuário tem permissão para ver tickets internos
     if (userRole === 'user') {
       // Se é um ticket interno e não foi criado pelo usuário, negar acesso
       if (ticket.is_internal && ticket.created_by !== userId) {
         return NextResponse.json(
-          { error: 'Acesso negado. Você não tem permissão para ver este ticket.' },
+          { error: 'Acesso negado. Você não tem permissão para ver este ticket interno.' },
           { status: 403 }
         )
       }
