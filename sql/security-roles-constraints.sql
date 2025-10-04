@@ -224,7 +224,7 @@ CREATE TRIGGER trigger_sanitize_role_name
 -- 8. AUDITORIA DE ALTERAÇÕES EM PERFIS (Tabela de Logs)
 CREATE TABLE IF NOT EXISTS role_audit_log (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  role_id UUID REFERENCES roles(id) ON DELETE SET NULL,
+  role_id UUID REFERENCES roles(id) ON DELETE CASCADE,  -- CASCADE para deletar logs automaticamente
   role_name VARCHAR(50),
   action VARCHAR(20) NOT NULL, -- 'created', 'updated', 'deleted'
   changed_by VARCHAR(255),
