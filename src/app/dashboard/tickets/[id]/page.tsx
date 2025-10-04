@@ -164,6 +164,7 @@ export default function TicketDetailsPage() {
   const canCloseTickets = hasPermission('tickets_close')
   const canDeleteTickets = hasPermission('tickets_delete')
   const canChangePriority = hasPermission('tickets_change_priority')
+  const canChangeStatus = hasPermission('tickets_change_status')
   const canViewHistory = hasPermission('tickets_view_history')
   
   // Debug: Log permissions para verificar se estão sendo carregadas corretamente
@@ -1024,8 +1025,8 @@ export default function TicketDetailsPage() {
             <div className="space-y-3">
               {/* Botões de Ação - Baseado em permissões */}
               
-              {/* Botão Alterar Status - Apenas se pode editar */}
-              {(canEditThisTicket && (ticket.status !== 'cancelled' || canDeleteTickets)) && (
+              {/* Botão Alterar Status - APENAS se tem permissão tickets_change_status */}
+              {(canChangeStatus && (ticket.status !== 'cancelled' || canDeleteTickets)) && (
                 <button
                   onClick={() => setEditingStatus(true)}
                   className="w-full h-12 px-3 sm:px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded-2xl hover:bg-blue-700 hover:border-blue-700 transition-all duration-300 font-medium text-sm relative overflow-hidden"

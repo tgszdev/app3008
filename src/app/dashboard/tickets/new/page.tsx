@@ -78,6 +78,7 @@ export default function NewTicketPage() {
   const canAssignTickets = hasPermission('tickets_assign')
   const canEditAllTickets = hasPermission('tickets_edit_all')
   const canCreateTickets = hasPermission('tickets_create')
+  const canCreateInternalTickets = hasPermission('tickets_create_internal')
 
   // Buscar lista de analistas e categorias
   useEffect(() => {
@@ -441,7 +442,7 @@ export default function NewTicketPage() {
           </div>
           
           {/* Internal Ticket Checkbox */}
-          {canEditAllTickets && (
+          {canCreateInternalTickets && (
             <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl">
               <label className="flex items-start space-x-3 cursor-pointer">
                 <input
