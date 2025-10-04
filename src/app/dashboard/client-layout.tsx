@@ -121,6 +121,7 @@ export default function DashboardLayout({
   const { theme, setTheme } = useTheme()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [shouldShowTimesheetMenu, setShouldShowTimesheetMenu] = useState(true) // Default true para evitar flash
   // Removed section collapse logic - now handled by StickySidebar
   
   // Proteção de sessão com notificações
@@ -158,8 +159,39 @@ export default function DashboardLayout({
     }
   }, [status, router])
 
+  // Verificar se deve mostrar menu de apontamentos
+  useEffect(() => {
+    if (status !== 'authenticated') return
+
+    const checkTimesheetMenuAccess = async () => {
+      try {
+        const response = await fetch('/api/timesheets/should-show-menu')
+        if (response.ok) {
+          const data = await response.json()
+          setShouldShowTimesheetMenu(data.shouldShowMenu)
+          console.log('[TIMESHEET MENU] Acesso:', data)
+        }
+      } catch (error) {
+        console.error('[TIMESHEET MENU] Erro ao verificar acesso:', error)
+        // Em caso de erro, esconde o menu (mais seguro)
+        setShouldShowTimesheetMenu(false)
+      }
+    }
+
+    checkTimesheetMenuAccess()
+  }, [status])
+
   const userRole = (session?.user as any)?.role
   const isAdmin = userRole === 'admin'
+
+  // Filtrar seções do menu baseado em permissões
+  const filteredNavigationSections = navigationSections.filter(section => {
+    // Remover seção de apontamentos se o usuário não tem acesso
+    if (section.title === 'APONTAMENTOS' && !shouldShowTimesheetMenu) {
+      return false
+    }
+    return true
+  })
 
   // Mostrar loading enquanto verifica autenticação
   if (status === 'loading') {
@@ -212,7 +244,7 @@ export default function DashboardLayout({
             </Link>
             
             {/* Navigation Sections */}
-            {navigationSections.map((section) => {
+            {filteredNavigationSections.map((section) => {
               // Skip admin sections for non-admin users
               if (section.adminOnly && !isAdmin) return null
               
@@ -328,7 +360,7 @@ export default function DashboardLayout({
             <div className="mx-4 h-px bg-gray-200 dark:bg-gray-700" />
             
             {/* Sticky Sections */}
-            <StickySidebar sections={navigationSections} isAdmin={isAdmin} />
+            <StickySidebar sections={filteredNavigationSections} isAdmin={isAdmin} />
           </nav>
           
           {/* User section at bottom of sidebar - Sticky Mode */}
