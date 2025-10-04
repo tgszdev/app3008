@@ -160,18 +160,31 @@ export async function DELETE(
     }
 
     // Deletar role
+    console.log('[DELETE ROLE] Tentando deletar:', { roleId, name: role.name, is_system: role.is_system })
+    
     const { error: deleteError } = await supabaseAdmin
       .from('roles')
       .delete()
       .eq('id', roleId)
 
     if (deleteError) {
-      console.error('Error deleting role:', deleteError)
+      console.error('[DELETE ROLE] ❌ Erro ao deletar:', deleteError)
+      console.error('[DELETE ROLE] Detalhes completos:', {
+        message: deleteError.message,
+        code: deleteError.code,
+        details: deleteError.details,
+        hint: deleteError.hint
+      })
+      
       return NextResponse.json({ 
         error: 'Failed to delete role',
-        details: deleteError.message 
+        details: deleteError.message,
+        code: deleteError.code,
+        hint: deleteError.hint
       }, { status: 500 })
     }
+    
+    console.log('[DELETE ROLE] ✅ Perfil deletado com sucesso')
 
     // Limpar cache
     clearPermissionsCache()
