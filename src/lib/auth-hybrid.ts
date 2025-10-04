@@ -356,8 +356,8 @@ export const authHybridConfig: NextAuthConfig = {
   },
   session: {
     strategy: 'jwt',
-    maxAge: 24 * 60 * 60,
-    updateAge: 60 * 60,
+    maxAge: 7 * 24 * 60 * 60, // 7 dias (timeout absoluto)
+    updateAge: 60 * 60, // Atualiza a cada 1 hora
   },
   secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
   trustHost: true,

@@ -403,7 +403,7 @@ export const authConfig: NextAuthConfig = {
   },
   session: {
     strategy: 'jwt', // VOLTAR PARA JWT (obrigatório para CredentialsProvider)
-    maxAge: 24 * 60 * 60, // 24 horas
+    maxAge: 7 * 24 * 60 * 60, // 7 dias (timeout absoluto)
     updateAge: 60 * 60, // Atualiza a cada 1 hora
   },
   secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,

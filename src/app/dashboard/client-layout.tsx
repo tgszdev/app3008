@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import { useProtectedSession } from '@/hooks/useProtectedSession'
+import { useIdleTimeout } from '@/hooks/useIdleTimeout'
+import { IdleWarningModal } from '@/components/IdleWarningModal'
 import { OrganizationSelector } from '@/components/OrganizationSelector'
 import {
   Home,
@@ -128,6 +130,20 @@ export default function DashboardLayout({
     enablePolling: true,
     pollingInterval: 10000, // Fallback polling a cada 10s
     redirectTo: '/login?reason=session_invalidated'
+  })
+
+  // Idle timeout (60 minutos de inatividade)
+  const { 
+    isWarning, 
+    remainingSeconds, 
+    resetIdleTimer 
+  } = useIdleTimeout({
+    timeout: 60 * 60 * 1000,        // 60 minutos
+    warningTime: 5 * 60 * 1000,     // Avisa 5 minutos antes
+    enabled: status === 'authenticated',
+    onIdle: () => {
+      signOut({ callbackUrl: '/login?reason=idle_timeout' })
+    }
   })
 
   
@@ -390,6 +406,14 @@ export default function DashboardLayout({
           </div>
         </main>
       </div>
+
+      {/* Idle Warning Modal */}
+      <IdleWarningModal
+        isOpen={isWarning}
+        remainingSeconds={remainingSeconds}
+        onContinue={resetIdleTimer}
+        onLogout={() => signOut({ callbackUrl: '/login?reason=idle_timeout' })}
+      />
     </div>
   )
 }
