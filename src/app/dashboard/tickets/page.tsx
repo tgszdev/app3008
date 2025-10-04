@@ -407,17 +407,25 @@ export default function TicketsPage() {
   }
 
   useEffect(() => {
-    // IMPORTANTE: Só buscar tickets se houver clientes selecionados
-    // Se não tiver nenhum cliente selecionado, não deve mostrar nada
-    if (selectedClients.length > 0) {
+    // Para usuários de contexto único (context type), buscar tickets sempre
+    // Para usuários multi-cliente (matrix type), só buscar se houver clientes selecionados
+    const userType = (session?.user as any)?.userType
+    
+    if (userType === 'context') {
+      // Usuário de contexto único: sempre buscar tickets do seu contexto
       fetchTickets()
       fetchAllTickets()
-    } else {
+    } else if (userType === 'matrix' && selectedClients.length > 0) {
+      // Usuário multi-cliente: só buscar se houver clientes selecionados
+      fetchTickets()
+      fetchAllTickets()
+    } else if (userType === 'matrix' && selectedClients.length === 0) {
+      // Usuário multi-cliente sem seleção: não mostrar nada
       setTickets([])
       setAllTickets([])
       setLoading(false)
     }
-  }, [statusFilter, priorityFilter, selectedClients, myTicketsOnly, periodFilter])
+  }, [statusFilter, priorityFilter, selectedClients, myTicketsOnly, periodFilter, session])
 
   const handleDeleteTicket = async (ticketId: string) => {
     if (!confirm('Tem certeza que deseja excluir este chamado?')) return
