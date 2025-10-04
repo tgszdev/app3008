@@ -1023,25 +1023,27 @@ export default function TicketDetailsPage() {
             
             <div className="space-y-3">
               {/* Botões de Ação - Baseado em permissões */}
-              {((canEditThisTicket || canAssignTickets) && 
-                (ticket.status !== 'cancelled' || canDeleteTickets)) && (
-                <>
-                  <button
-                    onClick={() => setEditingStatus(true)}
-                    className="w-full h-12 px-3 sm:px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded-2xl hover:bg-blue-700 hover:border-blue-700 transition-all duration-300 font-medium text-sm relative overflow-hidden"
-                  >
-                    <span className="relative z-10 truncate">Alterar Status</span>
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
-                  </button>
-                  
-                  <button
-                    onClick={() => setEditingAssignee(true)}
-                    className="w-full h-12 px-3 sm:px-4 py-2 bg-gray-700 dark:bg-gray-700 text-white border border-gray-700 rounded-2xl hover:bg-gray-600 hover:border-gray-600 transition-all duration-300 font-medium text-sm relative overflow-hidden"
-                  >
-                    <span className="relative z-10 truncate">Atribuir Responsável</span>
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
-                  </button>
-                </>
+              
+              {/* Botão Alterar Status - Apenas se pode editar */}
+              {(canEditThisTicket && (ticket.status !== 'cancelled' || canDeleteTickets)) && (
+                <button
+                  onClick={() => setEditingStatus(true)}
+                  className="w-full h-12 px-3 sm:px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded-2xl hover:bg-blue-700 hover:border-blue-700 transition-all duration-300 font-medium text-sm relative overflow-hidden"
+                >
+                  <span className="relative z-10 truncate">Alterar Status</span>
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
+                </button>
+              )}
+              
+              {/* Botão Atribuir Responsável - APENAS se tem permissão tickets_assign */}
+              {(canAssignTickets && (ticket.status !== 'cancelled' || canDeleteTickets)) && (
+                <button
+                  onClick={() => setEditingAssignee(true)}
+                  className="w-full h-12 px-3 sm:px-4 py-2 bg-gray-700 dark:bg-gray-700 text-white border border-gray-700 rounded-2xl hover:bg-gray-600 hover:border-gray-600 transition-all duration-300 font-medium text-sm relative overflow-hidden"
+                >
+                  <span className="relative z-10 truncate">Atribuir Responsável</span>
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
+                </button>
               )}
               
               {/* File Upload - Disabled for cancelled tickets unless has delete permission */}
