@@ -1,0 +1,457 @@
+{
+  "timestamp": "2025-10-04T19:01:07.144Z",
+  "summary": {
+    "totalPermissions": 62,
+    "implementationRate": "88.2",
+    "criticalIssues": 3,
+    "highIssues": 35,
+    "unprotectedElements": 17,
+    "qualityScore": "19.1"
+  },
+  "status": "FAIL",
+  "issues": [
+    {
+      "type": "NO_PERMISSION_CHECK",
+      "severity": "CRITICAL",
+      "permission": "tickets_change_status",
+      "component": "src/app/dashboard/tickets/[id]/page.tsx",
+      "element": "Botão \"Alterar Status\"",
+      "line": 1028,
+      "message": "Elemento crítico sem verificação de permissão"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "timesheets_view_own",
+      "component": "src/app/dashboard/timesheets/page.tsx",
+      "element": "Próprios apontamentos na lista",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "timesheets_view_all",
+      "component": "src/app/dashboard/timesheets/page.tsx",
+      "element": "Todos os apontamentos",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "timesheets_create",
+      "component": "src/app/dashboard/timesheets/page.tsx",
+      "element": "Botão \"Adicionar Apontamento\"",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "timesheets_edit_own",
+      "component": "src/app/dashboard/timesheets/page.tsx",
+      "element": "Edição de próprios registros",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "timesheets_edit_all",
+      "component": "src/app/dashboard/timesheets/page.tsx",
+      "element": "Edição de todos os registros",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "timesheets_approve",
+      "component": "src/app/dashboard/timesheets/admin/page.tsx",
+      "element": "Página de aprovação",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "timesheets_approve",
+      "component": "src/app/dashboard/timesheets/admin/page.tsx",
+      "element": "Botões Aprovar/Rejeitar",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "organizations_view",
+      "component": "src/app/dashboard/organizations/page.tsx",
+      "element": "Página de organizações",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "organizations_create",
+      "component": "src/app/dashboard/organizations/page.tsx",
+      "element": "Botão \"Criar Organização\"",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "organizations_edit",
+      "component": "src/app/dashboard/organizations/page.tsx",
+      "element": "Botão \"Editar\"",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "organizations_delete",
+      "component": "src/app/dashboard/organizations/page.tsx",
+      "element": "Botão \"Deletar\"",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "contexts_manage",
+      "component": "src/app/dashboard/organizations/page.tsx",
+      "element": "Associação de usuários",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "sla_view",
+      "component": "src/app/dashboard/sla/page.tsx",
+      "element": "Página de SLA",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "sla_create",
+      "component": "src/app/dashboard/sla/page.tsx",
+      "element": "Botão \"Criar SLA\"",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "sla_edit",
+      "component": "src/app/dashboard/sla/page.tsx",
+      "element": "Botão \"Editar\"",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "sla_delete",
+      "component": "src/app/dashboard/sla/page.tsx",
+      "element": "Botão \"Deletar\"",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "satisfaction_view_results",
+      "component": "src/app/dashboard/satisfaction/page.tsx",
+      "element": "Resultados de pesquisas",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "satisfaction_create_survey",
+      "component": "src/app/dashboard/satisfaction/page.tsx",
+      "element": "Botão \"Criar Pesquisa\"",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "satisfaction_edit_survey",
+      "component": "src/app/dashboard/satisfaction/page.tsx",
+      "element": "Botão \"Editar Pesquisa\"",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "satisfaction_delete_survey",
+      "component": "src/app/dashboard/satisfaction/page.tsx",
+      "element": "Botão \"Deletar Pesquisa\"",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "satisfaction_export_data",
+      "component": "src/app/dashboard/satisfaction/page.tsx",
+      "element": "Botão \"Exportar Resultados\"",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "comments_view_all",
+      "component": "src/app/dashboard/comments/page.tsx",
+      "element": "Lista completa de comentários",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_CHECK",
+      "severity": "CRITICAL",
+      "permission": "comments_edit_any",
+      "component": "src/app/dashboard/tickets/[id]/page.tsx",
+      "element": "Botão editar em comentários de outros",
+      "line": null,
+      "message": "Elemento crítico sem verificação de permissão"
+    },
+    {
+      "type": "NO_PERMISSION_CHECK",
+      "severity": "CRITICAL",
+      "permission": "comments_delete_any",
+      "component": "src/app/dashboard/tickets/[id]/page.tsx",
+      "element": "Botão deletar em comentários de outros",
+      "line": null,
+      "message": "Elemento crítico sem verificação de permissão"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "comments_moderate",
+      "component": "src/app/dashboard/comments/page.tsx",
+      "element": "Botões de moderação",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "reports_view",
+      "component": "src/app/dashboard/reports/page.tsx",
+      "element": "Página de relatórios",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "reports_export",
+      "component": "src/app/dashboard/reports/page.tsx",
+      "element": "Botão \"Exportar\"",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "reports_create_custom",
+      "component": "src/app/dashboard/reports/page.tsx",
+      "element": "Botão \"Criar Personalizado\"",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "reports_schedule",
+      "component": "src/app/dashboard/reports/page.tsx",
+      "element": "Botão \"Agendar Envio\"",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "notifications_manage_global",
+      "component": "src/app/dashboard/settings/notifications/page.tsx",
+      "element": "Configurações globais",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "system_settings",
+      "component": "src/app/dashboard/settings/page.tsx",
+      "element": "Página de configurações",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "system_users",
+      "component": "src/app/dashboard/users/page.tsx",
+      "element": "Página de usuários",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "system_users",
+      "component": "src/app/dashboard/settings/page.tsx",
+      "element": "Card \"Gerenciar Usuários\"",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "system_roles",
+      "component": "src/app/dashboard/settings/page.tsx",
+      "element": "Card \"Gerenciar Perfis\"",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "system_roles",
+      "component": "src/components/RoleManagementModal.tsx",
+      "element": "Modal de perfis",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "system_backup",
+      "component": "src/app/dashboard/settings/page.tsx",
+      "element": "Card \"Backup\"",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "NO_PERMISSION_HOOK",
+      "severity": "HIGH",
+      "permission": "system_logs",
+      "component": "src/app/dashboard/settings/page.tsx",
+      "element": "Card \"Logs\"",
+      "message": "Componente não usa usePermissions()"
+    },
+    {
+      "type": "UNPROTECTED_ELEMENT",
+      "severity": "CRITICAL",
+      "permission": "tickets_change_status",
+      "element": "Botão \"Alterar Status\"",
+      "component": "src/app/dashboard/tickets/[id]/page.tsx",
+      "message": "SEM VERIFICAÇÃO DE PERMISSÃO"
+    },
+    {
+      "type": "UNPROTECTED_ELEMENT",
+      "severity": "CRITICAL",
+      "permission": "timesheets_create",
+      "element": "Botão \"Adicionar Apontamento\"",
+      "component": "src/app/dashboard/timesheets/page.tsx",
+      "message": "SEM VERIFICAÇÃO DE PERMISSÃO"
+    },
+    {
+      "type": "UNPROTECTED_ELEMENT",
+      "severity": "CRITICAL",
+      "permission": "organizations_create",
+      "element": "Botão \"Criar Organização\"",
+      "component": "src/app/dashboard/organizations/page.tsx",
+      "message": "SEM VERIFICAÇÃO DE PERMISSÃO"
+    },
+    {
+      "type": "UNPROTECTED_ELEMENT",
+      "severity": "CRITICAL",
+      "permission": "organizations_edit",
+      "element": "Botão \"Editar\"",
+      "component": "src/app/dashboard/organizations/page.tsx",
+      "message": "SEM VERIFICAÇÃO DE PERMISSÃO"
+    },
+    {
+      "type": "UNPROTECTED_ELEMENT",
+      "severity": "CRITICAL",
+      "permission": "organizations_delete",
+      "element": "Botão \"Deletar\"",
+      "component": "src/app/dashboard/organizations/page.tsx",
+      "message": "SEM VERIFICAÇÃO DE PERMISSÃO"
+    },
+    {
+      "type": "UNPROTECTED_ELEMENT",
+      "severity": "CRITICAL",
+      "permission": "sla_create",
+      "element": "Botão \"Criar SLA\"",
+      "component": "src/app/dashboard/sla/page.tsx",
+      "message": "SEM VERIFICAÇÃO DE PERMISSÃO"
+    },
+    {
+      "type": "UNPROTECTED_ELEMENT",
+      "severity": "CRITICAL",
+      "permission": "sla_edit",
+      "element": "Botão \"Editar\"",
+      "component": "src/app/dashboard/sla/page.tsx",
+      "message": "SEM VERIFICAÇÃO DE PERMISSÃO"
+    },
+    {
+      "type": "UNPROTECTED_ELEMENT",
+      "severity": "CRITICAL",
+      "permission": "sla_delete",
+      "element": "Botão \"Deletar\"",
+      "component": "src/app/dashboard/sla/page.tsx",
+      "message": "SEM VERIFICAÇÃO DE PERMISSÃO"
+    },
+    {
+      "type": "UNPROTECTED_ELEMENT",
+      "severity": "CRITICAL",
+      "permission": "satisfaction_create_survey",
+      "element": "Botão \"Criar Pesquisa\"",
+      "component": "src/app/dashboard/satisfaction/page.tsx",
+      "message": "SEM VERIFICAÇÃO DE PERMISSÃO"
+    },
+    {
+      "type": "UNPROTECTED_ELEMENT",
+      "severity": "CRITICAL",
+      "permission": "satisfaction_edit_survey",
+      "element": "Botão \"Editar Pesquisa\"",
+      "component": "src/app/dashboard/satisfaction/page.tsx",
+      "message": "SEM VERIFICAÇÃO DE PERMISSÃO"
+    },
+    {
+      "type": "UNPROTECTED_ELEMENT",
+      "severity": "CRITICAL",
+      "permission": "satisfaction_delete_survey",
+      "element": "Botão \"Deletar Pesquisa\"",
+      "component": "src/app/dashboard/satisfaction/page.tsx",
+      "message": "SEM VERIFICAÇÃO DE PERMISSÃO"
+    },
+    {
+      "type": "UNPROTECTED_ELEMENT",
+      "severity": "CRITICAL",
+      "permission": "satisfaction_export_data",
+      "element": "Botão \"Exportar Resultados\"",
+      "component": "src/app/dashboard/satisfaction/page.tsx",
+      "message": "SEM VERIFICAÇÃO DE PERMISSÃO"
+    },
+    {
+      "type": "UNPROTECTED_ELEMENT",
+      "severity": "CRITICAL",
+      "permission": "comments_edit_any",
+      "element": "Botão editar em comentários de outros",
+      "component": "src/app/dashboard/tickets/[id]/page.tsx",
+      "message": "SEM VERIFICAÇÃO DE PERMISSÃO"
+    },
+    {
+      "type": "UNPROTECTED_ELEMENT",
+      "severity": "CRITICAL",
+      "permission": "comments_delete_any",
+      "element": "Botão deletar em comentários de outros",
+      "component": "src/app/dashboard/tickets/[id]/page.tsx",
+      "message": "SEM VERIFICAÇÃO DE PERMISSÃO"
+    },
+    {
+      "type": "UNPROTECTED_ELEMENT",
+      "severity": "CRITICAL",
+      "permission": "reports_export",
+      "element": "Botão \"Exportar\"",
+      "component": "src/app/dashboard/reports/page.tsx",
+      "message": "SEM VERIFICAÇÃO DE PERMISSÃO"
+    },
+    {
+      "type": "UNPROTECTED_ELEMENT",
+      "severity": "CRITICAL",
+      "permission": "reports_create_custom",
+      "element": "Botão \"Criar Personalizado\"",
+      "component": "src/app/dashboard/reports/page.tsx",
+      "message": "SEM VERIFICAÇÃO DE PERMISSÃO"
+    },
+    {
+      "type": "UNPROTECTED_ELEMENT",
+      "severity": "CRITICAL",
+      "permission": "reports_schedule",
+      "element": "Botão \"Agendar Envio\"",
+      "component": "src/app/dashboard/reports/page.tsx",
+      "message": "SEM VERIFICAÇÃO DE PERMISSÃO"
+    }
+  ]
+}
