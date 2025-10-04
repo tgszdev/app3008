@@ -51,10 +51,10 @@ EXECUTE FUNCTION sync_users_on_context_update();
 -- 4. CRIAR FUNÇÃO PARA SINCRONIZAR TODOS (MANUTENÇÃO)
 CREATE OR REPLACE FUNCTION sync_all_context_users()
 RETURNS TABLE(
-  user_email TEXT,
-  old_name TEXT,
-  new_name TEXT,
-  status TEXT
+  user_email VARCHAR(255),
+  old_name VARCHAR(255),
+  new_name VARCHAR(255),
+  status VARCHAR(50)
 ) AS $$
 DECLARE
   user_record RECORD;
@@ -89,23 +89,23 @@ BEGIN
         updated_count := updated_count + 1;
         
         RETURN QUERY SELECT 
-          user_record.email,
-          user_record.context_name,
-          context_record.name,
-          'ATUALIZADO'::TEXT;
+          user_record.email::VARCHAR(255),
+          user_record.context_name::VARCHAR(255),
+          context_record.name::VARCHAR(255),
+          'ATUALIZADO'::VARCHAR(50);
       ELSE
         RETURN QUERY SELECT 
-          user_record.email,
-          user_record.context_name,
-          context_record.name,
-          'JÁ SINCRONIZADO'::TEXT;
+          user_record.email::VARCHAR(255),
+          user_record.context_name::VARCHAR(255),
+          context_record.name::VARCHAR(255),
+          'JÁ SINCRONIZADO'::VARCHAR(50);
       END IF;
     ELSE
       RETURN QUERY SELECT 
-        user_record.email,
-        user_record.context_name,
-        NULL::TEXT,
-        'CONTEXTO NÃO ENCONTRADO'::TEXT;
+        user_record.email::VARCHAR(255),
+        user_record.context_name::VARCHAR(255),
+        NULL::VARCHAR(255),
+        'CONTEXTO NÃO ENCONTRADO'::VARCHAR(50);
     END IF;
   END LOOP;
   
