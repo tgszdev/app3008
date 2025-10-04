@@ -140,7 +140,7 @@ export default function NotificationSettingsPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow">
         {/* Header */}
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -306,7 +306,7 @@ export default function NotificationSettingsPage() {
                     type="time"
                     value={preferences.quiet_hours_start}
                     onChange={(e) => setPreferences(prev => ({ ...prev, quiet_hours_start: e.target.value }))}
-                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
                 <div>
@@ -317,7 +317,7 @@ export default function NotificationSettingsPage() {
                     type="time"
                     value={preferences.quiet_hours_end}
                     onChange={(e) => setPreferences(prev => ({ ...prev, quiet_hours_end: e.target.value }))}
-                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
               </div>
@@ -333,7 +333,7 @@ export default function NotificationSettingsPage() {
               <>
                 <button
                   onClick={sendTestNotification}
-                  className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center gap-2"
+                  className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-2xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center gap-2"
                   title="Enviar notificação de teste"
                 >
                   <TestTube className="h-4 w-4" />
@@ -355,7 +355,7 @@ export default function NotificationSettingsPage() {
                       toast.error(helpMsg ? `${errorMsg}\n${helpMsg}` : errorMsg)
                     }
                   }}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+                  className="px-4 py-2 bg-purple-600 text-white rounded-2xl hover:bg-purple-700 transition-colors flex items-center gap-2"
                   title="Enviar email de teste"
                 >
                   <Send className="h-4 w-4" />
@@ -372,7 +372,7 @@ export default function NotificationSettingsPage() {
           <button
             onClick={savePreferences}
             disabled={saving}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+            className="px-6 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50"
           >
             {saving ? (
               <Loader2 className="h-4 w-4 animate-spin" />

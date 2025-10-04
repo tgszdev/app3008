@@ -74,9 +74,9 @@ export default function SettingsPage() {
       {/* Cards de Configuração */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {/* Email Configuration Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
           <div className="flex items-start mb-4">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex-shrink-0">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex-shrink-0">
               <Mail className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div className="ml-3">
@@ -95,7 +95,7 @@ export default function SettingsPage() {
           
           <button
             onClick={() => setEmailModalOpen(true)}
-            className="w-full inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-medium rounded-2xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
           >
             <Settings className="h-5 w-5 mr-2" />
             Configurar Email
@@ -103,9 +103,9 @@ export default function SettingsPage() {
         </div>
 
         {/* Knowledge Base Permissions Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
           <div className="flex items-start mb-4">
-            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex-shrink-0">
+            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-2xl flex-shrink-0">
               <BookOpen className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div className="ml-3">
@@ -124,9 +124,9 @@ export default function SettingsPage() {
         </div>
 
         {/* Category Management Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
           <div className="flex items-start mb-4">
-            <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex-shrink-0">
+            <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-2xl flex-shrink-0">
               <Folder className="h-6 w-6 text-orange-600 dark:text-orange-400" />
             </div>
             <div className="ml-3">
@@ -145,7 +145,7 @@ export default function SettingsPage() {
           
           <button
             onClick={() => setCategoryModalOpen(true)}
-            className="w-full inline-flex items-center justify-center px-4 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-orange-600 text-white font-medium rounded-2xl hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
           >
             <Settings className="h-5 w-5 mr-2" />
             Gerenciar Categorias
@@ -153,9 +153,9 @@ export default function SettingsPage() {
         </div>
 
         {/* Status Management Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
           <div className="flex items-start mb-4">
-            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex-shrink-0">
+            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-2xl flex-shrink-0">
               <Clock className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div className="ml-3">
@@ -174,7 +174,7 @@ export default function SettingsPage() {
           
           <button
             onClick={() => setStatusManagementModalOpen(true)}
-            className="w-full inline-flex items-center justify-center px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-purple-600 text-white font-medium rounded-2xl hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
           >
             <Settings className="h-5 w-5 mr-2" />
             Gerenciar Status
@@ -182,9 +182,9 @@ export default function SettingsPage() {
         </div>
 
         {/* Security Settings Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
           <div className="flex items-start mb-4">
-            <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg flex-shrink-0">
+            <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-2xl flex-shrink-0">
               <Shield className="h-6 w-6 text-red-600 dark:text-red-400" />
             </div>
             <div className="ml-3">
@@ -203,7 +203,7 @@ export default function SettingsPage() {
           
           <button
             onClick={() => setSecurityModalOpen(true)}
-            className="w-full inline-flex items-center justify-center px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-red-600 text-white font-medium rounded-2xl hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
           >
             <Settings className="h-5 w-5 mr-2" />
             Configurar Segurança
@@ -211,9 +211,9 @@ export default function SettingsPage() {
         </div>
 
         {/* Notifications Settings Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
           <div className="flex items-start mb-4">
-            <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex-shrink-0">
+            <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-2xl flex-shrink-0">
               <Bell className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
             </div>
             <div className="ml-3">
@@ -232,7 +232,7 @@ export default function SettingsPage() {
           
           <button
             onClick={() => setNotificationModalOpen(true)}
-            className="w-full inline-flex items-center justify-center px-4 py-2 bg-yellow-600 text-white font-medium rounded-lg hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors"
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-yellow-600 text-white font-medium rounded-2xl hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors"
           >
             <Settings className="h-5 w-5 mr-2" />
             Configurar Notificações
@@ -240,9 +240,9 @@ export default function SettingsPage() {
         </div>
 
         {/* Backup Settings Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
           <div className="flex items-start mb-4">
-            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg flex-shrink-0">
+            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-2xl flex-shrink-0">
               <Database className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
             <div className="ml-3">
@@ -261,7 +261,7 @@ export default function SettingsPage() {
           
           <button
             onClick={() => setBackupModalOpen(true)}
-            className="w-full inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white font-medium rounded-2xl hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
           >
             <Settings className="h-5 w-5 mr-2" />
             Gerenciar Backups
@@ -269,9 +269,9 @@ export default function SettingsPage() {
         </div>
 
         {/* Timesheet Permissions Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
           <div className="flex items-start mb-4">
-            <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex-shrink-0">
+            <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-2xl flex-shrink-0">
               <Clock className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
             </div>
             <div className="ml-3">
@@ -290,7 +290,7 @@ export default function SettingsPage() {
           
           <button
             onClick={() => setTimesheetPermissionsModalOpen(true)}
-            className="w-full inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white font-medium rounded-2xl hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
           >
             <Settings className="h-5 w-5 mr-2" />
             Configurar Permissões
@@ -298,9 +298,9 @@ export default function SettingsPage() {
         </div>
 
         {/* Role Management Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
           <div className="flex items-start mb-4">
-            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex-shrink-0">
+            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-2xl flex-shrink-0">
               <UserCog className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div className="ml-3">
@@ -319,7 +319,7 @@ export default function SettingsPage() {
           
           <button
             onClick={() => setRoleManagementModalOpen(true)}
-            className="w-full inline-flex items-center justify-center px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-purple-600 text-white font-medium rounded-2xl hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
           >
             <Settings className="h-5 w-5 mr-2" />
             Gerenciar Perfis
@@ -327,9 +327,9 @@ export default function SettingsPage() {
         </div>
 
         {/* Ticket Statuses Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
           <div className="flex items-start mb-4">
-            <div className="p-2 bg-slate-100 dark:bg-slate-900/30 rounded-lg flex-shrink-0">
+            <div className="p-2 bg-slate-100 dark:bg-slate-900/30 rounded-2xl flex-shrink-0">
               <List className="h-6 w-6 text-slate-600 dark:text-slate-400" />
             </div>
             <div className="ml-3">
@@ -348,7 +348,7 @@ export default function SettingsPage() {
 
           <button
             onClick={() => setStatusManagementModalOpen(true)}
-            className="w-full inline-flex items-center justify-center px-4 py-2 bg-slate-600 text-white font-medium rounded-lg hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-colors"
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-slate-600 text-white font-medium rounded-2xl hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-colors"
           >
             <Settings className="h-5 w-5 mr-2" />
             Gerenciar Status
@@ -356,9 +356,9 @@ export default function SettingsPage() {
         </div>
 
           {/* Workflow Automation Card */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
             <div className="flex items-start mb-4">
-              <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex-shrink-0">
+              <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl flex-shrink-0">
                 <Workflow className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div className="ml-3">
@@ -377,7 +377,7 @@ export default function SettingsPage() {
             
             <button
               onClick={() => setWorkflowManagementModalOpen(true)}
-              className="w-full inline-flex items-center justify-center px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors"
+              className="w-full inline-flex items-center justify-center px-4 py-2 bg-emerald-600 text-white font-medium rounded-2xl hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors"
             >
               <Settings className="h-5 w-5 mr-2" />
               Configurar Workflows
@@ -385,9 +385,9 @@ export default function SettingsPage() {
           </div>
 
           {/* Escalation Management Card */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
             <div className="flex items-start mb-4">
-              <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex-shrink-0">
+              <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-2xl flex-shrink-0">
                 <Timer className="h-6 w-6 text-orange-600 dark:text-orange-400" />
               </div>
               <div className="ml-3">
@@ -406,7 +406,7 @@ export default function SettingsPage() {
             
             <button
               onClick={() => setEscalationManagementModalOpen(true)}
-              className="w-full inline-flex items-center justify-center px-4 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
+              className="w-full inline-flex items-center justify-center px-4 py-2 bg-orange-600 text-white font-medium rounded-2xl hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
             >
               <Settings className="h-5 w-5 mr-2" />
               Configurar Escalação
