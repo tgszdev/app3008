@@ -78,9 +78,14 @@ export async function GET(request: Request) {
       .lte('created_at', endDate.toISOString().split('T')[0] + 'T23:59:59.999')
 
     // Apply multi-tenant filter
-    if (userType === 'context' && userContextId) {
-      // Usuários de contexto só veem tickets do seu contexto
-      ticketsQuery = ticketsQuery.eq('context_id', userContextId)
+    if (userType === 'context') {
+      if (userContextId) {
+        // Usuários de contexto só veem tickets do seu contexto
+        ticketsQuery = ticketsQuery.eq('context_id', userContextId)
+      } else {
+        // Usuário context SEM context_id: retornar vazio
+        ticketsQuery = ticketsQuery.eq('id', '00000000-0000-0000-0000-000000000000')
+      }
     } else if (userType === 'matrix') {
       // Para usuários matrix, buscar contextos associados
       const { data: userContexts, error: contextsError } = await supabaseAdmin
@@ -129,8 +134,12 @@ export async function GET(request: Request) {
       .gte('created_at', previousStartDate.toISOString().split('T')[0] + 'T00:00:00')
       .lte('created_at', previousEndDate.toISOString().split('T')[0] + 'T23:59:59.999')
 
-    if (userType === 'context' && userContextId) {
-      previousTicketsQuery = previousTicketsQuery.eq('context_id', userContextId)
+    if (userType === 'context') {
+      if (userContextId) {
+        previousTicketsQuery = previousTicketsQuery.eq('context_id', userContextId)
+      } else {
+        previousTicketsQuery = previousTicketsQuery.eq('id', '00000000-0000-0000-0000-000000000000')
+      }
     } else if (userType === 'matrix') {
       // Para usuários matrix, buscar contextos associados
       const { data: userContexts, error: contextsError } = await supabaseAdmin

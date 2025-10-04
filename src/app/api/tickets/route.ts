@@ -65,9 +65,15 @@ export async function GET(request: NextRequest) {
       `)
 
     // IMPORTANTE: Filtrar por contexto e tickets internos ANTES de outros filtros
-    if (userType === 'context' && userContextId) {
-      // Usuários de contexto só veem tickets do seu contexto
-      query = query.eq('context_id', userContextId)
+    if (userType === 'context') {
+      if (userContextId) {
+        // Usuários de contexto só veem tickets do seu contexto
+        query = query.eq('context_id', userContextId)
+      } else {
+        // Usuário context SEM context_id: não deve ver NENHUM ticket
+        // Filtro impossível para retornar vazio
+        query = query.eq('id', '00000000-0000-0000-0000-000000000000')
+      }
     } else if (userRole === 'user' && userId) {
       // Users da matriz só veem:
       // 1. Tickets não internos (is_internal = false ou null)

@@ -70,7 +70,15 @@ export async function GET(
     }
 
     // VALIDAÇÃO MULTI-TENANT: Verificar se o usuário tem acesso ao contexto do ticket
-    if (userType === 'context' && userContextId) {
+    if (userType === 'context') {
+      if (!userContextId) {
+        // Usuário context SEM context_id: não deve acessar NENHUM ticket
+        return NextResponse.json(
+          { error: 'Acesso negado. Usuário sem contexto associado.' },
+          { status: 403 }
+        )
+      }
+      
       // Usuário de contexto único: só pode ver tickets do seu contexto
       if (ticket.context_id !== userContextId) {
         return NextResponse.json(

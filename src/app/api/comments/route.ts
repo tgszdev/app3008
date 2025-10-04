@@ -113,11 +113,16 @@ export async function GET(request: NextRequest) {
     let filteredComments = comments || []
     
     // Aplicar filtro multi-tenant
-    if (userType === 'context' && userContextId) {
-      // Usuários de contexto só veem comentários de tickets do seu contexto
-      filteredComments = filteredComments.filter((comment: any) => {
-        return comment.ticket?.context_id === userContextId
-      })
+    if (userType === 'context') {
+      if (userContextId) {
+        // Usuários de contexto só veem comentários de tickets do seu contexto
+        filteredComments = filteredComments.filter((comment: any) => {
+          return comment.ticket?.context_id === userContextId
+        })
+      } else {
+        // Usuário context SEM context_id: não deve ver NENHUM comentário
+        filteredComments = []
+      }
     } else if (userType === 'matrix') {
       // Para usuários matrix, buscar contextos associados
       const { data: userContexts, error: contextsError } = await supabaseAdmin
