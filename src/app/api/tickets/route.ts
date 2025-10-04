@@ -15,11 +15,24 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
     
-    // Obter role do usuário e contexto
-    const userRole = (session.user as any).role || 'user'
-    const userId = session.user?.id
-    const userType = (session.user as any).userType
-    const userContextId = (session.user as any).context_id
+    // Obter dados do usuário do BANCO (source of truth)
+    const { data: userData, error: userError } = await supabaseAdmin
+      .from('users')
+      .select('id, role, user_type, context_id')
+      .eq('email', session.user.email)
+      .single()
+
+    if (userError || !userData) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      )
+    }
+
+    const userRole = userData.role || 'user'
+    const userId = userData.id
+    const userType = userData.user_type
+    const userContextId = userData.context_id
     
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
@@ -138,11 +151,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
     
-    // Obter dados do usuário autenticado
-    const userRole = (session.user as any).role || 'user'
-    const userId = session.user?.id
-    const userType = (session.user as any).userType
-    const userContextId = (session.user as any).context_id
+    // Obter dados do usuário do BANCO (source of truth)
+    const { data: userData, error: userError } = await supabaseAdmin
+      .from('users')
+      .select('id, role, user_type, context_id')
+      .eq('email', session.user.email)
+      .single()
+
+    if (userError || !userData) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      )
+    }
+
+    const userRole = userData.role || 'user'
+    const userId = userData.id
+    const userType = userData.user_type
+    const userContextId = userData.context_id
     
     const body = await request.json()
     const { title, description, priority, category, category_id, created_by, assigned_to, due_date, is_internal, context_id } = body
@@ -342,8 +368,22 @@ async function handleUpdate(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
     
-    const userType = (session.user as any).userType
-    const userContextId = (session.user as any).context_id
+    // Obter dados do usuário do BANCO (source of truth)
+    const { data: userData, error: userError } = await supabaseAdmin
+      .from('users')
+      .select('id, user_type, context_id')
+      .eq('email', session.user.email)
+      .single()
+
+    if (userError || !userData) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      )
+    }
+
+    const userType = userData.user_type
+    const userContextId = userData.context_id
     
     const body = await request.json()
     const { id, updated_by, user_id, ...updateData } = body
@@ -585,8 +625,22 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
     
-    const userType = (session.user as any).userType
-    const userContextId = (session.user as any).context_id
+    // Obter dados do usuário do BANCO (source of truth)
+    const { data: userData, error: userError } = await supabaseAdmin
+      .from('users')
+      .select('id, user_type, context_id')
+      .eq('email', session.user.email)
+      .single()
+
+    if (userError || !userData) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      )
+    }
+
+    const userType = userData.user_type
+    const userContextId = userData.context_id
     
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
