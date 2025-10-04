@@ -1,19 +1,13 @@
 {
-  "timestamp": "2025-10-04T19:11:49.134Z",
+  "timestamp": "2025-10-04T19:30:08.531Z",
   "summary": {
     "totalPermissions": 10,
-    "correctImplementations": 6,
-    "criticalIssues": 4,
-    "qualityScore": "60.0",
+    "correctImplementations": 8,
+    "criticalIssues": 2,
+    "qualityScore": "80.0",
     "status": "FAIL"
   },
   "criticalIssues": [
-    {
-      "permission": "tickets_change_status",
-      "file": "src/app/dashboard/tickets/[id]/page.tsx",
-      "line": 1028,
-      "issue": "⚠️ PROBLEMA: Usando canEditThisTicket, canEditAllTickets, canEditOwnTickets mas deveria usar verificação isolada!"
-    },
     {
       "permission": "tickets_bulk_actions",
       "file": "src/app/dashboard/tickets/page.tsx",
@@ -25,12 +19,6 @@
       "file": "src/app/dashboard/tickets/page.tsx",
       "line": null,
       "issue": "Nenhuma verificação de permissão encontrada"
-    },
-    {
-      "permission": "tickets_create_internal",
-      "file": "src/app/dashboard/tickets/new/page.tsx",
-      "line": null,
-      "issue": "⚠️ PROBLEMA: Usando canEditAllTickets mas deveria usar verificação isolada!"
     }
   ],
   "passesCI": false
