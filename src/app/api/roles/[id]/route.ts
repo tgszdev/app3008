@@ -162,6 +162,24 @@ export async function DELETE(
     // Deletar role
     console.log('[DELETE ROLE] Tentando deletar:', { roleId, name: role.name, is_system: role.is_system })
     
+    // Primeiro, deletar logs de auditoria associados (se existirem)
+    try {
+      const { error: auditDeleteError } = await supabaseAdmin
+        .from('role_audit_log')
+        .delete()
+        .eq('role_id', roleId)
+      
+      if (auditDeleteError) {
+        console.warn('[DELETE ROLE] ⚠️ Erro ao deletar audit logs (pode não existir tabela):', auditDeleteError.message)
+        // Continuar mesmo se falhar, pois tabela pode não existir
+      } else {
+        console.log('[DELETE ROLE] ✅ Audit logs deletados')
+      }
+    } catch (auditError) {
+      console.warn('[DELETE ROLE] Tabela role_audit_log não existe ou erro ao deletar logs')
+    }
+    
+    // Agora deletar o role
     const { error: deleteError } = await supabaseAdmin
       .from('roles')
       .delete()
