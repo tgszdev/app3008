@@ -332,22 +332,34 @@ export default function TicketsPage() {
     else setRefreshing(true)
 
     try {
+      const userType = (session?.user as any)?.userType
+      
+      console.log('[TICKETS DEBUG] fetchTickets iniciado', {
+        userType,
+        selectedClients: selectedClients.length,
+        myTicketsOnly,
+        showLoader
+      })
+
       const params = new URLSearchParams()
       
       // Filtro de clientes
       if (selectedClients.length > 0) {
         params.append('context_ids', selectedClients.join(','))
+        console.log('[TICKETS DEBUG] Filtro context_ids:', selectedClients.join(','))
       }
 
       // Filtro de "Meus Chamados" (criador OU responsável)
       if (myTicketsOnly && session?.user?.id) {
         params.append('myTickets', session.user.id)
+        console.log('[TICKETS DEBUG] Filtro myTickets:', session.user.id)
       }
 
       // Filtro de período
       if (periodFilter.start_date && periodFilter.end_date) {
         params.append('start_date', periodFilter.start_date)
         params.append('end_date', periodFilter.end_date)
+        console.log('[TICKETS DEBUG] Filtro período:', periodFilter)
       }
 
       // Filtro de status
@@ -361,10 +373,23 @@ export default function TicketsPage() {
       }
 
       const url = `/api/tickets?${params.toString()}`
+      console.log('[TICKETS DEBUG] URL da requisição:', url)
 
       const response = await axios.get(url)
+      console.log('[TICKETS DEBUG] Resposta recebida:', {
+        total: response.data.length,
+        primeiros3: response.data.slice(0, 3).map((t: any) => ({
+          id: t.id,
+          number: t.ticket_number,
+          title: t.title
+        }))
+      })
+      
+      console.log('[TICKETS DEBUG] Setando tickets no estado:', response.data.length)
       setTickets(response.data)
+      console.log('[TICKETS DEBUG] Tickets setados com sucesso')
     } catch (error: any) {
+      console.error('[TICKETS DEBUG] Erro ao carregar:', error.response?.data || error.message)
       toast.error('Erro ao carregar tickets')
     } finally {
       setLoading(false)
@@ -411,21 +436,35 @@ export default function TicketsPage() {
     // Para usuários multi-cliente (matrix type), só buscar se houver clientes selecionados
     const userType = (session?.user as any)?.userType
     
+    console.log('[TICKETS DEBUG] useEffect disparado', {
+      userType,
+      hasSession: !!session?.user?.id,
+      selectedClients: selectedClients.length,
+      statusFilter,
+      priorityFilter,
+      myTicketsOnly,
+      periodFilter
+    })
+    
     // Evitar re-fetch se não há sessão ainda
     if (!session?.user?.id) {
+      console.log('[TICKETS DEBUG] Sem sessão, abortando fetch')
       return
     }
     
     if (userType === 'context') {
       // Usuário de contexto único: sempre buscar tickets do seu contexto
+      console.log('[TICKETS DEBUG] Usuário context: buscando tickets...')
       fetchTickets()
       fetchAllTickets()
     } else if (userType === 'matrix' && selectedClients.length > 0) {
       // Usuário multi-cliente: só buscar se houver clientes selecionados
+      console.log('[TICKETS DEBUG] Usuário matrix: buscando tickets...')
       fetchTickets()
       fetchAllTickets()
     } else if (userType === 'matrix' && selectedClients.length === 0) {
       // Usuário multi-cliente sem seleção: não mostrar nada
+      console.log('[TICKETS DEBUG] Usuário matrix SEM seleção: limpando tickets')
       setTickets([])
       setAllTickets([])
       setLoading(false)
@@ -888,7 +927,18 @@ export default function TicketsPage() {
       )}
 
       {/* Lista de Tickets - Layout idêntico aos Tickets Recentes */}
-      {selectedClients.length > 0 && filteredTickets.length > 0 && (
+      {(() => {
+        const userType = (session?.user as any)?.userType
+        const shouldShowTickets = userType === 'context' ? filteredTickets.length > 0 : (selectedClients.length > 0 && filteredTickets.length > 0)
+        
+        console.log('[TICKETS DEBUG] Renderização:', {
+          userType,
+          shouldShowTickets,
+          filteredTicketsLength: filteredTickets.length,
+          selectedClientsLength: selectedClients.length
+        })
+        
+        return shouldShowTickets ? (
         <div className="space-y-3">
           {filteredTickets.map((ticket) => {
             // Buscar cor do status no cadastro
@@ -1100,10 +1150,14 @@ export default function TicketsPage() {
             )
           })}
         </div>
-      )}
+        ) : null
+      })()}
 
       {/* Estado vazio */}
-      {selectedClients.length > 0 && filteredTickets.length === 0 && (
+      {(() => {
+        const userType = (session?.user as any)?.userType
+        const shouldShowEmpty = userType === 'context' ? filteredTickets.length === 0 : (selectedClients.length > 0 && filteredTickets.length === 0)
+        return shouldShowEmpty ? (
         <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 text-center">
           <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-3" />
           <p className="text-gray-500 dark:text-gray-400 mb-4">
@@ -1117,7 +1171,8 @@ export default function TicketsPage() {
             Criar Primeiro Chamado
           </Link>
         </div>
-      )}
+        ) : null
+      })()}
 
     </div>
   )
