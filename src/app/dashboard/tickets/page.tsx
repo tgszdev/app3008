@@ -344,9 +344,12 @@ export default function TicketsPage() {
       const params = new URLSearchParams()
       
       // Filtro de clientes
-      if (selectedClients.length > 0) {
+      // IMPORTANTE: Usuários context NÃO enviam context_ids (API filtra automaticamente)
+      if (userType === 'matrix' && selectedClients.length > 0) {
         params.append('context_ids', selectedClients.join(','))
-        console.log('[TICKETS DEBUG] Filtro context_ids:', selectedClients.join(','))
+        console.log('[TICKETS DEBUG] Filtro context_ids (matrix):', selectedClients.join(','))
+      } else if (userType === 'context') {
+        console.log('[TICKETS DEBUG] Usuário context: API filtrará automaticamente pelo context_id do banco')
       }
 
       // Filtro de "Meus Chamados" (criador OU responsável)
@@ -400,12 +403,15 @@ export default function TicketsPage() {
   // Buscar todos os tickets para contagem nos cards (COM FILTROS)
   const fetchAllTickets = async () => {
     try {
+      const userType = (session?.user as any)?.userType
+      
       // Construir URL com os mesmos filtros de clientes e período
       let url = '/api/tickets'
       const params = new URLSearchParams()
 
       // Aplicar filtro de clientes
-      if (selectedClients.length > 0) {
+      // IMPORTANTE: Usuários context NÃO enviam context_ids (API filtra automaticamente)
+      if (userType === 'matrix' && selectedClients.length > 0) {
         params.append('context_ids', selectedClients.join(','))
       }
 
