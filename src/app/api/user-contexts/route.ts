@@ -126,8 +126,17 @@ export async function POST(request: NextRequest) {
         .eq('id', user_id)
 
       if (updateUserError) {
-        // Não falhar a operação, apenas logar o erro
+        console.error('[user-contexts POST] Erro ao sincronizar users table:', updateUserError)
+        // Não falhar a operação principal, mas retornar warning
+        return NextResponse.json({
+          association: newAssociation,
+          message: 'Associação criada, mas houve erro na sincronização',
+          warning: 'Sincronização parcial',
+          error: updateUserError.message
+        }, { status: 201 })
       }
+      
+      console.log('[user-contexts POST] Sincronização OK:', { user_id, context_id: contextData.id })
     }
 
     return NextResponse.json({
@@ -182,9 +191,12 @@ export async function DELETE(request: NextRequest) {
       .limit(1)
 
     if (checkError) {
+      console.error('[user-contexts DELETE] Erro ao verificar associações restantes:', checkError)
     } else {
       // Se não há mais associações, limpar todos os campos de contexto do usuário
       if (!remainingAssociations || remainingAssociations.length === 0) {
+        console.log('[user-contexts DELETE] Última associação removida, limpando users table:', user_id)
+        
         const { error: updateUserError } = await supabaseAdmin
           .from('users')
           .update({ 
@@ -196,8 +208,17 @@ export async function DELETE(request: NextRequest) {
           .eq('id', user_id)
 
         if (updateUserError) {
-          // Não falhar a operação, apenas logar o erro
+          console.error('[user-contexts DELETE] Erro ao limpar users table:', updateUserError)
+          return NextResponse.json({
+            message: 'Associação removida, mas houve erro na sincronização',
+            warning: 'Sincronização parcial',
+            error: updateUserError.message
+          }, { status: 200 })
         }
+        
+        console.log('[user-contexts DELETE] Users table limpo com sucesso')
+      } else {
+        console.log('[user-contexts DELETE] Usuário ainda tem associações, mantendo context_id')
       }
     }
 
