@@ -616,124 +616,34 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
       setLoading(true)
       const response = await apiClient.get('/api/roles')
       
-      // Se a API não existir ainda, criar roles padrão
-      if (response.status === 404 || !response.data) {
-        const defaultRoles: Role[] = [
-          {
-            id: '1',
-            name: 'admin',
-            display_name: 'Administrador',
-            description: 'Acesso total ao sistema',
-            permissions: systemRolesPermissions.admin,
-            is_system: true,
-            // created_at gerenciado automaticamente pelo Supabase
-            // updated_at gerenciado automaticamente pelo Supabase
-          },
-          {
-            id: '2',
-            name: 'developer',
-            display_name: 'Desenvolvedor',
-            description: 'Desenvolvimento e Correções',
-            permissions: systemRolesPermissions.developer,
-            is_system: true,
-            // created_at gerenciado automaticamente pelo Supabase
-            // updated_at gerenciado automaticamente pelo Supabase
-          },
-          {
-            id: '3',
-            name: 'analyst',
-            display_name: 'Analista',
-            description: 'Pode gerenciar tickets e criar conteúdo',
-            permissions: systemRolesPermissions.analyst,
-            is_system: true,
-            // created_at gerenciado automaticamente pelo Supabase
-            // updated_at gerenciado automaticamente pelo Supabase
-          },
-          {
-            id: '4',
-            name: 'user',
-            display_name: 'Usuário',
-            description: 'Pode criar tickets e visualizar conteúdo',
-            permissions: systemRolesPermissions.user,
-            is_system: true,
-            // created_at gerenciado automaticamente pelo Supabase
-            // updated_at gerenciado automaticamente pelo Supabase
-          }
-        ]
-        setRoles(defaultRoles)
-      } else {
-        // Aplicar migration automática para TODAS as novas permissões
-        const migratedRoles = migrateRolesPermissions(response.data)
-        
-        // Log para debug
-        console.log('[ROLES MIGRATION] Perfis migrados:', {
-          total: migratedRoles.length,
-          details: migratedRoles.map(r => ({
-            name: r.name,
-            totalPermissions: Object.keys(r.permissions).length,
-            newPermissions: Object.keys(r.permissions).filter(k => 
-              !response.data.find((orig: Role) => orig.id === r.id)?.permissions[k as keyof typeof r.permissions]
-            ).length
-          }))
-        })
-        
-        setRoles(migratedRoles)
+      if (!response.data || response.data.length === 0) {
+        console.error('[ROLES] ❌ ERRO: API retornou dados vazios!')
+        toast.error('Nenhum perfil encontrado no banco de dados. Configure os perfis no Supabase.')
+        setRoles([])
+        return
       }
+      
+      // Aplicar migration automática para TODAS as novas permissões
+      const migratedRoles = migrateRolesPermissions(response.data)
+      
+      console.log('[ROLES] ✅ Perfis carregados do BANCO:', {
+        total: migratedRoles.length,
+        roles: migratedRoles.map(r => r.name)
+      })
+      
+      setRoles(migratedRoles)
     } catch (error: any) {
-      console.error('[ROLES] Erro ao buscar perfis do banco:', error)
+      console.error('[ROLES] ❌ ERRO CRÍTICO ao buscar perfis:', error)
       console.error('[ROLES] Detalhes:', {
         message: error.message,
         response: error.response?.data,
-        status: error.response?.status
+        status: error.response?.status,
+        url: error.config?.url
       })
       
-      // Mostrar erro ao usuário
-      toast.error(`Erro ao buscar perfis do banco. Usando dados locais. Erro: ${error.message}`)
-      
-      // Se a API não existir, usar roles padrão com permissões corretas
-      const defaultRoles: Role[] = [
-        {
-          id: '1',
-          name: 'admin',
-          display_name: 'Administrador',
-          description: 'Acesso total ao sistema',
-          permissions: systemRolesPermissions.admin,
-          is_system: true,
-          // created_at gerenciado automaticamente pelo Supabase
-          // updated_at gerenciado automaticamente pelo Supabase
-        },
-        {
-          id: '2',
-          name: 'developer',
-          display_name: 'Desenvolvedor',
-          description: 'Desenvolvimento e Correções',
-          permissions: systemRolesPermissions.developer,
-          is_system: true,
-          // created_at gerenciado automaticamente pelo Supabase
-          // updated_at gerenciado automaticamente pelo Supabase
-        },
-        {
-          id: '3',
-          name: 'analyst',
-          display_name: 'Analista',
-          description: 'Pode gerenciar tickets e criar conteúdo',
-          permissions: systemRolesPermissions.analyst,
-          is_system: true,
-          // created_at gerenciado automaticamente pelo Supabase
-          // updated_at gerenciado automaticamente pelo Supabase
-        },
-        {
-          id: '4',
-          name: 'user',
-          display_name: 'Usuário',
-          description: 'Pode criar tickets e visualizar conteúdo',
-          permissions: systemRolesPermissions.user,
-          is_system: true,
-          // created_at gerenciado automaticamente pelo Supabase
-          // updated_at gerenciado automaticamente pelo Supabase
-        }
-      ]
-      setRoles(defaultRoles)
+      // NÃO usar dados mockados! Mostrar erro real
+      toast.error(`ERRO: Não foi possível carregar perfis do banco. ${error.message}`)
+      setRoles([])
     } finally {
       setLoading(false)
     }
