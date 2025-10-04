@@ -1,18 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
-import { clearPermissionsCache } from '@/lib/permissions'
+import { clearPermissionsCache } from '@/lib/permissions-cache'
 
-type RouteParams = {
-  params: Promise<{ id: string }>
-}
-
+/**
+ * PUT /api/roles/[id]
+ * Atualiza um perfil existente
+ */
 export async function PUT(
   request: NextRequest,
-  context: RouteParams
+  { params }: { params: { id: string } }
 ) {
   try {
-    const params = await context.params
     const session = await auth()
     
     if (!session?.user) {
@@ -30,51 +29,86 @@ export async function PUT(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
+    const roleId = params.id
     const body = await request.json()
-    const { display_name, description, permissions } = body
+    const { name, display_name, description, permissions, is_system } = body
 
-    // Atualizar role
-    const { data: updatedRole, error } = await supabaseAdmin
-      .from('roles')
-      .update({
-        display_name,
-        description,
-        permissions,
-        // updated_at gerenciado automaticamente pelo Supabase
-      })
-      .eq('id', params.id)
-      .select()
-      .single()
-
-    if (error) {
-      
-      // Se a tabela não existir, retornar sucesso simulado
-      if (error.code === '42P01') {
-        return NextResponse.json({
-          ...body,
-          id: params.id,
-          // updated_at gerenciado automaticamente pelo Supabase
-        })
-      }
-      
-      return NextResponse.json({ error: 'Failed to update role' }, { status: 500 })
+    if (!roleId) {
+      return NextResponse.json({ error: 'Role ID is required' }, { status: 400 })
     }
 
-    // Limpar cache de permissões após atualizar role
-    clearPermissionsCache()
+    // Buscar role atual
+    const { data: existingRole, error: fetchError } = await supabaseAdmin
+      .from('roles')
+      .select('*')
+      .eq('id', roleId)
+      .single()
 
-    return NextResponse.json(updatedRole)
-  } catch (error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    if (fetchError || !existingRole) {
+      return NextResponse.json({ error: 'Role not found' }, { status: 404 })
+    }
+
+    // Não permitir alteração do is_system para roles do sistema
+    if (existingRole.is_system && !is_system) {
+      return NextResponse.json({ 
+        error: 'Cannot remove is_system flag from system roles' 
+      }, { status: 400 })
+    }
+
+    // Preparar dados para atualização
+    const updateData: any = {
+      updated_at: new Date().toISOString()
+    }
+
+    if (display_name) updateData.display_name = display_name
+    if (description !== undefined) updateData.description = description
+    if (permissions) updateData.permissions = permissions
+
+    // Atualizar apenas se não for role do sistema OU se for admin alterando permissões
+    if (!existingRole.is_system || (existingRole.is_system && permissions)) {
+      // Atualizar role
+      const { data: updatedRole, error: updateError } = await supabaseAdmin
+        .from('roles')
+        .update(updateData)
+        .eq('id', roleId)
+        .select()
+        .single()
+
+      if (updateError) {
+        console.error('Error updating role:', updateError)
+        return NextResponse.json({ 
+          error: 'Failed to update role',
+          details: updateError.message 
+        }, { status: 500 })
+      }
+
+      // Limpar cache de permissões
+      clearPermissionsCache()
+
+      return NextResponse.json(updatedRole, { status: 200 })
+    } else {
+      return NextResponse.json({ 
+        error: 'Cannot modify system roles structure' 
+      }, { status: 400 })
+    }
+  } catch (error: any) {
+    console.error('Error in PUT /api/roles/[id]:', error)
+    return NextResponse.json({ 
+      error: 'Internal server error',
+      details: error.message 
+    }, { status: 500 })
   }
 }
 
+/**
+ * DELETE /api/roles/[id]
+ * Deleta um perfil (apenas perfis personalizados)
+ */
 export async function DELETE(
   request: NextRequest,
-  context: RouteParams
+  { params }: { params: { id: string } }
 ) {
   try {
-    const params = await context.params
     const session = await auth()
     
     if (!session?.user) {
@@ -92,35 +126,103 @@ export async function DELETE(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    // Verificar se não é um role do sistema
-    const { data: role } = await supabaseAdmin
+    const roleId = params.id
+
+    // Buscar role
+    const { data: role, error: fetchError } = await supabaseAdmin
       .from('roles')
-      .select('is_system')
-      .eq('id', params.id)
+      .select('*')
+      .eq('id', roleId)
       .single()
 
-    if (role?.is_system) {
-      return NextResponse.json({ error: 'Cannot delete system role' }, { status: 400 })
+    if (fetchError || !role) {
+      return NextResponse.json({ error: 'Role not found' }, { status: 404 })
+    }
+
+    // Não permitir deletar roles do sistema
+    if (role.is_system) {
+      return NextResponse.json({ 
+        error: 'Cannot delete system roles' 
+      }, { status: 400 })
+    }
+
+    // Verificar se há usuários usando este role
+    const { count: usersCount } = await supabaseAdmin
+      .from('users')
+      .select('id', { count: 'exact', head: true })
+      .eq('role', role.name)
+
+    if (usersCount && usersCount > 0) {
+      return NextResponse.json({ 
+        error: `Cannot delete role. ${usersCount} user(s) are using this role.`,
+        usersCount 
+      }, { status: 400 })
     }
 
     // Deletar role
-    const { error } = await supabaseAdmin
+    const { error: deleteError } = await supabaseAdmin
       .from('roles')
       .delete()
-      .eq('id', params.id)
+      .eq('id', roleId)
 
-    if (error) {
-      
-      // Se a tabela não existir, retornar sucesso simulado
-      if (error.code === '42P01') {
-        return NextResponse.json({ message: 'Role deleted successfully' })
-      }
-      
-      return NextResponse.json({ error: 'Failed to delete role' }, { status: 500 })
+    if (deleteError) {
+      console.error('Error deleting role:', deleteError)
+      return NextResponse.json({ 
+        error: 'Failed to delete role',
+        details: deleteError.message 
+      }, { status: 500 })
     }
 
-    return NextResponse.json({ message: 'Role deleted successfully' })
-  } catch (error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    // Limpar cache
+    clearPermissionsCache()
+
+    return NextResponse.json({ 
+      success: true,
+      message: 'Role deleted successfully' 
+    }, { status: 200 })
+  } catch (error: any) {
+    console.error('Error in DELETE /api/roles/[id]:', error)
+    return NextResponse.json({ 
+      error: 'Internal server error',
+      details: error.message 
+    }, { status: 500 })
+  }
+}
+
+/**
+ * GET /api/roles/[id]
+ * Busca um perfil específico
+ */
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await auth()
+    
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const roleId = params.id
+
+    // Buscar role
+    const { data: role, error } = await supabaseAdmin
+      .from('roles')
+      .select('*')
+      .eq('id', roleId)
+      .single()
+
+    if (error || !role) {
+      return NextResponse.json({ error: 'Role not found' }, { status: 404 })
+    }
+
+    return NextResponse.json(role, { status: 200 })
+  } catch (error: any) {
+    console.error('Error in GET /api/roles/[id]:', error)
+    return NextResponse.json({ 
+      error: 'Internal server error',
+      details: error.message 
+    }, { status: 500 })
   }
 }
