@@ -106,14 +106,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Erro ao criar associação' }, { status: 500 })
     }
 
-    // SINCRONIZAÇÃO: Atualizar context_id do usuário
-    const { error: updateUserError } = await supabaseAdmin
-      .from('users')
-      .update({ context_id })
-      .eq('id', user_id)
+    // SINCRONIZAÇÃO: Atualizar context_id E dados do contexto no usuário
+    // Buscar dados completos do contexto
+    const { data: contextData } = await supabaseAdmin
+      .from('contexts')
+      .select('id, name, slug, type')
+      .eq('id', context_id)
+      .single()
+    
+    if (contextData) {
+      const { error: updateUserError } = await supabaseAdmin
+        .from('users')
+        .update({ 
+          context_id: contextData.id,
+          context_name: contextData.name,
+          context_slug: contextData.slug,
+          context_type: contextData.type
+        })
+        .eq('id', user_id)
 
-    if (updateUserError) {
-      // Não falhar a operação, apenas logar o erro
+      if (updateUserError) {
+        // Não falhar a operação, apenas logar o erro
+      }
     }
 
     return NextResponse.json({
@@ -169,11 +183,16 @@ export async function DELETE(request: NextRequest) {
 
     if (checkError) {
     } else {
-      // Se não há mais associações, remover context_id do usuário
+      // Se não há mais associações, limpar todos os campos de contexto do usuário
       if (!remainingAssociations || remainingAssociations.length === 0) {
         const { error: updateUserError } = await supabaseAdmin
           .from('users')
-          .update({ context_id: null })
+          .update({ 
+            context_id: null,
+            context_name: null,
+            context_slug: null,
+            context_type: null
+          })
           .eq('id', user_id)
 
         if (updateUserError) {
