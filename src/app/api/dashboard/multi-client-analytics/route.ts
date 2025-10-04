@@ -74,10 +74,14 @@ export async function GET(request: NextRequest) {
         }
       }
     } else if (userType === 'context') {
-      // Para usuários de contexto, só podem acessar seu próprio contexto
-      if (contextIds.length > 1 || !contextIds.includes(userContextId)) {
-        return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
+      // Para usuários de contexto, SEMPRE usar o context_id do banco (mais atualizado)
+      // Ignorar contextIds da URL (pode estar desatualizado na sessão JWT)
+      if (!userContextId) {
+        return NextResponse.json({ error: 'Usuário sem contexto definido' }, { status: 403 })
       }
+      // Forçar uso do contexto correto do banco
+      contextIds.length = 0
+      contextIds.push(userContextId)
     }
 
     // Buscar dados de cada contexto selecionado
