@@ -33,12 +33,17 @@ interface Role {
     // Tickets
     tickets_view: boolean
     tickets_create: boolean
+    tickets_create_internal: boolean // Criar tickets internos
     tickets_edit_own: boolean
     tickets_edit_all: boolean
     tickets_delete: boolean
     tickets_assign: boolean
     tickets_close: boolean
     tickets_change_priority: boolean
+    tickets_change_status: boolean // Alterar status
+    tickets_view_internal: boolean // Ver tickets internos
+    tickets_export: boolean // Exportar tickets
+    tickets_bulk_actions: boolean // Ações em massa
     
     // Knowledge Base
     kb_view: boolean
@@ -57,12 +62,57 @@ interface Role {
     timesheets_analytics: boolean
     timesheets_analytics_full: boolean // Ver Analytics de todos os colaboradores
     
+    // Organizations/Contexts
+    organizations_view: boolean
+    organizations_create: boolean
+    organizations_edit: boolean
+    organizations_delete: boolean
+    contexts_manage: boolean
+    
+    // SLA
+    sla_view: boolean
+    sla_create: boolean
+    sla_edit: boolean
+    sla_delete: boolean
+    sla_override: boolean // Quebrar/ignorar SLA manualmente
+    
+    // Satisfaction
+    satisfaction_view_results: boolean
+    satisfaction_create_survey: boolean
+    satisfaction_edit_survey: boolean
+    satisfaction_delete_survey: boolean
+    satisfaction_export_data: boolean
+    
+    // Comments
+    comments_view_all: boolean
+    comments_edit_any: boolean
+    comments_delete_any: boolean
+    comments_moderate: boolean
+    
+    // Reports
+    reports_view: boolean
+    reports_export: boolean
+    reports_create_custom: boolean
+    reports_schedule: boolean // Agendar relatórios automáticos
+    
+    // API/Integrations
+    api_access: boolean
+    api_create_token: boolean
+    api_revoke_token: boolean
+    integrations_manage: boolean
+    webhooks_manage: boolean
+    
+    // Notifications
+    notifications_manage_global: boolean
+    notifications_send_broadcast: boolean
+    
     // System
     system_settings: boolean
     system_users: boolean
     system_roles: boolean
     system_backup: boolean
     system_logs: boolean
+    system_audit_view: boolean // Ver logs de auditoria
   }
   is_system: boolean // Roles do sistema (admin, analyst, user) não podem ser deletados
   created_at: string
@@ -75,19 +125,29 @@ interface RoleManagementModalProps {
 }
 
 const defaultPermissions = {
+  // Tickets
   tickets_view: false,
   tickets_create: false,
+  tickets_create_internal: false,
   tickets_edit_own: false,
   tickets_edit_all: false,
   tickets_delete: false,
   tickets_assign: false,
   tickets_close: false,
   tickets_change_priority: false,
+  tickets_change_status: false,
+  tickets_view_internal: false,
+  tickets_export: false,
+  tickets_bulk_actions: false,
+  
+  // Knowledge Base
   kb_view: false,
   kb_create: false,
   kb_edit: false,
   kb_delete: false,
   kb_manage_categories: false,
+  
+  // Timesheets
   timesheets_view_own: false,
   timesheets_view_all: false,
   timesheets_create: false,
@@ -96,30 +156,87 @@ const defaultPermissions = {
   timesheets_approve: false,
   timesheets_analytics: false,
   timesheets_analytics_full: false,
+  
+  // Organizations/Contexts
+  organizations_view: false,
+  organizations_create: false,
+  organizations_edit: false,
+  organizations_delete: false,
+  contexts_manage: false,
+  
+  // SLA
+  sla_view: false,
+  sla_create: false,
+  sla_edit: false,
+  sla_delete: false,
+  sla_override: false,
+  
+  // Satisfaction
+  satisfaction_view_results: false,
+  satisfaction_create_survey: false,
+  satisfaction_edit_survey: false,
+  satisfaction_delete_survey: false,
+  satisfaction_export_data: false,
+  
+  // Comments
+  comments_view_all: false,
+  comments_edit_any: false,
+  comments_delete_any: false,
+  comments_moderate: false,
+  
+  // Reports
+  reports_view: false,
+  reports_export: false,
+  reports_create_custom: false,
+  reports_schedule: false,
+  
+  // API/Integrations
+  api_access: false,
+  api_create_token: false,
+  api_revoke_token: false,
+  integrations_manage: false,
+  webhooks_manage: false,
+  
+  // Notifications
+  notifications_manage_global: false,
+  notifications_send_broadcast: false,
+  
+  // System
   system_settings: false,
   system_users: false,
   system_roles: false,
   system_backup: false,
-  system_logs: false
+  system_logs: false,
+  system_audit_view: false
 }
 
 // Permissões padrão para os roles existentes
 const systemRolesPermissions = {
   admin: {
     ...defaultPermissions,
+    // Tickets - FULL ACCESS
     tickets_view: true,
     tickets_create: true,
+    tickets_create_internal: true,
     tickets_edit_own: true,
     tickets_edit_all: true,
     tickets_delete: true,
     tickets_assign: true,
     tickets_close: true,
     tickets_change_priority: true,
+    tickets_change_status: true,
+    tickets_view_internal: true,
+    tickets_export: true,
+    tickets_bulk_actions: true,
+    
+    // KB - FULL ACCESS
     kb_view: true,
     kb_create: true,
     kb_edit: true,
     kb_delete: true,
     kb_manage_categories: true,
+    
+    // Timesheets - FULL ACCESS
     timesheets_view_own: true,
     timesheets_view_all: true,
     timesheets_create: true,
@@ -127,28 +244,85 @@ const systemRolesPermissions = {
     timesheets_edit_all: true,
     timesheets_approve: true,
     timesheets_analytics: true,
-    timesheets_analytics_full: true, // Admin tem acesso completo por padrão
+    timesheets_analytics_full: true,
+    
+    // Organizations - FULL ACCESS
+    organizations_view: true,
+    organizations_create: true,
+    organizations_edit: true,
+    organizations_delete: true,
+    contexts_manage: true,
+    
+    // SLA - FULL ACCESS
+    sla_view: true,
+    sla_create: true,
+    sla_edit: true,
+    sla_delete: true,
+    sla_override: true,
+    
+    // Satisfaction - FULL ACCESS
+    satisfaction_view_results: true,
+    satisfaction_create_survey: true,
+    satisfaction_edit_survey: true,
+    satisfaction_delete_survey: true,
+    satisfaction_export_data: true,
+    
+    // Comments - FULL ACCESS
+    comments_view_all: true,
+    comments_edit_any: true,
+    comments_delete_any: true,
+    comments_moderate: true,
+    
+    // Reports - FULL ACCESS
+    reports_view: true,
+    reports_export: true,
+    reports_create_custom: true,
+    reports_schedule: true,
+    
+    // API/Integrations - FULL ACCESS
+    api_access: true,
+    api_create_token: true,
+    api_revoke_token: true,
+    integrations_manage: true,
+    webhooks_manage: true,
+    
+    // Notifications - FULL ACCESS
+    notifications_manage_global: true,
+    notifications_send_broadcast: true,
+    
+    // System - FULL ACCESS
     system_settings: true,
     system_users: true,
     system_roles: true,
     system_backup: true,
-    system_logs: true
+    system_logs: true,
+    system_audit_view: true
   },
   developer: {
     ...defaultPermissions,
+    // Tickets - ADVANCED ACCESS
     tickets_view: true,
     tickets_create: true,
+    tickets_create_internal: true,
     tickets_edit_own: true,
     tickets_edit_all: true,
     tickets_delete: false,
-    tickets_assign: true, // Desenvolvedor pode atribuir tickets
+    tickets_assign: true,
     tickets_close: true,
     tickets_change_priority: true,
+    tickets_change_status: true,
+    tickets_view_internal: true,
+    tickets_export: true,
+    tickets_bulk_actions: false,
+    
+    // KB - ADVANCED ACCESS
     kb_view: true,
     kb_create: true,
     kb_edit: true,
     kb_delete: false,
     kb_manage_categories: false,
+    
+    // Timesheets
     timesheets_view_own: true,
     timesheets_view_all: true,
     timesheets_create: true,
@@ -156,44 +330,231 @@ const systemRolesPermissions = {
     timesheets_edit_all: false,
     timesheets_approve: false,
     timesheets_analytics: true,
-    timesheets_analytics_full: false, // Desenvolvedor vê apenas seus próprios dados
+    timesheets_analytics_full: false,
+    
+    // Organizations - VIEW ONLY
+    organizations_view: true,
+    organizations_create: false,
+    organizations_edit: false,
+    organizations_delete: false,
+    contexts_manage: false,
+    
+    // SLA - VIEW ONLY
+    sla_view: true,
+    sla_create: false,
+    sla_edit: false,
+    sla_delete: false,
+    sla_override: false,
+    
+    // Satisfaction - VIEW ONLY
+    satisfaction_view_results: true,
+    satisfaction_create_survey: false,
+    satisfaction_edit_survey: false,
+    satisfaction_delete_survey: false,
+    satisfaction_export_data: false,
+    
+    // Comments - MODERATE
+    comments_view_all: true,
+    comments_edit_any: false,
+    comments_delete_any: false,
+    comments_moderate: true,
+    
+    // Reports - VIEW & EXPORT
+    reports_view: true,
+    reports_export: true,
+    reports_create_custom: false,
+    reports_schedule: false,
+    
+    // API - NO ACCESS
+    api_access: false,
+    api_create_token: false,
+    api_revoke_token: false,
+    integrations_manage: false,
+    webhooks_manage: false,
+    
+    // Notifications - NO ACCESS
+    notifications_manage_global: false,
+    notifications_send_broadcast: false,
+    
+    // System - NO ACCESS
     system_settings: false,
     system_users: false,
     system_roles: false,
     system_backup: false,
-    system_logs: false
+    system_logs: false,
+    system_audit_view: false
   },
   analyst: {
     ...defaultPermissions,
+    // Tickets - MANAGEMENT ACCESS
     tickets_view: true,
     tickets_create: true,
+    tickets_create_internal: true,
     tickets_edit_own: true,
     tickets_edit_all: true,
+    tickets_delete: false,
     tickets_assign: true,
     tickets_close: true,
     tickets_change_priority: true,
+    tickets_change_status: true,
+    tickets_view_internal: true,
+    tickets_export: true,
+    tickets_bulk_actions: true,
+    
+    // KB - MANAGEMENT ACCESS
     kb_view: true,
     kb_create: true,
     kb_edit: true,
+    kb_delete: false,
+    kb_manage_categories: true,
+    
+    // Timesheets - MANAGEMENT ACCESS
     timesheets_view_own: true,
     timesheets_view_all: true,
     timesheets_create: true,
     timesheets_edit_own: true,
+    timesheets_edit_all: false,
     timesheets_approve: true,
-    timesheets_analytics: true, // Analista pode ver analytics (apenas próprio)
-    timesheets_analytics_full: false // Analista vê apenas seus próprios dados
+    timesheets_analytics: true,
+    timesheets_analytics_full: false,
+    
+    // Organizations - VIEW ONLY
+    organizations_view: true,
+    organizations_create: false,
+    organizations_edit: false,
+    organizations_delete: false,
+    contexts_manage: false,
+    
+    // SLA - MANAGEMENT ACCESS
+    sla_view: true,
+    sla_create: true,
+    sla_edit: true,
+    sla_delete: false,
+    sla_override: false,
+    
+    // Satisfaction - MANAGEMENT ACCESS
+    satisfaction_view_results: true,
+    satisfaction_create_survey: true,
+    satisfaction_edit_survey: true,
+    satisfaction_delete_survey: false,
+    satisfaction_export_data: true,
+    
+    // Comments - MODERATE
+    comments_view_all: true,
+    comments_edit_any: false,
+    comments_delete_any: true,
+    comments_moderate: true,
+    
+    // Reports - MANAGEMENT ACCESS
+    reports_view: true,
+    reports_export: true,
+    reports_create_custom: true,
+    reports_schedule: false,
+    
+    // API - NO ACCESS
+    api_access: false,
+    api_create_token: false,
+    api_revoke_token: false,
+    integrations_manage: false,
+    webhooks_manage: false,
+    
+    // Notifications - BROADCAST
+    notifications_manage_global: false,
+    notifications_send_broadcast: true,
+    
+    // System - NO ACCESS
+    system_settings: false,
+    system_users: false,
+    system_roles: false,
+    system_backup: false,
+    system_logs: false,
+    system_audit_view: false
   },
   user: {
     ...defaultPermissions,
+    // Tickets - BASIC ACCESS
     tickets_view: true,
     tickets_create: true,
+    tickets_create_internal: false,
     tickets_edit_own: true,
+    tickets_edit_all: false,
+    tickets_delete: false,
+    tickets_assign: false,
+    tickets_close: false,
+    tickets_change_priority: false,
+    tickets_change_status: false,
+    tickets_view_internal: false,
+    tickets_export: false,
+    tickets_bulk_actions: false,
+    
+    // KB - VIEW ONLY
     kb_view: true,
+    kb_create: false,
+    kb_edit: false,
+    kb_delete: false,
+    kb_manage_categories: false,
+    
+    // Timesheets - BASIC ACCESS
     timesheets_view_own: true,
+    timesheets_view_all: false,
     timesheets_create: true,
     timesheets_edit_own: true,
-    timesheets_analytics: false, // Usuário NÃO tem acesso ao analytics
-    timesheets_analytics_full: false // Usuário não tem acesso completo
+    timesheets_edit_all: false,
+    timesheets_approve: false,
+    timesheets_analytics: false,
+    timesheets_analytics_full: false,
+    
+    // Organizations - NO ACCESS
+    organizations_view: false,
+    organizations_create: false,
+    organizations_edit: false,
+    organizations_delete: false,
+    contexts_manage: false,
+    
+    // SLA - NO ACCESS
+    sla_view: false,
+    sla_create: false,
+    sla_edit: false,
+    sla_delete: false,
+    sla_override: false,
+    
+    // Satisfaction - VIEW ONLY (own)
+    satisfaction_view_results: false,
+    satisfaction_create_survey: false,
+    satisfaction_edit_survey: false,
+    satisfaction_delete_survey: false,
+    satisfaction_export_data: false,
+    
+    // Comments - VIEW OWN
+    comments_view_all: false,
+    comments_edit_any: false,
+    comments_delete_any: false,
+    comments_moderate: false,
+    
+    // Reports - NO ACCESS
+    reports_view: false,
+    reports_export: false,
+    reports_create_custom: false,
+    reports_schedule: false,
+    
+    // API - NO ACCESS
+    api_access: false,
+    api_create_token: false,
+    api_revoke_token: false,
+    integrations_manage: false,
+    webhooks_manage: false,
+    
+    // Notifications - NO ACCESS
+    notifications_manage_global: false,
+    notifications_send_broadcast: false,
+    
+    // System - NO ACCESS
+    system_settings: false,
+    system_users: false,
+    system_roles: false,
+    system_backup: false,
+    system_logs: false,
+    system_audit_view: false
   }
 }
 
@@ -532,12 +893,17 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
       // Tickets
       tickets_view: 'Visualizar Tickets',
       tickets_create: 'Criar Tickets',
+      tickets_create_internal: 'Criar Tickets Internos',
       tickets_edit_own: 'Editar Próprios Tickets',
       tickets_edit_all: 'Editar Todos os Tickets',
       tickets_delete: 'Excluir Tickets',
       tickets_assign: 'Atribuir Tickets',
       tickets_close: 'Fechar Tickets',
       tickets_change_priority: 'Alterar Criticidade',
+      tickets_change_status: 'Alterar Status',
+      tickets_view_internal: 'Ver Tickets Internos',
+      tickets_export: 'Exportar Tickets',
+      tickets_bulk_actions: 'Ações em Massa',
       
       // Knowledge Base
       kb_view: 'Visualizar Base de Conhecimento',
@@ -556,12 +922,57 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
       timesheets_analytics: 'Ver Analytics',
       timesheets_analytics_full: 'Ver Analytics Completo',
       
+      // Organizations
+      organizations_view: 'Visualizar Organizações',
+      organizations_create: 'Criar Organizações',
+      organizations_edit: 'Editar Organizações',
+      organizations_delete: 'Excluir Organizações',
+      contexts_manage: 'Gerenciar Contextos',
+      
+      // SLA
+      sla_view: 'Visualizar SLA',
+      sla_create: 'Criar SLA',
+      sla_edit: 'Editar SLA',
+      sla_delete: 'Excluir SLA',
+      sla_override: 'Quebrar SLA',
+      
+      // Satisfaction
+      satisfaction_view_results: 'Ver Resultados de Satisfação',
+      satisfaction_create_survey: 'Criar Pesquisas',
+      satisfaction_edit_survey: 'Editar Pesquisas',
+      satisfaction_delete_survey: 'Excluir Pesquisas',
+      satisfaction_export_data: 'Exportar Dados',
+      
+      // Comments
+      comments_view_all: 'Ver Todos os Comentários',
+      comments_edit_any: 'Editar Qualquer Comentário',
+      comments_delete_any: 'Excluir Qualquer Comentário',
+      comments_moderate: 'Moderar Comentários',
+      
+      // Reports
+      reports_view: 'Visualizar Relatórios',
+      reports_export: 'Exportar Relatórios',
+      reports_create_custom: 'Criar Relatórios Personalizados',
+      reports_schedule: 'Agendar Relatórios',
+      
+      // API/Integrations
+      api_access: 'Acesso à API',
+      api_create_token: 'Criar Tokens de API',
+      api_revoke_token: 'Revogar Tokens',
+      integrations_manage: 'Gerenciar Integrações',
+      webhooks_manage: 'Gerenciar Webhooks',
+      
+      // Notifications
+      notifications_manage_global: 'Gerenciar Notificações Globais',
+      notifications_send_broadcast: 'Enviar Notificações em Massa',
+      
       // System
       system_settings: 'Configurações do Sistema',
       system_users: 'Gerenciar Usuários',
       system_roles: 'Gerenciar Perfis',
       system_backup: 'Backup e Restauração',
-      system_logs: 'Visualizar Logs'
+      system_logs: 'Visualizar Logs',
+      system_audit_view: 'Ver Logs de Auditoria'
     }
     
     return labels[permission] || permission
@@ -572,12 +983,17 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
       // Tickets
       tickets_view: 'Permite visualizar todos os tickets do sistema',
       tickets_create: 'Permite criar novos tickets',
+      tickets_create_internal: 'Permite criar tickets internos (visíveis apenas para equipe interna)',
       tickets_edit_own: 'Permite editar apenas tickets criados pelo próprio usuário',
       tickets_edit_all: 'Permite editar todos os tickets do sistema',
       tickets_delete: 'Permite excluir tickets permanentemente',
       tickets_assign: 'Permite atribuir ou alterar o responsável por tickets',
       tickets_close: 'Permite fechar tickets resolvidos',
       tickets_change_priority: 'Permite alterar a criticidade (prioridade) de tickets',
+      tickets_change_status: 'Permite alterar o status de tickets (aberto, em andamento, etc)',
+      tickets_view_internal: 'Permite visualizar tickets marcados como internos',
+      tickets_export: 'Permite exportar listagem de tickets (Excel, CSV, PDF)',
+      tickets_bulk_actions: 'Permite executar ações em múltiplos tickets simultaneamente',
       
       // Knowledge Base
       kb_view: 'Permite visualizar artigos da base de conhecimento',
@@ -596,12 +1012,57 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
       timesheets_analytics: 'Permite acessar relatórios e análises de apontamentos',
       timesheets_analytics_full: 'Permite ver análises de todos os colaboradores (se desmarcado, vê apenas suas próprias)',
       
+      // Organizations
+      organizations_view: 'Permite visualizar organizações e suas informações',
+      organizations_create: 'Permite criar novas organizações/clientes',
+      organizations_edit: 'Permite editar informações de organizações',
+      organizations_delete: 'Permite excluir organizações do sistema',
+      contexts_manage: 'Permite gerenciar contextos e associações de usuários',
+      
+      // SLA
+      sla_view: 'Permite visualizar políticas de SLA configuradas',
+      sla_create: 'Permite criar novas políticas de SLA',
+      sla_edit: 'Permite editar políticas de SLA existentes',
+      sla_delete: 'Permite excluir políticas de SLA',
+      sla_override: 'Permite quebrar/ignorar SLA em casos excepcionais',
+      
+      // Satisfaction
+      satisfaction_view_results: 'Permite visualizar resultados de pesquisas de satisfação',
+      satisfaction_create_survey: 'Permite criar novas pesquisas de satisfação',
+      satisfaction_edit_survey: 'Permite editar pesquisas existentes',
+      satisfaction_delete_survey: 'Permite excluir pesquisas de satisfação',
+      satisfaction_export_data: 'Permite exportar dados e resultados das pesquisas',
+      
+      // Comments
+      comments_view_all: 'Permite visualizar comentários de todos os tickets',
+      comments_edit_any: 'Permite editar comentários de qualquer usuário',
+      comments_delete_any: 'Permite excluir comentários de qualquer usuário',
+      comments_moderate: 'Permite moderar comentários (aprovar, reprovar, marcar spam)',
+      
+      // Reports
+      reports_view: 'Permite visualizar relatórios disponíveis',
+      reports_export: 'Permite exportar relatórios (Excel, PDF, CSV)',
+      reports_create_custom: 'Permite criar relatórios personalizados',
+      reports_schedule: 'Permite agendar envio automático de relatórios',
+      
+      // API/Integrations
+      api_access: 'Permite acesso às APIs do sistema',
+      api_create_token: 'Permite criar tokens de API para integrações',
+      api_revoke_token: 'Permite revogar tokens de API existentes',
+      integrations_manage: 'Permite gerenciar integrações com sistemas externos',
+      webhooks_manage: 'Permite criar e gerenciar webhooks',
+      
+      // Notifications
+      notifications_manage_global: 'Permite gerenciar configurações globais de notificações',
+      notifications_send_broadcast: 'Permite enviar notificações em massa para múltiplos usuários',
+      
       // System
       system_settings: 'Permite configurar parâmetros gerais do sistema',
       system_users: 'Permite criar, editar e desativar usuários',
       system_roles: 'Permite gerenciar perfis e suas permissões',
       system_backup: 'Permite fazer backup e restaurar dados do sistema',
-      system_logs: 'Permite visualizar logs de auditoria e sistema'
+      system_logs: 'Permite visualizar logs do sistema',
+      system_audit_view: 'Permite visualizar logs de auditoria detalhados'
     }
     
     return tooltips[permission] || 'Sem descrição disponível'
@@ -612,6 +1073,13 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
       'Tickets': [] as string[],
       'Base de Conhecimento': [] as string[],
       'Apontamentos': [] as string[],
+      'Organizações': [] as string[],
+      'SLA': [] as string[],
+      'Satisfação': [] as string[],
+      'Comentários': [] as string[],
+      'Relatórios': [] as string[],
+      'API/Integrações': [] as string[],
+      'Notificações': [] as string[],
       'Sistema': [] as string[]
     }
     
@@ -619,6 +1087,13 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
       if (perm.startsWith('tickets_')) groups['Tickets'].push(perm)
       else if (perm.startsWith('kb_')) groups['Base de Conhecimento'].push(perm)
       else if (perm.startsWith('timesheets_')) groups['Apontamentos'].push(perm)
+      else if (perm.startsWith('organizations_') || perm.startsWith('contexts_')) groups['Organizações'].push(perm)
+      else if (perm.startsWith('sla_')) groups['SLA'].push(perm)
+      else if (perm.startsWith('satisfaction_')) groups['Satisfação'].push(perm)
+      else if (perm.startsWith('comments_')) groups['Comentários'].push(perm)
+      else if (perm.startsWith('reports_')) groups['Relatórios'].push(perm)
+      else if (perm.startsWith('api_') || perm.startsWith('integrations_') || perm.startsWith('webhooks_')) groups['API/Integrações'].push(perm)
+      else if (perm.startsWith('notifications_')) groups['Notificações'].push(perm)
       else if (perm.startsWith('system_')) groups['Sistema'].push(perm)
     })
     
