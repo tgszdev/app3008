@@ -680,6 +680,16 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
         setRoles(migratedRoles)
       }
     } catch (error: any) {
+      console.error('[ROLES] Erro ao buscar perfis do banco:', error)
+      console.error('[ROLES] Detalhes:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      })
+      
+      // Mostrar erro ao usuário
+      toast.error(`Erro ao buscar perfis do banco. Usando dados locais. Erro: ${error.message}`)
+      
       // Se a API não existir, usar roles padrão com permissões corretas
       const defaultRoles: Role[] = [
         {
