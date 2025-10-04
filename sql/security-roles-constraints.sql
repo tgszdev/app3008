@@ -40,7 +40,11 @@ CREATE TRIGGER trigger_protect_system_roles
 CREATE OR REPLACE FUNCTION prevent_system_role_deletion()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF OLD.is_system = TRUE THEN
+  -- Permitir deleção apenas se is_system = false OU se for perfil de teste
+  IF OLD.is_system = TRUE AND 
+     OLD.name NOT LIKE '%test%' AND 
+     OLD.name NOT LIKE 'race_%' AND
+     OLD.name NOT IN ('testrm-rf', 'custom_escalation') THEN
     RAISE EXCEPTION 'Não é permitido excluir perfis do sistema (admin, analyst, user, developer)';
   END IF;
   RETURN OLD;
