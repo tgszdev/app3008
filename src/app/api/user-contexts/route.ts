@@ -74,6 +74,34 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'user_id e context_id são obrigatórios' }, { status: 400 })
     }
 
+    // Buscar informações do usuário
+    const { data: targetUser, error: targetUserError } = await supabaseAdmin
+      .from('users')
+      .select('user_type, email')
+      .eq('id', user_id)
+      .single()
+
+    if (targetUserError || !targetUser) {
+      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 })
+    }
+
+    // TRAVA: Verificar se é usuário context e já tem associação
+    if (targetUser.user_type === 'context') {
+      const { count: existingCount } = await supabaseAdmin
+        .from('user_contexts')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user_id)
+
+      if (existingCount && existingCount > 0) {
+        return NextResponse.json({ 
+          error: 'Usuário de cliente único já possui uma associação. Remova a associação existente antes de criar outra.',
+          user_type: 'context',
+          max_associations: 1,
+          current_associations: existingCount
+        }, { status: 400 })
+      }
+    }
+
     // Verificar se a associação já existe
     const { data: existing } = await supabaseAdmin
       .from('user_contexts')
