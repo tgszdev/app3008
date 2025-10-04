@@ -295,22 +295,28 @@ export const authConfig: NextAuthConfig = {
 
           // Buscar permissões do perfil do usuário
           let userPermissions = {}
-          if (user.role_name) {
+          const roleName = user.role_name || user.role // Usar role como fallback
+          
+          if (roleName) {
             // Buscar permissões do perfil no banco
-            const { data: roleData } = await supabaseAdmin
+            const { data: roleData, error: roleError } = await supabaseAdmin
               .from('roles')
               .select('permissions')
-              .eq('name', user.role_name)
+              .eq('name', roleName)
               .single()
             
             if (roleData?.permissions) {
               userPermissions = roleData.permissions
+              console.log(`[AUTH] Permissões carregadas do banco para role="${roleName}":`, Object.keys(roleData.permissions).length, 'permissões')
+            } else {
+              console.log(`[AUTH] Perfil "${roleName}" não encontrado no banco. Usando fallback.`, roleError?.message)
             }
           }
 
           // Se não encontrou no banco, usar permissões padrão baseadas no role
           if (Object.keys(userPermissions).length === 0) {
-            userPermissions = getDefaultPermissions(user.role_name || user.role)
+            console.log(`[AUTH] Usando permissões padrão (fallback) para role="${roleName}"`)
+            userPermissions = getDefaultPermissions(roleName)
           }
 
           console.log('Login successful for:', credentials.email)
