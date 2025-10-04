@@ -275,12 +275,12 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
           onClick={() => !showForm && onClose()}
         />
         
-        <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full max-w-xs sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-2 sm:mx-0">
+        <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full max-w-xs sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-2 sm:mx-0">
           {/* Header - Responsivo */}
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-4 sm:px-6 py-3 sm:py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2 sm:space-x-3">
-                <div className="bg-white/20 p-1.5 sm:p-2 rounded-lg">
+                <div className="bg-white/20 p-1.5 sm:p-2 rounded-2xl">
                   <Circle className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
                 <div>
@@ -322,7 +322,7 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                           slug: !editingStatus ? generateSlug(e.target.value) : formData.slug
                         })
                       }}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                       placeholder="Ex: Em Progresso"
                     />
                   </div>
@@ -336,7 +336,7 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                       required
                       value={formData.slug}
                       onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                       placeholder="em-progresso"
                     />
                   </div>
@@ -356,7 +356,7 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                         type="text"
                         value={formData.color}
                         onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                        className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       />
                     </div>
                   </div>
@@ -404,7 +404,7 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       rows={3}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                       placeholder="Descrição do status..."
                     />
                   </div>
@@ -427,13 +427,13 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                         is_internal: false
                       })
                     }}
-                    className="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm"
+                    className="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
-                    className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center space-x-2 text-sm"
+                    className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 flex items-center justify-center space-x-2 text-sm"
                   >
                     <Save className="h-4 w-4" />
                     <span>{editingStatus ? 'Atualizar' : 'Criar'} Status</span>
@@ -449,7 +449,7 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                   </h4>
                   <button
                     onClick={() => setShowForm(true)}
-                    className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center sm:justify-start space-x-2 text-sm"
+                    className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 flex items-center justify-center sm:justify-start space-x-2 text-sm"
                   >
                     <Plus className="h-4 w-4" />
                     <span>Adicionar</span>
@@ -472,7 +472,7 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                     {statuses.map((status, index) => (
                       <div
                         key={status.id}
-                        className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 sm:p-4 border border-gray-200 dark:border-gray-600"
+                        className="bg-gray-50 dark:bg-gray-700/50 rounded-2xl p-3 sm:p-4 border border-gray-200 dark:border-gray-600"
                       >
                         {/* Mobile Layout */}
                         <div className="flex flex-col sm:hidden space-y-3">
@@ -504,7 +504,7 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                                 <MoreVertical className="h-5 w-5" />
                               </button>
                               {openMenuId === status.id && (
-                                <div className="absolute right-0 top-8 z-10 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 w-40">
+                                <div className="absolute right-0 top-8 z-10 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 py-1 w-40">
                                   {index > 0 && (
                                     <button
                                       onClick={() => {
@@ -651,14 +651,14 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
                           <div className="flex items-center space-x-2 ml-4">
                             <button
                               onClick={() => handleEdit(status)}
-                              className="p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                              className="p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20 rounded-2xl transition-colors"
                               title="Editar"
                             >
                               <Edit2 className="h-4 w-4" />
                             </button>
                             <button
                               onClick={() => handleDelete(status.id)}
-                              className="p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                              className="p-2 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 rounded-2xl transition-colors"
                               title="Excluir"
                             >
                               <Trash2 className="h-4 w-4" />
@@ -678,7 +678,7 @@ export default function StatusManagementModal({ isOpen, onClose }: StatusManagem
             <div className="bg-gray-50 dark:bg-gray-900 px-4 sm:px-6 py-3 border-t border-gray-200 dark:border-gray-700">
               <button
                 onClick={onClose}
-                className="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm"
+                className="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm"
               >
                 Fechar
               </button>

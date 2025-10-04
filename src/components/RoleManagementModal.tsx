@@ -636,7 +636,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
       {/* Modal */}
       <div className="fixed inset-0 z-50 overflow-y-auto">
         <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-          <div className="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-6xl">
+          <div className="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-6xl">
                 <div className="bg-white dark:bg-gray-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                   <div className="sm:flex sm:items-start">
                     <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30 sm:mx-0 sm:h-10 sm:w-10">
@@ -650,7 +650,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           Configure os perfis de usuário e suas permissões no sistema
                         </p>
-                        <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-200 dark:border-blue-800">
                           <p className="text-xs text-blue-800 dark:text-blue-200 flex items-start gap-2">
                             <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
                             <span>
@@ -679,7 +679,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                         <div className="flex gap-2">
                           <button
                             onClick={() => setIsCreating(true)}
-                            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-2xl hover:bg-purple-700 transition-colors"
                           >
                             <Plus className="h-5 w-5" />
                             Criar Novo Perfil
@@ -695,7 +695,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                                 toast.error('Erro ao limpar cache')
                               }
                             }}
-                            className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                            className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-600 text-white rounded-2xl hover:bg-gray-700 transition-colors"
                             title="Limpar cache de permissões"
                           >
                             <Database className="h-5 w-5" />
@@ -706,7 +706,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
 
                       {/* Formulário de criação */}
                       {isCreating && (
-                        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-4">
+                        <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-4 space-y-4">
                           <h4 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <Plus className="h-5 w-5" />
                             Novo Perfil
@@ -722,7 +722,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                                 value={newRole.name}
                                 onChange={(e) => setNewRole({ ...newRole, name: e.target.value })}
                                 placeholder="ex: supervisor"
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                               />
                             </div>
                             
@@ -735,7 +735,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                                 value={newRole.display_name}
                                 onChange={(e) => setNewRole({ ...newRole, display_name: e.target.value })}
                                 placeholder="ex: Supervisor"
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                               />
                             </div>
                             
@@ -748,7 +748,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                                 value={newRole.description}
                                 onChange={(e) => setNewRole({ ...newRole, description: e.target.value })}
                                 placeholder="ex: Supervisiona equipes"
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                               />
                             </div>
                           </div>
@@ -757,7 +757,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                           <div className="space-y-6">
                             <h5 className="font-medium text-gray-900 dark:text-white">Permissões</h5>
                             {Object.entries(groupPermissions(newRole.permissions!)).map(([group, perms]) => (
-                              <div key={group} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                              <div key={group} className="border border-gray-200 dark:border-gray-700 rounded-2xl p-4">
                                 <h6 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                                   {group === 'Tickets' && <FileText className="h-4 w-4" />}
                                   {group === 'Base de Conhecimento' && <Eye className="h-4 w-4" />}
@@ -771,7 +771,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                                       key={perm}
                                       className="relative group"
                                     >
-                                      <label className="flex items-start gap-2 cursor-pointer p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                      <label className="flex items-start gap-2 cursor-pointer p-2 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                                         <input
                                           type="checkbox"
                                           checked={newRole.permissions![perm as keyof Role['permissions']]}
@@ -789,7 +789,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                                       </label>
                                       
                                       {/* Tooltip completo */}
-                                      <div className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded-lg p-3 w-64 bottom-full left-0 mb-2 pointer-events-none">
+                                      <div className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded-2xl p-3 w-64 bottom-full left-0 mb-2 pointer-events-none">
                                         <div className="font-semibold mb-1">{getPermissionLabel(perm)}</div>
                                         <div>{getPermissionTooltip(perm)}</div>
                                         <div className="absolute bottom-0 left-6 transform translate-y-1/2 rotate-45 w-2 h-2 bg-gray-900"></div>
@@ -805,7 +805,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                             <button
                               onClick={handleCreateRole}
                               disabled={saving}
-                              className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                              className="flex-1 px-4 py-2 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-colors disabled:opacity-50"
                             >
                               {saving ? 'Salvando...' : 'Criar Perfil'}
                             </button>
@@ -819,7 +819,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                                   permissions: { ...defaultPermissions }
                                 })
                               }}
-                              className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                              className="px-4 py-2 bg-gray-500 text-white rounded-2xl hover:bg-gray-600 transition-colors"
                             >
                               Cancelar
                             </button>
@@ -830,10 +830,10 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                       {/* Lista de perfis existentes */}
                       <div className="space-y-4">
                         {roles.map(role => (
-                          <div key={role.id} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                          <div key={role.id} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-4">
                             <div className="flex items-start justify-between mb-4">
                               <div className="flex items-start gap-3">
-                                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-2xl">
                                   <Shield className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                                 </div>
                                 <div>
@@ -858,13 +858,13 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                                     <button
                                       onClick={() => handleSaveRole(editingRole)}
                                       disabled={saving}
-                                      className="p-2 text-green-600 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-colors"
+                                      className="p-2 text-green-600 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-2xl transition-colors"
                                     >
                                       <Save className="h-5 w-5" />
                                     </button>
                                     <button
                                       onClick={() => setEditingRole(null)}
-                                      className="p-2 text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                                      className="p-2 text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-2xl transition-colors"
                                     >
                                       <X className="h-5 w-5" />
                                     </button>
@@ -906,14 +906,14 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                                           permissions: updatedPermissions
                                         })
                                       }}
-                                      className="p-2 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                                      className="p-2 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-2xl transition-colors"
                                     >
                                       <Edit2 className="h-5 w-5" />
                                     </button>
                                     {!role.is_system && (
                                       <button
                                         onClick={() => handleDeleteRole(role.id)}
-                                        className="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                                        className="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-2xl transition-colors"
                                       >
                                         <Trash2 className="h-5 w-5" />
                                       </button>
@@ -927,7 +927,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                             {editingRole?.id === role.id ? (
                               <div className="space-y-6">
                                 {Object.entries(groupPermissions(editingRole.permissions)).map(([group, perms]) => (
-                                  <div key={group} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                  <div key={group} className="border border-gray-200 dark:border-gray-700 rounded-2xl p-4">
                                     <h6 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                                       {group === 'Tickets' && <FileText className="h-4 w-4" />}
                                       {group === 'Base de Conhecimento' && <Eye className="h-4 w-4" />}
@@ -941,7 +941,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                                           key={perm}
                                           className="relative group"
                                         >
-                                          <label className="flex items-start gap-2 cursor-pointer p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                          <label className="flex items-start gap-2 cursor-pointer p-2 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                                             <input
                                               type="checkbox"
                                               checked={editingRole.permissions[perm as keyof Role['permissions']]}
@@ -960,7 +960,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                                           </label>
                                           
                                           {/* Tooltip completo */}
-                                          <div className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded-lg p-3 w-64 bottom-full left-0 mb-2 pointer-events-none">
+                                          <div className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded-2xl p-3 w-64 bottom-full left-0 mb-2 pointer-events-none">
                                             <div className="font-semibold mb-1">{getPermissionLabel(perm)}</div>
                                             <div>{getPermissionTooltip(perm)}</div>
                                             <div className="absolute bottom-0 left-6 transform translate-y-1/2 rotate-45 w-2 h-2 bg-gray-900"></div>
@@ -980,7 +980,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
                                     if (activePerms.length === 0) return null
                                     
                                     return (
-                                      <div key={group} className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3">
+                                      <div key={group} className="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-3">
                                         <h6 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1">
                                           {group === 'Tickets' && <FileText className="h-3 w-3" />}
                                           {group === 'Base de Conhecimento' && <Eye className="h-3 w-3" />}

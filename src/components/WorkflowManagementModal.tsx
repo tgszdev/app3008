@@ -276,7 +276,7 @@ export default function WorkflowManagementModal({ isOpen, onClose }: { isOpen: b
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+      <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             Automação de Workflows
@@ -309,7 +309,7 @@ export default function WorkflowManagementModal({ isOpen, onClose }: { isOpen: b
                   {rules.map(rule => (
                     <div
                       key={rule.id}
-                      className="p-4 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                      className="p-4 border rounded-2xl bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">

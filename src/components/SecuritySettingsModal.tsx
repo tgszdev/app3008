@@ -159,7 +159,7 @@ export default function SecuritySettingsModal({ isOpen, onClose }: SecuritySetti
       <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
         <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onClick={onClose} />
         
-        <div className="inline-block w-full max-w-4xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 rounded-lg shadow-xl">
+        <div className="inline-block w-full max-w-4xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
             <div className="flex items-center justify-between">
@@ -182,7 +182,7 @@ export default function SecuritySettingsModal({ isOpen, onClose }: SecuritySetti
             ) : (
               <div className="space-y-6">
                 {/* Políticas de Senha */}
-                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                <div className="border border-gray-200 dark:border-gray-700 rounded-2xl p-4">
                   <h3 className="text-lg font-semibold mb-4 flex items-center">
                     <Key className="w-5 h-5 mr-2 text-blue-600" />
                     Políticas de Senha
@@ -199,7 +199,7 @@ export default function SecuritySettingsModal({ isOpen, onClose }: SecuritySetti
                         max="32"
                         value={settings.passwordMinLength}
                         onChange={(e) => setSettings({...settings, passwordMinLength: parseInt(e.target.value)})}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                     
@@ -212,7 +212,7 @@ export default function SecuritySettingsModal({ isOpen, onClose }: SecuritySetti
                         min="0"
                         value={settings.passwordExpirationDays}
                         onChange={(e) => setSettings({...settings, passwordExpirationDays: parseInt(e.target.value)})}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-blue-500"
                         placeholder="0 = sem expiração"
                       />
                     </div>
@@ -262,7 +262,7 @@ export default function SecuritySettingsModal({ isOpen, onClose }: SecuritySetti
                 </div>
 
                 {/* Políticas de Sessão */}
-                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                <div className="border border-gray-200 dark:border-gray-700 rounded-2xl p-4">
                   <h3 className="text-lg font-semibold mb-4 flex items-center">
                     <Clock className="w-5 h-5 mr-2 text-blue-600" />
                     Políticas de Sessão
@@ -278,7 +278,7 @@ export default function SecuritySettingsModal({ isOpen, onClose }: SecuritySetti
                         min="5"
                         value={settings.sessionTimeout}
                         onChange={(e) => setSettings({...settings, sessionTimeout: parseInt(e.target.value)})}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                     
@@ -292,7 +292,7 @@ export default function SecuritySettingsModal({ isOpen, onClose }: SecuritySetti
                         max="10"
                         value={settings.maxConcurrentSessions}
                         onChange={(e) => setSettings({...settings, maxConcurrentSessions: parseInt(e.target.value)})}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                   </div>
@@ -311,7 +311,7 @@ export default function SecuritySettingsModal({ isOpen, onClose }: SecuritySetti
                 </div>
 
                 {/* Políticas de Bloqueio */}
-                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                <div className="border border-gray-200 dark:border-gray-700 rounded-2xl p-4">
                   <h3 className="text-lg font-semibold mb-4 flex items-center">
                     <Lock className="w-5 h-5 mr-2 text-blue-600" />
                     Políticas de Bloqueio
@@ -328,7 +328,7 @@ export default function SecuritySettingsModal({ isOpen, onClose }: SecuritySetti
                         max="10"
                         value={settings.maxLoginAttempts}
                         onChange={(e) => setSettings({...settings, maxLoginAttempts: parseInt(e.target.value)})}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                     
@@ -341,14 +341,14 @@ export default function SecuritySettingsModal({ isOpen, onClose }: SecuritySetti
                         min="5"
                         value={settings.lockoutDuration}
                         onChange={(e) => setSettings({...settings, lockoutDuration: parseInt(e.target.value)})}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* Auditoria */}
-                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                <div className="border border-gray-200 dark:border-gray-700 rounded-2xl p-4">
                   <h3 className="text-lg font-semibold mb-4 flex items-center">
                     <AlertTriangle className="w-5 h-5 mr-2 text-blue-600" />
                     Auditoria e Logs
@@ -375,7 +375,7 @@ export default function SecuritySettingsModal({ isOpen, onClose }: SecuritySetti
                           min="30"
                           value={settings.auditLogRetentionDays}
                           onChange={(e) => setSettings({...settings, auditLogRetentionDays: parseInt(e.target.value)})}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-2xl focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
                     )}
@@ -383,7 +383,7 @@ export default function SecuritySettingsModal({ isOpen, onClose }: SecuritySetti
                 </div>
 
                 {/* Restrições de IP */}
-                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                <div className="border border-gray-200 dark:border-gray-700 rounded-2xl p-4">
                   <h3 className="text-lg font-semibold mb-4 flex items-center">
                     <Shield className="w-5 h-5 mr-2 text-blue-600" />
                     Restrições de IP
@@ -409,11 +409,11 @@ export default function SecuritySettingsModal({ isOpen, onClose }: SecuritySetti
                             value={newWhitelistIP}
                             onChange={(e) => setNewWhitelistIP(e.target.value)}
                             placeholder="Ex: 192.168.1.1"
-                            className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 px-3 py-2 border rounded-2xl focus:ring-2 focus:ring-blue-500"
                           />
                           <button
                             onClick={addWhitelistIP}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                            className="px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700"
                           >
                             Adicionar
                           </button>
@@ -455,11 +455,11 @@ export default function SecuritySettingsModal({ isOpen, onClose }: SecuritySetti
                             value={newBlacklistIP}
                             onChange={(e) => setNewBlacklistIP(e.target.value)}
                             placeholder="Ex: 10.0.0.1"
-                            className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 px-3 py-2 border rounded-2xl focus:ring-2 focus:ring-blue-500"
                           />
                           <button
                             onClick={addBlacklistIP}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                            className="px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700"
                           >
                             Adicionar
                           </button>
@@ -484,7 +484,7 @@ export default function SecuritySettingsModal({ isOpen, onClose }: SecuritySetti
 
                 {/* Mensagens */}
                 {message && (
-                  <div className={`p-3 rounded-lg ${
+                  <div className={`p-3 rounded-2xl ${
                     message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                   }`}>
                     {message.text}
@@ -498,14 +498,14 @@ export default function SecuritySettingsModal({ isOpen, onClose }: SecuritySetti
           <div className="bg-gray-50 dark:bg-gray-900 px-6 py-4 flex justify-end space-x-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               Cancelar
             </button>
             <button
               onClick={handleSave}
               disabled={saving}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center"
+              className="px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 disabled:opacity-50 flex items-center"
             >
               {saving ? (
                 <>

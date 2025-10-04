@@ -372,7 +372,7 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div>
@@ -401,7 +401,7 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
                 </h3>
                 <button
                   onClick={() => setShowForm(true)}
-                  className="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-2xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Nova Regra
@@ -423,7 +423,7 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
                   {rules.map((rule) => (
                     <div
                       key={rule.id}
-                      className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
+                      className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4 border border-gray-200 dark:border-gray-600"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -676,7 +676,7 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
                     
                     <div className="space-y-4">
                       {actions.map(action => (
-                        <div key={action.id} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                        <div key={action.id} className="border border-gray-200 dark:border-gray-600 rounded-2xl p-4">
                           <label className="flex items-center">
                             <input
                               type="checkbox"
@@ -948,14 +948,14 @@ export default function EscalationManagementModal({ isOpen, onClose }: Escalatio
                   <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <button
                       onClick={resetForm}
-                      className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                      className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-2xl hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                     >
                       Cancelar
                     </button>
                     <button
                       onClick={editingRule ? handleUpdate : handleCreate}
                       disabled={loading || !form.name || !form.time_threshold}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {loading ? 'Salvando...' : (editingRule ? 'Atualizar' : 'Criar')}
                     </button>

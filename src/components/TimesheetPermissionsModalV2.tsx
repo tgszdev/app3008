@@ -218,7 +218,7 @@ export default function TimesheetPermissionsModalV2({ isOpen, onClose }: Timeshe
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-900 rounded-lg w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="p-6 border-b dark:border-gray-700 flex justify-between items-center">
           <div>
@@ -232,7 +232,7 @@ export default function TimesheetPermissionsModalV2({ isOpen, onClose }: Timeshe
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl transition-colors"
           >
             <X className="w-5 h-5" />
           </button>

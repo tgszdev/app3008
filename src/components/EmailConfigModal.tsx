@@ -120,7 +120,7 @@ export default function EmailConfigModal({ isOpen, onClose, onSqlError }: EmailC
         />
 
         {/* Modal panel */}
-        <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
+        <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
           {/* Header */}
           <div className="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div className="flex items-center justify-between mb-4">
@@ -145,7 +145,7 @@ export default function EmailConfigModal({ isOpen, onClose, onSqlError }: EmailC
             ) : (
               <div className="space-y-4">
                 {/* Info sobre Gmail */}
-                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-2xl">
                   <p className="text-sm text-blue-800 dark:text-blue-200">
                     <strong>Para Gmail:</strong> Use uma senha de app, não sua senha normal.
                     <a 
@@ -170,7 +170,7 @@ export default function EmailConfigModal({ isOpen, onClose, onSqlError }: EmailC
                       value={emailConfig.host}
                       onChange={(e) => setEmailConfig({ ...emailConfig, host: e.target.value })}
                       placeholder="smtp.gmail.com"
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                   
@@ -181,7 +181,7 @@ export default function EmailConfigModal({ isOpen, onClose, onSqlError }: EmailC
                     <select
                       value={emailConfig.port}
                       onChange={(e) => setEmailConfig({ ...emailConfig, port: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="587">587 (TLS/STARTTLS)</option>
                       <option value="465">465 (SSL)</option>
@@ -198,7 +198,7 @@ export default function EmailConfigModal({ isOpen, onClose, onSqlError }: EmailC
                       value={emailConfig.user}
                       onChange={(e) => setEmailConfig({ ...emailConfig, user: e.target.value })}
                       placeholder="seu-email@gmail.com"
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                   
@@ -212,7 +212,7 @@ export default function EmailConfigModal({ isOpen, onClose, onSqlError }: EmailC
                         value={emailConfig.pass}
                         onChange={(e) => setEmailConfig({ ...emailConfig, pass: e.target.value })}
                         placeholder="Senha de 16 caracteres"
-                        className="w-full px-4 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                       <button
                         type="button"
@@ -233,7 +233,7 @@ export default function EmailConfigModal({ isOpen, onClose, onSqlError }: EmailC
                       value={emailConfig.from}
                       onChange={(e) => setEmailConfig({ ...emailConfig, from: e.target.value })}
                       placeholder="noreply@seudominio.com"
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       Deixe vazio para usar o email do usuário
@@ -249,7 +249,7 @@ export default function EmailConfigModal({ isOpen, onClose, onSqlError }: EmailC
                       value={emailConfig.fromName}
                       onChange={(e) => setEmailConfig({ ...emailConfig, fromName: e.target.value })}
                       placeholder="Sistema de Suporte"
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -276,7 +276,7 @@ export default function EmailConfigModal({ isOpen, onClose, onSqlError }: EmailC
               <button
                 onClick={handleSave}
                 disabled={saving || !emailConfig.user || !emailConfig.pass}
-                className="w-full inline-flex justify-center items-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+                className="w-full inline-flex justify-center items-center rounded-2xl border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
               >
                 {saving ? (
                   <Loader2 className="h-5 w-5 mr-2 animate-spin" />
@@ -288,7 +288,7 @@ export default function EmailConfigModal({ isOpen, onClose, onSqlError }: EmailC
               <button
                 onClick={handleTestEmail}
                 disabled={testingEmail || !emailConfig.user || !emailConfig.pass}
-                className="mt-3 w-full inline-flex justify-center items-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+                className="mt-3 w-full inline-flex justify-center items-center rounded-2xl border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
               >
                 {testingEmail ? (
                   <Loader2 className="h-5 w-5 mr-2 animate-spin" />
@@ -299,7 +299,7 @@ export default function EmailConfigModal({ isOpen, onClose, onSqlError }: EmailC
               </button>
               <button
                 onClick={onClose}
-                className="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-sm"
+                className="mt-3 w-full inline-flex justify-center rounded-2xl border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-sm"
               >
                 Cancelar
               </button>

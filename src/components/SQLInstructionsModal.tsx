@@ -53,7 +53,7 @@ export default function SQLInstructionsModal({
         />
         
         {/* Modal */}
-        <div className="relative z-50 w-full max-w-4xl bg-white dark:bg-gray-800 rounded-lg shadow-xl">
+        <div className="relative z-50 w-full max-w-4xl bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3">
@@ -92,7 +92,7 @@ export default function SQLInstructionsModal({
               </h3>
               <button
                 onClick={handleCopy}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl transition-colors"
               >
                 {copied ? (
                   <>
@@ -109,14 +109,14 @@ export default function SQLInstructionsModal({
             </div>
             
             <div className="relative">
-              <pre className="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 overflow-x-auto">
+              <pre className="bg-gray-100 dark:bg-gray-900 rounded-2xl p-4 overflow-x-auto">
                 <code className="text-sm text-gray-800 dark:text-gray-200 font-mono">
                   {sql}
                 </code>
               </pre>
             </div>
             
-            <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+            <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-2xl">
               <p className="text-sm text-yellow-800 dark:text-yellow-200">
                 <strong>⚠️ Importante:</strong> Execute este script apenas uma vez. 
                 O script já contém verificação IF NOT EXISTS para evitar duplicação.
@@ -130,7 +130,7 @@ export default function SQLInstructionsModal({
               href="https://supabase.com/dashboard/project/eyfvvximmeqmwdfqzqov/sql/new"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-2xl transition-colors flex items-center gap-2"
             >
               <Database className="h-4 w-4" />
               Abrir SQL Editor
@@ -138,7 +138,7 @@ export default function SQLInstructionsModal({
             
             <button
               onClick={onClose}
-              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors"
+              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-2xl transition-colors"
             >
               Fechar
             </button>

@@ -539,7 +539,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
         />
 
         {/* Modal panel */}
-        <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full">
+        <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full">
           {/* Header */}
           <div className="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-4">
@@ -566,13 +566,13 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                   placeholder="Buscar categorias..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               <select
                 value={organizationFilter}
                 onChange={(e) => setOrganizationFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-[200px]"
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-[200px]"
               >
                 <option value="">Todas as organizações</option>
                 <option value="global">Categorias Globais</option>
@@ -597,7 +597,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                   })
                   setShowCategoryModal(true)
                 }}
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors"
               >
                 <Plus className="h-5 w-5 mr-2" />
                 Nova Categoria
@@ -609,7 +609,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
           <div className="px-4 py-5 sm:p-6 max-h-[60vh] overflow-y-auto">
             {/* Resumo das categorias */}
             {!loading && categories.length > 0 && (
-              <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-2xl">
                 <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
                   Resumo das Categorias
                 </h4>
@@ -667,12 +667,12 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                   return (
                     <div
                       key={category.id}
-                      className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow"
+                      className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 hover:shadow-md transition-shadow"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                           <div
-                            className="h-10 w-10 rounded-lg flex items-center justify-center"
+                            className="h-10 w-10 rounded-2xl flex items-center justify-center"
                             style={{ backgroundColor: `${category.color}20` }}
                           >
                             <Icon className="h-5 w-5" style={{ color: category.color }} />
@@ -770,7 +770,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
           <div className="bg-gray-50 dark:bg-gray-900 px-4 py-3 sm:px-6 border-t border-gray-200 dark:border-gray-700">
             <button
               onClick={onClose}
-              className="w-full sm:w-auto inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="w-full sm:w-auto inline-flex justify-center rounded-2xl border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               Fechar
             </button>
@@ -788,7 +788,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                   setShowIconDropdown(false)
                 }}
               />
-              <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+              <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <form onSubmit={handleSubmit}>
                   <div className="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
@@ -812,7 +812,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                               slug: editingCategory ? formData.slug : generateSlug(e.target.value)
                             })
                           }}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
 
@@ -826,7 +826,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                           required
                           value={formData.slug}
                           onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
 
@@ -839,7 +839,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                           value={formData.description}
                           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                           rows={3}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
 
@@ -904,7 +904,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                 value={formData.context_id}
                                 onChange={(e) => setFormData({ ...formData, context_id: e.target.value })}
                                 required={!formData.is_global}
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                               >
                                 <option value="">Selecione uma organização/departamento</option>
                                 {contexts.map((context) => (
@@ -925,7 +925,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                             <select
                               value={formData.parent_category_id}
                               onChange={(e) => setFormData({ ...formData, parent_category_id: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                             >
                               <option value="">Nenhuma (categoria raiz)</option>
                               {categories
@@ -949,7 +949,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                             <button
                               type="button"
                               onClick={() => setShowIconDropdown(!showIconDropdown)}
-                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 flex items-center justify-between"
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 flex items-center justify-between"
                             >
                               <div className="flex items-center space-x-2">
                                 {formData.icon ? (
@@ -976,7 +976,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                                 />
                                 
                                 {/* Modal Minimalista */}
-                                <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl h-[700px] overflow-hidden">
+                                <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-4xl h-[700px] overflow-hidden">
                                   {/* Header Simples */}
                                   <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
                                     <h3 className="text-lg font-medium text-gray-900 dark:text-white">Selecionar Ícone</h3>
@@ -1049,7 +1049,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                             type="color"
                             value={formData.color}
                             onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                            className="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-lg"
+                            className="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-2xl"
                           />
                         </div>
                       </div>
@@ -1072,7 +1072,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                   <div className="bg-gray-50 dark:bg-gray-900 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                     <button
                       type="submit"
-                      className="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                      className="w-full inline-flex justify-center rounded-2xl border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
                     >
                       {editingCategory ? 'Atualizar' : 'Criar'}
                     </button>
@@ -1082,7 +1082,7 @@ export default function CategoryManagementModal({ isOpen, onClose }: CategoryMan
                         setShowCategoryModal(false)
                                         setShowIconDropdown(false)
                       }}
-                      className="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                      className="mt-3 w-full inline-flex justify-center rounded-2xl border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                     >
                       Cancelar
                     </button>
