@@ -411,6 +411,11 @@ export default function TicketsPage() {
     // Para usuários multi-cliente (matrix type), só buscar se houver clientes selecionados
     const userType = (session?.user as any)?.userType
     
+    // Evitar re-fetch se não há sessão ainda
+    if (!session?.user?.id) {
+      return
+    }
+    
     if (userType === 'context') {
       // Usuário de contexto único: sempre buscar tickets do seu contexto
       fetchTickets()
@@ -425,7 +430,7 @@ export default function TicketsPage() {
       setAllTickets([])
       setLoading(false)
     }
-  }, [statusFilter, priorityFilter, selectedClients, myTicketsOnly, periodFilter, session])
+  }, [statusFilter, priorityFilter, selectedClients, myTicketsOnly, periodFilter])
 
   const handleDeleteTicket = async (ticketId: string) => {
     if (!confirm('Tem certeza que deseja excluir este chamado?')) return
