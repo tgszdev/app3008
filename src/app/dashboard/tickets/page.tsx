@@ -703,31 +703,35 @@ export default function TicketsPage() {
             <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-transparent via-yellow-500/20 to-transparent animate-pulse"></div>
           </button>
           
-          {/* Botão Export PDF */}
-          <button
-            onClick={handleExportPDF}
-            disabled={isGeneratingPDF}
-            className="w-full sm:w-auto sm:min-w-[180px] h-10 flex items-center justify-center gap-2 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden whitespace-nowrap"
-          >
-            {isGeneratingPDF ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <FileDown className="h-4 w-4 flex-shrink-0" />
-            )}
-            <span className="text-sm font-medium">
-              {isGeneratingPDF ? 'Gerando...' : 'Exportar PDF'}
-            </span>
-            <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-transparent via-purple-500/20 to-transparent animate-pulse"></div>
-          </button>
+          {/* Botão Export PDF - APENAS se tem permissão */}
+          {hasPermission('tickets_export') && (
+            <button
+              onClick={handleExportPDF}
+              disabled={isGeneratingPDF}
+              className="w-full sm:w-auto sm:min-w-[180px] h-10 flex items-center justify-center gap-2 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden whitespace-nowrap"
+            >
+              {isGeneratingPDF ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <FileDown className="h-4 w-4 flex-shrink-0" />
+              )}
+              <span className="text-sm font-medium">
+                {isGeneratingPDF ? 'Gerando...' : 'Exportar PDF'}
+              </span>
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-transparent via-purple-500/20 to-transparent animate-pulse"></div>
+            </button>
+          )}
 
-          {/* Botão Novo Chamado */}
-          <Link
-            href="/dashboard/tickets/new"
-            className="w-full sm:w-auto sm:min-w-[180px] h-10 flex items-center justify-center gap-2 px-3 sm:px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-3xl transition-all duration-300 whitespace-nowrap"
-          >
-            <Plus className="h-5 w-5" />
-            <span className="text-sm font-medium">Novo Chamado</span>
-          </Link>
+          {/* Botão Novo Chamado - APENAS se tem permissão */}
+          {hasPermission('tickets_create') && (
+            <Link
+              href="/dashboard/tickets/new"
+              className="w-full sm:w-auto sm:min-w-[180px] h-10 flex items-center justify-center gap-2 px-3 sm:px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-3xl transition-all duration-300 whitespace-nowrap"
+            >
+              <Plus className="h-5 w-5" />
+              <span className="text-sm font-medium">Novo Chamado</span>
+            </Link>
+          )}
         </div>
       </div>
 
