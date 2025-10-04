@@ -141,7 +141,7 @@ export default function NotificationBell() {
           />
           
           {/* Painel de notificações */}
-          <div className="notification-panel fixed sm:absolute top-20 sm:top-auto left-2 right-2 sm:left-auto sm:right-0 sm:mt-2 sm:w-96 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 z-[9999]">
+          <div className="notification-panel fixed sm:absolute top-20 sm:top-auto left-2 right-2 sm:left-auto sm:right-0 sm:mt-2 sm:w-96 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 z-[10001]">
           {/* Header */}
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">

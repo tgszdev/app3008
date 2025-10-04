@@ -6,8 +6,8 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import { useProtectedSession } from '@/hooks/useProtectedSession'
-import { useIdleTimeout } from '@/hooks/useIdleTimeout'
-import { IdleWarningModal } from '@/components/IdleWarningModal'
+// import { useIdleTimeout } from '@/hooks/useIdleTimeout'
+// import { IdleWarningModal } from '@/components/IdleWarningModal'
 import { OrganizationSelector } from '@/components/OrganizationSelector'
 import {
   Home,
@@ -132,19 +132,19 @@ export default function DashboardLayout({
     redirectTo: '/login?reason=session_invalidated'
   })
 
-  // Idle timeout (60 minutos de inatividade)
-  const { 
-    isWarning, 
-    remainingSeconds, 
-    resetIdleTimer 
-  } = useIdleTimeout({
-    timeout: 60 * 60 * 1000,        // 60 minutos
-    warningTime: 5 * 60 * 1000,     // Avisa 5 minutos antes
-    enabled: status === 'authenticated',
-    onIdle: () => {
-      signOut({ callbackUrl: '/login?reason=idle_timeout' })
-    }
-  })
+  // Idle timeout (60 minutos de inatividade) - DESABILITADO TEMPORARIAMENTE
+  // const { 
+  //   isWarning, 
+  //   remainingSeconds, 
+  //   resetIdleTimer 
+  // } = useIdleTimeout({
+  //   timeout: 60 * 60 * 1000,        // 60 minutos
+  //   warningTime: 5 * 60 * 1000,     // Avisa 5 minutos antes
+  //   enabled: status === 'authenticated',
+  //   onIdle: () => {
+  //     signOut({ callbackUrl: '/login?reason=idle_timeout' })
+  //   }
+  // })
 
   
   // Sidebar is always in sticky mode (64px wide)
@@ -407,13 +407,15 @@ export default function DashboardLayout({
         </main>
       </div>
 
-      {/* Idle Warning Modal */}
-      <IdleWarningModal
-        isOpen={isWarning}
-        remainingSeconds={remainingSeconds}
-        onContinue={resetIdleTimer}
-        onLogout={() => signOut({ callbackUrl: '/login?reason=idle_timeout' })}
-      />
+      {/* Idle Warning Modal - DESABILITADO TEMPORARIAMENTE */}
+      {/* {isWarning && (
+        <IdleWarningModal
+          isOpen={isWarning}
+          remainingSeconds={remainingSeconds}
+          onContinue={resetIdleTimer}
+          onLogout={() => signOut({ callbackUrl: '/login?reason=idle_timeout' })}
+        />
+      )} */}
     </div>
   )
 }

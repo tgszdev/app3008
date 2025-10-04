@@ -144,13 +144,13 @@ export function useIdleTimeout(options: UseIdleTimeoutOptions = {}) {
     }
 
     events.forEach(event => {
-      window.addEventListener(event, handleActivity, { passive: true })
+      window.addEventListener(event, handleActivity, { passive: true, capture: false })
     })
 
     // Cleanup
     return () => {
       events.forEach(event => {
-        window.removeEventListener(event, handleActivity)
+        window.removeEventListener(event, handleActivity, { capture: false })
       })
       clearTimers()
     }

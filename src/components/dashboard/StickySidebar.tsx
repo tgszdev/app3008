@@ -207,7 +207,7 @@ export function StickySidebar({ sections, isAdmin }: StickySidebarProps) {
         <div
           ref={menuRef}
           className={cn(
-            "fixed z-[9999] min-w-[220px] max-w-[300px] rounded-lg shadow-2xl",
+            "fixed z-[10001] min-w-[220px] max-w-[300px] rounded-lg shadow-2xl",
             "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700",
             "animate-in fade-in-0 zoom-in-95 duration-200 floating-menu-scrollbar"
           )}
