@@ -34,11 +34,7 @@ export default function RichTextEditor({
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
-        heading: {
-          levels: [1, 2, 3],
-        },
-      }),
+      StarterKit,
       Image.configure({
         inline: true,
         allowBase64: true, // Temporário durante upload
@@ -48,6 +44,7 @@ export default function RichTextEditor({
       }),
       Link.configure({
         openOnClick: false,
+        autolink: true,
         HTMLAttributes: {
           class: 'text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline cursor-pointer',
         },
