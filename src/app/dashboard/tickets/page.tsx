@@ -522,8 +522,8 @@ export default function TicketsPage() {
 
         {/* Botões de Ação - Responsivo */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          {/* Seletor de Clientes */}
-          {availableContexts && availableContexts.length > 0 && (
+          {/* Seletor de Clientes - só mostra se tiver mais de 1 cliente */}
+          {availableContexts && availableContexts.length > 1 && (
             <div className="w-full sm:w-auto relative" ref={clientSelectorRef}>
               <button
                 onClick={() => setShowClientSelector(!showClientSelector)}
