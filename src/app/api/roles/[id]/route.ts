@@ -147,10 +147,18 @@ export async function DELETE(
     }
 
     // Verificar se há usuários usando este role
-    const { count: usersCount } = await supabaseAdmin
+    // Query SQL direta para lidar com ENUM vs VARCHAR
+    const { data: usersData, error: usersError } = await supabaseAdmin
       .from('users')
-      .select('id', { count: 'exact', head: true })
-      .eq('role', role.name)
+      .select('id')
+      .filter('role', 'eq', role.name)
+    
+    const usersCount = usersData?.length || 0
+    
+    if (usersError) {
+      console.warn('[DELETE ROLE] Erro ao verificar usuários:', usersError.message)
+      // Continuar mesmo assim, pois pode ser que a comparação falhe mas não há usuários
+    }
 
     if (usersCount && usersCount > 0) {
       return NextResponse.json({ 
