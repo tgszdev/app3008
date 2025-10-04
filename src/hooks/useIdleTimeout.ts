@@ -102,11 +102,12 @@ export function useIdleTimeout(options: UseIdleTimeoutOptions = {}) {
   const resetIdleTimer = useCallback(() => {
     lastActivityRef.current = Date.now()
     
-    setState({
+    // Só atualiza estado se estava em warning
+    setState(prev => ({
       isIdle: false,
       isWarning: false,
       remainingTime: timeout
-    })
+    }))
     
     clearTimers()
 

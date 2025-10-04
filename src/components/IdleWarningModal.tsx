@@ -19,6 +19,9 @@ export function IdleWarningModal({
 }: IdleWarningModalProps) {
   const [progress, setProgress] = useState(100)
   
+  // Não renderizar nada se não estiver aberto
+  if (!isOpen) return null
+  
   const minutes = Math.floor(remainingSeconds / 60)
   const seconds = remainingSeconds % 60
 
@@ -29,18 +32,16 @@ export function IdleWarningModal({
     setProgress(progressPercentage)
   }, [remainingSeconds])
 
-  if (!isOpen) return null
-
   return (
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] animate-in fade-in duration-200"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] animate-in fade-in duration-200"
         onClick={onContinue}
       />
 
       {/* Modal */}
-      <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[101] w-full max-w-md animate-in zoom-in-95 fade-in duration-200">
+      <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[10000] w-full max-w-md animate-in zoom-in-95 fade-in duration-200">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border-2 border-yellow-400 dark:border-yellow-500 overflow-hidden">
           {/* Header com gradiente */}
           <div className="bg-gradient-to-r from-yellow-500 to-orange-500 p-6 text-white relative overflow-hidden">
