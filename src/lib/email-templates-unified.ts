@@ -195,13 +195,6 @@ u+#body a{color:inherit;text-decoration:none;font-size:inherit;font-family:inher
         <!-- Container -->
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="800" style="max-width:800px;background-color:#ffffff;border:1px solid #e0e0e0;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.08)">
           
-          <!-- Breadcrumb -->
-          <tr>
-            <td style="padding:16px 48px;background-color:#fafafa;border-bottom:1px solid #e0e0e0;font-size:13px;color:#666;font-weight:400">
-              ${data.client_name || 'Sistema'} <span style="color:#ccc;margin:0 6px">/</span> ${data.category || 'Geral'} <span style="color:#ccc;margin:0 6px">/</span> <span style="color:#333;font-weight:500">#${data.ticket_number}</span>
-            </td>
-          </tr>
-          
           <!-- Header -->
           <tr>
             <td style="padding:40px 48px 32px;background-color:#ffffff;border-bottom:1px solid #e0e0e0">
@@ -211,9 +204,6 @@ u+#body a{color:inherit;text-decoration:none;font-size:inherit;font-family:inher
                     <p style="margin:0 0 16px;font-size:13px;color:#999;font-weight:500;text-transform:uppercase;letter-spacing:0.5px">Nova Atividade</p>
                     <h1 style="margin:0 0 8px;font-size:32px;font-weight:700;color:#1a1a1a;letter-spacing:-0.5px">${title}</h1>
                     <p style="margin:0 0 4px;font-size:15px;color:#999;font-weight:400">Chamado <span style="color:#333;font-weight:600">#${data.ticket_number}</span></p>
-                    ${data.ticket_title ? `
-                    <p style="margin:12px 0 0;font-size:18px;color:#333;font-weight:600;line-height:1.4">${data.ticket_title}</p>
-                    ` : ''}
                     ${data.commenter_name || data.changed_by ? `
                     <p style="margin:8px 0 0;font-size:14px;color:#666">Por <span style="color:#333;font-weight:500">${data.commenter_name || data.changed_by}</span> • Agora mesmo</p>
                     ` : ''}
