@@ -95,14 +95,20 @@ export async function createAndSendNotification(notification: NotificationData) 
     
     if (preferences.email_enabled && typePreferences?.email && user.email) {
       try {
-        console.log('Tentando enviar email para:', user.email)
-        const result = await sendEmail({
+        console.log('Tentando enviar email para:', user.email, 'Tipo:', notification.type)
+        
+        // ✨ NOVO: Usar template rico baseado no tipo de notificação
+        const emailData: any = {
           to: user.email,
           title: notification.title,
           message: notification.message,
           actionUrl: notification.action_url,
-          actionText: 'Ver Detalhes'
-        })
+          actionText: 'Ver Detalhes',
+          type: notification.type, // Passar tipo para template engine decidir
+          data: notification.data // Dados extras para template rico
+        }
+        
+        const result = await sendEmail(emailData)
         console.log('Resultado do envio de email:', result)
         if (result.success) {
           console.log('✅ Email de notificação enviado com sucesso para:', user.email)

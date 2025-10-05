@@ -1,0 +1,245 @@
+{
+  "features": {
+    "staticAnalysis": {
+      "newFeatures": [
+        {
+          "file": "src/lib/email-templates-rich.ts",
+          "lines": 548,
+          "hasErrorHandling": false
+        },
+        {
+          "file": "src/lib/email-tracking.ts",
+          "lines": 162,
+          "hasErrorHandling": true
+        },
+        {
+          "file": "src/app/api/track/email/open/route.ts",
+          "lines": 63,
+          "hasErrorHandling": true
+        },
+        {
+          "file": "src/app/api/track/email/click/route.ts",
+          "lines": 44,
+          "hasErrorHandling": true
+        },
+        {
+          "file": "sql/create-email-tracking-tables.sql",
+          "lines": 108,
+          "hasErrorHandling": false
+        },
+        {
+          "feature": "new_comment_notification",
+          "implemented": true
+        }
+      ],
+      "codeQuality": [],
+      "issues": [
+        {
+          "file": "src/lib/email-templates-rich.ts",
+          "issue": "Sem tratamento de erro",
+          "severity": "MEDIUM"
+        },
+        {
+          "file": "sql/create-email-tracking-tables.sql",
+          "issue": "Sem tratamento de erro",
+          "severity": "MEDIUM"
+        }
+      ]
+    },
+    "database": {
+      "tables": {
+        "email_engagement": {
+          "exists": true,
+          "ready": true,
+          "count": 0
+        },
+        "email_link_clicks": {
+          "exists": true,
+          "ready": true,
+          "count": 0
+        },
+        "email_logs": {
+          "exists": true,
+          "ready": true,
+          "count": 0
+        }
+      },
+      "views": [
+        {
+          "name": "email_metrics",
+          "exists": true
+        }
+      ]
+    },
+    "e2e": {
+      "tests": [
+        {
+          "test": "User has notification preferences",
+          "status": "PASS",
+          "details": {
+            "email_enabled": true
+          }
+        }
+      ],
+      "ticket": "3c95f96e-0b84-4ff7-b3e0-e6aeba97bc3c"
+    },
+    "mutation": [
+      {
+        "name": "Comentário público em ticket próprio",
+        "expected": "Notificar responsável (se houver)",
+        "test": {
+          "is_internal": false,
+          "is_creator": true
+        }
+      },
+      {
+        "name": "Comentário público em ticket de outro",
+        "expected": "Notificar criador E responsável",
+        "test": {
+          "is_internal": false,
+          "is_creator": false
+        }
+      },
+      {
+        "name": "Comentário interno",
+        "expected": "Notificar apenas equipe (sem detalhes)",
+        "test": {
+          "is_internal": true,
+          "is_creator": false
+        }
+      },
+      {
+        "name": "Responsável comenta próprio ticket",
+        "expected": "Notificar criador",
+        "test": {
+          "is_internal": false,
+          "is_creator": false,
+          "is_assigned": true
+        }
+      }
+    ],
+    "security": [
+      {
+        "name": "Email Injection via tracking token",
+        "test": "Decodificar token malicioso",
+        "payload": "YWFhYWFhYWE8c2NyaXB0PmFsZXJ0KDEpPC9zY3JpcHQ+",
+        "expected": "Retornar null ou erro",
+        "severity": "HIGH"
+      },
+      {
+        "name": "XSS em conteúdo de comentário",
+        "test": "Comentário com <script>alert(1)</script>",
+        "payload": "<script>alert(document.cookie)</script>",
+        "expected": "HTML escapado no email",
+        "severity": "CRITICAL"
+      },
+      {
+        "name": "SQL Injection em tracking",
+        "test": "Token com: '; DROP TABLE email_logs; --",
+        "payload": "JzsgRFJPUCBUQUJMRSBlbWFpbF9sb2dzOyAtLQ==",
+        "expected": "Query parametrizada, não executa",
+        "severity": "CRITICAL"
+      },
+      {
+        "name": "Rate Limiting Bypass",
+        "test": "100 emails em 1 minuto",
+        "payload": "Multiple requests",
+        "expected": "Bloqueio após X emails/minuto",
+        "severity": "MEDIUM"
+      },
+      {
+        "name": "Email Spoofing",
+        "test": "Comentário fingindo ser admin",
+        "payload": "From: admin@system.com",
+        "expected": "Usar apenas dados autenticados",
+        "severity": "HIGH"
+      }
+    ],
+    "chaos": [
+      {
+        "scenario": "Banco de dados offline durante envio",
+        "impact": "Falha ao buscar preferências do usuário",
+        "mitigation": "Try/catch + usar preferências padrão",
+        "implemented": true
+      },
+      {
+        "scenario": "Provider de email retorna 500",
+        "impact": "Email não é enviado",
+        "mitigation": "Salvar em fila para retry",
+        "implemented": false
+      },
+      {
+        "scenario": "Timeout em request de tracking",
+        "impact": "Pixel de tracking não carrega",
+        "mitigation": "Não bloquear carregamento do email",
+        "implemented": true
+      },
+      {
+        "scenario": "Usuário não tem preferências",
+        "impact": "Não sabe se deve enviar email",
+        "mitigation": "Usar preferências padrão (enviar)",
+        "implemented": true
+      },
+      {
+        "scenario": "Template de email não existe",
+        "impact": "Erro ao renderizar",
+        "mitigation": "Fallback para template simples",
+        "implemented": false
+      }
+    ]
+  },
+  "tests": [
+    {
+      "name": "Email Injection via tracking token",
+      "category": "Security",
+      "status": "PASS",
+      "severity": "HIGH"
+    },
+    {
+      "name": "XSS em conteúdo de comentário",
+      "category": "Security",
+      "status": "PASS",
+      "severity": "CRITICAL"
+    },
+    {
+      "name": "SQL Injection em tracking",
+      "category": "Security",
+      "status": "PASS",
+      "severity": "CRITICAL"
+    },
+    {
+      "name": "Rate Limiting Bypass",
+      "category": "Security",
+      "status": "WARN",
+      "severity": "MEDIUM"
+    },
+    {
+      "name": "Email Spoofing",
+      "category": "Security",
+      "status": "WARN",
+      "severity": "HIGH"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "MEDIUM",
+      "category": "Chaos Engineering",
+      "issue": "Mitigação não implementada: Provider de email retorna 500",
+      "impact": "Email não é enviado"
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "Chaos Engineering",
+      "issue": "Mitigação não implementada: Template de email não existe",
+      "impact": "Erro ao renderizar"
+    }
+  ],
+  "metrics": {
+    "totalEmails": 0,
+    "emailsOpened": 0,
+    "emailsClicked": 0,
+    "avgTimeToOpen": 0,
+    "openRate": 0,
+    "clickRate": 0
+  }
+}
