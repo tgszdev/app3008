@@ -79,6 +79,7 @@ export async function createAndSendNotification(notification: NotificationData) 
     const typeMapping: Record<string, string> = {
       'ticket_status_changed': 'ticket_updated',
       'ticket_priority_changed': 'ticket_updated',
+      'new_comment': 'comment_added', // ✨ NOVO: Mapear new_comment para comment_added
       'test': 'ticket_updated' // Para testes, usar ticket_updated como padrão
     }
     

@@ -245,18 +245,53 @@ export async function sendNotificationEmail({
   title,
   message,
   actionUrl,
-  actionText = 'Ver Detalhes'
+  actionText = 'Ver Detalhes',
+  type,
+  data
 }: {
   to: string
   title: string
   message: string
   actionUrl?: string
   actionText?: string
+  type?: string
+  data?: any
 }) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
   const fullActionUrl = actionUrl ? `${baseUrl}${actionUrl}` : `${baseUrl}/dashboard`
 
-  const html = `
+  // ✨ USAR TEMPLATES RICOS baseado no tipo
+  const { generateEmailTemplate } = await import('./email-templates-rich')
+  const { generateTrackingPixel, makeTrackableLinkHtml } = await import('./email-tracking')
+  
+  let html: string
+  let subject: string = title
+  
+  try {
+    // Tentar usar template rico se tipo for reconhecido
+    if (type && data) {
+      const richTemplate = generateEmailTemplate(type as any, {
+        ...data,
+        baseUrl,
+        actionUrl: fullActionUrl,
+        actionText,
+        title,
+        message
+      })
+      
+      if (richTemplate) {
+        html = richTemplate
+        console.log('✅ Usando template RICO para tipo:', type)
+      } else {
+        throw new Error('Template não encontrado')
+      }
+    } else {
+      throw new Error('Sem tipo ou dados, usar template padrão')
+    }
+  } catch (error) {
+    // Fallback para template padrão se rico não disponível
+    console.log('ℹ️ Usando template padrão (fallback)')
+    html = `
     <!DOCTYPE html>
     <html lang="pt-BR">
     <head>
@@ -321,6 +356,28 @@ export async function sendNotificationEmail({
     </body>
     </html>
   `
+  }
+
+  // ✨ ADICIONAR TRACKING de abertura e clique
+  try {
+    const trackingPixel = await generateTrackingPixel(to, type || 'unknown')
+    const trackableLink = await makeTrackableLinkHtml(fullActionUrl, actionText, to, type || 'unknown')
+    
+    // Injetar tracking pixel antes do </body>
+    html = html.replace('</body>', `${trackingPixel}</body>`)
+    
+    // Substituir link de ação por versão rastreável (se existir)
+    if (actionUrl && trackableLink) {
+      html = html.replace(
+        new RegExp(`<a href="${fullActionUrl}"[^>]*>${actionText}[^<]*</a>`, 'g'),
+        trackableLink
+      )
+    }
+    
+    console.log('✅ Tracking adicionado ao email')
+  } catch (trackError) {
+    console.warn('⚠️ Erro ao adicionar tracking (não crítico):', trackError)
+  }
 
   const text = `
 ${title}
@@ -336,7 +393,7 @@ Este é um email automático. Por favor, não responda.
 
   return sendEmail({
     to,
-    subject: title,
+    subject,
     html,
     text
   })
