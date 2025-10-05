@@ -262,7 +262,7 @@ export async function sendNotificationEmail({
 
   // ✨ USAR TEMPLATES RICOS baseado no tipo
   const { generateEmailTemplate } = await import('./email-templates-rich')
-  const { generateTrackingPixel, makeTrackableLinkHtml } = await import('./email-tracking')
+  // const { generateTrackingPixel, makeTrackableLinkHtml } = await import('./email-tracking') // DESABILITADO - causando erro
   
   let html: string
   let subject: string = title
@@ -384,7 +384,9 @@ export async function sendNotificationEmail({
   `
   }
 
-  // ✨ ADICIONAR TRACKING de abertura e clique
+  // ✨ TRACKING TEMPORARIAMENTE DESABILITADO - Estava causando erro
+  // TODO: Corrigir email-tracking.ts antes de reativar
+  /*
   try {
     const trackingPixel = await generateTrackingPixel(to, type || 'unknown')
     const trackableLink = await makeTrackableLinkHtml(fullActionUrl, actionText, to, type || 'unknown')
@@ -404,6 +406,7 @@ export async function sendNotificationEmail({
   } catch (trackError) {
     console.warn('⚠️ Erro ao adicionar tracking (não crítico):', trackError)
   }
+  */
 
   const text = `
 ${title}
