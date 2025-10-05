@@ -545,3 +545,30 @@ export const richEmailTemplates = {
   ticketAssigned: richTicketAssigned
 }
 
+/**
+ * ✨ FUNÇÃO PRINCIPAL: Gerar template baseado no tipo de notificação
+ */
+export function generateEmailTemplate(type: string, data: any): string | null {
+  const typeMapping: Record<string, (data: any) => string> = {
+    'ticket_created': richTicketCreated,
+    'ticket_assigned': richTicketAssigned,
+    'ticket_status_changed': richStatusChanged,
+    'new_comment': richNewComment,
+    'comment_added': richNewComment,
+    'status_changed': richStatusChanged
+  }
+  
+  const templateFunction = typeMapping[type]
+  if (!templateFunction) {
+    console.warn(`⚠️ Template rico não encontrado para tipo: ${type}`)
+    return null
+  }
+  
+  try {
+    return templateFunction(data)
+  } catch (error) {
+    console.error(`❌ Erro ao gerar template rico para tipo ${type}:`, error)
+    return null
+  }
+}
+
