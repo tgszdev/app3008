@@ -181,7 +181,12 @@ export function generateUnifiedEmailTemplate(data: NotificationData): string {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="x-apple-disable-message-reformatting">
+<meta name="format-detection" content="telephone=no,address=no,email=no">
 <title>${title} - #${data.ticket_number}</title>
+<style>
+a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important;font-size:inherit!important;font-family:inherit!important;font-weight:inherit!important;line-height:inherit!important}
+u+#body a{color:inherit;text-decoration:none;font-size:inherit;font-family:inherit;font-weight:inherit;line-height:inherit}
+</style>
 </head>
 <body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background-color:#f5f5f5;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale">
   <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f5f5f5;padding:40px 20px">
@@ -209,7 +214,9 @@ export function generateUnifiedEmailTemplate(data: NotificationData): string {
                     ${data.ticket_title ? `
                     <p style="margin:12px 0 0;font-size:18px;color:#333;font-weight:600;line-height:1.4">${data.ticket_title}</p>
                     ` : ''}
-                    <p style="margin:8px 0 0;font-size:14px;color:#666">Por <span style="color:#333;font-weight:500">${data.commenter_name || data.changed_by || data.created_by || 'Sistema'}</span> • Agora mesmo</p>
+                    ${data.commenter_name || data.changed_by ? `
+                    <p style="margin:8px 0 0;font-size:14px;color:#666">Por <span style="color:#333;font-weight:500">${data.commenter_name || data.changed_by}</span> • Agora mesmo</p>
+                    ` : ''}
                   </td>
                 </tr>
               </table>
