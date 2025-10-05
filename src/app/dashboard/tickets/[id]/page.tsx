@@ -326,12 +326,15 @@ export default function TicketDetailsPage() {
       toast.success('Status atualizado com sucesso!')
       setEditingStatus(false)
       
-      // Se o status mudou para resolvido, mostrar modal de avaliação
-      // Aceitar variações: "resolved", "Resolvido", "resolvido", etc.
+      // Se o status mudou para resolvido OU fechado, mostrar modal de avaliação
+      // Aceitar: "resolved", "Resolvido", "resolvido", "closed", "Fechado", "fechado"
       const isResolved = newStatus && (
         newStatus.toLowerCase() === 'resolved' || 
         newStatus.toLowerCase() === 'resolvido' ||
-        newStatus === 'Resolvido'
+        newStatus === 'Resolvido' ||
+        newStatus.toLowerCase() === 'closed' ||
+        newStatus.toLowerCase() === 'fechado' ||
+        newStatus === 'Fechado'
       )
       
       if (isResolved && ticket?.created_by_user?.id === session?.user?.id) {
@@ -1124,12 +1127,15 @@ export default function TicketDetailsPage() {
             </div>
           </div>
 
-          {/* Rating Component - Show for resolved/resolvido tickets and ticket creator */}
+          {/* Rating Component - Show for resolved/resolvido/fechado tickets and ticket creator */}
           {(() => {
             const isResolved = ticket.status && (
               ticket.status.toLowerCase() === 'resolved' || 
               ticket.status.toLowerCase() === 'resolvido' ||
-              ticket.status === 'Resolvido'
+              ticket.status === 'Resolvido' ||
+              ticket.status.toLowerCase() === 'closed' ||
+              ticket.status.toLowerCase() === 'fechado' ||
+              ticket.status === 'Fechado'
             )
             const isCreator = ticket.created_by_user?.id === session?.user?.id
             
