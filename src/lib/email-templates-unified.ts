@@ -224,7 +224,9 @@ table{border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt}
                     <p style="margin:0 0 4px;font-size:15px;color:#999;font-weight:400">Chamado <span style="color:#333;font-weight:600">#${data.ticket_number}</span></p>
                     ${data.commenter_name || data.changed_by ? `
                     <p style="margin:8px 0 0;font-size:14px;color:#666">Por <span style="color:#333;font-weight:500">${authorName}</span> • ${dateTimeBR}</p>
-                    ` : ''}
+                    ` : `
+                    <p style="margin:8px 0 0;font-size:14px;color:#666">${dateTimeBR}</p>
+                    `}
                   </td>
                 </tr>
               </table>
