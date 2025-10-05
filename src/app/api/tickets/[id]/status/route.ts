@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getBrazilTimestamp } from '@/lib/date-utils'
+import { createAndSendNotification } from '@/lib/notifications'
 
 type RouteParams = {
   params: Promise<{ id: string }>
@@ -115,8 +116,6 @@ export async function PUT(request: NextRequest, context: RouteParams) {
 
     // ✨ NOVO: Enviar notificação de mudança de status
     try {
-      const { createAndSendNotification } = await import('@/lib/notifications')
-      
       // Buscar dados completos do ticket para notificação
       const { data: fullTicket } = await supabaseAdmin
         .from('tickets')
