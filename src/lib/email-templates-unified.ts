@@ -175,6 +175,19 @@ export function generateUnifiedEmailTemplate(data: NotificationData): string {
   const priorityTranslated = translatePriority(data.priority)
   const priorityColor = getPriorityColor(data.priority)
   
+  // Gerar timestamp brasileiro
+  const now = new Date()
+  const dateTimeBR = now.toLocaleString('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+  
+  const authorName = data.commenter_name || data.changed_by || data.created_by || 'Sistema'
+  
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -210,7 +223,7 @@ table{border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt}
                     <h1 style="margin:0 0 8px;font-size:32px;font-weight:700;color:#1a1a1a;letter-spacing:-0.5px">${title}</h1>
                     <p style="margin:0 0 4px;font-size:15px;color:#999;font-weight:400">Chamado <span style="color:#333;font-weight:600">#${data.ticket_number}</span></p>
                     ${data.commenter_name || data.changed_by ? `
-                    <p style="margin:8px 0 0;font-size:14px;color:#666">Por <span style="color:#333;font-weight:500">${data.commenter_name || data.changed_by}</span> • Agora mesmo</p>
+                    <p style="margin:8px 0 0;font-size:14px;color:#666">Por <span style="color:#333;font-weight:500">${authorName}</span> • ${dateTimeBR}</p>
                     ` : ''}
                   </td>
                 </tr>
