@@ -1,0 +1,715 @@
+{
+  "infrastructure": {
+    "emailProvider": null,
+    "configFiles": [
+      "src/lib/email.ts",
+      "src/lib/email-service.ts"
+    ],
+    "envVars": [],
+    "libraries": [
+      "nodemailer"
+    ]
+  },
+  "configuration": {
+    "database": {
+      "tables": {
+        "email_notifications": {
+          "exists": true,
+          "count": 0
+        },
+        "email_queue": {
+          "exists": true,
+          "count": 0
+        },
+        "notification_queue": {
+          "exists": true,
+          "count": 0
+        },
+        "email_logs": {
+          "exists": true,
+          "count": 0
+        },
+        "email_templates": {
+          "exists": true,
+          "count": 3
+        }
+      },
+      "triggers": [],
+      "functions": [],
+      "queuedEmails": 0
+    }
+  },
+  "templates": [],
+  "triggers": {
+    "Novo Ticket Criado": {
+      "file": "src/app/api/tickets/route.ts",
+      "implemented": true
+    },
+    "Ticket Atribuído": {
+      "file": "src/app/api/tickets/route.ts",
+      "implemented": true
+    },
+    "Novo Comentário": {
+      "file": "src/app/api/comments/route.ts",
+      "implemented": false
+    },
+    "Status Alterado": {
+      "file": "src/app/api/tickets/[id]/status/route.ts",
+      "implemented": false
+    },
+    "Ticket Fechado": {
+      "file": "src/app/api/tickets/route.ts",
+      "implemented": true
+    },
+    "SLA Violado": {
+      "file": "src/lib/sla-monitor.ts",
+      "implemented": false
+    }
+  },
+  "mockData": [
+    {
+      "file": "/src/lib/email-config.ts",
+      "pattern": "Email logado ao invés de enviado",
+      "occurrences": 3,
+      "severity": "CRITICAL"
+    },
+    {
+      "file": "/src/lib/email-config.ts",
+      "pattern": "Email logado ao invés de enviado",
+      "occurrences": 3,
+      "severity": "CRITICAL"
+    },
+    {
+      "file": "/src/lib/email-config.ts",
+      "pattern": "Email logado ao invés de enviado",
+      "occurrences": 3,
+      "severity": "CRITICAL"
+    },
+    {
+      "file": "/src/lib/email-service-smtp.ts",
+      "pattern": "Email logado ao invés de enviado",
+      "occurrences": 2,
+      "severity": "CRITICAL"
+    },
+    {
+      "file": "/src/lib/email-service-smtp.ts",
+      "pattern": "Email logado ao invés de enviado",
+      "occurrences": 2,
+      "severity": "CRITICAL"
+    },
+    {
+      "file": "/src/lib/email.ts",
+      "pattern": "Email logado ao invés de enviado",
+      "occurrences": 1,
+      "severity": "CRITICAL"
+    },
+    {
+      "file": "/src/lib/email.ts",
+      "pattern": "Email logado ao invés de enviado",
+      "occurrences": 1,
+      "severity": "CRITICAL"
+    },
+    {
+      "file": "/src/lib/escalation-engine.ts",
+      "pattern": "Email logado ao invés de enviado",
+      "occurrences": 2,
+      "severity": "CRITICAL"
+    },
+    {
+      "file": "/src/lib/escalation-engine.ts",
+      "pattern": "Email logado ao invés de enviado",
+      "occurrences": 2,
+      "severity": "CRITICAL"
+    },
+    {
+      "file": "/src/lib/notifications.ts",
+      "pattern": "Email logado ao invés de enviado",
+      "occurrences": 5,
+      "severity": "CRITICAL"
+    }
+  ],
+  "security": {
+    "vulnerabilities": [
+      {
+        "type": "Email Injection",
+        "file": "/src/lib/email-config.ts",
+        "severity": "HIGH"
+      },
+      {
+        "type": "No Rate Limiting",
+        "file": "/src/lib/email-config.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "Email Injection",
+        "file": "/src/lib/email-config.ts",
+        "severity": "HIGH"
+      },
+      {
+        "type": "No Rate Limiting",
+        "file": "/src/lib/email-config.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "Email Injection",
+        "file": "/src/lib/email-config.ts",
+        "severity": "HIGH"
+      },
+      {
+        "type": "No Rate Limiting",
+        "file": "/src/lib/email-config.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "Email Injection",
+        "file": "/src/lib/email-service-escalation.ts",
+        "severity": "HIGH"
+      },
+      {
+        "type": "No Rate Limiting",
+        "file": "/src/lib/email-service-escalation.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "Email Injection",
+        "file": "/src/lib/email-service-escalation.ts",
+        "severity": "HIGH"
+      },
+      {
+        "type": "No Rate Limiting",
+        "file": "/src/lib/email-service-escalation.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "Email Injection",
+        "file": "/src/lib/email-service-smtp.ts",
+        "severity": "HIGH"
+      },
+      {
+        "type": "No Rate Limiting",
+        "file": "/src/lib/email-service-smtp.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "HTML Injection",
+        "file": "/src/lib/email-service-smtp.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "Email Injection",
+        "file": "/src/lib/email-service-smtp.ts",
+        "severity": "HIGH"
+      },
+      {
+        "type": "No Rate Limiting",
+        "file": "/src/lib/email-service-smtp.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "HTML Injection",
+        "file": "/src/lib/email-service-smtp.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "Email Injection",
+        "file": "/src/lib/email-service.backup.ts",
+        "severity": "HIGH"
+      },
+      {
+        "type": "No Rate Limiting",
+        "file": "/src/lib/email-service.backup.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "HTML Injection",
+        "file": "/src/lib/email-service.backup.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "Email Injection",
+        "file": "/src/lib/email-service.ts",
+        "severity": "HIGH"
+      },
+      {
+        "type": "No Rate Limiting",
+        "file": "/src/lib/email-service.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "Email Injection",
+        "file": "/src/lib/email-service.ts",
+        "severity": "HIGH"
+      },
+      {
+        "type": "No Rate Limiting",
+        "file": "/src/lib/email-service.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "Email Injection",
+        "file": "/src/lib/email.ts",
+        "severity": "HIGH"
+      },
+      {
+        "type": "No Rate Limiting",
+        "file": "/src/lib/email.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "HTML Injection",
+        "file": "/src/lib/email.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "Email Injection",
+        "file": "/src/lib/email.ts",
+        "severity": "HIGH"
+      },
+      {
+        "type": "No Rate Limiting",
+        "file": "/src/lib/email.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "HTML Injection",
+        "file": "/src/lib/email.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "Email Injection",
+        "file": "/src/lib/escalation-engine.ts",
+        "severity": "HIGH"
+      },
+      {
+        "type": "No Rate Limiting",
+        "file": "/src/lib/escalation-engine.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "Email Injection",
+        "file": "/src/lib/escalation-engine.ts",
+        "severity": "HIGH"
+      },
+      {
+        "type": "No Rate Limiting",
+        "file": "/src/lib/escalation-engine.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "Email Injection",
+        "file": "/src/lib/notifications.ts",
+        "severity": "HIGH"
+      },
+      {
+        "type": "No Rate Limiting",
+        "file": "/src/lib/notifications.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "Email Injection",
+        "file": "/src/app/api/escalation/debug-email/route.ts",
+        "severity": "HIGH"
+      },
+      {
+        "type": "No Rate Limiting",
+        "file": "/src/app/api/escalation/debug-email/route.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "Email Injection",
+        "file": "/src/app/api/settings/email/test/route.ts",
+        "severity": "HIGH"
+      },
+      {
+        "type": "No Rate Limiting",
+        "file": "/src/app/api/settings/email/test/route.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "Email Injection",
+        "file": "/src/app/api/test-email/route.ts",
+        "severity": "HIGH"
+      },
+      {
+        "type": "No Rate Limiting",
+        "file": "/src/app/api/test-email/route.ts",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "Email Injection",
+        "file": "/src/app/api/test-notification-email/route.ts",
+        "severity": "HIGH"
+      },
+      {
+        "type": "No Rate Limiting",
+        "file": "/src/app/api/test-notification-email/route.ts",
+        "severity": "MEDIUM"
+      }
+    ],
+    "protections": []
+  },
+  "performance": {
+    "metrics": {
+      "totalFilesScanned": 0,
+      "emailFunctionsFound": 19,
+      "tablesFound": 5,
+      "mockDataFound": 10,
+      "vulnerabilitiesFound": 43,
+      "criticalIssues": 11,
+      "highIssues": 15,
+      "mediumIssues": 2
+    },
+    "healthScore": 0,
+    "status": "CRÍTICO"
+  },
+  "issues": [
+    {
+      "severity": "CRITICAL",
+      "category": "Infrastructure",
+      "issue": "Provider de email não configurado",
+      "impact": "Sistema não pode enviar emails",
+      "solution": "Configurar SMTP ou provider (Resend, SendGrid, etc.)"
+    },
+    {
+      "severity": "HIGH",
+      "category": "Mock Data",
+      "issue": "Dados mockados em /src/lib/auth-config.backup.ts",
+      "impact": "Emails podem não estar sendo enviados (apenas logados)"
+    },
+    {
+      "severity": "HIGH",
+      "category": "Mock Data",
+      "issue": "Dados mockados em /src/lib/auth-config.ts",
+      "impact": "Emails podem não estar sendo enviados (apenas logados)"
+    },
+    {
+      "severity": "HIGH",
+      "category": "Mock Data",
+      "issue": "Dados mockados em /src/lib/auth-hybrid.ts",
+      "impact": "Emails podem não estar sendo enviados (apenas logados)"
+    },
+    {
+      "severity": "HIGH",
+      "category": "Mock Data",
+      "issue": "Dados mockados em /src/lib/email-config.ts",
+      "impact": "Emails podem não estar sendo enviados (apenas logados)"
+    },
+    {
+      "severity": "HIGH",
+      "category": "Mock Data",
+      "issue": "Dados mockados em /src/lib/email-service-escalation.ts",
+      "impact": "Emails podem não estar sendo enviados (apenas logados)"
+    },
+    {
+      "severity": "HIGH",
+      "category": "Mock Data",
+      "issue": "Dados mockados em /src/lib/email-service-smtp.ts",
+      "impact": "Emails podem não estar sendo enviados (apenas logados)"
+    },
+    {
+      "severity": "HIGH",
+      "category": "Mock Data",
+      "issue": "Dados mockados em /src/lib/email-service.backup.ts",
+      "impact": "Emails podem não estar sendo enviados (apenas logados)"
+    },
+    {
+      "severity": "HIGH",
+      "category": "Mock Data",
+      "issue": "Dados mockados em /src/lib/email-service.ts",
+      "impact": "Emails podem não estar sendo enviados (apenas logados)"
+    },
+    {
+      "severity": "HIGH",
+      "category": "Mock Data",
+      "issue": "Dados mockados em /src/lib/email.ts",
+      "impact": "Emails podem não estar sendo enviados (apenas logados)"
+    },
+    {
+      "severity": "HIGH",
+      "category": "Mock Data",
+      "issue": "Dados mockados em /src/lib/escalation-engine-simple.ts",
+      "impact": "Emails podem não estar sendo enviados (apenas logados)"
+    },
+    {
+      "severity": "HIGH",
+      "category": "Mock Data",
+      "issue": "Dados mockados em /src/lib/escalation-engine.ts",
+      "impact": "Emails podem não estar sendo enviados (apenas logados)"
+    },
+    {
+      "severity": "HIGH",
+      "category": "Mock Data",
+      "issue": "Dados mockados em /src/lib/notifications.ts",
+      "impact": "Emails podem não estar sendo enviados (apenas logados)"
+    },
+    {
+      "severity": "HIGH",
+      "category": "Mock Data",
+      "issue": "Dados mockados em /src/lib/workflow-engine.ts",
+      "impact": "Emails podem não estar sendo enviados (apenas logados)"
+    },
+    {
+      "severity": "HIGH",
+      "category": "Mock Data",
+      "issue": "Dados mockados em /src/app/api/settings/notifications/test/route.ts",
+      "impact": "Emails podem não estar sendo enviados (apenas logados)"
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "E2E Flow",
+      "issue": "Novo Comentário: Email não é enviado",
+      "impact": "Usuários não são notificados desta ação"
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "E2E Flow",
+      "issue": "Status Alterado: Email não é enviado",
+      "impact": "Usuários não são notificados desta ação"
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "Mock Data",
+      "issue": "Email logado ao invés de enviado em /src/lib/email-config.ts",
+      "impact": "Emails não estão sendo enviados de verdade"
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "Mock Data",
+      "issue": "Email logado ao invés de enviado em /src/lib/email-config.ts",
+      "impact": "Emails não estão sendo enviados de verdade"
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "Mock Data",
+      "issue": "Email logado ao invés de enviado em /src/lib/email-config.ts",
+      "impact": "Emails não estão sendo enviados de verdade"
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "Mock Data",
+      "issue": "Email logado ao invés de enviado em /src/lib/email-service-smtp.ts",
+      "impact": "Emails não estão sendo enviados de verdade"
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "Mock Data",
+      "issue": "Email logado ao invés de enviado em /src/lib/email-service-smtp.ts",
+      "impact": "Emails não estão sendo enviados de verdade"
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "Mock Data",
+      "issue": "Email logado ao invés de enviado em /src/lib/email.ts",
+      "impact": "Emails não estão sendo enviados de verdade"
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "Mock Data",
+      "issue": "Email logado ao invés de enviado em /src/lib/email.ts",
+      "impact": "Emails não estão sendo enviados de verdade"
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "Mock Data",
+      "issue": "Email logado ao invés de enviado em /src/lib/escalation-engine.ts",
+      "impact": "Emails não estão sendo enviados de verdade"
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "Mock Data",
+      "issue": "Email logado ao invés de enviado em /src/lib/escalation-engine.ts",
+      "impact": "Emails não estão sendo enviados de verdade"
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "Mock Data",
+      "issue": "Email logado ao invés de enviado em /src/lib/notifications.ts",
+      "impact": "Emails não estão sendo enviados de verdade"
+    },
+    {
+      "severity": "HIGH",
+      "category": "Security",
+      "issue": "43 vulnerabilidades de segurança",
+      "impact": "Sistema pode ser explorado para spam/phishing"
+    },
+    {
+      "severity": "LOW",
+      "category": "Templates",
+      "issue": "Templates de email não encontrados em diretórios padrão",
+      "impact": "Dificulta manutenção (pode estar inline no código)"
+    }
+  ],
+  "codeAnalysis": {
+    "emailFunctions": [
+      {
+        "file": "/src/lib/email-config.ts",
+        "function": "sendEmail",
+        "occurrences": 1
+      },
+      {
+        "file": "/src/lib/email-config.ts",
+        "function": "sendNotification",
+        "occurrences": 1
+      },
+      {
+        "file": "/src/lib/email-config.ts",
+        "function": "nodemailerTransport",
+        "occurrences": 2
+      },
+      {
+        "file": "/src/lib/email-service-escalation.ts",
+        "function": "sendEmail",
+        "occurrences": 1
+      },
+      {
+        "file": "/src/lib/email-service-escalation.ts",
+        "function": "sendNotification",
+        "occurrences": 1
+      },
+      {
+        "file": "/src/lib/email-service-smtp.ts",
+        "function": "sendEmail",
+        "occurrences": 1
+      },
+      {
+        "file": "/src/lib/email-service-smtp.ts",
+        "function": "nodemailerTransport",
+        "occurrences": 2
+      },
+      {
+        "file": "/src/lib/email-service.backup.ts",
+        "function": "sendEmail",
+        "occurrences": 1
+      },
+      {
+        "file": "/src/lib/email-service.ts",
+        "function": "sendEmail",
+        "occurrences": 1
+      },
+      {
+        "file": "/src/lib/email-service.ts",
+        "function": "sendNotification",
+        "occurrences": 1
+      },
+      {
+        "file": "/src/lib/email.ts",
+        "function": "sendEmail",
+        "occurrences": 1
+      },
+      {
+        "file": "/src/lib/email.ts",
+        "function": "sendNotification",
+        "occurrences": 1
+      },
+      {
+        "file": "/src/lib/escalation-engine.ts",
+        "function": "sendEmail",
+        "occurrences": 1
+      },
+      {
+        "file": "/src/lib/escalation-engine.ts",
+        "function": "sendNotification",
+        "occurrences": 2
+      },
+      {
+        "file": "/src/lib/notifications.ts",
+        "function": "sendNotification",
+        "occurrences": 2
+      },
+      {
+        "file": "/src/app/api/escalation/debug-email/route.ts",
+        "function": "nodemailerTransport",
+        "occurrences": 2
+      },
+      {
+        "file": "/src/app/api/settings/email/test/route.ts",
+        "function": "nodemailerTransport",
+        "occurrences": 2
+      },
+      {
+        "file": "/src/app/api/test-email/route.ts",
+        "function": "sendNotification",
+        "occurrences": 2
+      },
+      {
+        "file": "/src/app/api/test-notification-email/route.ts",
+        "function": "sendNotification",
+        "occurrences": 2
+      }
+    ],
+    "triggers": [],
+    "templates": [],
+    "mockData": [
+      {
+        "file": "/src/lib/auth-config.backup.ts",
+        "pattern": "mockEmail",
+        "occurrences": 3
+      },
+      {
+        "file": "/src/lib/auth-config.ts",
+        "pattern": "mockEmail",
+        "occurrences": 3
+      },
+      {
+        "file": "/src/lib/auth-hybrid.ts",
+        "pattern": "mockEmail",
+        "occurrences": 2
+      },
+      {
+        "file": "/src/lib/email-config.ts",
+        "pattern": "mockEmail",
+        "occurrences": 3
+      },
+      {
+        "file": "/src/lib/email-service-escalation.ts",
+        "pattern": "mockEmail",
+        "occurrences": 7
+      },
+      {
+        "file": "/src/lib/email-service-smtp.ts",
+        "pattern": "mockEmail",
+        "occurrences": 10
+      },
+      {
+        "file": "/src/lib/email-service.backup.ts",
+        "pattern": "mockEmail",
+        "occurrences": 1
+      },
+      {
+        "file": "/src/lib/email-service.ts",
+        "pattern": "mockEmail",
+        "occurrences": 7
+      },
+      {
+        "file": "/src/lib/email.ts",
+        "pattern": "mockEmail",
+        "occurrences": 1
+      },
+      {
+        "file": "/src/lib/escalation-engine-simple.ts",
+        "pattern": "mockEmail",
+        "occurrences": 4
+      },
+      {
+        "file": "/src/lib/escalation-engine.ts",
+        "pattern": "mockEmail",
+        "occurrences": 5
+      },
+      {
+        "file": "/src/lib/notifications.ts",
+        "pattern": "mockEmail",
+        "occurrences": 5
+      },
+      {
+        "file": "/src/lib/workflow-engine.ts",
+        "pattern": "mockEmail",
+        "occurrences": 1
+      },
+      {
+        "file": "/src/app/api/settings/notifications/test/route.ts",
+        "pattern": "mockEmail",
+        "occurrences": 1
+      }
+    ]
+  }
+}
