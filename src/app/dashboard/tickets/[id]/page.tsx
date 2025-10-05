@@ -326,18 +326,13 @@ export default function TicketDetailsPage() {
       toast.success('Status atualizado com sucesso!')
       setEditingStatus(false)
       
-      // Se o status mudou para resolvido OU fechado, mostrar modal de avaliação
-      // Aceitar: "resolved", "Resolvido", "resolvido", "closed", "Fechado", "fechado"
-      const isResolved = newStatus && (
-        newStatus.toLowerCase() === 'resolved' || 
-        newStatus.toLowerCase() === 'resolvido' ||
-        newStatus === 'Resolvido' ||
-        newStatus.toLowerCase() === 'closed' ||
-        newStatus.toLowerCase() === 'fechado' ||
-        newStatus === 'Fechado'
-      )
+      // Se o status mudou para um status FINAL (is_final = true no banco), mostrar modal de avaliação
+      // Usar dados REAIS do banco, não hardcoded!
+      const newStatusData = availableStatuses.find(s => s.slug === newStatus)
+      const isStatusFinal = newStatusData?.is_final === true
       
-      if (isResolved && ticket?.created_by_user?.id === session?.user?.id) {
+      if (isStatusFinal && ticket?.created_by_user?.id === session?.user?.id) {
+        console.log('[RATING] Status final detectado, abrindo modal de avaliação:', newStatus)
         setTimeout(() => {
           setShowRatingModal(true)
         }, 1000)
@@ -1127,19 +1122,14 @@ export default function TicketDetailsPage() {
             </div>
           </div>
 
-          {/* Rating Component - Show for resolved/resolvido/fechado tickets and ticket creator */}
+          {/* Rating Component - Show for FINAL status tickets (usando is_final do banco) */}
           {(() => {
-            const isResolved = ticket.status && (
-              ticket.status.toLowerCase() === 'resolved' || 
-              ticket.status.toLowerCase() === 'resolvido' ||
-              ticket.status === 'Resolvido' ||
-              ticket.status.toLowerCase() === 'closed' ||
-              ticket.status.toLowerCase() === 'fechado' ||
-              ticket.status === 'Fechado'
-            )
+            // Usar dados REAIS do banco, não hardcoded!
+            const currentStatusData = availableStatuses.find(s => s.slug === ticket.status)
+            const isStatusFinal = currentStatusData?.is_final === true
             const isCreator = ticket.created_by_user?.id === session?.user?.id
             
-            return isResolved && isCreator && (
+            return isStatusFinal && isCreator && (
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
                 <TicketRating
                   ticketId={ticket.id}
