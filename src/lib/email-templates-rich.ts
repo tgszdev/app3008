@@ -547,9 +547,10 @@ export const richEmailTemplates = {
 
 /**
  * ✨ FUNÇÃO PRINCIPAL: Gerar template baseado no tipo de notificação
+ * Retorna apenas o HTML (subject e text são gerenciados pelo email-config)
  */
 export function generateEmailTemplate(type: string, data: any): string | null {
-  const typeMapping: Record<string, (data: any) => string> = {
+  const typeMapping: Record<string, (data: any) => { subject: string, html: string, text: string }> = {
     'ticket_created': richTicketCreated,
     'ticket_assigned': richTicketAssigned,
     'ticket_status_changed': richStatusChanged,
@@ -565,7 +566,8 @@ export function generateEmailTemplate(type: string, data: any): string | null {
   }
   
   try {
-    return templateFunction(data)
+    const template = templateFunction(data)
+    return template.html // Retornar apenas o HTML
   } catch (error) {
     console.error(`❌ Erro ao gerar template rico para tipo ${type}:`, error)
     return null

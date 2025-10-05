@@ -270,14 +270,40 @@ export async function sendNotificationEmail({
   try {
     // Tentar usar template rico se tipo for reconhecido
     if (type && data) {
-      const richTemplate = generateEmailTemplate(type as any, {
-        ...data,
+      // Mapear campos para o formato esperado pelos templates ricos
+      const templateData = {
+        ticket_number: data.ticket_number || '0000',
+        ticket_title: data.ticket_title || title,
+        title: data.ticket_title || title, // Alias
+        ticket_url: fullActionUrl,
+        description: data.description || message,
+        priority: data.ticket_priority || data.priority || 'medium',
+        category: data.category || 'Geral',
+        ticket_status: data.ticket_status || data.new_status || 'open',
+        
+        // Para new_comment
+        commenter_name: data.comment_author || 'Usuário',
+        comment_text: data.comment_content || message,
+        
+        // Para status_changed
+        old_status: data.old_status || '',
+        new_status: data.new_status || data.ticket_status || '',
+        changed_by: data.changed_by || 'Sistema',
+        resolution_notes: data.resolution_notes || '',
+        
+        // Para ticket_assigned
+        assigned_to_name: data.assigned_to_name || 'Você',
+        assigned_by: data.assigned_by || 'Sistema',
+        
+        // Contexto adicional
+        created_by: data.created_by || 'Usuário',
+        client_name: data.client_name || '',
         baseUrl,
         actionUrl: fullActionUrl,
-        actionText,
-        title,
-        message
-      })
+        actionText
+      }
+      
+      const richTemplate = generateEmailTemplate(type as any, templateData)
       
       if (richTemplate) {
         html = richTemplate
@@ -290,7 +316,7 @@ export async function sendNotificationEmail({
     }
   } catch (error) {
     // Fallback para template padrão se rico não disponível
-    console.log('ℹ️ Usando template padrão (fallback)')
+    console.log('ℹ️ Usando template padrão (fallback)', error)
     html = `
     <!DOCTYPE html>
     <html lang="pt-BR">
