@@ -44,6 +44,7 @@ interface Role {
     tickets_view_internal: boolean // Ver tickets internos
     tickets_export: boolean // Exportar tickets
     tickets_bulk_actions: boolean // Ações em massa
+    tickets_view_history: boolean // Ver histórico do ticket
     
     // Knowledge Base
     kb_view: boolean
@@ -139,6 +140,7 @@ const defaultPermissions = {
   tickets_view_internal: false,
   tickets_export: false,
   tickets_bulk_actions: false,
+  tickets_view_history: false,
   
   // Knowledge Base
   kb_view: false,
@@ -228,6 +230,7 @@ const systemRolesPermissions = {
     tickets_view_internal: true,
     tickets_export: true,
     tickets_bulk_actions: true,
+    tickets_view_history: true, // Admin vê histórico
     
     // KB - FULL ACCESS
     kb_view: true,
@@ -314,6 +317,7 @@ const systemRolesPermissions = {
     tickets_view_internal: true,
     tickets_export: true,
     tickets_bulk_actions: false,
+    tickets_view_history: true, // Developer vê histórico
     
     // KB - ADVANCED ACCESS
     kb_view: true,
@@ -400,6 +404,7 @@ const systemRolesPermissions = {
     tickets_view_internal: true,
     tickets_export: true,
     tickets_bulk_actions: true,
+    tickets_view_history: true, // Analyst vê histórico
     
     // KB - MANAGEMENT ACCESS
     kb_view: true,
@@ -486,6 +491,7 @@ const systemRolesPermissions = {
     tickets_view_internal: false,
     tickets_export: false,
     tickets_bulk_actions: false,
+    tickets_view_history: false, // User NÃO vê histórico
     
     // KB - VIEW ONLY
     kb_view: true,
@@ -862,6 +868,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
       tickets_view_internal: 'Ver Tickets Internos',
       tickets_export: 'Exportar Tickets',
       tickets_bulk_actions: 'Ações em Massa',
+      tickets_view_history: 'Ver Histórico do Ticket',
       
       // Knowledge Base
       kb_view: 'Visualizar Base de Conhecimento',
@@ -952,6 +959,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
       tickets_view_internal: 'Permite visualizar tickets marcados como internos',
       tickets_export: 'Permite exportar listagem de tickets (Excel, CSV, PDF)',
       tickets_bulk_actions: 'Permite executar ações em múltiplos tickets simultaneamente',
+      tickets_view_history: 'Permite visualizar o histórico completo de alterações do ticket',
       
       // Knowledge Base
       kb_view: 'Permite visualizar artigos da base de conhecimento',
