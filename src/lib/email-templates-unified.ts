@@ -192,38 +192,24 @@ export function generateUnifiedEmailTemplate(data: NotificationData): string {
           
           <!-- Breadcrumb -->
           <tr>
-            <td style="padding:20px 48px;background-color:#fafafa;border-bottom:1px solid #e0e0e0;font-size:13px;color:#666;font-weight:500">
-              <span>${data.client_name || 'Sistema'}</span>
-              <span style="color:#999;margin:0 8px">/</span>
-              <span>${data.category || 'Geral'}</span>
-              <span style="color:#999;margin:0 8px">/</span>
-              <span style="color:#8b5cf6;font-weight:600">#${data.ticket_number}</span>
+            <td style="padding:16px 48px;background-color:#fafafa;border-bottom:1px solid #e0e0e0;font-size:13px;color:#666;font-weight:400">
+              ${data.client_name || 'Sistema'} <span style="color:#ccc;margin:0 6px">/</span> ${data.category || 'Geral'} <span style="color:#ccc;margin:0 6px">/</span> <span style="color:#333;font-weight:500">#${data.ticket_number}</span>
             </td>
           </tr>
           
           <!-- Header -->
           <tr>
             <td style="padding:40px 48px 32px;background-color:#ffffff;border-bottom:1px solid #e0e0e0">
-              <div style="background:#f3e8ff;border:1px solid #d8b4fe;padding:8px 16px;border-radius:20px;margin-bottom:20px;font-size:13px;color:#7c3aed;font-weight:600;display:inline-block">
-                <span style="color:#8b5cf6">● </span>NOVA ATIVIDADE
-              </div>
               <table cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
                   <td>
-                    <h1 style="margin:0;font-size:28px;font-weight:700;color:#1a1a1a;letter-spacing:-0.5px;display:inline-block">${title}</h1>
-                    <span style="background:rgba(139,92,246,0.15);color:#8b5cf6;padding:8px 16px;border-radius:8px;font-size:18px;font-weight:700;border:1px solid rgba(139,92,246,0.3);margin-left:16px;display:inline-block">#${data.ticket_number}</span>
-                  </td>
-                </tr>
-                ${data.ticket_title ? `
-                <tr>
-                  <td style="padding-top:12px">
-                    <p style="margin:0;font-size:17px;color:#333;font-weight:500;line-height:1.4">${data.ticket_title}</p>
-                  </td>
-                </tr>
-                ` : ''}
-                <tr>
-                  <td style="padding-top:8px">
-                    <p style="margin:0;font-size:14px;color:#666">Por ${data.commenter_name || data.changed_by || data.created_by || 'Sistema'} • Agora mesmo</p>
+                    <p style="margin:0 0 16px;font-size:13px;color:#999;font-weight:500;text-transform:uppercase;letter-spacing:0.5px">Nova Atividade</p>
+                    <h1 style="margin:0 0 8px;font-size:32px;font-weight:700;color:#1a1a1a;letter-spacing:-0.5px">${title}</h1>
+                    <p style="margin:0 0 4px;font-size:15px;color:#999;font-weight:400">Chamado <span style="color:#333;font-weight:600">#${data.ticket_number}</span></p>
+                    ${data.ticket_title ? `
+                    <p style="margin:12px 0 0;font-size:18px;color:#333;font-weight:600;line-height:1.4">${data.ticket_title}</p>
+                    ` : ''}
+                    <p style="margin:8px 0 0;font-size:14px;color:#666">Por <span style="color:#333;font-weight:500">${data.commenter_name || data.changed_by || data.created_by || 'Sistema'}</span> • Agora mesmo</p>
                   </td>
                 </tr>
               </table>
