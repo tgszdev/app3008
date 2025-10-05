@@ -260,62 +260,54 @@ export async function sendNotificationEmail({
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
   const fullActionUrl = actionUrl ? `${baseUrl}${actionUrl}` : `${baseUrl}/dashboard`
 
-  // ✨ USAR TEMPLATES RICOS baseado no tipo
-  const { generateEmailTemplate } = await import('./email-templates-rich')
-  // const { generateTrackingPixel, makeTrackableLinkHtml } = await import('./email-tracking') // DESABILITADO - causando erro
+  // ✨ USAR TEMPLATE UNIFICADO GLASSMORPHISM (Template 02)
+  const { generateEmailFromNotification } = await import('./email-templates-unified')
   
   let html: string
   let subject: string = title
   
   try {
-    // Tentar usar template rico se tipo for reconhecido
+    // Usar template unificado se tipo for reconhecido
     if (type && data) {
-      // Mapear campos para o formato esperado pelos templates ricos
+      // Mapear campos para o formato do template unificado
       const templateData = {
+        type: type as any,
         ticket_number: data.ticket_number || '0000',
         ticket_title: data.ticket_title || title,
-        title: data.ticket_title || title, // Alias
         ticket_url: fullActionUrl,
         description: data.description || message,
-        priority: data.ticket_priority || data.priority || 'medium',
+        priority: data.ticket_priority || data.priority || 'MÉDIA',
         category: data.category || 'Geral',
-        ticket_status: data.ticket_status || data.new_status || 'open',
         
-        // Para new_comment
-        commenter_name: data.comment_author || 'Usuário',
-        comment_text: data.comment_content || message,
+        // Pessoas
+        created_by: data.created_by,
+        assigned_to: data.assigned_to,
+        commenter_name: data.comment_author || data.commenter_name,
+        changed_by: data.changed_by,
         
-        // Para status_changed
-        old_status: data.old_status || '',
-        new_status: data.new_status || data.ticket_status || '',
-        changed_by: data.changed_by || 'Sistema',
-        resolution_notes: data.resolution_notes || '',
+        // Cliente
+        client_name: data.client_name,
         
-        // Para ticket_assigned
-        assigned_to_name: data.assigned_to_name || 'Você',
-        assigned_by: data.assigned_by || 'Sistema',
+        // Comentário
+        comment_text: data.comment_content || data.comment_text,
         
-        // Contexto adicional
-        created_by: data.created_by || 'Usuário',
-        client_name: data.client_name || '',
-        baseUrl,
-        actionUrl: fullActionUrl,
-        actionText
+        // Status
+        old_status: data.old_status,
+        new_status: data.new_status,
+        resolution_notes: data.resolution_notes,
+        
+        // Prioridade
+        old_priority: data.old_priority,
+        new_priority: data.new_priority
       }
       
-      const richTemplate = generateEmailTemplate(type as any, templateData)
-      
-      if (richTemplate) {
-        html = richTemplate
-        console.log('✅ Usando template RICO para tipo:', type)
-      } else {
-        throw new Error('Template não encontrado')
-      }
+      html = generateEmailFromNotification(type as any, templateData)
+      console.log('✅ Usando template UNIFICADO (Glassmorphism) para tipo:', type)
     } else {
       throw new Error('Sem tipo ou dados, usar template padrão')
     }
   } catch (error) {
-    // Fallback para template padrão se rico não disponível
+    // Fallback para template padrão se houver erro
     console.log('ℹ️ Usando template padrão (fallback)', error)
     html = `
     <!DOCTYPE html>
