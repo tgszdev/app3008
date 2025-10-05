@@ -1,0 +1,69 @@
+{
+  "database": {
+    "tablesExist": {
+      "ratings": true,
+      "ticket_ratings": true,
+      "satisfaction_surveys": true,
+      "ticket_satisfaction": true
+    },
+    "recordCounts": {
+      "ratings": 0,
+      "ticket_ratings": 0,
+      "satisfaction_surveys": 0,
+      "ticket_satisfaction": 0
+    },
+    "structure": {},
+    "relationships": {}
+  },
+  "codeAnalysis": {
+    "filesFound": [
+      "src/app/dashboard/tickets/[id]/page.tsx",
+      "src/components/tickets/TicketRating.tsx",
+      "src/components/tickets/RatingModal.tsx",
+      "src/app/api/tickets/[id]/rating/route.ts",
+      "src/app/dashboard/satisfaction/page.tsx"
+    ],
+    "filesMissing": [
+      "src/app/api/ratings/route.ts"
+    ],
+    "mockDataFound": [],
+    "permissionChecks": [],
+    "apiCalls": [
+      {
+        "file": "src/components/tickets/TicketRating.tsx",
+        "apis": [
+          "/api/tickets/${ticketId}/rating"
+        ]
+      },
+      {
+        "file": "src/components/tickets/RatingModal.tsx",
+        "apis": [
+          "/api/tickets/${ticketId}/rating"
+        ]
+      }
+    ]
+  },
+  "mockData": [],
+  "security": {},
+  "performance": {},
+  "issues": [
+    {
+      "severity": "HIGH",
+      "category": "API",
+      "issue": "Endpoint src/app/api/ratings/route.ts não existe",
+      "impact": "Funcionalidade não implementada"
+    },
+    {
+      "severity": "HIGH",
+      "category": "API",
+      "issue": "Endpoint src/app/api/satisfaction/route.ts não existe",
+      "impact": "Funcionalidade não implementada"
+    },
+    {
+      "severity": "MEDIUM",
+      "category": "Chaos Engineering",
+      "issue": "API retorna erro 500",
+      "impact": "SEM tratamento de erro para API de rating"
+    }
+  ]
+}

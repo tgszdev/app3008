@@ -327,7 +327,14 @@ export default function TicketDetailsPage() {
       setEditingStatus(false)
       
       // Se o status mudou para resolvido, mostrar modal de avaliação
-      if (newStatus === 'resolved' && ticket?.created_by_user?.id === session?.user?.id) {
+      // Aceitar variações: "resolved", "Resolvido", "resolvido", etc.
+      const isResolved = newStatus && (
+        newStatus.toLowerCase() === 'resolved' || 
+        newStatus.toLowerCase() === 'resolvido' ||
+        newStatus === 'Resolvido'
+      )
+      
+      if (isResolved && ticket?.created_by_user?.id === session?.user?.id) {
         setTimeout(() => {
           setShowRatingModal(true)
         }, 1000)
@@ -1117,19 +1124,28 @@ export default function TicketDetailsPage() {
             </div>
           </div>
 
-          {/* Rating Component - Show only for resolved tickets and ticket creator */}
-          {ticket.status === 'resolved' && ticket.created_by_user?.id === session?.user?.id && (
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
-              <TicketRating
-                ticketId={ticket.id}
-                ticketNumber={ticket.ticket_number.toString()}
-                currentUserId={session.user.id}
-                onRatingSubmitted={() => {
-                  toast.success('Obrigado pela sua avaliação!')
-                }}
-              />
-            </div>
-          )}
+          {/* Rating Component - Show for resolved/resolvido tickets and ticket creator */}
+          {(() => {
+            const isResolved = ticket.status && (
+              ticket.status.toLowerCase() === 'resolved' || 
+              ticket.status.toLowerCase() === 'resolvido' ||
+              ticket.status === 'Resolvido'
+            )
+            const isCreator = ticket.created_by_user?.id === session?.user?.id
+            
+            return isResolved && isCreator && (
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
+                <TicketRating
+                  ticketId={ticket.id}
+                  ticketNumber={ticket.ticket_number.toString()}
+                  currentUserId={session.user.id}
+                  onRatingSubmitted={() => {
+                    toast.success('Obrigado pela sua avaliação!')
+                  }}
+                />
+              </div>
+            )
+          })()}
 
           {/* LINHA DO TEMPO */}
           <TicketTimeline 
