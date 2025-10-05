@@ -84,15 +84,39 @@ function getTitleForType(type: NotificationType, data: NotificationData): string
   return titles[type] || 'Notificação'
 }
 
+// Traduzir prioridade
+function translatePriority(priority?: string): string {
+  if (!priority) return 'MÉDIA'
+  const map: Record<string, string> = {
+    'low': 'BAIXA',
+    'medium': 'MÉDIA',
+    'high': 'ALTA',
+    'critical': 'CRÍTICA',
+    'urgent': 'URGENTE'
+  }
+  return map[priority.toLowerCase()] || priority.toUpperCase()
+}
+
 // Gerar conteúdo dinâmico baseado no tipo
 function getMainContent(type: NotificationType, data: NotificationData): string {
   switch (type) {
     case 'ticket_created':
+    case 'ticket_assigned':
       return `
-        <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:20px 0">
-          <p style="margin:0 0 12px;color:#64748b;font-size:13px;font-weight:600">DESCRIÇÃO DO CHAMADO</p>
-          <p style="margin:0;color:#334155;line-height:1.6">${data.description || data.ticket_title || 'Novo chamado aberto no sistema'}</p>
+        ${data.ticket_title ? `
+        <div style="background:#f8fafc;border-radius:12px;padding:20px;margin:20px 0;border-left:4px solid #667eea">
+          <p style="margin:0 0 8px;color:#64748b;font-size:12px;font-weight:700;letter-spacing:1px">TÍTULO DO CHAMADO</p>
+          <h2 style="margin:0 0 16px;color:#1e293b;font-size:18px;font-weight:600;line-height:1.4">${data.ticket_title}</h2>
+          ${data.description ? `
+            <p style="margin:0 0 8px;color:#64748b;font-size:12px;font-weight:700;letter-spacing:1px">DESCRIÇÃO</p>
+            <p style="margin:0;color:#334155;line-height:1.6;font-size:14px">${data.description}</p>
+          ` : ''}
         </div>
+        ` : `
+        <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:20px 0">
+          <p style="margin:0;color:#334155;line-height:1.6">${data.description || 'Novo chamado aberto no sistema'}</p>
+        </div>
+        `}
       `
     
     case 'ticket_status_changed':
@@ -166,6 +190,7 @@ export function generateUnifiedEmailTemplate(data: NotificationData): string {
   const icon = getIconForType(data.type)
   const title = getTitleForType(data.type, data)
   const mainContent = getMainContent(data.type, data)
+  const priorityTranslated = translatePriority(data.priority)
   
   return `
     <!DOCTYPE html>
@@ -187,21 +212,21 @@ export function generateUnifiedEmailTemplate(data: NotificationData): string {
         img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
         
         /* Responsivo */
-        @media only screen and (max-width: 600px) {
-          .container { width: 100% !important; margin: 20px 10px !important; }
-          .content { padding: 20px !important; }
-          .header { padding: 24px 20px !important; }
+        @media only screen and (max-width: 850px) {
+          .container { width: 95% !important; margin: 20px auto !important; }
+          .content { padding: 24px !important; }
+          .header { padding: 28px 24px !important; }
           .grid-2 { display: block !important; }
-          .grid-item { margin-bottom: 12px !important; }
-          .btn { padding: 14px !important; font-size: 15px !important; }
-          h1 { font-size: 20px !important; }
+          .grid-item { margin-bottom: 12px !important; width: 100% !important; padding: 0 !important; }
+          .btn { padding: 16px !important; font-size: 16px !important; }
+          h1 { font-size: 22px !important; }
           .hide-mobile { display: none !important; }
         }
         
         @media only screen and (max-width: 480px) {
-          .container { border-radius: 16px !important; }
-          .content { padding: 16px !important; }
-          .header { padding: 20px 16px !important; }
+          .container { border-radius: 16px !important; margin: 10px !important; width: 98% !important; }
+          .content { padding: 20px !important; }
+          .header { padding: 24px 20px !important; }
         }
       </style>
     </head>
@@ -213,7 +238,7 @@ export function generateUnifiedEmailTemplate(data: NotificationData): string {
           <td align="center">
             
             <!-- Card -->
-            <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="container" style="max-width:600px;margin:40px auto;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:24px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.1);border:1px solid rgba(255,255,255,0.18)">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="container" style="max-width:800px;width:100%;margin:40px auto;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:24px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.1);border:1px solid rgba(255,255,255,0.18)">
               
               <!-- Header Glassmorphism -->
               <tr>
@@ -290,7 +315,7 @@ export function generateUnifiedEmailTemplate(data: NotificationData): string {
                       <td style="padding-top:12px">
                         <div style="background:linear-gradient(135deg,#fef2f2 0%,#fee2e2 100%);border-radius:8px;padding:12px;text-align:center">
                           <div style="font-size:11px;color:#991b1b;font-weight:600;margin-bottom:4px">CRITICIDADE</div>
-                          <div style="font-size:18px;color:#dc2626;font-weight:700">${data.priority}</div>
+                          <div style="font-size:18px;color:#dc2626;font-weight:700">${priorityTranslated}</div>
                         </div>
                       </td>
                     </tr>

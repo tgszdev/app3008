@@ -270,16 +270,23 @@ export async function POST(request: NextRequest) {
     // ✨ NOVO: Enviar notificação por email sobre novo comentário
     console.log(`[COMMENT] Iniciando envio de notificações para ticket ${ticket_id}`)
     try {
-      // Buscar dados do ticket para notificação
+      // Buscar dados COMPLETOS do ticket para notificação (incluindo contexto/cliente)
       const { data: ticket, error: ticketError } = await supabaseAdmin
         .from('tickets')
         .select(`
           id,
           ticket_number,
           title,
+          description,
+          priority,
           created_by,
           assigned_to,
-          created_by_user:created_by(id, email, name)
+          context_id,
+          category_id,
+          created_by_user:created_by(id, email, name),
+          assigned_to_user:assigned_to(id, email, name),
+          contexts:context_id(id, name),
+          categories:category_id(id, name)
         `)
         .eq('id', ticket_id)
         .single()
@@ -309,9 +316,15 @@ export async function POST(request: NextRequest) {
               ticket_id: ticket.id,
               ticket_number: ticket.ticket_number,
               ticket_title: ticket.title,
+              description: ticket.description,
+              priority: ticket.priority,
               comment_content: content,
               comment_author: userData.name,
-              is_internal
+              is_internal,
+              created_by: ticket.created_by_user?.name || 'Usuário',
+              assigned_to: ticket.assigned_to_user?.name || null,
+              client_name: ticket.contexts?.name || null,
+              category: ticket.categories?.name || 'Geral'
             }
           })
         }
@@ -331,9 +344,15 @@ export async function POST(request: NextRequest) {
               ticket_id: ticket.id,
               ticket_number: ticket.ticket_number,
               ticket_title: ticket.title,
+              description: ticket.description,
+              priority: ticket.priority,
               comment_content: content,
               comment_author: userData.name,
-              is_internal
+              is_internal,
+              created_by: ticket.created_by_user?.name || 'Usuário',
+              assigned_to: ticket.assigned_to_user?.name || null,
+              client_name: ticket.contexts?.name || null,
+              category: ticket.categories?.name || 'Geral'
             }
           })
         }

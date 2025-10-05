@@ -276,30 +276,40 @@ export async function sendNotificationEmail({
         ticket_title: data.ticket_title || title,
         ticket_url: fullActionUrl,
         description: data.description || message,
-        priority: data.ticket_priority || data.priority || 'MÉDIA',
+        priority: data.priority || data.ticket_priority || 'medium',
         category: data.category || 'Geral',
         
         // Pessoas
-        created_by: data.created_by,
-        assigned_to: data.assigned_to,
-        commenter_name: data.comment_author || data.commenter_name,
-        changed_by: data.changed_by,
+        created_by: data.created_by || 'Usuário',
+        assigned_to: data.assigned_to || null,
+        commenter_name: data.comment_author || data.commenter_name || 'Usuário',
+        changed_by: data.changed_by || 'Sistema',
         
-        // Cliente
-        client_name: data.client_name,
+        // Cliente (context)
+        client_name: data.client_name || null,
         
         // Comentário
-        comment_text: data.comment_content || data.comment_text,
+        comment_text: data.comment_content || data.comment_text || message,
         
         // Status
-        old_status: data.old_status,
-        new_status: data.new_status,
-        resolution_notes: data.resolution_notes,
+        old_status: data.old_status || '',
+        new_status: data.new_status || '',
+        resolution_notes: data.resolution_notes || '',
         
         // Prioridade
-        old_priority: data.old_priority,
-        new_priority: data.new_priority
+        old_priority: data.old_priority || '',
+        new_priority: data.new_priority || data.priority || ''
       }
+      
+      console.log('[EMAIL] Dados mapeados para template:', {
+        type,
+        ticket_number: templateData.ticket_number,
+        priority: templateData.priority,
+        category: templateData.category,
+        client_name: templateData.client_name,
+        created_by: templateData.created_by,
+        assigned_to: templateData.assigned_to
+      })
       
       html = generateEmailFromNotification(type as any, templateData)
       console.log('✅ Usando template UNIFICADO (Glassmorphism) para tipo:', type)

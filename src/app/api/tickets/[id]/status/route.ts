@@ -116,19 +116,24 @@ export async function PUT(request: NextRequest, context: RouteParams) {
 
     // ✨ NOVO: Enviar notificação de mudança de status
     try {
-      // Buscar dados completos do ticket para notificação
+      // Buscar dados completos do ticket para notificação (incluindo contexto/cliente)
       const { data: fullTicket } = await supabaseAdmin
         .from('tickets')
         .select(`
           id,
           ticket_number,
           title,
+          description,
           priority,
           status,
           created_by,
           assigned_to,
+          context_id,
+          category_id,
           created_by_user:created_by(name, email),
-          assigned_to_user:assigned_to(name, email)
+          assigned_to_user:assigned_to(name, email),
+          contexts:context_id(name),
+          categories:category_id(name)
         `)
         .eq('id', params.id)
         .single()
@@ -146,11 +151,16 @@ export async function PUT(request: NextRequest, context: RouteParams) {
               ticket_id: fullTicket.id,
               ticket_number: fullTicket.ticket_number,
               ticket_title: fullTicket.title,
-              ticket_priority: fullTicket.priority,
+              description: fullTicket.description,
+              priority: fullTicket.priority,
               old_status: ticket.status,
               new_status: status,
               changed_by: (session.user as any).name,
-              resolution_notes
+              resolution_notes,
+              created_by: fullTicket.created_by_user?.name || 'Usuário',
+              assigned_to: fullTicket.assigned_to_user?.name || null,
+              client_name: fullTicket.contexts?.name || null,
+              category: fullTicket.categories?.name || 'Geral'
             }
           })
         }

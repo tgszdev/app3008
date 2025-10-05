@@ -268,24 +268,50 @@ export async function POST(request: NextRequest) {
     } catch (historyError) {
     }
 
+    // Buscar dados completos do ticket para notificação
+    const { data: fullTicketData } = await supabaseAdmin
+      .from('tickets')
+      .select(`
+        id,
+        ticket_number,
+        title,
+        description,
+        priority,
+        status,
+        created_by,
+        assigned_to,
+        context_id,
+        category_id,
+        created_by_user:created_by(name),
+        assigned_to_user:assigned_to(name),
+        contexts:context_id(name),
+        categories:category_id(name)
+      `)
+      .eq('id', newTicket.id)
+      .single()
+    
     // Enviar notificação para o responsável (se houver)
-    if (assigned_to && assigned_to !== created_by) {
+    if (assigned_to && assigned_to !== created_by && fullTicketData) {
       try {
         await createAndSendNotification({
           user_id: assigned_to,
-          title: `Novo Chamado #${newTicket.ticket_number || newTicket.id.substring(0, 8)}`,
-          message: `Novo chamado criado: ${title}`,
+          title: `Novo Chamado #${fullTicketData.ticket_number}`,
+          message: `Novo chamado criado: ${fullTicketData.title}`,
           type: 'ticket_assigned',
           severity: 'info',
           data: {
-            ticket_id: newTicket.id,
-            ticket_number: newTicket.ticket_number,
-            ticket_title: title,
-            ticket_priority: priority,
-            ticket_status: newTicket.status,
-            description: description
+            ticket_id: fullTicketData.id,
+            ticket_number: fullTicketData.ticket_number,
+            ticket_title: fullTicketData.title,
+            description: fullTicketData.description,
+            priority: fullTicketData.priority,
+            ticket_status: fullTicketData.status,
+            created_by: fullTicketData.created_by_user?.name || 'Usuário',
+            assigned_to: fullTicketData.assigned_to_user?.name || 'Você',
+            client_name: fullTicketData.contexts?.name || null,
+            category: fullTicketData.categories?.name || 'Geral'
           },
-          action_url: `/dashboard/tickets/${newTicket.id}`
+          action_url: `/dashboard/tickets/${fullTicketData.id}`
         })
       } catch (notificationError) {
       }
