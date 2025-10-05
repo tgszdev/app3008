@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getBrazilTimestamp } from '@/lib/date-utils'
+import { createAndSendNotification } from '@/lib/notifications'
 
 export async function GET(request: NextRequest) {
   try {
