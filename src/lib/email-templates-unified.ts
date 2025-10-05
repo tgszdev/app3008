@@ -155,11 +155,10 @@ h1{margin:0 0 12px;font-size:28px;font-weight:700;color:#fafafa;letter-spacing:-
 .block-content{font-size:15px;color:#e4e4e7;line-height:1.8}
 .block-title{font-size:19px;font-weight:600;color:#fafafa;margin-bottom:12px}
 .properties{background:#18181b;border:1px solid #3f3f46;border-radius:6px;padding:4px;margin-bottom:24px}
-.property{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid #3f3f46}
+.property{padding:16px 20px;border-bottom:1px solid #3f3f46}
 .property:last-child{border-bottom:none}
-.property-icon{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;font-weight:700;flex-shrink:0}
-.property-content{flex:1;margin-left:16px}
-.property-label{font-size:12px;color:#71717a;font-weight:500;margin-bottom:4px}
+.property-content{width:100%}
+.property-label{font-size:12px;color:#71717a;font-weight:600;margin-bottom:6px;letter-spacing:0.5px;text-transform:uppercase}
 .property-value{font-size:15px;color:#fafafa;font-weight:500}
 .urgency-box{background:linear-gradient(135deg,#dc2626,#ef4444);border-radius:6px;padding:24px;margin-bottom:28px;text-align:center}
 .urgency-label{font-size:11px;color:rgba(255,255,255,0.8);font-weight:700;letter-spacing:1.5px;margin-bottom:8px}
@@ -180,7 +179,11 @@ h1{margin:0 0 12px;font-size:28px;font-weight:700;color:#fafafa;letter-spacing:-
 </div>
 <div class="header">
 <div class="status-pill">NOVA ATIVIDADE</div>
-<h1>${title}</h1>
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:12px">
+<h1 style="margin:0">${title}</h1>
+<span style="background:rgba(168,85,247,0.15);color:#a855f7;padding:8px 16px;border-radius:8px;font-size:18px;font-weight:700;border:1px solid rgba(168,85,247,0.3)">#${data.ticket_number}</span>
+</div>
+${data.ticket_title ? `<p style="font-size:17px;color:#e4e4e7;margin-bottom:8px;font-weight:500">${data.ticket_title}</p>` : ''}
 <p class="meta-line">Por ${data.commenter_name || data.changed_by || data.created_by || 'Sistema'} • Agora mesmo</p>
 </div>
 <div class="content">
@@ -188,22 +191,18 @@ ${mainContent}
 <div class="properties">
 ${data.created_by ? `
 <div class="property">
-<div class="property-icon" style="background:linear-gradient(135deg,#8b5cf6,#a855f7)">US</div>
 <div class="property-content"><div class="property-label">Solicitante</div><div class="property-value">${data.created_by}</div></div>
 </div>
 ` : ''}
 ${data.assigned_to || data.type.includes('assign') ? `
 <div class="property">
-<div class="property-icon" style="background:linear-gradient(135deg,#3b82f6,#6366f1)">RE</div>
 <div class="property-content"><div class="property-label">Responsável</div><div class="property-value">${data.assigned_to || 'Aguardando atribuição'}</div></div>
 </div>
 ` : ''}
 <div class="property">
-<div class="property-icon" style="background:linear-gradient(135deg,#10b981,#14b8a6)">CL</div>
 <div class="property-content"><div class="property-label">Cliente / Organização</div><div class="property-value">${data.client_name || 'Não informado'}</div></div>
 </div>
 <div class="property">
-<div class="property-icon" style="background:linear-gradient(135deg,#f59e0b,#f97316)">CA</div>
 <div class="property-content"><div class="property-label">Categoria</div><div class="property-value">${data.category || 'Geral'}</div></div>
 </div>
 </div>
