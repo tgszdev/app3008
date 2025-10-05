@@ -1,7 +1,8 @@
 /**
  * ╔════════════════════════════════════════════════════════════════════╗
- * ║  TEMPLATE UNIFICADO LINEAR HIERARCHY 03                            ║
- * ║  Dark Theme Professional • Contexto Rico • 100% Responsivo         ║
+ * ║  TEMPLATE UNIFICADO - OTIMIZADO PARA EMAIL                         ║
+ * ║  100% Compatível com Gmail, Outlook, Apple Mail                    ║
+ * ║  Renderização cristalina em todos os clientes                      ║
  * ╚════════════════════════════════════════════════════════════════════╝
  */
 
@@ -56,72 +57,115 @@ function translatePriority(priority?: string): string {
   return map[priority.toLowerCase()] || priority.toUpperCase()
 }
 
+function getPriorityColor(priority?: string): string {
+  if (!priority) return '#f59e0b'
+  const colors: Record<string, string> = {
+    'low': '#10b981',
+    'medium': '#f59e0b', 
+    'high': '#ef4444',
+    'critical': '#dc2626',
+    'urgent': '#991b1b'
+  }
+  return colors[priority.toLowerCase()] || '#f59e0b'
+}
+
 function getMainContent(type: NotificationType, data: NotificationData): string {
-  const baseBlock = (label: string, content: string, borderColor: string = '#a855f7') => `
-    <div class="block" style="border-left-color:${borderColor}">
-      <div class="block-label">${label}</div>
-      <div class="block-content">${content}</div>
-    </div>
-  `
-  
   switch (type) {
     case 'ticket_created':
     case 'ticket_assigned':
       return `
         ${data.ticket_title ? `
-          ${baseBlock('TÍTULO DO CHAMADO', `<div class="block-title">${data.ticket_title}</div>`)}
+          <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:20px">
+            <tr>
+              <td style="background:#f8f9fa;border:1px solid #e0e0e0;border-left:3px solid #8b5cf6;border-radius:6px;padding:24px">
+                <div style="font-size:12px;color:#666;font-weight:600;letter-spacing:1px;margin-bottom:12px;text-transform:uppercase">TÍTULO DO CHAMADO</div>
+                <div style="font-size:19px;font-weight:600;color:#1a1a1a;margin-bottom:12px">${data.ticket_title}</div>
+                ${data.description ? `
+                  <div style="font-size:12px;color:#666;font-weight:600;letter-spacing:1px;margin:16px 0 12px;text-transform:uppercase">DESCRIÇÃO</div>
+                  <div style="font-size:15px;color:#333;line-height:1.8">${data.description.substring(0, 300)}${data.description.length > 300 ? '...' : ''}</div>
+                ` : ''}
+              </td>
+            </tr>
+          </table>
         ` : ''}
-        ${data.description ? baseBlock('DESCRIÇÃO', data.description) : ''}
       `
     
     case 'ticket_status_changed':
       return `
-        ${baseBlock('MUDANÇA DE STATUS', `
-          <div style="display:flex;align-items:center;gap:20px;justify-content:center">
-            <div style="text-align:center">
-              <div style="font-size:12px;color:#71717a;margin-bottom:8px">ANTERIOR</div>
-              <div style="background:#18181b;border:1px solid #3f3f46;padding:12px 20px;border-radius:6px;color:#fafafa;font-weight:600">${data.old_status || '—'}</div>
-            </div>
-            <div style="color:#a855f7;font-size:20px">→</div>
-            <div style="text-align:center">
-              <div style="font-size:12px;color:#71717a;margin-bottom:8px">NOVO</div>
-              <div style="background:linear-gradient(135deg,#8b5cf6,#a855f7);padding:12px 20px;border-radius:6px;color:#fff;font-weight:600">${data.new_status || '—'}</div>
-            </div>
-          </div>
-          ${data.resolution_notes ? `
-            <div style="margin-top:16px;padding-top:16px;border-top:1px solid #3f3f46">
-              <div style="font-size:12px;color:#71717a;margin-bottom:8px">OBSERVAÇÕES</div>
-              <div style="color:#e4e4e7">${data.resolution_notes}</div>
-            </div>
-          ` : ''}
-        `)}
-        ${data.ticket_title ? baseBlock('SOBRE O CHAMADO', `<div class="block-title">${data.ticket_title}</div>`, '#71717a') : ''}
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:20px">
+          <tr>
+            <td style="background:#f8f9fa;border:1px solid #e0e0e0;border-left:3px solid #8b5cf6;border-radius:6px;padding:24px">
+              <div style="font-size:12px;color:#666;font-weight:600;letter-spacing:1px;margin-bottom:16px;text-transform:uppercase">MUDANÇA DE STATUS</div>
+              <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center" style="padding:12px">
+                    <div style="font-size:12px;color:#666;margin-bottom:8px;font-weight:500">ANTERIOR</div>
+                    <div style="background:#fff;border:1px solid #e0e0e0;padding:12px 20px;border-radius:6px;color:#333;font-weight:600;display:inline-block">${data.old_status || '—'}</div>
+                  </td>
+                  <td align="center" width="40" style="font-size:20px;color:#8b5cf6">→</td>
+                  <td align="center" style="padding:12px">
+                    <div style="font-size:12px;color:#666;margin-bottom:8px;font-weight:500">NOVO</div>
+                    <div style="background:#8b5cf6;padding:12px 20px;border-radius:6px;color:#fff;font-weight:600;display:inline-block">${data.new_status || '—'}</div>
+                  </td>
+                </tr>
+              </table>
+              ${data.resolution_notes ? `
+                <div style="margin-top:16px;padding-top:16px;border-top:1px solid #e0e0e0">
+                  <div style="font-size:12px;color:#666;margin-bottom:8px;font-weight:600">OBSERVAÇÕES</div>
+                  <div style="color:#333;font-size:14px;line-height:1.6">${data.resolution_notes}</div>
+                </div>
+              ` : ''}
+            </td>
+          </tr>
+        </table>
+        ${data.ticket_title ? `
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:20px">
+          <tr>
+            <td style="background:#f8f9fa;border:1px solid #e0e0e0;border-left:3px solid #999;border-radius:6px;padding:20px">
+              <div style="font-size:12px;color:#666;font-weight:600;letter-spacing:1px;margin-bottom:12px;text-transform:uppercase">SOBRE O CHAMADO</div>
+              <div style="font-size:18px;font-weight:600;color:#1a1a1a">${data.ticket_title}</div>
+            </td>
+          </tr>
+        </table>
+        ` : ''}
       `
     
     case 'new_comment':
     case 'comment_added':
       return `
-        ${baseBlock('COMENTÁRIO RECEBIDO', data.comment_text || 'Novo comentário adicionado')}
-        ${data.ticket_title ? baseBlock('SOBRE O CHAMADO', `<div class="block-title">${data.ticket_title}</div>${data.description && data.description !== data.comment_text ? '<div style="margin-top:12px;color:#a1a1aa;font-size:14px">' + data.description.substring(0, 180) + '...</div>' : ''}`, '#71717a') : ''}
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:20px">
+          <tr>
+            <td style="background:#f8f9fa;border:1px solid #e0e0e0;border-left:3px solid #8b5cf6;border-radius:6px;padding:24px">
+              <div style="font-size:12px;color:#666;font-weight:600;letter-spacing:1px;margin-bottom:12px;text-transform:uppercase">COMENTÁRIO RECEBIDO</div>
+              <div style="font-size:15px;color:#333;line-height:1.8">${data.comment_text || 'Novo comentário adicionado'}</div>
+            </td>
+          </tr>
+        </table>
+        ${data.ticket_title ? `
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:20px">
+          <tr>
+            <td style="background:#f8f9fa;border:1px solid #e0e0e0;border-left:3px solid #999;border-radius:6px;padding:20px">
+              <div style="font-size:12px;color:#666;font-weight:600;letter-spacing:1px;margin-bottom:12px;text-transform:uppercase">SOBRE O CHAMADO</div>
+              <div style="font-size:18px;font-weight:600;color:#1a1a1a;margin-bottom:12px">${data.ticket_title}</div>
+              ${data.description && data.description !== data.comment_text ? `
+                <div style="font-size:14px;color:#666;line-height:1.6;margin-top:12px">${data.description.substring(0, 180)}...</div>
+              ` : ''}
+            </td>
+          </tr>
+        </table>
+        ` : ''}
       `
     
-    case 'ticket_priority_changed':
-      return baseBlock('MUDANÇA DE PRIORIDADE', `
-        <div style="display:flex;align-items:center;gap:20px;justify-content:center">
-          <div style="text-align:center">
-            <div style="font-size:12px;color:#71717a;margin-bottom:8px">ANTERIOR</div>
-            <div style="background:#18181b;border:1px solid #3f3f46;padding:12px 20px;border-radius:6px;color:#fafafa;font-weight:600">${translatePriority(data.old_priority)}</div>
-          </div>
-          <div style="color:#a855f7;font-size:20px">→</div>
-          <div style="text-align:center">
-            <div style="font-size:12px;color:#71717a;margin-bottom:8px">NOVA</div>
-            <div style="background:linear-gradient(135deg,#dc2626,#ef4444);padding:12px 20px;border-radius:6px;color:#fff;font-weight:600">${translatePriority(data.new_priority || data.priority)}</div>
-          </div>
-        </div>
-      `)
-    
     default:
-      return baseBlock('NOTIFICAÇÃO', data.comment_text || data.description || 'Você tem uma nova notificação')
+      return `
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:20px">
+          <tr>
+            <td style="background:#f8f9fa;border:1px solid #e0e0e0;border-left:3px solid #8b5cf6;border-radius:6px;padding:24px">
+              <div style="font-size:15px;color:#333;line-height:1.8">${data.comment_text || data.description || 'Você tem uma nova notificação'}</div>
+            </td>
+          </tr>
+        </table>
+      `
   }
 }
 
@@ -129,96 +173,135 @@ export function generateUnifiedEmailTemplate(data: NotificationData): string {
   const title = getTitleForType(data.type)
   const mainContent = getMainContent(data.type, data)
   const priorityTranslated = translatePriority(data.priority)
+  const priorityColor = getPriorityColor(data.priority)
   
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="x-apple-disable-message-reformatting">
 <title>${title} - #${data.ticket_number}</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',sans-serif;background:#18181b;color:#e4e4e7;padding:40px 20px;line-height:1.6}
-.container{max-width:800px;margin:0 auto;background:#27272a;border:1px solid #3f3f46;border-radius:12px;overflow:hidden}
-.breadcrumb{padding:20px 48px;background:#18181b;border-bottom:1px solid #3f3f46;display:flex;align-items:center;gap:12px;font-size:13px;color:#71717a;font-weight:500;flex-wrap:wrap}
-.breadcrumb-sep{color:#52525b}
-.breadcrumb-active{color:#a855f7;font-weight:600}
-.header{padding:40px 48px 32px;border-bottom:1px solid #3f3f46}
-.status-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.3);padding:8px 16px;border-radius:20px;margin-bottom:20px;font-size:13px;color:#a855f7;font-weight:600}
-.status-pill::before{content:'';width:6px;height:6px;border-radius:50%;background:#a855f7}
-h1{margin:0 0 12px;font-size:28px;font-weight:700;color:#fafafa;letter-spacing:-0.5px}
-.meta-line{font-size:14px;color:#71717a}
-.content{padding:40px 48px}
-.block{background:#18181b;border:1px solid #3f3f46;border-left:3px solid #a855f7;border-radius:6px;padding:24px;margin-bottom:20px}
-.block-label{font-size:12px;color:#71717a;font-weight:600;letter-spacing:1px;margin-bottom:12px}
-.block-content{font-size:15px;color:#e4e4e7;line-height:1.8}
-.block-title{font-size:19px;font-weight:600;color:#fafafa;margin-bottom:12px}
-.properties{background:#18181b;border:1px solid #3f3f46;border-radius:6px;padding:4px;margin-bottom:24px}
-.property{padding:16px 20px;border-bottom:1px solid #3f3f46}
-.property:last-child{border-bottom:none}
-.property-content{width:100%}
-.property-label{font-size:12px;color:#71717a;font-weight:600;margin-bottom:6px;letter-spacing:0.5px;text-transform:uppercase}
-.property-value{font-size:15px;color:#fafafa;font-weight:500}
-.urgency-box{background:linear-gradient(135deg,#dc2626,#ef4444);border-radius:6px;padding:24px;margin-bottom:28px;text-align:center}
-.urgency-label{font-size:11px;color:rgba(255,255,255,0.8);font-weight:700;letter-spacing:1.5px;margin-bottom:8px}
-.urgency-value{font-size:26px;color:#fff;font-weight:700}
-.btn{display:block;background:#a855f7;color:#fff;text-decoration:none;padding:14px;border-radius:6px;text-align:center;font-weight:600;font-size:15px;border:1px solid #9333ea}
-.footer{padding:32px 48px;background:#18181b;border-top:1px solid #3f3f46;text-align:center;color:#52525b;font-size:13px}
-@media(max-width:700px){.breadcrumb,.header,.content,.footer{padding:20px 24px}.property{flex-wrap:wrap}}
-</style>
 </head>
-<body>
-<div class="container">
-<div class="breadcrumb">
-<span>${data.client_name || 'Sistema'}</span>
-<span class="breadcrumb-sep">/</span>
-<span>${data.category || 'Geral'}</span>
-<span class="breadcrumb-sep">/</span>
-<span class="breadcrumb-active">#${data.ticket_number}</span>
-</div>
-<div class="header">
-<div class="status-pill">NOVA ATIVIDADE</div>
-<div style="display:flex;align-items:center;gap:16px;margin-bottom:12px">
-<h1 style="margin:0">${title}</h1>
-<span style="background:rgba(168,85,247,0.15);color:#a855f7;padding:8px 16px;border-radius:8px;font-size:18px;font-weight:700;border:1px solid rgba(168,85,247,0.3)">#${data.ticket_number}</span>
-</div>
-${data.ticket_title ? `<p style="font-size:17px;color:#e4e4e7;margin-bottom:8px;font-weight:500">${data.ticket_title}</p>` : ''}
-<p class="meta-line">Por ${data.commenter_name || data.changed_by || data.created_by || 'Sistema'} • Agora mesmo</p>
-</div>
-<div class="content">
-${mainContent}
-<div class="properties">
-${data.created_by ? `
-<div class="property">
-<div class="property-content"><div class="property-label">Solicitante</div><div class="property-value">${data.created_by}</div></div>
-</div>
-` : ''}
-${data.assigned_to || data.type.includes('assign') ? `
-<div class="property">
-<div class="property-content"><div class="property-label">Responsável</div><div class="property-value">${data.assigned_to || 'Aguardando atribuição'}</div></div>
-</div>
-` : ''}
-<div class="property">
-<div class="property-content"><div class="property-label">Cliente / Organização</div><div class="property-value">${data.client_name || 'Não informado'}</div></div>
-</div>
-<div class="property">
-<div class="property-content"><div class="property-label">Categoria</div><div class="property-value">${data.category || 'Geral'}</div></div>
-</div>
-</div>
-${data.priority ? `
-<div class="urgency-box">
-<div class="urgency-label">NÍVEL DE CRITICIDADE</div>
-<div class="urgency-value">${translatePriority(data.priority)}</div>
-</div>
-` : ''}
-<a href="${data.ticket_url}" class="btn">Acessar Chamado →</a>
-</div>
-<div class="footer">
-<p>Sistema de Suporte Técnico</p>
-<p style="margin-top:8px">Notificação automática • Não responda</p>
-</div>
-</div>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background-color:#f5f5f5;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f5f5f5;padding:40px 20px">
+    <tr>
+      <td align="center">
+        <!-- Container -->
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="800" style="max-width:800px;background-color:#ffffff;border:1px solid #e0e0e0;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.08)">
+          
+          <!-- Breadcrumb -->
+          <tr>
+            <td style="padding:20px 48px;background-color:#fafafa;border-bottom:1px solid #e0e0e0;font-size:13px;color:#666;font-weight:500">
+              <span>${data.client_name || 'Sistema'}</span>
+              <span style="color:#999;margin:0 8px">/</span>
+              <span>${data.category || 'Geral'}</span>
+              <span style="color:#999;margin:0 8px">/</span>
+              <span style="color:#8b5cf6;font-weight:600">#${data.ticket_number}</span>
+            </td>
+          </tr>
+          
+          <!-- Header -->
+          <tr>
+            <td style="padding:40px 48px 32px;background-color:#ffffff;border-bottom:1px solid #e0e0e0">
+              <div style="background:#f3e8ff;border:1px solid #d8b4fe;padding:8px 16px;border-radius:20px;margin-bottom:20px;font-size:13px;color:#7c3aed;font-weight:600;display:inline-block">
+                <span style="color:#8b5cf6">● </span>NOVA ATIVIDADE
+              </div>
+              <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td>
+                    <h1 style="margin:0;font-size:28px;font-weight:700;color:#1a1a1a;letter-spacing:-0.5px;display:inline-block">${title}</h1>
+                    <span style="background:rgba(139,92,246,0.15);color:#8b5cf6;padding:8px 16px;border-radius:8px;font-size:18px;font-weight:700;border:1px solid rgba(139,92,246,0.3);margin-left:16px;display:inline-block">#${data.ticket_number}</span>
+                  </td>
+                </tr>
+                ${data.ticket_title ? `
+                <tr>
+                  <td style="padding-top:12px">
+                    <p style="margin:0;font-size:17px;color:#333;font-weight:500;line-height:1.4">${data.ticket_title}</p>
+                  </td>
+                </tr>
+                ` : ''}
+                <tr>
+                  <td style="padding-top:8px">
+                    <p style="margin:0;font-size:14px;color:#666">Por ${data.commenter_name || data.changed_by || data.created_by || 'Sistema'} • Agora mesmo</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          
+          <!-- Content -->
+          <tr>
+            <td style="padding:40px 48px;background-color:#ffffff">
+              ${mainContent}
+              
+              <!-- Properties -->
+              <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px;margin-bottom:24px">
+                ${data.created_by ? `
+                <tr>
+                  <td style="padding:16px 20px;border-bottom:1px solid #e0e0e0">
+                    <div style="font-size:12px;color:#666;font-weight:600;margin-bottom:6px;letter-spacing:0.5px">SOLICITANTE</div>
+                    <div style="font-size:15px;color:#1a1a1a;font-weight:500">${data.created_by}</div>
+                  </td>
+                </tr>
+                ` : ''}
+                ${data.assigned_to || data.type.includes('assign') ? `
+                <tr>
+                  <td style="padding:16px 20px;border-bottom:1px solid #e0e0e0">
+                    <div style="font-size:12px;color:#666;font-weight:600;margin-bottom:6px;letter-spacing:0.5px">RESPONSÁVEL</div>
+                    <div style="font-size:15px;color:#1a1a1a;font-weight:500">${data.assigned_to || 'Aguardando atribuição'}</div>
+                  </td>
+                </tr>
+                ` : ''}
+                <tr>
+                  <td style="padding:16px 20px;border-bottom:1px solid #e0e0e0">
+                    <div style="font-size:12px;color:#666;font-weight:600;margin-bottom:6px;letter-spacing:0.5px">CLIENTE / ORGANIZAÇÃO</div>
+                    <div style="font-size:15px;color:#1a1a1a;font-weight:500">${data.client_name || 'Não informado'}</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:16px 20px">
+                    <div style="font-size:12px;color:#666;font-weight:600;margin-bottom:6px;letter-spacing:0.5px">CATEGORIA</div>
+                    <div style="font-size:15px;color:#1a1a1a;font-weight:500">${data.category || 'Geral'}</div>
+                  </td>
+                </tr>
+              </table>
+              
+              <!-- Priority -->
+              ${data.priority ? `
+              <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:28px">
+                <tr>
+                  <td align="center" style="background-color:${priorityColor};border-radius:6px;padding:24px">
+                    <div style="font-size:11px;color:#fff;font-weight:700;letter-spacing:1.5px;margin-bottom:8px">NÍVEL DE CRITICIDADE</div>
+                    <div style="font-size:26px;color:#fff;font-weight:700">${translatePriority(data.priority)}</div>
+                  </td>
+                </tr>
+              </table>
+              ` : ''}
+              
+              <!-- Button -->
+              <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center">
+                    <a href="${data.ticket_url}" style="display:inline-block;background-color:#8b5cf6;color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:6px;font-weight:600;font-size:15px">Acessar Chamado →</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="padding:32px 48px;background-color:#fafafa;border-top:1px solid #e0e0e0;text-align:center;color:#999;font-size:13px">
+              <p style="margin:0">Sistema de Suporte Técnico</p>
+              <p style="margin:8px 0 0">Notificação automática • Não responda</p>
+            </td>
+          </tr>
+          
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>`
 }
