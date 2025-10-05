@@ -279,7 +279,11 @@ export async function POST(request: NextRequest) {
           severity: 'info',
           data: {
             ticket_id: newTicket.id,
-            ticket_number: newTicket.ticket_number
+            ticket_number: newTicket.ticket_number,
+            ticket_title: title,
+            ticket_priority: priority,
+            ticket_status: newTicket.status,
+            description: description
           },
           action_url: `/dashboard/tickets/${newTicket.id}`
         })
@@ -308,7 +312,11 @@ export async function POST(request: NextRequest) {
               severity: 'info',
               data: {
                 ticket_id: newTicket.id,
-                ticket_number: newTicket.ticket_number
+                ticket_number: newTicket.ticket_number,
+                ticket_title: title,
+                ticket_priority: priority,
+                ticket_status: newTicket.status,
+                description: description
               },
               action_url: `/dashboard/tickets/${newTicket.id}`
             }).catch(err => console.log('Erro ao notificar admin (ignorado):', err))
@@ -507,7 +515,11 @@ async function handleUpdate(request: NextRequest) {
               severity: 'info',
               data: {
                 ticket_id: id,
-                ticket_number: currentTicket.ticket_number
+                ticket_number: currentTicket.ticket_number,
+                ticket_title: currentTicket.title,
+                ticket_priority: currentTicket.priority,
+                ticket_status: currentTicket.status,
+                description: currentTicket.description
               },
               action_url: `/dashboard/tickets/${id}`
             })

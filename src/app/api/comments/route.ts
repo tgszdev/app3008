@@ -293,7 +293,15 @@ export async function POST(request: NextRequest) {
               ? `Comentário interno adicionado` 
               : content.substring(0, 200) + (content.length > 200 ? '...' : ''),
             action_url: `/dashboard/tickets/${ticket.id}`,
-            ticket_id: ticket.id
+            ticket_id: ticket.id,
+            data: {
+              ticket_id: ticket.id,
+              ticket_number: ticket.ticket_number,
+              ticket_title: ticket.title,
+              comment_content: content,
+              comment_author: userData.name,
+              is_internal
+            }
           })
         }
         
@@ -307,7 +315,15 @@ export async function POST(request: NextRequest) {
               ? `Comentário interno adicionado` 
               : content.substring(0, 200) + (content.length > 200 ? '...' : ''),
             action_url: `/dashboard/tickets/${ticket.id}`,
-            ticket_id: ticket.id
+            ticket_id: ticket.id,
+            data: {
+              ticket_id: ticket.id,
+              ticket_number: ticket.ticket_number,
+              ticket_title: ticket.title,
+              comment_content: content,
+              comment_author: userData.name,
+              is_internal
+            }
           })
         }
         

@@ -113,6 +113,78 @@ export async function PUT(request: NextRequest, context: RouteParams) {
     } catch (logError) {
     }
 
+    // ✨ NOVO: Enviar notificação de mudança de status
+    try {
+      const { createAndSendNotification } = await import('@/lib/notifications')
+      
+      // Buscar dados completos do ticket para notificação
+      const { data: fullTicket } = await supabaseAdmin
+        .from('tickets')
+        .select(`
+          id,
+          ticket_number,
+          title,
+          priority,
+          status,
+          created_by,
+          assigned_to,
+          created_by_user:created_by(name, email),
+          assigned_to_user:assigned_to(name, email)
+        `)
+        .eq('id', params.id)
+        .single()
+      
+      if (fullTicket) {
+        // Notificar criador do ticket (se não for quem mudou)
+        if (fullTicket.created_by && fullTicket.created_by !== session.user?.id) {
+          await createAndSendNotification({
+            user_id: fullTicket.created_by,
+            type: 'ticket_status_changed',
+            title: `🔄 Status alterado - Chamado #${fullTicket.ticket_number}`,
+            message: `O status do chamado "${fullTicket.title}" foi alterado para: ${status}`,
+            action_url: `/dashboard/tickets/${fullTicket.id}`,
+            data: {
+              ticket_id: fullTicket.id,
+              ticket_number: fullTicket.ticket_number,
+              ticket_title: fullTicket.title,
+              ticket_priority: fullTicket.priority,
+              old_status: ticket.status,
+              new_status: status,
+              changed_by: (session.user as any).name,
+              resolution_notes
+            }
+          })
+        }
+        
+        // Notificar responsável (se houver e não for quem mudou)
+        if (fullTicket.assigned_to && 
+            fullTicket.assigned_to !== session.user?.id && 
+            fullTicket.assigned_to !== fullTicket.created_by) {
+          await createAndSendNotification({
+            user_id: fullTicket.assigned_to,
+            type: 'ticket_status_changed',
+            title: `🔄 Status alterado - Chamado #${fullTicket.ticket_number}`,
+            message: `O status do chamado "${fullTicket.title}" foi alterado para: ${status}`,
+            action_url: `/dashboard/tickets/${fullTicket.id}`,
+            data: {
+              ticket_id: fullTicket.id,
+              ticket_number: fullTicket.ticket_number,
+              ticket_title: fullTicket.title,
+              ticket_priority: fullTicket.priority,
+              old_status: ticket.status,
+              new_status: status,
+              changed_by: (session.user as any).name,
+              resolution_notes
+            }
+          })
+        }
+        
+        console.log(`✅ Notificações de mudança de status enviadas para ticket #${fullTicket.ticket_number}`)
+      }
+    } catch (notificationError) {
+      console.error('⚠️ Erro ao enviar notificação de status (não crítico):', notificationError)
+    }
+
     return NextResponse.json(ticket)
   } catch (error) {
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
