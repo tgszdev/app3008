@@ -184,16 +184,19 @@ export function generateUnifiedEmailTemplate(data: NotificationData): string {
 <meta name="format-detection" content="telephone=no,address=no,email=no">
 <title>${title} - #${data.ticket_number}</title>
 <style>
-a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important;font-size:inherit!important;font-family:inherit!important;font-weight:inherit!important;line-height:inherit!important}
-u+#body a{color:inherit;text-decoration:none;font-size:inherit;font-family:inherit;font-weight:inherit;line-height:inherit}
+body,td,p,a,h1,h2,h3,h4,span,div{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif!important;-webkit-font-smoothing:antialiased!important;-moz-osx-font-smoothing:grayscale!important}
+a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important}
+a{color:inherit;text-decoration:none}
+img{-ms-interpolation-mode:bicubic;border:0;outline:none}
+table{border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt}
 </style>
 </head>
-<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background-color:#f5f5f5;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale">
+<body style="margin:0;padding:0;background-color:#f5f5f5">
   <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f5f5f5;padding:40px 20px">
     <tr>
       <td align="center">
         <!-- Container -->
-        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="800" style="max-width:800px;background-color:#ffffff;border:1px solid #e0e0e0;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.08)">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="800" style="max-width:800px;width:100%;background-color:#ffffff;border:1px solid #dddddd;border-radius:4px">
           
           <!-- Header -->
           <tr>
