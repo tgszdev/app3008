@@ -266,6 +266,58 @@ export async function POST(request: NextRequest) {
       .update({ updated_at: getBrazilTimestamp() })
       .eq('id', ticket_id)
 
+    // ✨ NOVO: Enviar notificação por email sobre novo comentário
+    try {
+      // Buscar dados do ticket para notificação
+      const { data: ticket } = await supabaseAdmin
+        .from('tickets')
+        .select(`
+          id,
+          ticket_number,
+          title,
+          created_by,
+          assigned_to,
+          created_by_user:created_by(id, email, name)
+        `)
+        .eq('id', ticket_id)
+        .single()
+      
+      if (ticket) {
+        // Notificar o criador do ticket (se não for ele quem comentou)
+        if (ticket.created_by && ticket.created_by !== userData.id) {
+          await createAndSendNotification({
+            user_id: ticket.created_by,
+            type: 'new_comment',
+            title: `💬 Novo comentário no chamado #${ticket.ticket_number}`,
+            message: is_internal 
+              ? `Comentário interno adicionado` 
+              : content.substring(0, 200) + (content.length > 200 ? '...' : ''),
+            action_url: `/dashboard/tickets/${ticket.id}`,
+            ticket_id: ticket.id
+          })
+        }
+        
+        // Notificar o responsável (se houver e não for quem comentou)
+        if (ticket.assigned_to && ticket.assigned_to !== userData.id && ticket.assigned_to !== ticket.created_by) {
+          await createAndSendNotification({
+            user_id: ticket.assigned_to,
+            type: 'new_comment',
+            title: `💬 Novo comentário no chamado #${ticket.ticket_number}`,
+            message: is_internal 
+              ? `Comentário interno adicionado` 
+              : content.substring(0, 200) + (content.length > 200 ? '...' : ''),
+            action_url: `/dashboard/tickets/${ticket.id}`,
+            ticket_id: ticket.id
+          })
+        }
+        
+        console.log(`✅ Notificações de novo comentário enviadas para ticket #${ticket.ticket_number}`)
+      }
+    } catch (notificationError) {
+      console.error('⚠️ Erro ao enviar notificação de comentário (não crítico):', notificationError)
+      // Não falhar a criação do comentário por causa de notificação
+    }
+
     return NextResponse.json(comment)
 
   } catch (error: any) {
