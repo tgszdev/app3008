@@ -268,9 +268,10 @@ export async function POST(request: NextRequest) {
       .eq('id', ticket_id)
 
     // ✨ NOVO: Enviar notificação por email sobre novo comentário
+    console.log(`[COMMENT] Iniciando envio de notificações para ticket ${ticket_id}`)
     try {
       // Buscar dados do ticket para notificação
-      const { data: ticket } = await supabaseAdmin
+      const { data: ticket, error: ticketError } = await supabaseAdmin
         .from('tickets')
         .select(`
           id,
@@ -283,9 +284,18 @@ export async function POST(request: NextRequest) {
         .eq('id', ticket_id)
         .single()
       
+      console.log(`[COMMENT] Ticket encontrado:`, { 
+        ticket_number: ticket?.ticket_number, 
+        created_by: ticket?.created_by, 
+        commenter: userData.id,
+        error: ticketError?.message 
+      })
+      
       if (ticket) {
         // Notificar o criador do ticket (se não for ele quem comentou)
+        console.log(`[COMMENT] Verificando criador: ${ticket.created_by} !== ${userData.id} = ${ticket.created_by !== userData.id}`)
         if (ticket.created_by && ticket.created_by !== userData.id) {
+          console.log(`[COMMENT] Enviando notificação para criador: ${ticket.created_by}`)
           await createAndSendNotification({
             user_id: ticket.created_by,
             type: 'new_comment',
