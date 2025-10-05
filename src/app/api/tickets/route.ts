@@ -6,6 +6,48 @@ import { executeWorkflowsForTicket } from '@/lib/workflow-engine'
 import { executeEscalationForTicketSimple } from '@/lib/escalation-engine-simple'
 import { getBrazilTimestamp } from '@/lib/date-utils'
 
+// Helper: Buscar dados COMPLETOS do ticket para notificações
+async function getFullTicketData(ticketId: string) {
+  const { data } = await supabaseAdmin
+    .from('tickets')
+    .select(`
+      id,
+      ticket_number,
+      title,
+      description,
+      priority,
+      status,
+      created_by,
+      assigned_to,
+      context_id,
+      category_id,
+      created_by_user:created_by(name, email),
+      assigned_to_user:assigned_to(name, email),
+      contexts:context_id(name),
+      categories:category_id(name)
+    `)
+    .eq('id', ticketId)
+    .single()
+  
+  return data
+}
+
+// Helper: Formatar dados do ticket para notificação
+function formatTicketDataForNotification(ticket: any) {
+  return {
+    ticket_id: ticket.id,
+    ticket_number: ticket.ticket_number,
+    ticket_title: ticket.title,
+    description: ticket.description,
+    priority: ticket.priority,
+    ticket_status: ticket.status,
+    created_by: ticket.created_by_user?.name || 'Usuário',
+    assigned_to: ticket.assigned_to_user?.name || null,
+    client_name: ticket.contexts?.name || null,
+    category: ticket.categories?.name || 'Geral'
+  }
+}
+
 // GET - Listar todos os tickets
 export async function GET(request: NextRequest) {
   try {
@@ -293,6 +335,13 @@ export async function POST(request: NextRequest) {
     // Enviar notificação para o responsável (se houver)
     if (assigned_to && assigned_to !== created_by && fullTicketData) {
       try {
+        console.log('[TICKET CREATE] Dados para notificação:', {
+          client_name: fullTicketData.contexts?.name,
+          category: fullTicketData.categories?.name,
+          priority: fullTicketData.priority,
+          created_by: fullTicketData.created_by_user?.name
+        })
+        
         await createAndSendNotification({
           user_id: assigned_to,
           title: `Novo Chamado #${fullTicketData.ticket_number}`,
@@ -314,6 +363,7 @@ export async function POST(request: NextRequest) {
           action_url: `/dashboard/tickets/${fullTicketData.id}`
         })
       } catch (notificationError) {
+        console.error('[TICKET CREATE] Erro ao notificar:', notificationError)
       }
     }
 
@@ -326,25 +376,35 @@ export async function POST(request: NextRequest) {
         .eq('role', 'admin')
         .neq('id', created_by)
 
-      if (admins && admins.length > 0) {
+      if (admins && admins.length > 0 && fullTicketData) {
+        console.log('[TICKET CREATE ADMIN] Notificando admins com dados completos:', {
+          client_name: fullTicketData.contexts?.name,
+          category: fullTicketData.categories?.name,
+          priority: fullTicketData.priority
+        })
+        
         // ⚡ OTIMIZAÇÃO: Notificar admins em PARALELO (não sequencial)
         await Promise.all(
           admins.map(admin =>
             createAndSendNotification({
               user_id: admin.id,
-              title: `Novo Chamado #${newTicket.ticket_number || newTicket.id.substring(0, 8)}`,
-              message: `Novo chamado criado: ${title}`,
+              title: `Novo Chamado #${fullTicketData.ticket_number}`,
+              message: `Novo chamado criado: ${fullTicketData.title}`,
               type: 'ticket_created',
               severity: 'info',
               data: {
-                ticket_id: newTicket.id,
-                ticket_number: newTicket.ticket_number,
-                ticket_title: title,
-                ticket_priority: priority,
-                ticket_status: newTicket.status,
-                description: description
+                ticket_id: fullTicketData.id,
+                ticket_number: fullTicketData.ticket_number,
+                ticket_title: fullTicketData.title,
+                description: fullTicketData.description,
+                priority: fullTicketData.priority,
+                ticket_status: fullTicketData.status,
+                created_by: fullTicketData.created_by_user?.name || 'Usuário',
+                assigned_to: fullTicketData.assigned_to_user?.name || null,
+                client_name: fullTicketData.contexts?.name || null,
+                category: fullTicketData.categories?.name || 'Geral'
               },
-              action_url: `/dashboard/tickets/${newTicket.id}`
+              action_url: `/dashboard/tickets/${fullTicketData.id}`
             }).catch(err => console.log('Erro ao notificar admin (ignorado):', err))
           )
         )
@@ -533,22 +593,18 @@ async function handleUpdate(request: NextRequest) {
         try {
           // Notificar se o ticket foi atribuído a alguém
           if (updateData.assigned_to && updateData.assigned_to !== currentTicket.assigned_to) {
-            await createAndSendNotification({
-              user_id: updateData.assigned_to,
-              title: `Chamado #${currentTicket.ticket_number || currentTicket.id.substring(0, 8)} atribuído a você`,
-              message: `O chamado "${currentTicket.title}" foi atribuído a você`,
-              type: 'ticket_assigned',
-              severity: 'info',
-              data: {
-                ticket_id: id,
-                ticket_number: currentTicket.ticket_number,
-                ticket_title: currentTicket.title,
-                ticket_priority: currentTicket.priority,
-                ticket_status: currentTicket.status,
-                description: currentTicket.description
-              },
-              action_url: `/dashboard/tickets/${id}`
-            })
+            const fullData = await getFullTicketData(id)
+            if (fullData) {
+              await createAndSendNotification({
+                user_id: updateData.assigned_to,
+                title: `Chamado #${fullData.ticket_number} atribuído a você`,
+                message: `O chamado "${fullData.title}" foi atribuído a você`,
+                type: 'ticket_assigned',
+                severity: 'info',
+                data: formatTicketDataForNotification(fullData),
+                action_url: `/dashboard/tickets/${id}`
+              })
+            }
           }
 
           // Notificar o criador se o status mudou
@@ -576,20 +632,22 @@ async function handleUpdate(request: NextRequest) {
                 notificationTitle = `Chamado #${currentTicket.ticket_number || currentTicket.id.substring(0, 8)} atualizado`
             }
 
-            await createAndSendNotification({
-              user_id: currentTicket.created_by,
-              title: notificationTitle,
-              message: `Status do chamado "${currentTicket.title}" foi alterado para ${updateData.status}`,
-              type: 'ticket_status_changed',
-              severity: notificationSeverity,
-              data: {
-                ticket_id: id,
-                ticket_number: currentTicket.ticket_number,
-                old_status: currentTicket.status,
-                new_status: updateData.status
-              },
-              action_url: `/dashboard/tickets/${id}`
-            })
+            const fullData = await getFullTicketData(id)
+            if (fullData) {
+              await createAndSendNotification({
+                user_id: currentTicket.created_by,
+                title: notificationTitle,
+                message: `Status do chamado "${fullData.title}" foi alterado para ${updateData.status}`,
+                type: 'ticket_status_changed',
+                severity: notificationSeverity,
+                data: {
+                  ...formatTicketDataForNotification(fullData),
+                  old_status: currentTicket.status,
+                  new_status: updateData.status
+                },
+                action_url: `/dashboard/tickets/${id}`
+              })
+            }
           }
 
           // Notificar sobre mudança de prioridade
@@ -601,20 +659,22 @@ async function handleUpdate(request: NextRequest) {
               urgent: 'Urgente'
             }
             
-            await createAndSendNotification({
-              user_id: currentTicket.created_by,
-              title: `Prioridade do Chamado #${currentTicket.ticket_number || currentTicket.id.substring(0, 8)} alterada`,
-              message: `Prioridade alterada de ${priorityMap[currentTicket.priority as string] || currentTicket.priority} para ${priorityMap[updateData.priority as string] || updateData.priority}`,
-              type: 'ticket_priority_changed',
-              severity: updateData.priority === 'urgent' ? 'warning' : 'info',
-              data: {
-                ticket_id: id,
-                ticket_number: currentTicket.ticket_number,
-                old_priority: currentTicket.priority,
-                new_priority: updateData.priority
-              },
-              action_url: `/dashboard/tickets/${id}`
-            })
+            const fullData = await getFullTicketData(id)
+            if (fullData) {
+              await createAndSendNotification({
+                user_id: currentTicket.created_by,
+                title: `Prioridade do Chamado #${fullData.ticket_number} alterada`,
+                message: `Prioridade alterada de ${priorityMap[currentTicket.priority as string] || currentTicket.priority} para ${priorityMap[updateData.priority as string] || updateData.priority}`,
+                type: 'ticket_priority_changed',
+                severity: updateData.priority === 'urgent' ? 'warning' : 'info',
+                data: {
+                  ...formatTicketDataForNotification(fullData),
+                  old_priority: currentTicket.priority,
+                  new_priority: updateData.priority
+                },
+                action_url: `/dashboard/tickets/${id}`
+              })
+            }
           }
         } catch (notificationError) {
         }

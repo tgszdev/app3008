@@ -179,11 +179,16 @@ export async function PUT(request: NextRequest, context: RouteParams) {
               ticket_id: fullTicket.id,
               ticket_number: fullTicket.ticket_number,
               ticket_title: fullTicket.title,
-              ticket_priority: fullTicket.priority,
+              description: fullTicket.description,
+              priority: fullTicket.priority,
               old_status: ticket.status,
               new_status: status,
               changed_by: (session.user as any).name,
-              resolution_notes
+              resolution_notes,
+              created_by: fullTicket.created_by_user?.name || 'Usuário',
+              assigned_to: fullTicket.assigned_to_user?.name || null,
+              client_name: fullTicket.contexts?.name || null,
+              category: fullTicket.categories?.name || 'Geral'
             }
           })
         }

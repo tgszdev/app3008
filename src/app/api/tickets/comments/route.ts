@@ -2,6 +2,49 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { createAndSendNotification } from '@/lib/notifications'
 
+// Helper: Buscar dados COMPLETOS do ticket para notificações
+async function getFullTicketData(ticketId: string) {
+  const { data } = await supabaseAdmin
+    .from('tickets')
+    .select(`
+      id,
+      ticket_number,
+      title,
+      description,
+      priority,
+      status,
+      created_by,
+      assigned_to,
+      context_id,
+      category_id,
+      created_by_user:created_by(name, email),
+      assigned_to_user:assigned_to(name, email),
+      contexts:context_id(name),
+      categories:category_id(name)
+    `)
+    .eq('id', ticketId)
+    .single()
+  
+  return data
+}
+
+// Helper: Formatar dados do ticket para notificação
+function formatTicketDataForNotification(ticket: any, extraData: any = {}) {
+  return {
+    ticket_id: ticket.id,
+    ticket_number: ticket.ticket_number,
+    ticket_title: ticket.title,
+    description: ticket.description,
+    priority: ticket.priority,
+    ticket_status: ticket.status,
+    created_by: ticket.created_by_user?.name || 'Usuário',
+    assigned_to: ticket.assigned_to_user?.name || null,
+    client_name: ticket.contexts?.name || null,
+    category: ticket.categories?.name || 'Geral',
+    ...extraData
+  }
+}
+
 // POST - Adicionar comentário
 export async function POST(request: NextRequest) {
   try {
@@ -100,19 +143,23 @@ export async function POST(request: NextRequest) {
             ticket_number: ticket.ticket_number
           })
           
-          const notificationResult = await createAndSendNotification({
-            user_id: ticket.created_by,
-            title: `Novo comentário no Chamado #${ticket.ticket_number || ticket.id.substring(0, 8)}`,
-            message: `${userName} comentou: "${commentPreview}"`,
-            type: 'comment_added',
-            severity: 'info',
-            data: {
-              ticket_id: ticket.id,
-              comment_id: comment.id,
-              ticket_number: ticket.ticket_number
-            },
-            action_url: `/dashboard/tickets/${ticket.id}#comment-${comment.id}`
-          })
+          const fullTicketData = await getFullTicketData(ticket.id)
+          if (fullTicketData) {
+            const notificationResult = await createAndSendNotification({
+              user_id: ticket.created_by,
+              title: `Novo comentário no Chamado #${fullTicketData.ticket_number}`,
+              message: `${userName} comentou: "${commentPreview}"`,
+              type: 'comment_added',
+              severity: 'info',
+              data: {
+                ...formatTicketDataForNotification(fullTicketData),
+                comment_id: comment.id,
+                comment_text: content,
+                commenter_name: userName
+              },
+              action_url: `/dashboard/tickets/${ticket.id}#comment-${comment.id}`
+            })
+          }
           
         } else {
           console.log('Criador não notificado porque:', {
@@ -129,19 +176,23 @@ export async function POST(request: NextRequest) {
             ticket_number: ticket.ticket_number
           })
           
-          const notificationResult = await createAndSendNotification({
-            user_id: ticket.assigned_to,
-            title: `Novo comentário no Chamado #${ticket.ticket_number || ticket.id.substring(0, 8)}`,
-            message: `${userName} comentou: "${commentPreview}"`,
-            type: 'comment_added',
-            severity: 'info',
-            data: {
-              ticket_id: ticket.id,
-              comment_id: comment.id,
-              ticket_number: ticket.ticket_number
-            },
-            action_url: `/dashboard/tickets/${ticket.id}#comment-${comment.id}`
-          })
+          const fullTicketData = await getFullTicketData(ticket.id)
+          if (fullTicketData) {
+            const notificationResult = await createAndSendNotification({
+              user_id: ticket.assigned_to,
+              title: `Novo comentário no Chamado #${fullTicketData.ticket_number}`,
+              message: `${userName} comentou: "${commentPreview}"`,
+              type: 'comment_added',
+              severity: 'info',
+              data: {
+                ...formatTicketDataForNotification(fullTicketData),
+                comment_id: comment.id,
+                comment_text: content,
+                commenter_name: userName
+              },
+              action_url: `/dashboard/tickets/${ticket.id}#comment-${comment.id}`
+            })
+          }
           
         } else {
           console.log('Responsável não notificado porque:', {
@@ -167,19 +218,23 @@ export async function POST(request: NextRequest) {
               .single()
 
             if (mentionedUser && mentionedUser.id !== user_id) {
-              await createAndSendNotification({
-                user_id: mentionedUser.id,
-                title: `Você foi mencionado no Chamado #${ticket.ticket_number || ticket.id.substring(0, 8)}`,
-                message: `${userName} mencionou você em um comentário`,
-                type: 'comment_mention',
-                severity: 'info',
-                data: {
-                  ticket_id: ticket.id,
-                  comment_id: comment.id,
-                  ticket_number: ticket.ticket_number
-                },
-                action_url: `/dashboard/tickets/${ticket.id}#comment-${comment.id}`
-              })
+              const fullTicketData = await getFullTicketData(ticket.id)
+              if (fullTicketData) {
+                await createAndSendNotification({
+                  user_id: mentionedUser.id,
+                  title: `Você foi mencionado no Chamado #${fullTicketData.ticket_number}`,
+                  message: `${userName} mencionou você em um comentário`,
+                  type: 'comment_mention',
+                  severity: 'info',
+                  data: {
+                    ...formatTicketDataForNotification(fullTicketData),
+                    comment_id: comment.id,
+                    comment_text: content,
+                    commenter_name: userName
+                  },
+                  action_url: `/dashboard/tickets/${ticket.id}#comment-${comment.id}`
+                })
+              }
             }
           }
         }
