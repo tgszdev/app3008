@@ -1,43 +1,26 @@
 /**
  * ╔════════════════════════════════════════════════════════════════════╗
- * ║  TEMPLATE UNIFICADO DE EMAIL - GLASSMORPHISM (Template 02)        ║
- * ║  Aplicado a TODAS as notificações                                  ║
- * ║  100% Responsivo para Mobile, Tablet, Desktop                      ║
+ * ║  TEMPLATE UNIFICADO LINEAR HIERARCHY 03                            ║
+ * ║  Dark Theme Professional • Contexto Rico • 100% Responsivo         ║
  * ╚════════════════════════════════════════════════════════════════════╝
  */
 
-// Tipos de notificação suportados
 type NotificationType = 
-  | 'ticket_created'      // Novo chamado criado
-  | 'ticket_assigned'     // Chamado atribuído
-  | 'ticket_status_changed' // Mudança de status
-  | 'new_comment'         // Novo comentário
-  | 'comment_added'       // Comentário adicionado
-  | 'ticket_priority_changed' // Mudança de prioridade
-  | 'ticket_resolved'     // Chamado resolvido
-  | 'ticket_closed'       // Chamado fechado
-  | 'mention'             // Menção em comentário
-  | 'sla_warning'         // Aviso de SLA
+  | 'ticket_created' | 'ticket_assigned' | 'ticket_status_changed'
+  | 'new_comment' | 'comment_added' | 'ticket_priority_changed'
+  | 'ticket_resolved' | 'ticket_closed' | 'mention' | 'sla_warning'
 
-// Dados da notificação
 interface NotificationData {
-  // Básico
   ticket_number: string
   ticket_title?: string
   ticket_url: string
-  
-  // Pessoas
   created_by?: string
   assigned_to?: string
   commenter_name?: string
   changed_by?: string
-  
-  // Contexto
   client_name?: string
   category?: string
   priority?: string
-  
-  // Conteúdo
   comment_text?: string
   description?: string
   old_status?: string
@@ -45,30 +28,10 @@ interface NotificationData {
   old_priority?: string
   new_priority?: string
   resolution_notes?: string
-  
-  // Meta
   type: NotificationType
 }
 
-// Mapear ícones por tipo
-function getIconForType(type: NotificationType): string {
-  const icons: Record<NotificationType, string> = {
-    'ticket_created': '🎫',
-    'ticket_assigned': '👤',
-    'ticket_status_changed': '🔄',
-    'new_comment': '💬',
-    'comment_added': '💬',
-    'ticket_priority_changed': '⚡',
-    'ticket_resolved': '✅',
-    'ticket_closed': '🔒',
-    'mention': '@',
-    'sla_warning': '⚠️'
-  }
-  return icons[type] || '📧'
-}
-
-// Mapear títulos por tipo
-function getTitleForType(type: NotificationType, data: NotificationData): string {
+function getTitleForType(type: NotificationType): string {
   const titles: Record<NotificationType, string> = {
     'ticket_created': 'Novo Chamado Criado',
     'ticket_assigned': 'Chamado Atribuído',
@@ -84,280 +47,184 @@ function getTitleForType(type: NotificationType, data: NotificationData): string
   return titles[type] || 'Notificação'
 }
 
-// Traduzir prioridade
 function translatePriority(priority?: string): string {
   if (!priority) return 'MÉDIA'
   const map: Record<string, string> = {
-    'low': 'BAIXA',
-    'medium': 'MÉDIA',
-    'high': 'ALTA',
-    'critical': 'CRÍTICA',
-    'urgent': 'URGENTE'
+    'low': 'BAIXA', 'medium': 'MÉDIA', 'high': 'ALTA',
+    'critical': 'CRÍTICA', 'urgent': 'URGENTE'
   }
   return map[priority.toLowerCase()] || priority.toUpperCase()
 }
 
-// Gerar conteúdo dinâmico baseado no tipo
 function getMainContent(type: NotificationType, data: NotificationData): string {
+  const baseBlock = (label: string, content: string, borderColor: string = '#a855f7') => `
+    <div class="block" style="border-left-color:${borderColor}">
+      <div class="block-label">${label}</div>
+      <div class="block-content">${content}</div>
+    </div>
+  `
+  
   switch (type) {
     case 'ticket_created':
     case 'ticket_assigned':
       return `
         ${data.ticket_title ? `
-        <div style="background:#f8fafc;border-radius:12px;padding:20px;margin:20px 0;border-left:4px solid #667eea">
-          <p style="margin:0 0 8px;color:#64748b;font-size:12px;font-weight:700;letter-spacing:1px">TÍTULO DO CHAMADO</p>
-          <h2 style="margin:0 0 16px;color:#1e293b;font-size:18px;font-weight:600;line-height:1.4">${data.ticket_title}</h2>
-          ${data.description ? `
-            <p style="margin:0 0 8px;color:#64748b;font-size:12px;font-weight:700;letter-spacing:1px">DESCRIÇÃO</p>
-            <p style="margin:0;color:#334155;line-height:1.6;font-size:14px">${data.description}</p>
-          ` : ''}
-        </div>
-        ` : `
-        <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:20px 0">
-          <p style="margin:0;color:#334155;line-height:1.6">${data.description || 'Novo chamado aberto no sistema'}</p>
-        </div>
-        `}
+          ${baseBlock('TÍTULO DO CHAMADO', `<div class="block-title">${data.ticket_title}</div>`)}
+        ` : ''}
+        ${data.description ? baseBlock('DESCRIÇÃO', data.description) : ''}
       `
     
     case 'ticket_status_changed':
       return `
-        <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:20px 0">
-          <div style="display:flex;align-items:center;justify-content:center;gap:16px">
+        ${baseBlock('MUDANÇA DE STATUS', `
+          <div style="display:flex;align-items:center;gap:20px;justify-content:center">
             <div style="text-align:center">
-              <div style="font-size:11px;color:#64748b;font-weight:600;margin-bottom:8px">STATUS ANTERIOR</div>
-              <div style="background:#fff;padding:12px 20px;border-radius:8px;font-weight:600;color:#334155">${data.old_status || '—'}</div>
+              <div style="font-size:12px;color:#71717a;margin-bottom:8px">ANTERIOR</div>
+              <div style="background:#18181b;border:1px solid #3f3f46;padding:12px 20px;border-radius:6px;color:#fafafa;font-weight:600">${data.old_status || '—'}</div>
             </div>
-            <div style="font-size:24px;color:#667eea">→</div>
+            <div style="color:#a855f7;font-size:20px">→</div>
             <div style="text-align:center">
-              <div style="font-size:11px;color:#64748b;font-weight:600;margin-bottom:8px">NOVO STATUS</div>
-              <div style="background:linear-gradient(135deg,#667eea,#764ba2);padding:12px 20px;border-radius:8px;font-weight:600;color:#fff">${data.new_status || '—'}</div>
+              <div style="font-size:12px;color:#71717a;margin-bottom:8px">NOVO</div>
+              <div style="background:linear-gradient(135deg,#8b5cf6,#a855f7);padding:12px 20px;border-radius:6px;color:#fff;font-weight:600">${data.new_status || '—'}</div>
             </div>
           </div>
           ${data.resolution_notes ? `
-            <div style="margin-top:16px;padding-top:16px;border-top:1px solid #e2e8f0">
-              <div style="font-size:11px;color:#64748b;font-weight:600;margin-bottom:8px">OBSERVAÇÕES</div>
-              <p style="margin:0;color:#334155;line-height:1.6">${data.resolution_notes}</p>
+            <div style="margin-top:16px;padding-top:16px;border-top:1px solid #3f3f46">
+              <div style="font-size:12px;color:#71717a;margin-bottom:8px">OBSERVAÇÕES</div>
+              <div style="color:#e4e4e7">${data.resolution_notes}</div>
             </div>
           ` : ''}
-        </div>
+        `)}
+        ${data.ticket_title ? baseBlock('SOBRE O CHAMADO', `<div class="block-title">${data.ticket_title}</div>`, '#71717a') : ''}
       `
     
     case 'new_comment':
     case 'comment_added':
       return `
-        <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:20px 0">
-          <div style="display:flex;align-items:center;margin-bottom:12px">
-            <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px">${(data.commenter_name || data.changed_by || 'U')[0].toUpperCase()}</div>
-            <div style="margin-left:12px">
-              <div style="font-weight:600;color:#334155">${data.commenter_name || data.changed_by || 'Usuário'}</div>
-              <div style="font-size:12px;color:#64748b">comentou</div>
-            </div>
-          </div>
-          <p style="margin:0;color:#334155;line-height:1.6">${data.comment_text || 'Novo comentário adicionado ao chamado'}</p>
-        </div>
+        ${baseBlock('COMENTÁRIO RECEBIDO', data.comment_text || 'Novo comentário adicionado')}
+        ${data.ticket_title ? baseBlock('SOBRE O CHAMADO', `<div class="block-title">${data.ticket_title}</div>${data.description && data.description !== data.comment_text ? '<div style="margin-top:12px;color:#a1a1aa;font-size:14px">' + data.description.substring(0, 180) + '...</div>' : ''}`, '#71717a') : ''}
       `
     
     case 'ticket_priority_changed':
-      return `
-        <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:20px 0">
-          <div style="display:flex;align-items:center;justify-content:center;gap:16px">
-            <div style="text-align:center">
-              <div style="font-size:11px;color:#64748b;font-weight:600;margin-bottom:8px">PRIORIDADE ANTERIOR</div>
-              <div style="background:#fff;padding:12px 20px;border-radius:8px;font-weight:600;color:#334155">${data.old_priority || '—'}</div>
-            </div>
-            <div style="font-size:24px;color:#667eea">→</div>
-            <div style="text-align:center">
-              <div style="font-size:11px;color:#64748b;font-weight:600;margin-bottom:8px">NOVA PRIORIDADE</div>
-              <div style="background:#fef2f2;padding:12px 20px;border-radius:8px;font-weight:600;color:#dc2626">${data.new_priority || data.priority || '—'}</div>
-            </div>
+      return baseBlock('MUDANÇA DE PRIORIDADE', `
+        <div style="display:flex;align-items:center;gap:20px;justify-content:center">
+          <div style="text-align:center">
+            <div style="font-size:12px;color:#71717a;margin-bottom:8px">ANTERIOR</div>
+            <div style="background:#18181b;border:1px solid #3f3f46;padding:12px 20px;border-radius:6px;color:#fafafa;font-weight:600">${translatePriority(data.old_priority)}</div>
+          </div>
+          <div style="color:#a855f7;font-size:20px">→</div>
+          <div style="text-align:center">
+            <div style="font-size:12px;color:#71717a;margin-bottom:8px">NOVA</div>
+            <div style="background:linear-gradient(135deg,#dc2626,#ef4444);padding:12px 20px;border-radius:6px;color:#fff;font-weight:600">${translatePriority(data.new_priority || data.priority)}</div>
           </div>
         </div>
-      `
+      `)
     
     default:
-      return `
-        <div style="background:#f1f5f9;border-radius:12px;padding:20px;margin:20px 0">
-          <p style="margin:0;color:#334155;line-height:1.6">${data.comment_text || data.description || 'Você tem uma nova notificação'}</p>
-        </div>
-      `
+      return baseBlock('NOTIFICAÇÃO', data.comment_text || data.description || 'Você tem uma nova notificação')
   }
 }
 
-/**
- * Template Unificado Glassmorphism - 100% Responsivo
- */
 export function generateUnifiedEmailTemplate(data: NotificationData): string {
-  const icon = getIconForType(data.type)
-  const title = getTitleForType(data.type, data)
+  const title = getTitleForType(data.type)
   const mainContent = getMainContent(data.type, data)
   const priorityTranslated = translatePriority(data.priority)
   
-  return `
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta http-equiv="X-UA-Compatible" content="IE=edge">
-      <title>${title} - Chamado #${data.ticket_number}</title>
-      <!--[if mso]>
-      <style type="text/css">
-        body, table, td {font-family: Arial, sans-serif !important;}
-      </style>
-      <![endif]-->
-      <style>
-        /* Reset */
-        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
-        
-        /* Responsivo */
-        @media only screen and (max-width: 850px) {
-          .container { width: 95% !important; margin: 20px auto !important; }
-          .content { padding: 24px !important; }
-          .header { padding: 28px 24px !important; }
-          .grid-2 { display: block !important; }
-          .grid-item { margin-bottom: 12px !important; width: 100% !important; padding: 0 !important; }
-          .btn { padding: 16px !important; font-size: 16px !important; }
-          h1 { font-size: 22px !important; }
-          .hide-mobile { display: none !important; }
-        }
-        
-        @media only screen and (max-width: 480px) {
-          .container { border-radius: 16px !important; margin: 10px !important; width: 98% !important; }
-          .content { padding: 20px !important; }
-          .header { padding: 24px 20px !important; }
-        }
-      </style>
-    </head>
-    <body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale">
-      
-      <!-- Container Principal -->
-      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:40px 0">
-        <tr>
-          <td align="center">
-            
-            <!-- Card -->
-            <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="container" style="max-width:800px;width:100%;margin:40px auto;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:24px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.1);border:1px solid rgba(255,255,255,0.18)">
-              
-              <!-- Header Glassmorphism -->
-              <tr>
-                <td class="header" style="padding:40px;background:linear-gradient(135deg,rgba(102,126,234,0.1) 0%,rgba(118,75,162,0.1) 100%)">
-                  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#fff;border-radius:16px;padding:32px;box-shadow:0 4px 12px rgba(0,0,0,0.05)">
-                    
-                    <!-- Cabeçalho com Ícone -->
-                    <tr>
-                      <td>
-                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                          <tr>
-                            <td style="width:48px;vertical-align:top">
-                              <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;text-align:center;line-height:48px">${icon}</div>
-                            </td>
-                            <td style="padding-left:16px;vertical-align:middle">
-                              <h1 style="margin:0;font-size:20px;color:#1e293b;font-weight:600;line-height:1.3">${title}</h1>
-                              <p style="margin:4px 0 0;color:#64748b;font-size:14px">Chamado #${data.ticket_number}</p>
-                            </td>
-                          </tr>
-                        </table>
-                      </td>
-                    </tr>
-                    
-                    <!-- Conteúdo Principal -->
-                    <tr>
-                      <td style="padding-top:20px">
-                        ${mainContent}
-                      </td>
-                    </tr>
-                    
-                    <!-- Grid de Informações (2 colunas) -->
-                    <tr>
-                      <td style="padding-top:24px">
-                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="grid-2">
-                          ${data.created_by ? `
-                          <tr>
-                            <td class="grid-item" style="width:50%;padding-right:6px;padding-bottom:12px;vertical-align:top">
-                              <div style="background:#fafafa;border-radius:8px;padding:12px">
-                                <div style="font-size:11px;color:#64748b;font-weight:600;margin-bottom:4px">SOLICITANTE</div>
-                                <div style="font-size:14px;color:#0f172a;font-weight:500">${data.created_by}</div>
-                              </div>
-                            </td>
-                            <td class="grid-item" style="width:50%;padding-left:6px;padding-bottom:12px;vertical-align:top">
-                              <div style="background:#fafafa;border-radius:8px;padding:12px">
-                                <div style="font-size:11px;color:#64748b;font-weight:600;margin-bottom:4px">RESPONSÁVEL</div>
-                                <div style="font-size:14px;color:#0f172a;font-weight:500">${data.assigned_to || 'Não atribuído'}</div>
-                              </div>
-                            </td>
-                          </tr>
-                          ` : ''}
-                          ${data.client_name || data.category ? `
-                          <tr>
-                            <td class="grid-item" style="width:50%;padding-right:6px;padding-bottom:12px;vertical-align:top">
-                              <div style="background:#fafafa;border-radius:8px;padding:12px">
-                                <div style="font-size:11px;color:#64748b;font-weight:600;margin-bottom:4px">CLIENTE</div>
-                                <div style="font-size:14px;color:#0f172a;font-weight:500">${data.client_name || 'N/A'}</div>
-                              </div>
-                            </td>
-                            <td class="grid-item" style="width:50%;padding-left:6px;padding-bottom:12px;vertical-align:top">
-                              <div style="background:#fafafa;border-radius:8px;padding:12px">
-                                <div style="font-size:11px;color:#64748b;font-weight:600;margin-bottom:4px">CATEGORIA</div>
-                                <div style="font-size:14px;color:#0f172a;font-weight:500">${data.category || 'N/A'}</div>
-                              </div>
-                            </td>
-                          </tr>
-                          ` : ''}
-                        </table>
-                      </td>
-                    </tr>
-                    
-                    <!-- Criticidade -->
-                    ${data.priority ? `
-                    <tr>
-                      <td style="padding-top:12px">
-                        <div style="background:linear-gradient(135deg,#fef2f2 0%,#fee2e2 100%);border-radius:8px;padding:12px;text-align:center">
-                          <div style="font-size:11px;color:#991b1b;font-weight:600;margin-bottom:4px">CRITICIDADE</div>
-                          <div style="font-size:18px;color:#dc2626;font-weight:700">${priorityTranslated}</div>
-                        </div>
-                      </td>
-                    </tr>
-                    ` : ''}
-                    
-                    <!-- Botão de Ação -->
-                    <tr>
-                      <td style="padding-top:24px">
-                        <a href="${data.ticket_url}" class="btn" style="display:block;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;text-decoration:none;padding:16px;border-radius:12px;text-align:center;font-weight:600;font-size:16px;box-shadow:0 4px 12px rgba(102,126,234,0.3);transition:all 0.3s">
-                          Abrir Chamado →
-                        </a>
-                      </td>
-                    </tr>
-                    
-                  </table>
-                </td>
-              </tr>
-              
-              <!-- Footer -->
-              <tr>
-                <td style="padding:24px;text-align:center;background:rgba(248,250,252,0.5)">
-                  <p style="margin:0 0 8px;color:#64748b;font-size:13px">Sistema de Suporte Técnico</p>
-                  <p style="margin:0;color:#94a3b8;font-size:12px">Este é um email automático. Por favor, não responda.</p>
-                </td>
-              </tr>
-              
-            </table>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </body>
-    </html>
-  `
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>${title} - #${data.ticket_number}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#18181b;color:#e4e4e7;padding:40px 20px;line-height:1.6}
+.container{max-width:800px;margin:0 auto;background:#27272a;border:1px solid #3f3f46;border-radius:12px;overflow:hidden}
+.breadcrumb{padding:20px 48px;background:#18181b;border-bottom:1px solid #3f3f46;display:flex;align-items:center;gap:12px;font-size:13px;color:#71717a;font-weight:500;flex-wrap:wrap}
+.breadcrumb-sep{color:#52525b}
+.breadcrumb-active{color:#a855f7;font-weight:600}
+.header{padding:40px 48px 32px;border-bottom:1px solid #3f3f46}
+.status-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.3);padding:8px 16px;border-radius:20px;margin-bottom:20px;font-size:13px;color:#a855f7;font-weight:600}
+.status-pill::before{content:'';width:6px;height:6px;border-radius:50%;background:#a855f7}
+h1{margin:0 0 12px;font-size:28px;font-weight:700;color:#fafafa;letter-spacing:-0.5px}
+.meta-line{font-size:14px;color:#71717a}
+.content{padding:40px 48px}
+.block{background:#18181b;border:1px solid #3f3f46;border-left:3px solid #a855f7;border-radius:6px;padding:24px;margin-bottom:20px}
+.block-label{font-size:12px;color:#71717a;font-weight:600;letter-spacing:1px;margin-bottom:12px}
+.block-content{font-size:15px;color:#e4e4e7;line-height:1.8}
+.block-title{font-size:19px;font-weight:600;color:#fafafa;margin-bottom:12px}
+.properties{background:#18181b;border:1px solid #3f3f46;border-radius:6px;padding:4px;margin-bottom:24px}
+.property{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid #3f3f46}
+.property:last-child{border-bottom:none}
+.property-icon{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;font-weight:700;flex-shrink:0}
+.property-content{flex:1;margin-left:16px}
+.property-label{font-size:12px;color:#71717a;font-weight:500;margin-bottom:4px}
+.property-value{font-size:15px;color:#fafafa;font-weight:500}
+.urgency-box{background:linear-gradient(135deg,#dc2626,#ef4444);border-radius:6px;padding:24px;margin-bottom:28px;text-align:center}
+.urgency-label{font-size:11px;color:rgba(255,255,255,0.8);font-weight:700;letter-spacing:1.5px;margin-bottom:8px}
+.urgency-value{font-size:26px;color:#fff;font-weight:700}
+.btn{display:block;background:#a855f7;color:#fff;text-decoration:none;padding:14px;border-radius:6px;text-align:center;font-weight:600;font-size:15px;border:1px solid #9333ea}
+.footer{padding:32px 48px;background:#18181b;border-top:1px solid #3f3f46;text-align:center;color:#52525b;font-size:13px}
+@media(max-width:700px){.breadcrumb,.header,.content,.footer{padding:20px 24px}.property{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="breadcrumb">
+<span>${data.client_name || 'Sistema'}</span>
+<span class="breadcrumb-sep">/</span>
+<span>${data.category || 'Geral'}</span>
+<span class="breadcrumb-sep">/</span>
+<span class="breadcrumb-active">#${data.ticket_number}</span>
+</div>
+<div class="header">
+<div class="status-pill">NOVA ATIVIDADE</div>
+<h1>${title}</h1>
+<p class="meta-line">Por ${data.commenter_name || data.changed_by || data.created_by || 'Sistema'} • Agora mesmo</p>
+</div>
+<div class="content">
+${mainContent}
+<div class="properties">
+${data.created_by ? `
+<div class="property">
+<div class="property-icon" style="background:linear-gradient(135deg,#8b5cf6,#a855f7)">US</div>
+<div class="property-content"><div class="property-label">Solicitante</div><div class="property-value">${data.created_by}</div></div>
+</div>
+` : ''}
+${data.assigned_to || data.type.includes('assign') ? `
+<div class="property">
+<div class="property-icon" style="background:linear-gradient(135deg,#3b82f6,#6366f1)">RE</div>
+<div class="property-content"><div class="property-label">Responsável</div><div class="property-value">${data.assigned_to || 'Aguardando atribuição'}</div></div>
+</div>
+` : ''}
+<div class="property">
+<div class="property-icon" style="background:linear-gradient(135deg,#10b981,#14b8a6)">CL</div>
+<div class="property-content"><div class="property-label">Cliente / Organização</div><div class="property-value">${data.client_name || 'Não informado'}</div></div>
+</div>
+<div class="property">
+<div class="property-icon" style="background:linear-gradient(135deg,#f59e0b,#f97316)">CA</div>
+<div class="property-content"><div class="property-label">Categoria</div><div class="property-value">${data.category || 'Geral'}</div></div>
+</div>
+</div>
+${data.priority ? `
+<div class="urgency-box">
+<div class="urgency-label">NÍVEL DE CRITICIDADE</div>
+<div class="urgency-value">${translatePriority(data.priority)}</div>
+</div>
+` : ''}
+<a href="${data.ticket_url}" class="btn">Acessar Chamado →</a>
+</div>
+<div class="footer">
+<p>Sistema de Suporte Técnico</p>
+<p style="margin-top:8px">Notificação automática • Não responda</p>
+</div>
+</div>
+</body>
+</html>`
 }
 
-// Função auxiliar para usar nos email-config.ts
-export function generateEmailFromNotification(
-  type: NotificationType,
-  data: Partial<NotificationData>
-): string {
+export function generateEmailFromNotification(type: NotificationType, data: Partial<NotificationData>): string {
   const fullData: NotificationData = {
     type,
     ticket_number: data.ticket_number || '0000',
@@ -381,4 +248,3 @@ export function generateEmailFromNotification(
   
   return generateUnifiedEmailTemplate(fullData)
 }
-
