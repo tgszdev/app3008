@@ -220,7 +220,7 @@ export async function POST(request: NextRequest) {
     // Buscar o usuário no banco de dados
     const { data: userData, error: userError } = await supabaseAdmin
       .from('users')
-      .select('id')
+      .select('id, name, email')
       .eq('email', session.user.email)
       .single()
 
