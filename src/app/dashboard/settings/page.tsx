@@ -239,6 +239,35 @@ export default function SettingsPage() {
           </button>
         </div>
 
+        {/* WhatsApp Settings Card */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
+          <div className="flex items-start mb-4">
+            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-2xl flex-shrink-0">
+              <span className="text-2xl">📱</span>
+            </div>
+            <div className="ml-3">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                WhatsApp
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Meta Business API
+              </p>
+            </div>
+          </div>
+          
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-grow">
+            Receba notificações instantâneas via API oficial da Meta/Facebook
+          </p>
+          
+          <a
+            href="/dashboard/settings/whatsapp"
+            className="w-full inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white font-medium rounded-2xl hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+          >
+            <Settings className="h-5 w-5 mr-2" />
+            Configurar WhatsApp
+          </a>
+        </div>
+
         {/* Backup Settings Card */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col h-full">
           <div className="flex items-start mb-4">
