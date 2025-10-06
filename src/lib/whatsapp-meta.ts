@@ -132,6 +132,14 @@ export async function sendWhatsAppTemplate(params: WhatsAppTemplateParams) {
 /**
  * 💬 Notificação: Novo Comentário
  * Template: novo_comentario
+ * 
+ * Variáveis:
+ * {{1}} = ticket_number (ex: 1234)
+ * {{2}} = comment_text (comentário)
+ * {{3}} = ticket_title (título)
+ * {{4}} = commenter_name (quem comentou)
+ * {{5}} = client_name (cliente)
+ * {{6}} = ticket_id (UUID para URL)
  */
 export async function sendWhatsAppNewComment(data: {
   to: string
@@ -140,7 +148,7 @@ export async function sendWhatsAppNewComment(data: {
   ticket_title: string
   commenter_name: string
   client_name: string
-  ticket_url: string
+  ticket_id: string
 }) {
   return sendWhatsAppTemplate({
     template_name: 'novo_comentario',
@@ -149,19 +157,12 @@ export async function sendWhatsAppNewComment(data: {
       {
         type: 'body',
         parameters: [
-          { type: 'text', text: data.ticket_number },
-          { type: 'text', text: data.comment_text.substring(0, 200) },
-          { type: 'text', text: data.ticket_title },
-          { type: 'text', text: data.commenter_name },
-          { type: 'text', text: data.client_name || 'N/A' }
-        ]
-      },
-      {
-        type: 'button',
-        sub_type: 'url',
-        index: 0,
-        parameters: [
-          { type: 'text', text: data.ticket_url.replace('https://www.ithostbr.tech', '') }
+          { type: 'text', text: data.ticket_number }, // {{1}}
+          { type: 'text', text: data.comment_text.substring(0, 150) }, // {{2}}
+          { type: 'text', text: data.ticket_title }, // {{3}}
+          { type: 'text', text: data.commenter_name }, // {{4}}
+          { type: 'text', text: data.client_name || 'N/A' }, // {{5}}
+          { type: 'text', text: data.ticket_id } // {{6}} para URL
         ]
       }
     ]
@@ -171,6 +172,14 @@ export async function sendWhatsAppNewComment(data: {
 /**
  * 🔄 Notificação: Status Alterado
  * Template: status_alterado
+ * 
+ * Variáveis:
+ * {{1}} = ticket_number
+ * {{2}} = old_status
+ * {{3}} = new_status
+ * {{4}} = ticket_title
+ * {{5}} = changed_by
+ * {{6}} = ticket_id (UUID para URL)
  */
 export async function sendWhatsAppStatusChanged(data: {
   to: string
@@ -179,8 +188,7 @@ export async function sendWhatsAppStatusChanged(data: {
   new_status: string
   ticket_title: string
   changed_by: string
-  client_name: string
-  ticket_url: string
+  ticket_id: string
 }) {
   return sendWhatsAppTemplate({
     template_name: 'status_alterado',
@@ -189,20 +197,12 @@ export async function sendWhatsAppStatusChanged(data: {
       {
         type: 'body',
         parameters: [
-          { type: 'text', text: data.ticket_number },
-          { type: 'text', text: data.old_status },
-          { type: 'text', text: data.new_status },
-          { type: 'text', text: data.ticket_title },
-          { type: 'text', text: data.changed_by },
-          { type: 'text', text: data.client_name || 'N/A' }
-        ]
-      },
-      {
-        type: 'button',
-        sub_type: 'url',
-        index: 0,
-        parameters: [
-          { type: 'text', text: data.ticket_url.replace('https://www.ithostbr.tech', '') }
+          { type: 'text', text: data.ticket_number }, // {{1}}
+          { type: 'text', text: data.old_status }, // {{2}}
+          { type: 'text', text: data.new_status }, // {{3}}
+          { type: 'text', text: data.ticket_title }, // {{4}}
+          { type: 'text', text: data.changed_by }, // {{5}}
+          { type: 'text', text: data.ticket_id } // {{6}} para URL
         ]
       }
     ]
@@ -212,6 +212,14 @@ export async function sendWhatsAppStatusChanged(data: {
 /**
  * 🎫 Notificação: Chamado Criado
  * Template: chamado_criado
+ * 
+ * Variáveis:
+ * {{1}} = ticket_number
+ * {{2}} = ticket_title
+ * {{3}} = priority
+ * {{4}} = client_name
+ * {{5}} = category
+ * {{6}} = ticket_id (UUID para URL)
  */
 export async function sendWhatsAppTicketCreated(data: {
   to: string
@@ -220,7 +228,7 @@ export async function sendWhatsAppTicketCreated(data: {
   priority: string
   client_name: string
   category: string
-  ticket_url: string
+  ticket_id: string
 }) {
   return sendWhatsAppTemplate({
     template_name: 'chamado_criado',
@@ -229,19 +237,12 @@ export async function sendWhatsAppTicketCreated(data: {
       {
         type: 'body',
         parameters: [
-          { type: 'text', text: data.ticket_number },
-          { type: 'text', text: data.ticket_title },
-          { type: 'text', text: data.priority },
-          { type: 'text', text: data.client_name || 'N/A' },
-          { type: 'text', text: data.category }
-        ]
-      },
-      {
-        type: 'button',
-        sub_type: 'url',
-        index: 0,
-        parameters: [
-          { type: 'text', text: data.ticket_url.replace('https://www.ithostbr.tech', '') }
+          { type: 'text', text: data.ticket_number }, // {{1}}
+          { type: 'text', text: data.ticket_title }, // {{2}}
+          { type: 'text', text: data.priority }, // {{3}}
+          { type: 'text', text: data.client_name || 'N/A' }, // {{4}}
+          { type: 'text', text: data.category }, // {{5}}
+          { type: 'text', text: data.ticket_id } // {{6}} para URL
         ]
       }
     ]
