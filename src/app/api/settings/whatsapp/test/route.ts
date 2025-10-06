@@ -8,13 +8,19 @@ import { sendWhatsAppTemplate } from '@/lib/whatsapp-meta'
  */
 export async function POST(request: NextRequest) {
   try {
+    console.log('[WhatsApp Test] Iniciando teste...')
+    
     const session = await getServerSession(authOptions)
     
     if (!session?.user?.id) {
+      console.log('[WhatsApp Test] Não autenticado')
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
 
+    console.log('[WhatsApp Test] Usuário:', session.user.email)
+
     const { phone } = await request.json()
+    console.log('[WhatsApp Test] Telefone:', phone)
 
     if (!phone) {
       return NextResponse.json(
@@ -33,12 +39,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Enviar usando template hello_world (padrão da Meta)
+    console.log('[WhatsApp Test] Enviando template hello_world...')
+    console.log('[WhatsApp Test] Credenciais:', {
+      hasPhoneId: !!process.env.WHATSAPP_PHONE_NUMBER_ID,
+      hasToken: !!process.env.WHATSAPP_ACCESS_TOKEN
+    })
+    
     const result = await sendWhatsAppTemplate({
       template_name: 'hello_world',
       to: phone,
       language: 'en_US',
       components: []
     })
+    
+    console.log('[WhatsApp Test] Resultado:', result)
 
     if (result.success) {
       return NextResponse.json({
