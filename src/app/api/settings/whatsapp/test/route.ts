@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth-config'
+import { auth } from '@/lib/auth'
 import { sendWhatsAppTemplate } from '@/lib/whatsapp-meta'
 
 /**
@@ -10,7 +9,7 @@ export async function POST(request: NextRequest) {
   try {
     console.log('[WhatsApp Test] Iniciando teste...')
     
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.id) {
       console.log('[WhatsApp Test] Não autenticado')
