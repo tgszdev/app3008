@@ -78,16 +78,19 @@ export async function sendWhatsAppTemplate(params: WhatsAppTemplateParams) {
       console.error('❌ Erro Meta WhatsApp API:', result)
       
       // Salvar erro no banco
-      await supabaseAdmin
-        .from('whatsapp_messages')
-        .insert({
-          to_phone: phoneNumber,
-          template_name: params.template_name,
-          status: 'failed',
-          error_message: result.error?.message || 'Erro desconhecido',
-          failed_at: new Date().toISOString()
-        })
-        .catch(err => console.error('Erro ao salvar log:', err))
+      try {
+        await supabaseAdmin
+          .from('whatsapp_messages')
+          .insert({
+            to_phone: phoneNumber,
+            template_name: params.template_name,
+            status: 'failed',
+            error_message: result.error?.message || 'Erro desconhecido',
+            failed_at: new Date().toISOString()
+          })
+      } catch (err) {
+        console.error('Erro ao salvar log:', err)
+      }
 
       throw new Error(result.error?.message || 'Erro ao enviar WhatsApp')
     }
@@ -97,17 +100,20 @@ export async function sendWhatsAppTemplate(params: WhatsAppTemplateParams) {
     console.log('✅ WhatsApp enviado! ID:', messageId)
 
     // Salvar no banco
-    await supabaseAdmin
-      .from('whatsapp_messages')
-      .insert({
-        message_id: messageId,
-        to_phone: phoneNumber,
-        template_name: params.template_name,
-        status: 'sent',
-        sent_at: new Date().toISOString(),
-        metadata: { components: params.components }
-      })
-      .catch(err => console.error('Erro ao salvar no banco:', err))
+    try {
+      await supabaseAdmin
+        .from('whatsapp_messages')
+        .insert({
+          message_id: messageId,
+          to_phone: phoneNumber,
+          template_name: params.template_name,
+          status: 'sent',
+          sent_at: new Date().toISOString(),
+          metadata: { components: params.components }
+        })
+    } catch (err) {
+      console.error('Erro ao salvar no banco:', err)
+    }
 
     return {
       success: true,
