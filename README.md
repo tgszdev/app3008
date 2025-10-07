@@ -254,3 +254,4 @@ Este projeto está sob licença MIT.
 ---
 
 **Desenvolvido com ❤️ usando Next.js e Supabase**# Deploy automatizado configurado
+# Deploy após reversão - Tue Oct  7 19:55:53 -03 2025
