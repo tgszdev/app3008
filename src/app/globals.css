@@ -170,16 +170,88 @@ details[open] summary::before {
   animation: fadeIn 0.2s ease-out;
 }
 
-/* Animação de sombra pulsante para o logo */
-@keyframes pulseWhite {
+/* ===== OPÇÕES DE SOMBRA CORPORATIVA ===== */
+
+/* OPÇÃO 1: Sombra Suave Corporativa (Recomendada) */
+@keyframes pulseCorporate {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.1), 0 4px 20px rgba(0, 0, 0, 0.05);
   }
   50% {
-    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 8px rgba(0, 0, 0, 0.05), 0 8px 30px rgba(0, 0, 0, 0.1);
   }
 }
 
-.animate-pulse-white {
-  animation: pulseWhite 2s ease-in-out infinite;
+.animate-pulse-corporate {
+  animation: pulseCorporate 3s ease-in-out infinite;
+}
+
+/* OPÇÃO 2: Sombra Azul Corporativa */
+@keyframes pulseBlue {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.1), 0 4px 20px rgba(59, 130, 246, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.08), 0 8px 25px rgba(59, 130, 246, 0.1);
+  }
+}
+
+.animate-pulse-blue {
+  animation: pulseBlue 2.5s ease-in-out infinite;
+}
+
+/* OPÇÃO 3: Sombra Cinza Esfumaçada */
+@keyframes pulseSmoke {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(107, 114, 128, 0.08), 0 2px 15px rgba(107, 114, 128, 0.03);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(107, 114, 128, 0.04), 0 6px 25px rgba(107, 114, 128, 0.06);
+  }
+}
+
+.animate-pulse-smoke {
+  animation: pulseSmoke 4s ease-in-out infinite;
+}
+
+/* OPÇÃO 4: Sombra Branca Suave */
+@keyframes pulseWhiteSoft {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.1), 0 2px 10px rgba(255, 255, 255, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.06), 0 4px 20px rgba(255, 255, 255, 0.08);
+  }
+}
+
+.animate-pulse-white-soft {
+  animation: pulseWhiteSoft 3.5s ease-in-out infinite;
+}
+
+/* OPÇÃO 5: Sombra Gradiente Corporativa */
+@keyframes pulseGradient {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.05), 0 4px 20px rgba(0, 0, 0, 0.03);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(0, 0, 0, 0.02), 0 8px 30px rgba(0, 0, 0, 0.06), 0 0 0 12px rgba(0, 0, 0, 0.01);
+  }
+}
+
+.animate-pulse-gradient {
+  animation: pulseGradient 3.2s ease-in-out infinite;
+}
+
+/* OPÇÃO 6: Sombra Minimalista */
+@keyframes pulseMinimal {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+  50% {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.animate-pulse-minimal {
+  animation: pulseMinimal 2.8s ease-in-out infinite;
 }
