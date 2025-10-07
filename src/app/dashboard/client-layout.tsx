@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import '@/styles/sticky-sidebar.css'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import { useProtectedSession } from '@/hooks/useProtectedSession'
@@ -288,6 +289,7 @@ export default function DashboardLayout({
               )
             })}
           </nav>
+          
           
           {/* User section at bottom of mobile sidebar */}
           <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-800">
