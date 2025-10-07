@@ -253,4 +253,4 @@ Este projeto está sob licença MIT.
 
 ---
 
-**Desenvolvido com ❤️ usando Next.js e Supabase**
+**Desenvolvido com ❤️ usando Next.js e Supabase**# Deploy automatizado configurado
