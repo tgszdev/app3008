@@ -337,8 +337,8 @@ export default function DashboardLayout({
         <div className="flex flex-1 flex-col">
           {/* Logo/Brand */}
           <div className="flex h-16 items-center justify-center border-b border-gray-200 dark:border-gray-700">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg">
-              S
+            <div className="w-10 h-10 bg-[#111111] rounded-lg flex items-center justify-center animate-pulse-gradient">
+              <Image src="/icons/symbol.png" alt="Logo" width={40} height={40} />
             </div>
           </div>
           
