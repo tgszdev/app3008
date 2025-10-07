@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
-import { Eye, EyeOff, Loader2, Headphones } from 'lucide-react'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import Image from 'next/image'
 import { Inter, Poppins } from 'next/font/google'
 
 const poppins = Poppins({ 
@@ -73,8 +74,8 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           {/* Logo Section */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl shadow-xl mb-4 transform hover:scale-105 transition-transform">
-              <Headphones className="w-12 h-12 text-white" />
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl shadow-xl mb-4 transform hover:scale-105 transition-transform overflow-hidden">
+              <Image src="/icons/symbol.png" alt="Logo" width={64} height={64} priority />
             </div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
               Sistema de Suporte
