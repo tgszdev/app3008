@@ -74,7 +74,7 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           {/* Logo Section */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-[#111111] rounded-2xl mb-4 transform hover:scale-105 transition-transform overflow-hidden animate-pulse-white">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-[#111111] rounded-2xl mb-4 transform hover:scale-105 transition-transform overflow-hidden animate-pulse-gradient">
               <Image src="/icons/symbol.png" alt="Logo" width={64} height={64} priority />
             </div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
