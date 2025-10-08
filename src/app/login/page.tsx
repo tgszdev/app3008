@@ -186,7 +186,16 @@ export default function LoginPage() {
             backgroundImage: 'url(/images/login-background.jpg)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
+            backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'fixed',
+            // Otimizações de qualidade
+            WebkitBackfaceVisibility: 'hidden',
+            backfaceVisibility: 'hidden',
+            WebkitTransform: 'translateZ(0)',
+            transform: 'translateZ(0)',
+            // Melhor renderização
+            imageRendering: 'high-quality',
+            WebkitImageRendering: 'optimize-contrast'
           }}
         />
         {/* Subtle gradient overlay for better visual consistency */}

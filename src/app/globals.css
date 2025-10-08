@@ -281,7 +281,7 @@ details[open] summary::before {
   }
 }
 
-/* Garantir que a imagem preencha todo o container */
+/* Otimização de qualidade para imagem de fundo */
 .login-background-image {
   position: absolute;
   top: 0;
@@ -290,6 +290,13 @@ details[open] summary::before {
   height: 100%;
   object-fit: cover;
   object-position: center;
+  /* Melhorar qualidade de renderização */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: high-quality;
+  /* Evitar pixelização */
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 /* Otimização para diferentes resoluções */
@@ -310,4 +317,22 @@ details[open] summary::before {
 /* Garantir que não haja overflow */
 .login-right-side {
   overflow: hidden;
+}
+
+/* Otimizações para telas de alta resolução */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .login-background-image {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: high-quality;
+  }
+}
+
+/* Melhor qualidade para telas Retina */
+@media (-webkit-min-device-pixel-ratio: 3), (min-resolution: 288dpi) {
+  .login-background-image {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: high-quality;
+  }
 }
