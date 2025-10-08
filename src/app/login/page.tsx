@@ -178,53 +178,14 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right Side - Background Image */}
+      {/* Right Side - Background Image Only */}
       <div className="hidden lg:block lg:w-1/2 xl:w-3/5 relative">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: 'url(/images/login-background.jpg)',
           }}
-        >
-          {/* Overlay with blur effect - watermark style */}
-          <div className="absolute inset-0 backdrop-blur-[2px] bg-gradient-to-br from-slate-900/10 via-blue-900/20 to-purple-900/10" />
-          
-          {/* Pattern overlay for watermark effect */}
-          <div 
-            className="absolute inset-0 opacity-5"
-            style={{
-              backgroundImage: `repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 35px,
-                rgba(255,255,255,.05) 35px,
-                rgba(255,255,255,.05) 70px
-              )`
-            }}
-          />
-          
-          {/* Content positioned in upper left area with better UX */}
-          <div className="absolute top-12 left-12 lg:top-16 lg:left-16">
-            <div className="bg-black/40 p-8 lg:p-10 rounded-2xl backdrop-blur-sm border border-white/10 shadow-2xl max-w-lg">
-              <div className="space-y-4">
-                <h2 className={`${poppins.className} text-3xl lg:text-4xl font-bold text-white drop-shadow-2xl leading-tight`}>
-                  <span className="block bg-gradient-to-r from-cyan-300 to-purple-400 bg-clip-text text-transparent">
-                    O Futuro do
-                  </span>
-                  <span className="block bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                    Atendimento é Agora
-                  </span>
-                </h2>
-                <div className="h-1 w-20 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full"></div>
-                <p className={`${inter.className} text-lg lg:text-xl text-white/90 font-light leading-relaxed max-w-md`}>
-                  Tecnologia feita para <span className="font-medium text-cyan-300">simplificar</span>, 
-                  <br className="hidden sm:block" />
-                  não complicar.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        />
       </div>
     </div>
   )
