@@ -306,7 +306,8 @@ export default function AnalyticsPage() {
   const [showFilters, setShowFilters] = useState(false)
   const [periodFilter, setPeriodFilter] = useState('30days')
   const [tempFilter, setTempFilter] = useState('30days')
-  const popupRef = useRef<HTMLDivElement>(null)
+  const clientPopupRef = useRef<HTMLDivElement>(null)
+  const filtersPopupRef = useRef<HTMLDivElement>(null)
   
   // Determinar se deve usar multi-client ou single-client
   const isMultiClient = isMatrixUser && selectedClients.length > 0
@@ -387,16 +388,9 @@ export default function AnalyticsPage() {
     return new Date().toISOString().split('T')[0]
   }
 
-  const handleClientSelectionChange = (clientId: string, checked: boolean) => {
-    let newSelection: string[]
-    if (checked) {
-      newSelection = [...selectedClients, clientId]
-    } else {
-      newSelection = selectedClients.filter(id => id !== clientId)
-    }
-    
-    setSelectedClients(newSelection)
-    localStorage.setItem('selectedClients', JSON.stringify(newSelection))
+  const handleClientSelectionChange = (selectedIds: string[]) => {
+    setSelectedClients(selectedIds)
+    localStorage.setItem('selectedClients', JSON.stringify(selectedIds))
   }
 
   const toggleMyTickets = () => {
@@ -418,8 +412,15 @@ export default function AnalyticsPage() {
   // Fechar popup ao clicar fora
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
+      const target = event.target as Node
+      
+      // Verificar se clicou fora do popup de clientes
+      if (clientPopupRef.current && !clientPopupRef.current.contains(target)) {
         setShowClientPopup(false)
+      }
+      
+      // Verificar se clicou fora do popup de filtros
+      if (filtersPopupRef.current && !filtersPopupRef.current.contains(target)) {
         setShowFilters(false)
       }
     }
@@ -476,12 +477,15 @@ export default function AnalyticsPage() {
         {/* Popup de Seleção de Clientes */}
         {showClientPopup && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div ref={popupRef} className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 w-full max-w-md mx-4">
+            <div ref={clientPopupRef} className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 w-full max-w-md mx-4">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    Selecionar Clientes
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    <Building className="w-4 h-4 text-blue-600" />
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      Seleção Rápida
+                    </h3>
+                  </div>
                   <button
                     onClick={() => setShowClientPopup(false)}
                     className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
@@ -490,19 +494,44 @@ export default function AnalyticsPage() {
                   </button>
                 </div>
                 
-                <div className="space-y-2 max-h-60 overflow-y-auto">
+                <div className="space-y-2 max-h-60 overflow-y-auto mb-4">
                   {availableContexts.length > 0 ? (
-                    availableContexts.map((context) => (
-                      <label key={context.id} className="flex items-center p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">
+                    availableContexts
+                      .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
+                      .map((context) => (
+                      <label key={context.id} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors rounded-xl">
                         <input
                           type="checkbox"
                           checked={selectedClients.includes(context.id)}
-                          onChange={(e) => handleClientSelectionChange(context.id, e.target.checked)}
-                          className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          onChange={() => {
+                            if (selectedClients.includes(context.id)) {
+                              handleClientSelectionChange(selectedClients.filter(id => id !== context.id))
+                            } else {
+                              handleClientSelectionChange([...selectedClients, context.id])
+                            }
+                          }}
+                          className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
                         />
-                        <span className="ml-3 text-sm text-gray-900 dark:text-white">
-                          {context.name}
-                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">
+                              {context.name}
+                            </span>
+                            <span className={`px-2 py-1 text-xs rounded-xl font-medium ${
+                              context.type === 'organization' 
+                                ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300" 
+                                : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300"
+                            }`}>
+                              {context.type === 'organization' ? 'Cliente' : 'Dept'}
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {context.slug}
+                          </div>
+                        </div>
+                        {selectedClients.includes(context.id) && (
+                          <Check className="w-4 h-4 text-blue-600" />
+                        )}
                       </label>
                     ))
                   ) : (
@@ -512,13 +541,27 @@ export default function AnalyticsPage() {
                   )}
                 </div>
                 
-                <div className="mt-6 flex gap-2">
-                  <button
-                    onClick={() => setShowClientPopup(false)}
-                    className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
-                  >
-                    Fechar
-                  </button>
+                <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {selectedClients.length} de {availableContexts.length} selecionados
+                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleClientSelectionChange(availableContexts.map(c => c.id))}
+                      className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
+                    >
+                      Todos
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleClientSelectionChange([])
+                        localStorage.removeItem('selectedClients')
+                      }}
+                      className="text-xs text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300 font-medium transition-colors"
+                    >
+                      Limpar
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -710,52 +753,110 @@ export default function AnalyticsPage() {
         <div className="mt-4 sm:mt-0 flex items-center gap-2">
           {/* Seletor de Clientes para usuários Matrix */}
           {isMatrixUser && (
-            <div className="relative" ref={popupRef}>
+            <div className="relative w-full sm:w-auto">
+              {/* Botão principal com bordas animadas */}
               <button
                 onClick={() => setShowClientPopup(!showClientPopup)}
-                className="flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-2xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                className="w-full sm:w-auto sm:min-w-[180px] h-12 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 flex items-center justify-center gap-2 relative overflow-hidden whitespace-nowrap"
               >
-                <Building className="h-4 w-4 mr-2" />
-                {selectedClients.length > 0 ? `${selectedClients.length} cliente${selectedClients.length !== 1 ? 's' : ''}` : 'Selecionar Clientes'}
-                {showClientPopup ? <ChevronUp className="h-4 w-4 ml-2" /> : <ChevronDown className="h-4 w-4 ml-2" />}
+                <Building className="w-4 h-4 flex-shrink-0" />
+                <span className="text-sm font-medium">
+                  {selectedClients.length === 0 
+                    ? 'Selecionar Clientes' 
+                    : selectedClients.length === 1 
+                      ? availableContexts.find(c => c.id === selectedClients[0])?.name || 'Cliente'
+                      : `${selectedClients.length} clientes`
+                  }
+                </span>
+                <ChevronDown className="w-4 h-4 flex-shrink-0" />
+                {/* Bordas animadas */}
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-blue-500/20 to-transparent animate-pulse"></div>
               </button>
-
+              
+              {/* Popup de seleção de clientes */}
               {showClientPopup && (
-                <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 z-50">
-                  <div className="p-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        Selecionar Clientes
-                      </h3>
-                      <button
-                        onClick={() => setShowClientPopup(false)}
-                        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                <div 
+                  ref={clientPopupRef}
+                  className="absolute top-full left-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-4 z-50"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Building className="w-4 h-4 text-blue-600" />
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">Seleção Rápida</span>
+                    </div>
+                    <button
+                      onClick={() => setShowClientPopup(false)}
+                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-2 mb-4">
+                    {availableContexts
+                      .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
+                      .map((context) => (
+                      <label
+                        key={context.id}
+                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors rounded-xl"
                       >
-                        <X className="h-4 w-4" />
+                        <input
+                          type="checkbox"
+                          checked={selectedClients.includes(context.id)}
+                          onChange={() => {
+                            if (selectedClients.includes(context.id)) {
+                              handleClientSelectionChange(selectedClients.filter(id => id !== context.id))
+                            } else {
+                              handleClientSelectionChange([...selectedClients, context.id])
+                            }
+                          }}
+                          className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">
+                              {context.name}
+                            </span>
+                            <span className={`px-2 py-1 text-xs rounded-xl font-medium ${
+                              context.type === 'organization' 
+                                ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300" 
+                                : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300"
+                            }`}>
+                              {context.type === 'organization' ? 'Cliente' : 'Dept'}
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {context.slug}
+                          </div>
+                        </div>
+                        {selectedClients.includes(context.id) && (
+                          <Check className="w-4 h-4 text-blue-600" />
+                        )}
+                      </label>
+                    ))}
+                  </div>
+                  
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {selectedClients.length} de {availableContexts.length} selecionados
+                    </span>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleClientSelectionChange(availableContexts.map(c => c.id))}
+                        className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
+                      >
+                        Todos
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleClientSelectionChange([])
+                          localStorage.removeItem('selectedClients')
+                        }}
+                        className="text-xs text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300 font-medium transition-colors"
+                      >
+                        Limpar
                       </button>
                     </div>
-                    
-                    <div className="space-y-2 max-h-60 overflow-y-auto">
-                      {availableContexts.map((context) => (
-                        <label key={context.id} className="flex items-center p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={selectedClients.includes(context.id)}
-                            onChange={(e) => handleClientSelectionChange(context.id, e.target.checked)}
-                            className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                          />
-                          <span className="ml-3 text-sm text-gray-900 dark:text-white">
-                            {context.name}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                    
-                    {availableContexts.length === 0 && (
-                      <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-                        Nenhum cliente disponível
-                      </p>
-                    )}
                   </div>
                 </div>
               )}
@@ -764,7 +865,7 @@ export default function AnalyticsPage() {
 
           {/* Filtros para usuários Matrix */}
           {isMatrixUser && selectedClients.length > 0 && (
-            <div className="relative" ref={popupRef}>
+            <div className="relative" ref={filtersPopupRef}>
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className="flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-2xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
