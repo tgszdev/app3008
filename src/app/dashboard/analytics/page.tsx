@@ -334,7 +334,7 @@ export default function AnalyticsPage() {
     } else {
       // Usuário context: carregar analytics single-client
       console.log('🔍 DEBUG: Context user - fetching analytics data')
-      fetchAnalyticsData()
+    fetchAnalyticsData()
     }
   }, [isMatrixUser, contextLoading])
 
@@ -1011,16 +1011,16 @@ export default function AnalyticsPage() {
 
           {/* Seletor de período para usuários Context */}
           {isContextUser && (
-            <select
-              value={dateRange}
-              onChange={(e) => setDateRange(e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-800 text-sm"
-            >
-              <option value="7days">Últimos 7 dias</option>
-              <option value="30days">Últimos 30 dias</option>
-              <option value="90days">Últimos 90 dias</option>
-              <option value="1year">Último ano</option>
-            </select>
+          <select
+            value={dateRange}
+            onChange={(e) => setDateRange(e.target.value)}
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-800 text-sm"
+          >
+            <option value="7days">Últimos 7 dias</option>
+            <option value="30days">Últimos 30 dias</option>
+            <option value="90days">Últimos 90 dias</option>
+            <option value="1year">Último ano</option>
+          </select>
           )}
 
           <button className="p-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors">
@@ -1063,10 +1063,10 @@ export default function AnalyticsPage() {
         />
         <StatCard
           title="Taxa de Satisfação"
-          value={isMultiClient ? 'N/A' : `${analyticsData?.overview.satisfactionRate || 0}%`}
+          value={isMultiClient ? `${multiClientData?.consolidated.performance_metrics?.satisfactionRate || 0}%` : `${analyticsData?.overview.satisfactionRate || 0}%`}
           icon={Award}
           trend={isMultiClient ? 'neutral' : (analyticsData?.overview.satisfactionTrend || 0) > 0 ? 'up' : (analyticsData?.overview.satisfactionTrend || 0) < 0 ? 'down' : 'neutral'}
-          trendValue={isMultiClient ? 'N/A' : `${Math.abs(analyticsData?.overview.satisfactionTrend || 0)}% vs período anterior`}
+          trendValue={isMultiClient ? `${multiClientData?.consolidated.performance_metrics?.satisfactionRate || 0}% baseado em avaliações` : `${Math.abs(analyticsData?.overview.satisfactionTrend || 0)}% vs período anterior`}
           color="bg-green-600"
         />
         <StatCard

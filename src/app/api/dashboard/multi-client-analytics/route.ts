@@ -135,6 +135,12 @@ export async function GET(request: NextRequest) {
               icon,
               is_global,
               context_id
+            ),
+            ratings:ticket_ratings(
+              id,
+              rating,
+              comment,
+              created_at
             )
           `)
           .eq('context_id', contextId)
@@ -433,9 +439,11 @@ export async function GET(request: NextRequest) {
       critical: 0
     }
     
-    // Calcular tempo médio de resolução
+    // Calcular tempo médio de resolução e satisfação
     let totalResolutionTime = 0
     let resolvedTicketsCount = 0
+    let totalRatings = 0
+    let totalRatingSum = 0
     
     // Processar tickets de todos os clientes para calcular métricas
     clientData.forEach(client => {
@@ -458,6 +466,14 @@ export async function GET(request: NextRequest) {
           totalResolutionTime += diffHours
           resolvedTicketsCount++
         }
+        
+        // Calcular satisfação se ticket tem rating
+        if (ticket.ratings && ticket.ratings.length > 0) {
+          ticket.ratings.forEach(rating => {
+            totalRatings++
+            totalRatingSum += rating.rating || 0
+          })
+        }
       })
     })
     
@@ -468,9 +484,13 @@ export async function GET(request: NextRequest) {
       ? `${avgResolutionDays.toFixed(1)} dias` 
       : 'N/A'
     
+    // Calcular taxa de satisfação
+    const satisfactionRate = totalRatings > 0 ? Math.round((totalRatingSum / totalRatings / 5) * 100) : 0
+    
     const performanceMetrics = {
       firstResponseTime: 'N/A',
       resolutionRate: resolvedTicketsCount > 0 ? Math.round((resolvedTicketsCount / totalTickets) * 100) : 0,
+      satisfactionRate: satisfactionRate,
       reopenRate: 0,
       escalationRate: 0
     }
