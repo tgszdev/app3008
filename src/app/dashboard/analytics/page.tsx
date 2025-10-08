@@ -397,6 +397,7 @@ export default function AnalyticsPage() {
       if (response.data?.consolidated) {
         console.log('🔍 DEBUG: Consolidated data structure:', {
           total_tickets: response.data.consolidated.total_tickets,
+          avg_resolution_time: response.data.consolidated.avg_resolution_time,
           status_stats: response.data.consolidated.status_stats?.length || 0,
           category_stats: response.data.consolidated.category_stats?.length || 0,
           period: response.data.consolidated.period,
@@ -1038,7 +1039,20 @@ export default function AnalyticsPage() {
         />
         <StatCard
           title="Tempo Médio de Resolução"
-          value={isMultiClient ? (multiClientData?.consolidated.avg_resolution_time || 'N/A') : (analyticsData?.overview.avgResolutionTime || 'N/A')}
+          value={(() => {
+            const value = isMultiClient ? (multiClientData?.consolidated.avg_resolution_time || 'N/A') : (analyticsData?.overview.avgResolutionTime || 'N/A')
+            console.log('🔍 DEBUG: Tempo Médio de Resolução:', {
+              isMultiClient,
+              multiClientData: !!multiClientData,
+              consolidated: !!multiClientData?.consolidated,
+              avg_resolution_time: multiClientData?.consolidated?.avg_resolution_time,
+              analyticsData: !!analyticsData,
+              overview: !!analyticsData?.overview,
+              avgResolutionTime: analyticsData?.overview?.avgResolutionTime,
+              finalValue: value
+            })
+            return value
+          })()}
           icon={Clock}
           trend={isMultiClient ? 'neutral' : (analyticsData?.overview.avgResolutionTrend || 0) < 0 ? 'up' : (analyticsData?.overview.avgResolutionTrend || 0) > 0 ? 'down' : 'neutral'}
           trendValue={isMultiClient ? 'N/A' : `${Math.abs(analyticsData?.overview.avgResolutionTrend || 0)}% vs período anterior`}
