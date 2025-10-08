@@ -1033,7 +1033,7 @@ export default function AnalyticsPage() {
           value={isMultiClient ? (multiClientData?.consolidated.total_tickets || 0) : (analyticsData?.overview.totalTickets || 0)}
           icon={TicketIcon}
           trend={isMultiClient ? 'neutral' : (analyticsData?.overview.totalTicketsTrend || 0) > 0 ? 'up' : (analyticsData?.overview.totalTicketsTrend || 0) < 0 ? 'down' : 'neutral'}
-          trendValue={isMultiClient ? 'N/A' : `${Math.abs(analyticsData?.overview.totalTicketsTrend || 0)}% vs período anterior`}
+          trendValue={isMultiClient ? `${selectedClients.length} cliente${selectedClients.length !== 1 ? 's' : ''} selecionado${selectedClients.length !== 1 ? 's' : ''}` : `${Math.abs(analyticsData?.overview.totalTicketsTrend || 0)}% vs período anterior`}
           color="bg-blue-600"
         />
         <StatCard

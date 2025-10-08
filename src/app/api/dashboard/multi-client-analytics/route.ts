@@ -184,8 +184,8 @@ export async function GET(request: NextRequest) {
         // Criar status dinâmicos baseados nos tickets encontrados
         // Se não existir na tabela, criar um status temporário
         const dynamicStatusStats = uniqueTicketStatuses.map(ticketStatus => {
-          // Buscar se existe na tabela
-          const existingStatus = statuses.find(s => s.slug === ticketStatus)
+          // Buscar se existe na tabela por name (português) em vez de slug (inglês)
+          const existingStatus = statuses.find(s => s.name === ticketStatus)
           
           if (existingStatus) {
             // Usar status da tabela
@@ -199,17 +199,13 @@ export async function GET(request: NextRequest) {
               count: matchingTickets.length
             }
           } else {
-            // Criar status dinâmico baseado no slug do ticket
+            // Criar status dinâmico baseado no status do ticket (português)
             const matchingTickets = tickets?.filter(ticket => ticket.status === ticketStatus) || []
-            const dynamicName = ticketStatus
-              .split('-')
-              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(' ')
             
             return {
               id: `dynamic-${ticketStatus}`,
-              name: dynamicName,
-              slug: ticketStatus,
+              name: ticketStatus, // Usar o status como está (português)
+              slug: ticketStatus.toLowerCase().replace(/\s+/g, '-'), // Converter para slug
               color: '#6B7280', // Cor padrão
               order_index: 999,
               count: matchingTickets.length
