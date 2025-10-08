@@ -178,14 +178,16 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right Side - Background Image Only */}
-      <div className="hidden lg:block lg:w-1/2 xl:w-3/5 relative">
+      {/* Right Side - Background Image with 16:9 Aspect Ratio */}
+      <div className="hidden lg:block lg:w-1/2 xl:w-3/5 relative overflow-hidden">
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat login-background-image"
           style={{
             backgroundImage: 'url(/images/login-background.jpg)',
           }}
         />
+        {/* Fallback gradient overlay for better visual consistency */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/20 via-transparent to-gray-900/30" />
       </div>
     </div>
   )

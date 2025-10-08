@@ -255,3 +255,37 @@ details[open] summary::before {
 .animate-pulse-minimal {
   animation: pulseMinimal 2.8s ease-in-out infinite;
 }
+
+/* ===== AJUSTES PARA IMAGEM DE LOGIN ===== */
+
+/* Garantir proporção 16:9 para imagem de fundo do login */
+.login-background-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  aspect-ratio: 16/9;
+}
+
+/* Fallback para navegadores que não suportam aspect-ratio */
+@supports not (aspect-ratio: 16/9) {
+  .login-background-image {
+    height: 56.25vw; /* 16:9 aspect ratio fallback */
+    max-height: 100vh;
+  }
+}
+
+/* Responsividade para diferentes tamanhos de tela */
+@media (min-width: 1024px) {
+  .login-background-image {
+    height: 100vh;
+    width: 100%;
+  }
+}
+
+@media (min-width: 1280px) {
+  .login-background-image {
+    height: 100vh;
+    width: 100%;
+  }
+}
