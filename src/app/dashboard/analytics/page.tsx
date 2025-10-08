@@ -398,6 +398,8 @@ export default function AnalyticsPage() {
         console.log('🔍 DEBUG: Consolidated data structure:', {
           total_tickets: response.data.consolidated.total_tickets,
           avg_resolution_time: response.data.consolidated.avg_resolution_time,
+          performance_metrics: response.data.consolidated.performance_metrics,
+          resolution_rate: response.data.consolidated.performance_metrics?.resolutionRate,
           status_stats: response.data.consolidated.status_stats?.length || 0,
           category_stats: response.data.consolidated.category_stats?.length || 0,
           period: response.data.consolidated.period,
@@ -1055,7 +1057,7 @@ export default function AnalyticsPage() {
           })()}
           icon={Clock}
           trend={isMultiClient ? 'neutral' : (analyticsData?.overview.avgResolutionTrend || 0) < 0 ? 'up' : (analyticsData?.overview.avgResolutionTrend || 0) > 0 ? 'down' : 'neutral'}
-          trendValue={isMultiClient ? 'N/A' : `${Math.abs(analyticsData?.overview.avgResolutionTrend || 0)}% vs período anterior`}
+          trendValue={isMultiClient ? `${multiClientData?.consolidated.performance_metrics?.resolutionRate || 0}% taxa de resolução` : `${Math.abs(analyticsData?.overview.avgResolutionTrend || 0)}% vs período anterior`}
           color="bg-purple-600"
           subtitle="Média geral"
         />
