@@ -313,24 +313,44 @@ export default function AnalyticsPage() {
   const isMultiClient = isMatrixUser && selectedClients.length > 0
 
   useEffect(() => {
+    console.log('🔍 DEBUG: Initial useEffect triggered:', {
+      contextLoading,
+      isMatrixUser,
+      isContextUser,
+      availableContexts: availableContexts.length
+    })
+    
     if (contextLoading) return
     
     if (isMatrixUser) {
       // Carregar clientes disponíveis do localStorage
       const savedClients = localStorage.getItem('selectedClients')
+      console.log('🔍 DEBUG: Matrix user - savedClients:', savedClients)
       if (savedClients) {
         const clients = JSON.parse(savedClients)
+        console.log('🔍 DEBUG: Setting selectedClients from localStorage:', clients)
         setSelectedClients(clients)
       }
     } else {
       // Usuário context: carregar analytics single-client
+      console.log('🔍 DEBUG: Context user - fetching analytics data')
       fetchAnalyticsData()
     }
   }, [isMatrixUser, contextLoading])
 
   useEffect(() => {
+    console.log('🔍 DEBUG: Multi-client useEffect triggered:', {
+      isMultiClient,
+      selectedClients,
+      periodFilter,
+      myTicketsOnly
+    })
+    
     if (isMultiClient) {
+      console.log('🔍 DEBUG: Fetching multi-client data...')
       fetchMultiClientData()
+    } else {
+      console.log('🔍 DEBUG: Not fetching multi-client data - isMultiClient is false')
     }
   }, [selectedClients, periodFilter, myTicketsOnly, isMultiClient])
 
@@ -359,9 +379,23 @@ export default function AnalyticsPage() {
         params.append('myTickets', session.user.id)
       }
       
+      console.log('🔍 DEBUG: Fetching multi-client data:', {
+        selectedClients,
+        periodFilter,
+        myTicketsOnly,
+        params: params.toString()
+      })
+      
       const response = await axios.get(`/api/dashboard/multi-client-analytics?${params}`)
+      
+      console.log('🔍 DEBUG: Multi-client response:', {
+        status: response.status,
+        data: response.data
+      })
+      
       setMultiClientData(response.data)
     } catch (error) {
+      console.error('🔍 DEBUG: Multi-client error:', error)
       toast.error('Erro ao carregar análises multi-cliente')
     } finally {
       setLoading(false)
@@ -591,6 +625,21 @@ export default function AnalyticsPage() {
   const peakHours = isMultiClient ? multiClientData?.consolidated.peak_hours || [] : analyticsData?.peakHours || []
   const userActivity = isMultiClient ? multiClientData?.consolidated.user_activity || [] : analyticsData?.userActivity || []
   const performanceMetrics = isMultiClient ? multiClientData?.consolidated.performance_metrics : analyticsData?.performanceMetrics
+
+  // Debug logs
+  console.log('🔍 DEBUG: Chart data mapping:', {
+    isMultiClient,
+    selectedClients,
+    multiClientData: multiClientData ? 'Present' : 'Null',
+    analyticsData: analyticsData ? 'Present' : 'Null',
+    ticketsTrend: ticketsTrend.length,
+    statusDistribution: statusDistribution.length,
+    priorityDistribution: priorityDistribution ? 'Present' : 'Null',
+    categoryDistribution: categoryDistribution.length,
+    peakHours: peakHours.length,
+    userActivity: userActivity.length,
+    performanceMetrics: performanceMetrics ? 'Present' : 'Null'
+  })
 
   // Chart configurations
   const ticketsTrendData = {
