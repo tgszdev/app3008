@@ -424,12 +424,6 @@ export async function GET(request: NextRequest) {
     const ticketsTrend = []
     const peakHours = Array.from({ length: 24 }, (_, hour) => ({ hour, count: 0 }))
     const userActivity = []
-    const performanceMetrics = {
-      firstResponseTime: 'N/A',
-      resolutionRate: 0,
-      reopenRate: 0,
-      escalationRate: 0
-    }
     
     // Calcular distribuição de prioridades
     const priorityDistribution = {
@@ -438,6 +432,10 @@ export async function GET(request: NextRequest) {
       high: 0,
       critical: 0
     }
+    
+    // Calcular tempo médio de resolução
+    let totalResolutionTime = 0
+    let resolvedTicketsCount = 0
     
     // Processar tickets de todos os clientes para calcular métricas
     clientData.forEach(client => {
@@ -451,8 +449,31 @@ export async function GET(request: NextRequest) {
         // Contar por hora
         const hour = new Date(ticket.created_at).getHours()
         peakHours[hour].count++
+        
+        // Calcular tempo de resolução se ticket foi resolvido
+        if (ticket.resolved_at) {
+          const created = new Date(ticket.created_at)
+          const resolved = new Date(ticket.resolved_at)
+          const diffHours = (resolved - created) / (1000 * 60 * 60) // em horas
+          totalResolutionTime += diffHours
+          resolvedTicketsCount++
+        }
       })
     })
+    
+    // Calcular tempo médio de resolução
+    const avgResolutionHours = resolvedTicketsCount > 0 ? totalResolutionTime / resolvedTicketsCount : 0
+    const avgResolutionDays = avgResolutionHours / 24
+    const avgResolutionTime = resolvedTicketsCount > 0 
+      ? `${avgResolutionDays.toFixed(1)} dias` 
+      : 'N/A'
+    
+    const performanceMetrics = {
+      firstResponseTime: 'N/A',
+      resolutionRate: resolvedTicketsCount > 0 ? Math.round((resolvedTicketsCount / totalTickets) * 100) : 0,
+      reopenRate: 0,
+      escalationRate: 0
+    }
 
     const response = {
       clients: clientData,
@@ -462,7 +483,7 @@ export async function GET(request: NextRequest) {
           start_date: startDate,
           end_date: endDate
         },
-        avg_resolution_time: 'N/A', // Será calculado se necessário
+        avg_resolution_time: avgResolutionTime,
         status_distribution: consolidatedStatusStats,
         priority_distribution: priorityDistribution,
         category_distribution: consolidatedCategoryStats,

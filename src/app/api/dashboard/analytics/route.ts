@@ -171,7 +171,7 @@ export async function GET(request: Request) {
       : 0
 
     // Calculate average resolution time from real data
-    const resolvedTickets = tickets?.filter(t => t.status === 'resolved') || []
+    const resolvedTickets = tickets?.filter(t => t.status === 'Resolvido' || t.status === 'Fechado') || []
     let avgResolutionHours = 0
     
     if (resolvedTickets.length > 0) {
@@ -192,7 +192,7 @@ export async function GET(request: Request) {
       : `${Math.round(avgResolutionHours / 24)}d`
 
     // Previous period resolution time for trend
-    const previousResolvedTickets = previousTickets?.filter(t => t.status === 'resolved') || []
+    const previousResolvedTickets = previousTickets?.filter(t => t.status === 'Resolvido' || t.status === 'Fechado') || []
     let previousAvgResolutionHours = 0
     
     if (previousResolvedTickets.length > 0) {
