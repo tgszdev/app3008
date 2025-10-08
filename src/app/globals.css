@@ -258,34 +258,56 @@ details[open] summary::before {
 
 /* ===== AJUSTES PARA IMAGEM DE LOGIN ===== */
 
-/* Garantir proporção 16:9 para imagem de fundo do login */
+/* Garantir que a imagem ocupe exatamente o espaço disponível do lado direito */
 .login-background-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center;
-  aspect-ratio: 16/9;
+  /* Remover aspect-ratio para usar 100% do espaço disponível */
 }
 
-/* Fallback para navegadores que não suportam aspect-ratio */
-@supports not (aspect-ratio: 16/9) {
-  .login-background-image {
-    height: 56.25vw; /* 16:9 aspect ratio fallback */
-    max-height: 100vh;
+/* Container do lado direito com dimensões fixas */
+.login-right-side {
+  /* Desktop: 50% da largura */
+  width: 50%;
+  height: 100vh;
+}
+
+/* Desktop grande: 60% da largura */
+@media (min-width: 1280px) {
+  .login-right-side {
+    width: 60%;
   }
 }
 
-/* Responsividade para diferentes tamanhos de tela */
-@media (min-width: 1024px) {
-  .login-background-image {
-    height: 100vh;
-    width: 100%;
+/* Garantir que a imagem preencha todo o container */
+.login-background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Otimização para diferentes resoluções */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  /* Desktop: 50% da largura */
+  .login-right-side {
+    width: 50%;
   }
 }
 
 @media (min-width: 1280px) {
-  .login-background-image {
-    height: 100vh;
-    width: 100%;
+  /* Desktop grande: 60% da largura */
+  .login-right-side {
+    width: 60%;
   }
+}
+
+/* Garantir que não haja overflow */
+.login-right-side {
+  overflow: hidden;
 }
