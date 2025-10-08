@@ -424,6 +424,40 @@ export async function GET(request: NextRequest) {
       })
       .sort((a, b) => b.total - a.total)
 
+    // Calcular dados adicionais para os gráficos
+    const ticketsTrend = []
+    const peakHours = Array.from({ length: 24 }, (_, hour) => ({ hour, count: 0 }))
+    const userActivity = []
+    const performanceMetrics = {
+      firstResponseTime: 'N/A',
+      resolutionRate: 0,
+      reopenRate: 0,
+      escalationRate: 0
+    }
+    
+    // Calcular distribuição de prioridades
+    const priorityDistribution = {
+      low: 0,
+      medium: 0,
+      high: 0,
+      critical: 0
+    }
+    
+    // Processar tickets de todos os clientes para calcular métricas
+    clientData.forEach(client => {
+      client.tickets.forEach(ticket => {
+        // Contar por prioridade
+        if (ticket.priority === 'low') priorityDistribution.low++
+        else if (ticket.priority === 'medium') priorityDistribution.medium++
+        else if (ticket.priority === 'high') priorityDistribution.high++
+        else if (ticket.priority === 'critical') priorityDistribution.critical++
+        
+        // Contar por hora
+        const hour = new Date(ticket.created_at).getHours()
+        peakHours[hour].count++
+      })
+    })
+
     const response = {
       clients: clientData,
       consolidated: {
@@ -432,8 +466,14 @@ export async function GET(request: NextRequest) {
           start_date: startDate,
           end_date: endDate
         },
-        status_stats: consolidatedStatusStats,
-        category_stats: consolidatedCategoryStats
+        avg_resolution_time: 'N/A', // Será calculado se necessário
+        status_distribution: consolidatedStatusStats,
+        priority_distribution: priorityDistribution,
+        category_distribution: consolidatedCategoryStats,
+        tickets_trend: ticketsTrend,
+        peak_hours: peakHours,
+        user_activity: userActivity,
+        performance_metrics: performanceMetrics
       }
     }
 

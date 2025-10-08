@@ -393,6 +393,21 @@ export default function AnalyticsPage() {
         data: response.data
       })
       
+      // Debug detalhado da estrutura de dados
+      if (response.data?.consolidated) {
+        console.log('🔍 DEBUG: Consolidated data structure:', {
+          total_tickets: response.data.consolidated.total_tickets,
+          status_stats: response.data.consolidated.status_stats?.length || 0,
+          category_stats: response.data.consolidated.category_stats?.length || 0,
+          period: response.data.consolidated.period,
+          has_tickets_trend: !!response.data.consolidated.tickets_trend,
+          has_peak_hours: !!response.data.consolidated.peak_hours,
+          has_user_activity: !!response.data.consolidated.user_activity,
+          has_performance_metrics: !!response.data.consolidated.performance_metrics,
+          has_priority_distribution: !!response.data.consolidated.priority_distribution
+        })
+      }
+      
       setMultiClientData(response.data)
     } catch (error) {
       console.error('🔍 DEBUG: Multi-client error:', error)
