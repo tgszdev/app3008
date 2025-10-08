@@ -281,7 +281,7 @@ details[open] summary::before {
   }
 }
 
-/* Otimização de qualidade para imagem de fundo */
+/* Otimização AVANÇADA de qualidade para imagem de fundo */
 .login-background-image {
   position: absolute;
   top: 0;
@@ -290,13 +290,30 @@ details[open] summary::before {
   height: 100%;
   object-fit: cover;
   object-position: center;
-  /* Melhorar qualidade de renderização */
+  
+  /* === RENDERIZAÇÃO ULTRA-HD === */
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
   image-rendering: high-quality;
-  /* Evitar pixelização */
+  image-rendering: pixelated;
+  
+  /* === ACELERAÇÃO HARDWARE MÁXIMA === */
   backface-visibility: hidden;
-  transform: translateZ(0);
+  transform: translateZ(0) scale(1);
+  will-change: transform;
+  
+  /* === FILTROS DE QUALIDADE === */
+  filter: contrast(1.1) brightness(1.05) saturate(1.1);
+  
+  /* === ANTI-ALIASING AVANÇADO === */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  /* === OTIMIZAÇÃO DE PIXEL === */
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  -o-transform: translateZ(0);
 }
 
 /* Otimização para diferentes resoluções */
@@ -319,20 +336,53 @@ details[open] summary::before {
   overflow: hidden;
 }
 
-/* Otimizações para telas de alta resolução */
+/* === OTIMIZAÇÕES ULTRA-HD POR DENSIDADE === */
+
+/* Retina 2x - Qualidade máxima */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .login-background-image {
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
     image-rendering: high-quality;
+    filter: contrast(1.15) brightness(1.08) saturate(1.15) sharpness(1.1);
+    transform: translateZ(0) scale(1.001);
   }
 }
 
-/* Melhor qualidade para telas Retina */
+/* Super Retina 3x - Ultra qualidade */
 @media (-webkit-min-device-pixel-ratio: 3), (min-resolution: 288dpi) {
   .login-background-image {
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
     image-rendering: high-quality;
+    filter: contrast(1.2) brightness(1.1) saturate(1.2) sharpness(1.15);
+    transform: translateZ(0) scale(1.002);
+  }
+}
+
+/* 4K+ - Qualidade extrema */
+@media (-webkit-min-device-pixel-ratio: 4), (min-resolution: 384dpi) {
+  .login-background-image {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: high-quality;
+    filter: contrast(1.25) brightness(1.12) saturate(1.25) sharpness(1.2);
+    transform: translateZ(0) scale(1.003);
+  }
+}
+
+/* === OTIMIZAÇÕES ESPECÍFICAS POR TAMANHO === */
+
+/* Telas grandes - Qualidade premium */
+@media (min-width: 1920px) {
+  .login-background-image {
+    filter: contrast(1.1) brightness(1.05) saturate(1.1) sharpness(1.05);
+  }
+}
+
+/* Telas ultra-wide - Qualidade máxima */
+@media (min-width: 2560px) {
+  .login-background-image {
+    filter: contrast(1.15) brightness(1.08) saturate(1.15) sharpness(1.1);
   }
 }

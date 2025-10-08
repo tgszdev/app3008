@@ -188,14 +188,33 @@ export default function LoginPage() {
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
             backgroundAttachment: 'fixed',
-            // Otimizações de qualidade
+            
+            // === OTIMIZAÇÕES ULTRA-HD ===
             WebkitBackfaceVisibility: 'hidden',
             backfaceVisibility: 'hidden',
-            WebkitTransform: 'translateZ(0)',
-            transform: 'translateZ(0)',
-            // Melhor renderização
+            WebkitTransform: 'translateZ(0) scale(1)',
+            transform: 'translateZ(0) scale(1)',
+            willChange: 'transform',
+            
+            // === RENDERIZAÇÃO MÁXIMA ===
             imageRendering: 'high-quality',
-            WebkitImageRendering: 'optimize-contrast'
+            WebkitImageRendering: 'optimize-contrast',
+            MozImageRendering: 'crisp-edges',
+            msImageRendering: 'crisp-edges',
+            
+            // === FILTROS DE QUALIDADE ===
+            filter: 'contrast(1.1) brightness(1.05) saturate(1.1)',
+            WebkitFilter: 'contrast(1.1) brightness(1.05) saturate(1.1)',
+            
+            // === ANTI-ALIASING AVANÇADO ===
+            WebkitFontSmoothing: 'antialiased',
+            MozOsxFontSmoothing: 'grayscale',
+            
+            // === OTIMIZAÇÃO DE PERFORMANCE ===
+            WebkitPerspective: '1000px',
+            perspective: '1000px',
+            WebkitTransformStyle: 'preserve-3d',
+            transformStyle: 'preserve-3d'
           }}
         />
         {/* Subtle gradient overlay for better visual consistency */}
