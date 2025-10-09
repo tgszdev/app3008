@@ -583,6 +583,12 @@ export async function GET(request: NextRequest) {
       consolidatedStatusCount: consolidatedStatusStats.length,
       consolidatedCategoryCount: consolidatedCategoryStats.length
     })
+    
+    console.log('🔍 DEBUG: Response structure:', {
+      hasConsolidated: !!response.consolidated,
+      consolidatedKeys: response.consolidated ? Object.keys(response.consolidated) : 'N/A',
+      categoryDistributionLength: response.consolidated?.category_distribution?.length || 'N/A'
+    })
 
     return NextResponse.json(response)
 
