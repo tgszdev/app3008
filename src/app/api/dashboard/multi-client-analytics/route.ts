@@ -739,21 +739,14 @@ export async function GET(request: NextRequest) {
 
     // Função para calcular insights rápidos
     function calculateQuickInsights(clientData, totalTickets, peakHours, priorityDistribution, userActivity, performanceMetrics) {
-      // 1. Melhor dia da semana (menor volume de tickets)
-      const dayStats = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 } // 0=domingo, 1=segunda, etc.
-      const dayNames = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado']
+      // 1. Cliente mais ativo (mais tickets)
+      const clientStats = clientData.map(client => ({
+        name: client.context.name,
+        ticketCount: client.tickets.length,
+        contextId: client.context.id
+      })).sort((a, b) => b.ticketCount - a.ticketCount)
       
-      clientData.forEach(client => {
-        client.tickets.forEach(ticket => {
-          const dayOfWeek = new Date(ticket.created_at).getDay()
-          dayStats[dayOfWeek]++
-        })
-      })
-      
-      const bestDay = Object.entries(dayStats)
-        .sort(([,a], [,b]) => a - b)[0] // Menor volume
-      const bestDayName = dayNames[parseInt(bestDay[0])]
-      const bestDayCount = bestDay[1]
+      const mostActiveClient = clientStats[0] || { name: 'N/A', ticketCount: 0 }
       
       // 2. Categoria mais problemática (mais tickets)
       const categoryStats = new Map()
@@ -801,10 +794,10 @@ export async function GET(request: NextRequest) {
       const criticalPercentage = totalTickets > 0 ? Math.round((criticalTickets / totalTickets) * 100) : 0
       
       return {
-        bestDay: {
-          day: bestDayName,
-          count: bestDayCount,
-          description: 'Menor volume de tickets'
+        mostActiveClient: {
+          name: mostActiveClient.name,
+          ticketCount: mostActiveClient.ticketCount,
+          description: `${mostActiveClient.ticketCount} tickets criados`
         },
         mostProblematicCategory: {
           category: mostProblematicCategory[0],

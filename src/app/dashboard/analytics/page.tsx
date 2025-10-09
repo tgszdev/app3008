@@ -1270,9 +1270,9 @@ export default function AnalyticsPage() {
           {quickInsights ? (
             <>
               <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
-                <p className="text-sm opacity-90 mb-1">Melhor dia da semana</p>
-                <p className="text-xl font-bold">{quickInsights.bestDay.day}</p>
-                <p className="text-xs opacity-75 mt-1">{quickInsights.bestDay.description}</p>
+                <p className="text-sm opacity-90 mb-1">Cliente mais ativo</p>
+                <p className="text-xl font-bold">{quickInsights.mostActiveClient.name}</p>
+                <p className="text-xs opacity-75 mt-1">{quickInsights.mostActiveClient.description}</p>
               </div>
               <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
                 <p className="text-sm opacity-90 mb-1">Categoria mais problemática</p>
@@ -1303,7 +1303,7 @@ export default function AnalyticsPage() {
           ) : (
             <>
               <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
-                <p className="text-sm opacity-90 mb-1">Melhor dia da semana</p>
+                <p className="text-sm opacity-90 mb-1">Cliente mais ativo</p>
                 <p className="text-xl font-bold">N/A</p>
                 <p className="text-xs opacity-75 mt-1">Dados não disponíveis</p>
               </div>
