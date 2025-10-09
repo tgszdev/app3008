@@ -565,11 +565,11 @@ export default function AnalyticsPage() {
                           className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
                         />
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                            <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
                               {context.name}
                             </span>
-                            <span className={`px-2 py-1 text-xs rounded-xl font-medium ${
+                            <span className={`px-2 py-1 text-xs rounded-xl font-medium flex-shrink-0 ${
                               context.type === 'organization' 
                                 ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300" 
                                 : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300"
@@ -577,7 +577,7 @@ export default function AnalyticsPage() {
                               {context.type === 'organization' ? 'Cliente' : 'Dept'}
                             </span>
                           </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                          <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
                             {context.slug}
                           </div>
                         </div>
@@ -818,7 +818,7 @@ export default function AnalyticsPage() {
             }
           </p>
         </div>
-        <div className="mt-4 sm:mt-0 flex items-center gap-2">
+        <div className="mt-4 sm:mt-0 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           {/* Seletor de Clientes para usuários Matrix */}
           {isMatrixUser && (
             <div className="relative w-full sm:w-auto">
@@ -845,7 +845,7 @@ export default function AnalyticsPage() {
               {showClientPopup && (
                 <div 
                   ref={clientPopupRef}
-                  className="absolute top-full left-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-4 z-50"
+                  className="absolute top-full left-0 mt-2 w-full sm:w-80 max-w-[calc(100vw-1rem)] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-4 z-50"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
@@ -881,11 +881,11 @@ export default function AnalyticsPage() {
                           className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
                         />
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                            <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
                               {context.name}
                             </span>
-                            <span className={`px-2 py-1 text-xs rounded-xl font-medium ${
+                            <span className={`px-2 py-1 text-xs rounded-xl font-medium flex-shrink-0 ${
                               context.type === 'organization' 
                                 ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300" 
                                 : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300"
@@ -893,7 +893,7 @@ export default function AnalyticsPage() {
                               {context.type === 'organization' ? 'Cliente' : 'Dept'}
                             </span>
                           </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                          <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
                             {context.slug}
                           </div>
                         </div>
@@ -1015,7 +1015,7 @@ export default function AnalyticsPage() {
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-800 text-sm"
+            className="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-800 text-sm"
           >
             <option value="7days">Últimos 7 dias</option>
             <option value="30days">Últimos 30 dias</option>
@@ -1024,14 +1024,14 @@ export default function AnalyticsPage() {
           </select>
           )}
 
-          <button className="p-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors">
+          <button className="w-full sm:w-auto p-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors flex items-center justify-center">
             <Download className="h-4 w-4" />
           </button>
         </div>
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Total de Tickets"
           value={isMultiClient ? (multiClientData?.consolidated.total_tickets || 0) : (analyticsData?.overview.totalTickets || 0)}
@@ -1081,14 +1081,14 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Tickets Trend */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate">
               Tendência de Tickets
             </h2>
-            <LineChart className="h-5 w-5 text-gray-400" />
+            <LineChart className="h-5 w-5 text-gray-400 flex-shrink-0" />
           </div>
           <div className="h-64">
             <Line data={ticketsTrendData} options={chartOptions} />
@@ -1098,10 +1098,10 @@ export default function AnalyticsPage() {
         {/* Status Distribution */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate">
               Distribuição por Status
             </h2>
-            <PieChart className="h-5 w-5 text-gray-400" />
+            <PieChart className="h-5 w-5 text-gray-400 flex-shrink-0" />
           </div>
           <div className="h-64">
             <Doughnut data={statusDistributionData} options={pieOptions} />
@@ -1111,10 +1111,10 @@ export default function AnalyticsPage() {
         {/* Priority Distribution */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate">
               Distribuição por Prioridade
             </h2>
-            <BarChart3 className="h-5 w-5 text-gray-400" />
+            <BarChart3 className="h-5 w-5 text-gray-400 flex-shrink-0" />
           </div>
           <div className="h-64">
             <Bar data={priorityDistributionData} options={chartOptions} />
@@ -1124,10 +1124,10 @@ export default function AnalyticsPage() {
         {/* Category Distribution */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate">
               Tickets por Categoria
             </h2>
-            <PieChart className="h-5 w-5 text-gray-400" />
+            <PieChart className="h-5 w-5 text-gray-400 flex-shrink-0" />
           </div>
           <div className="h-64">
             <Pie data={categoryDistributionData} options={pieOptions} />
@@ -1140,7 +1140,7 @@ export default function AnalyticsPage() {
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
           Métricas de Performance
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
           <div className="text-center">
             <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full mb-3">
               <Timer className="h-6 w-6 text-blue-600 dark:text-blue-400" />
@@ -1189,14 +1189,14 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Peak Hours & User Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Peak Hours */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate">
               Horários de Pico
             </h2>
-            <Clock className="h-5 w-5 text-gray-400" />
+            <Clock className="h-5 w-5 text-gray-400 flex-shrink-0" />
           </div>
           <div className="h-64">
             <Bar data={peakHoursData} options={chartOptions} />
@@ -1206,41 +1206,41 @@ export default function AnalyticsPage() {
         {/* Top Users */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate">
               Atividade por Usuário
             </h2>
-            <UserCheck className="h-5 w-5 text-gray-400" />
+            <UserCheck className="h-5 w-5 text-gray-400 flex-shrink-0" />
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full">
               <thead>
                 <tr className="text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  <th className="pb-3">Usuário</th>
-                  <th className="pb-3 text-center">Criados</th>
-                  <th className="pb-3 text-center">Resolvidos</th>
-                  <th className="pb-3 text-right">Tempo Médio</th>
+                  <th className="pb-3 px-2">Usuário</th>
+                  <th className="pb-3 text-center px-2">Criados</th>
+                  <th className="pb-3 text-center px-2">Resolvidos</th>
+                  <th className="pb-3 text-right px-2">Tempo Médio</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {userActivity.length > 0 ? (
                   userActivity.slice(0, 5).map((user, index) => (
                     <tr key={index}>
-                      <td className="py-3">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      <td className="py-3 px-2">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[120px] sm:max-w-none">
                           {user.name}
                         </p>
                       </td>
-                      <td className="py-3 text-center">
+                      <td className="py-3 text-center px-2">
                         <span className="text-sm text-gray-600 dark:text-gray-400">
                           {user.ticketsCreated}
                         </span>
                       </td>
-                      <td className="py-3 text-center">
+                      <td className="py-3 text-center px-2">
                         <span className="text-sm text-gray-600 dark:text-gray-400">
                           {user.ticketsResolved}
                         </span>
                       </td>
-                      <td className="py-3 text-right">
+                      <td className="py-3 text-right px-2">
                         <span className="text-sm text-gray-600 dark:text-gray-400">
                           {user.avgTime}
                         </span>
@@ -1266,38 +1266,38 @@ export default function AnalyticsPage() {
           <Zap className="h-6 w-6 mr-2" />
           <h2 className="text-lg font-semibold">Insights Rápidos</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {quickInsights ? (
             <>
               <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
                 <p className="text-sm opacity-90 mb-1">Cliente mais ativo</p>
-                <p className="text-xl font-bold">{quickInsights.mostActiveClient.name}</p>
-                <p className="text-xs opacity-75 mt-1">{quickInsights.mostActiveClient.description}</p>
+                <p className="text-lg sm:text-xl font-bold truncate">{quickInsights.mostActiveClient.name}</p>
+                <p className="text-xs opacity-75 mt-1 truncate">{quickInsights.mostActiveClient.description}</p>
               </div>
               <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
                 <p className="text-sm opacity-90 mb-1">Categoria mais problemática</p>
-                <p className="text-xl font-bold">{quickInsights.mostProblematicCategory.category}</p>
-                <p className="text-xs opacity-75 mt-1">{quickInsights.mostProblematicCategory.description}</p>
+                <p className="text-lg sm:text-xl font-bold truncate">{quickInsights.mostProblematicCategory.category}</p>
+                <p className="text-xs opacity-75 mt-1 truncate">{quickInsights.mostProblematicCategory.description}</p>
               </div>
               <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
                 <p className="text-sm opacity-90 mb-1">Técnico destaque</p>
-                <p className="text-xl font-bold">{quickInsights.topTechnician.name}</p>
-                <p className="text-xs opacity-75 mt-1">{quickInsights.topTechnician.description}</p>
+                <p className="text-lg sm:text-xl font-bold truncate">{quickInsights.topTechnician.name}</p>
+                <p className="text-xs opacity-75 mt-1 truncate">{quickInsights.topTechnician.description}</p>
               </div>
               <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
                 <p className="text-sm opacity-90 mb-1">Horário de pico</p>
-                <p className="text-xl font-bold">{quickInsights.peakHour.hour}</p>
-                <p className="text-xs opacity-75 mt-1">{quickInsights.peakHour.description}</p>
+                <p className="text-lg sm:text-xl font-bold truncate">{quickInsights.peakHour.hour}</p>
+                <p className="text-xs opacity-75 mt-1 truncate">{quickInsights.peakHour.description}</p>
               </div>
               <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
                 <p className="text-sm opacity-90 mb-1">Status mais comum</p>
-                <p className="text-xl font-bold">{quickInsights.mostCommonStatus.status}</p>
-                <p className="text-xs opacity-75 mt-1">{quickInsights.mostCommonStatus.description}</p>
+                <p className="text-lg sm:text-xl font-bold truncate">{quickInsights.mostCommonStatus.status}</p>
+                <p className="text-xs opacity-75 mt-1 truncate">{quickInsights.mostCommonStatus.description}</p>
               </div>
               <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
                 <p className="text-sm opacity-90 mb-1">Prioridade crítica</p>
-                <p className="text-xl font-bold">{quickInsights.criticalPriority.percentage}%</p>
-                <p className="text-xs opacity-75 mt-1">{quickInsights.criticalPriority.description}</p>
+                <p className="text-lg sm:text-xl font-bold truncate">{quickInsights.criticalPriority.percentage}%</p>
+                <p className="text-xs opacity-75 mt-1 truncate">{quickInsights.criticalPriority.description}</p>
               </div>
             </>
           ) : (
