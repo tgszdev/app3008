@@ -21,6 +21,7 @@ interface SatisfactionData {
     rating: number
     comment: string
     ticketNumber: string
+    ticketTitle: string
     createdAt: string
   }>
 }
@@ -316,9 +317,14 @@ export default function SatisfactionPage() {
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     {renderStars(comment.rating)}
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                      {comment.ticketNumber}
-                    </span>
+                    <div>
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                        {comment.ticketNumber}
+                      </span>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {comment.ticketTitle}
+                      </p>
+                    </div>
                   </div>
                   <span className="text-xs text-gray-500 dark:text-gray-400">
                     {formatDate(comment.createdAt)}
