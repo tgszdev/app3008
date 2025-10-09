@@ -280,6 +280,26 @@ details[open] summary::before {
   }
 }
 
+/* Melhorias específicas para modal mobile */
+@media (max-width: 768px) {
+  .chart-modal-mobile {
+    max-width: 95vw !important;
+    max-height: 95vh !important;
+    margin: 0.5rem !important;
+  }
+  
+  .chart-modal-mobile .chart-container {
+    padding: 4px !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+  
+  .chart-modal-mobile .chart-container canvas {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+}
+
 /* ===== AJUSTES PARA IMAGEM DE LOGIN ===== */
 
 /* Garantir que a imagem ocupe exatamente o espaço disponível do lado direito */

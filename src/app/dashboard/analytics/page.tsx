@@ -495,7 +495,10 @@ export default function AnalyticsPage() {
   }, [])
 
   const openChartModal = (title: string, type: 'line' | 'bar' | 'pie' | 'doughnut', data: any, options: any) => {
-    setSelectedChart({ title, type, data, options })
+    // Detectar se é mobile
+    const isMobile = window.innerWidth < 768
+    const modalOptions = isMobile ? modalChartOptionsMobile : modalChartOptions
+    setSelectedChart({ title, type, data, options: modalOptions })
     setShowChartModal(true)
   }
 
@@ -913,6 +916,90 @@ export default function AnalyticsPage() {
           usePointStyle: true,
           pointStyle: 'rect',
           color: '#E5E7EB'
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        padding: 16,
+        cornerRadius: 12,
+        titleFont: {
+          size: 16
+        },
+        bodyFont: {
+          size: 14
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: {
+          font: {
+            size: 12,
+            color: '#E5E7EB'
+          }
+        }
+      },
+      y: {
+        ticks: {
+          font: {
+            size: 12,
+            color: '#E5E7EB'
+          }
+        }
+      }
+    }
+  }
+
+  // Opções específicas para mobile no modal
+  const modalChartOptionsMobile = {
+    responsive: true,
+    maintainAspectRatio: false,
+    layout: {
+      padding: {
+        bottom: 40,
+        top: 20,
+        left: 10,
+        right: 10
+      }
+    },
+    plugins: {
+      legend: {
+        position: 'bottom' as const,
+        labels: {
+          padding: 15,
+          font: {
+            size: 12,
+            color: '#E5E7EB'
+          },
+          boxWidth: 14,
+          boxHeight: 14,
+          usePointStyle: true,
+          pointStyle: 'rect',
+          color: '#E5E7EB',
+          maxWidth: 200,
+          generateLabels: function(chart: any) {
+            const data = chart.data;
+            if (data.labels.length && data.datasets.length) {
+              const dataset = data.datasets[0];
+              const total = dataset.data.reduce((a: number, b: number) => a + b, 0);
+              return data.labels.map((label: string, index: number) => {
+                const value = dataset.data[index];
+                const percentage = ((value / total) * 100).toFixed(1);
+                // Truncar labels para mobile
+                const truncatedLabel = label.length > 12 ? label.substring(0, 12) + '...' : label;
+                return {
+                  text: `${truncatedLabel} (${percentage}%)`,
+                  fillStyle: dataset.backgroundColor[index],
+                  strokeStyle: dataset.borderColor ? dataset.borderColor[index] : dataset.backgroundColor[index],
+                  lineWidth: dataset.borderWidth || 0,
+                  hidden: false,
+                  index: index,
+                  fontColor: '#E5E7EB'
+                };
+              });
+            }
+            return [];
+          }
         }
       },
       tooltip: {
@@ -1528,35 +1615,35 @@ export default function AnalyticsPage() {
 
       {/* Modal do Gráfico */}
       {showChartModal && selectedChart && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-2 sm:p-4">
           <div 
             ref={chartModalRef}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden"
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[95vh] overflow-hidden chart-modal-mobile"
           >
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white truncate">
                 {selectedChart.title}
               </h3>
               <button
                 onClick={() => setShowChartModal(false)}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0"
               >
-                <X className="h-6 w-6 text-gray-500 dark:text-gray-400" />
+                <X className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500 dark:text-gray-400" />
               </button>
             </div>
             
-            <div className="p-6 h-[70vh]">
+            <div className="p-2 sm:p-6 h-[75vh] sm:h-[70vh] chart-container">
               {selectedChart.type === 'line' && (
-                <Line data={selectedChart.data} options={modalChartOptions} />
+                <Line data={selectedChart.data} options={selectedChart.options} />
               )}
               {selectedChart.type === 'bar' && (
-                <Bar data={selectedChart.data} options={modalChartOptions} />
+                <Bar data={selectedChart.data} options={selectedChart.options} />
               )}
               {selectedChart.type === 'pie' && (
-                <Pie data={selectedChart.data} options={modalChartOptions} />
+                <Pie data={selectedChart.data} options={selectedChart.options} />
               )}
               {selectedChart.type === 'doughnut' && (
-                <Doughnut data={selectedChart.data} options={modalChartOptions} />
+                <Doughnut data={selectedChart.data} options={selectedChart.options} />
               )}
             </div>
           </div>
