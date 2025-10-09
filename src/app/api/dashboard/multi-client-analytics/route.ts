@@ -165,6 +165,14 @@ export async function GET(request: NextRequest) {
           continue
         }
 
+        console.log(`🔍 DEBUG: Contexto ${context.name} retornou ${tickets?.length || 0} tickets`)
+        
+        // Verificar quantos tickets têm ratings
+        const ticketsWithRatings = tickets?.filter(ticket => ticket.ratings && ticket.ratings.length > 0) || []
+        console.log(`🔍 DEBUG: Contexto ${context.name} tem ${ticketsWithRatings.length} tickets com ratings`)
+        ticketsWithRatings.forEach(ticket => {
+          console.log(`  - Ticket ${ticket.id}: ${ticket.ratings.length} rating(s)`)
+        })
         
         if (tickets && tickets.length > 0) {
           tickets.forEach(ticket => {
