@@ -317,6 +317,9 @@ export default function AnalyticsPage() {
   const filtersPopupRef = useRef<HTMLDivElement>(null)
   const chartModalRef = useRef<HTMLDivElement>(null)
   
+  // Estado para controlar a cor do texto dos gráficos
+  const [textColor, setTextColor] = useState('#374151') // fallback para SSR
+  
   // Determinar se deve usar multi-client ou single-client
   const isMultiClient = isMatrixUser && selectedClients.length > 0
 
@@ -492,6 +495,32 @@ export default function AnalyticsPage() {
 
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Effect para detectar mudanças no tema e atualizar cor do texto
+  useEffect(() => {
+    const updateTextColor = () => {
+      if (typeof window !== 'undefined') {
+        const isDark = document.documentElement.classList.contains('dark')
+        setTextColor(isDark ? '#E5E7EB' : '#374151')
+      }
+    }
+    
+    // Atualizar cor inicial
+    updateTextColor()
+    
+    const observer = new MutationObserver(() => {
+      updateTextColor()
+    })
+    
+    if (typeof window !== 'undefined') {
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class']
+      })
+    }
+    
+    return () => observer.disconnect()
   }, [])
 
   const openChartModal = (title: string, type: 'line' | 'bar' | 'pie' | 'doughnut', data: any, options: any) => {
@@ -848,35 +877,6 @@ export default function AnalyticsPage() {
       }
     }
   }
-
-  // Estado para controlar a cor do texto
-  const [textColor, setTextColor] = useState('#374151') // fallback para SSR
-  
-  // Effect para detectar mudanças no tema e atualizar cor do texto
-  useEffect(() => {
-    const updateTextColor = () => {
-      if (typeof window !== 'undefined') {
-        const isDark = document.documentElement.classList.contains('dark')
-        setTextColor(isDark ? '#E5E7EB' : '#374151')
-      }
-    }
-    
-    // Atualizar cor inicial
-    updateTextColor()
-    
-    const observer = new MutationObserver(() => {
-      updateTextColor()
-    })
-    
-    if (typeof window !== 'undefined') {
-      observer.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ['class']
-      })
-    }
-    
-    return () => observer.disconnect()
-  }, [])
 
   // Opções específicas para mobile com legenda mais compacta
   const pieOptionsMobile = {
