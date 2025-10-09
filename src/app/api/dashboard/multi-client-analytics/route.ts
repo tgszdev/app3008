@@ -449,6 +449,11 @@ export async function GET(request: NextRequest) {
         console.log(`🔍 DEBUG: Processando ${clientData.length} clientes para métricas`)
         clientData.forEach((client, clientIndex) => {
           console.log(`🔍 DEBUG: Cliente ${clientIndex + 1} (${client.context.name}): ${client.tickets.length} tickets`)
+          
+          // Verificar se há tickets com ratings neste cliente
+          const ticketsWithRatings = client.tickets.filter(ticket => ticket.ratings && ticket.ratings.length > 0)
+          console.log(`🔍 DEBUG: Cliente ${client.context.name} tem ${ticketsWithRatings.length} tickets com ratings`)
+          
           client.tickets.forEach((ticket, ticketIndex) => {
             // Contar por prioridade
             if (ticket.priority === 'low') priorityDistribution.low++
