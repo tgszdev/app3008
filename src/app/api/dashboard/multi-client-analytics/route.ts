@@ -166,6 +166,8 @@ export async function GET(request: NextRequest) {
         }
 
         
+        console.log(`🔍 DEBUG: Contexto ${context.name} - Tickets retornados: ${tickets?.length || 0}`)
+        
         if (tickets && tickets.length > 0) {
           tickets.forEach(ticket => {
           })
@@ -434,8 +436,11 @@ export async function GET(request: NextRequest) {
     
     // Agrupar tickets por data de criação
     const ticketsByDate = new Map()
+    let totalTicketsProcessed = 0
     clientData.forEach(client => {
+      console.log(`🔍 DEBUG: Processando ${client.tickets.length} tickets do cliente ${client.context.name}`)
       client.tickets.forEach(ticket => {
+        totalTicketsProcessed++
         const date = new Date(ticket.created_at).toISOString().split('T')[0]
         if (!ticketsByDate.has(date)) {
           ticketsByDate.set(date, 0)
@@ -443,6 +448,8 @@ export async function GET(request: NextRequest) {
         ticketsByDate.set(date, ticketsByDate.get(date) + 1)
       })
     })
+    
+    console.log(`🔍 DEBUG: Total de tickets processados para tendência: ${totalTicketsProcessed}`)
     
     // Converter para array ordenado por data
     const sortedDates = Array.from(ticketsByDate.keys()).sort()
