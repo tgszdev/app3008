@@ -965,43 +965,7 @@ export default function AnalyticsPage() {
     },
     plugins: {
       legend: {
-        position: 'bottom' as const,
-        labels: {
-          padding: 15,
-          font: {
-            size: 12,
-            color: '#E5E7EB'
-          },
-          boxWidth: 14,
-          boxHeight: 14,
-          usePointStyle: true,
-          pointStyle: 'rect',
-          color: '#E5E7EB',
-          maxWidth: 200,
-          generateLabels: function(chart: any) {
-            const data = chart.data;
-            if (data.labels.length && data.datasets.length) {
-              const dataset = data.datasets[0];
-              const total = dataset.data.reduce((a: number, b: number) => a + b, 0);
-              return data.labels.map((label: string, index: number) => {
-                const value = dataset.data[index];
-                const percentage = ((value / total) * 100).toFixed(1);
-                // Truncar labels para mobile
-                const truncatedLabel = label.length > 12 ? label.substring(0, 12) + '...' : label;
-                return {
-                  text: `${truncatedLabel} (${percentage}%)`,
-                  fillStyle: dataset.backgroundColor[index],
-                  strokeStyle: dataset.borderColor ? dataset.borderColor[index] : dataset.backgroundColor[index],
-                  lineWidth: dataset.borderWidth || 0,
-                  hidden: false,
-                  index: index,
-                  fontColor: '#E5E7EB'
-                };
-              });
-            }
-            return [];
-          }
-        }
+        display: false
       },
       tooltip: {
         backgroundColor: 'rgba(0, 0, 0, 0.9)',
