@@ -427,9 +427,47 @@ export async function GET(request: NextRequest) {
       .sort((a, b) => b.total - a.total)
 
     // Calcular dados adicionais para os gráficos
+    // Calcular tendência de tickets por dia
     const ticketsTrend = []
     const peakHours = Array.from({ length: 24 }, (_, hour) => ({ hour, count: 0 }))
     const userActivity = []
+    
+    // Agrupar tickets por data de criação
+    const ticketsByDate = new Map()
+    clientData.forEach(client => {
+      client.tickets.forEach(ticket => {
+        const date = new Date(ticket.created_at).toISOString().split('T')[0]
+        if (!ticketsByDate.has(date)) {
+          ticketsByDate.set(date, 0)
+        }
+        ticketsByDate.set(date, ticketsByDate.get(date) + 1)
+      })
+    })
+    
+    // Converter para array ordenado por data
+    const sortedDates = Array.from(ticketsByDate.keys()).sort()
+    sortedDates.forEach(date => {
+      ticketsTrend.push({
+        date: date,
+        count: ticketsByDate.get(date)
+      })
+    })
+    
+    // Se não há dados, criar dados de exemplo para o período
+    if (ticketsTrend.length === 0) {
+      const start = new Date(startDate)
+      const end = new Date(endDate)
+      const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24))
+      
+      for (let i = 0; i < daysDiff; i++) {
+        const date = new Date(start)
+        date.setDate(start.getDate() + i)
+        ticketsTrend.push({
+          date: date.toISOString().split('T')[0],
+          count: 0
+        })
+      }
+    }
     
     // Calcular distribuição de prioridades
     const priorityDistribution = {
