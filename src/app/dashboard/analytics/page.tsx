@@ -1011,7 +1011,7 @@ export default function AnalyticsPage() {
               {/* Botão principal com bordas animadas */}
               <button
                 onClick={() => setShowClientPopup(!showClientPopup)}
-                className="w-full sm:w-auto sm:min-w-[180px] h-12 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 flex items-center justify-center gap-2 relative overflow-hidden whitespace-nowrap"
+                className="w-full sm:w-auto sm:min-w-[180px] h-12 flex items-center justify-center gap-2 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
               >
                 <Building className="w-4 h-4 flex-shrink-0" />
                 <span className="text-sm font-medium">
@@ -1122,7 +1122,7 @@ export default function AnalyticsPage() {
             <div className="relative" ref={filtersPopupRef}>
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="w-full sm:w-auto h-12 px-3 sm:px-4 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center gap-2"
+                className="w-full sm:w-auto sm:min-w-[180px] h-12 flex items-center justify-center gap-2 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
               >
                 <Filter className="h-4 w-4 mr-2" />
                 Filtros
@@ -1210,9 +1210,9 @@ export default function AnalyticsPage() {
           </select>
           )}
 
-          <button className="w-full sm:w-auto h-12 px-3 sm:px-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
-            <Download className="h-4 w-4" />
-            <span className="text-sm font-medium sm:hidden">Baixar</span>
+          <button className="w-full sm:w-auto sm:min-w-[180px] h-12 flex items-center justify-center gap-2 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap">
+            <Download className="h-4 w-4 flex-shrink-0" />
+            <span className="text-sm font-medium">Baixar</span>
           </button>
         </div>
       </div>
