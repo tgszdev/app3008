@@ -800,7 +800,8 @@ export default function AnalyticsPage() {
         },
         ticks: {
           font: {
-            size: 11
+            size: 11,
+            color: '#E5E7EB'
           }
         }
       },
@@ -810,7 +811,8 @@ export default function AnalyticsPage() {
         },
         ticks: {
           font: {
-            size: 11
+            size: 11,
+            color: '#E5E7EB'
           },
           maxRotation: 45,
           minRotation: 0
@@ -859,7 +861,8 @@ export default function AnalyticsPage() {
         labels: {
           padding: 12,
           font: {
-            size: 11
+            size: 11,
+            color: '#E5E7EB'
           },
           boxWidth: 12,
           boxHeight: 12,
@@ -923,7 +926,8 @@ export default function AnalyticsPage() {
         labels: {
           padding: 20,
           font: {
-            size: 14
+            size: 14,
+            color: '#E5E7EB'
           },
           boxWidth: 16,
           boxHeight: 16,
@@ -947,14 +951,16 @@ export default function AnalyticsPage() {
       x: {
         ticks: {
           font: {
-            size: 12
+            size: 12,
+            color: '#E5E7EB'
           }
         }
       },
       y: {
         ticks: {
           font: {
-            size: 12
+            size: 12,
+            color: '#E5E7EB'
           }
         }
       }
