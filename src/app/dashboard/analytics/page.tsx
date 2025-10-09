@@ -953,13 +953,14 @@ export default function AnalyticsPage() {
   // Opções específicas para mobile no modal
   const modalChartOptionsMobile = {
     responsive: true,
-    maintainAspectRatio: false,
+    maintainAspectRatio: true,
+    aspectRatio: 1,
     layout: {
       padding: {
-        bottom: 40,
+        bottom: 20,
         top: 20,
-        left: 10,
-        right: 10
+        left: 20,
+        right: 20
       }
     },
     plugins: {
@@ -1015,22 +1016,7 @@ export default function AnalyticsPage() {
       }
     },
     scales: {
-      x: {
-        ticks: {
-          font: {
-            size: 12,
-            color: '#E5E7EB'
-          }
-        }
-      },
-      y: {
-        ticks: {
-          font: {
-            size: 12,
-            color: '#E5E7EB'
-          }
-        }
-      }
+      display: false
     }
   }
 
@@ -1632,18 +1618,54 @@ export default function AnalyticsPage() {
               </button>
             </div>
             
-            <div className="p-2 sm:p-6 h-[75vh] sm:h-[70vh] chart-container">
-              {selectedChart.type === 'line' && (
-                <Line data={selectedChart.data} options={selectedChart.options} />
-              )}
-              {selectedChart.type === 'bar' && (
-                <Bar data={selectedChart.data} options={selectedChart.options} />
-              )}
-              {selectedChart.type === 'pie' && (
-                <Pie data={selectedChart.data} options={selectedChart.options} />
-              )}
-              {selectedChart.type === 'doughnut' && (
-                <Doughnut data={selectedChart.data} options={selectedChart.options} />
+            {/* Layout específico para mobile - duas seções */}
+            <div className="flex flex-col sm:block h-[75vh] sm:h-[70vh]">
+              {/* Seção do Gráfico - 60% no mobile */}
+              <div className="flex-1 sm:flex-none p-2 sm:p-6 h-[60%] sm:h-full chart-container">
+                {selectedChart.type === 'line' && (
+                  <Line data={selectedChart.data} options={selectedChart.options} />
+                )}
+                {selectedChart.type === 'bar' && (
+                  <Bar data={selectedChart.data} options={selectedChart.options} />
+                )}
+                {selectedChart.type === 'pie' && (
+                  <Pie data={selectedChart.data} options={selectedChart.options} />
+                )}
+                {selectedChart.type === 'doughnut' && (
+                  <Doughnut data={selectedChart.data} options={selectedChart.options} />
+                )}
+              </div>
+              
+              {/* Seção da Legenda - 40% no mobile (apenas para gráficos circulares) */}
+              {(selectedChart.type === 'pie' || selectedChart.type === 'doughnut') && (
+                <div className="sm:hidden flex-1 p-2 border-t border-gray-200 dark:border-gray-700 overflow-y-auto">
+                  <div className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+                    Legenda Detalhada:
+                  </div>
+                  <div className="space-y-2">
+                    {selectedChart.data.labels.map((label: string, index: number) => {
+                      const value = selectedChart.data.datasets[0].data[index]
+                      const total = selectedChart.data.datasets[0].data.reduce((a: number, b: number) => a + b, 0)
+                      const percentage = ((value / total) * 100).toFixed(1)
+                      const color = selectedChart.data.datasets[0].backgroundColor[index]
+                      
+                      return (
+                        <div key={index} className="flex items-center gap-3">
+                          <div 
+                            className="w-4 h-4 rounded-sm flex-shrink-0"
+                            style={{ backgroundColor: color }}
+                          />
+                          <span className="text-sm text-gray-700 dark:text-gray-300 flex-1">
+                            {label}
+                          </span>
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">
+                            {percentage}%
+                          </span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
               )}
             </div>
           </div>
