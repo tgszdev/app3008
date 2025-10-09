@@ -1122,7 +1122,7 @@ export default function AnalyticsPage() {
             <div className="relative" ref={filtersPopupRef}>
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-2xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                className="w-full sm:w-auto h-12 px-3 sm:px-4 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center gap-2"
               >
                 <Filter className="h-4 w-4 mr-2" />
                 Filtros
@@ -1210,8 +1210,9 @@ export default function AnalyticsPage() {
           </select>
           )}
 
-          <button className="w-full sm:w-auto p-2 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-colors flex items-center justify-center">
+          <button className="w-full sm:w-auto h-12 px-3 sm:px-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
             <Download className="h-4 w-4" />
+            <span className="text-sm font-medium sm:hidden">Baixar</span>
           </button>
         </div>
       </div>
