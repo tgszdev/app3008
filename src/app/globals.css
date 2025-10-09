@@ -42,6 +42,19 @@
     @apply bg-blue-400 hover:bg-blue-300;
   }
 
+  /* Estilos para legendas dos gráficos no dark mode */
+  .dark .chartjs-legend {
+    color: #E5E7EB !important;
+  }
+
+  .dark .chartjs-legend li {
+    color: #E5E7EB !important;
+  }
+
+  .dark .chartjs-legend li span {
+    color: #E5E7EB !important;
+  }
+
   /* Focus state */
   input[type="range"]:focus {
     outline: none;
