@@ -1124,9 +1124,11 @@ export default function AnalyticsPage() {
                 onClick={() => setShowFilters(!showFilters)}
                 className="w-full sm:w-auto sm:min-w-[180px] h-12 flex items-center justify-center gap-2 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap"
               >
-                <Filter className="h-4 w-4 mr-2" />
-                Filtros
-                {showFilters ? <ChevronUp className="h-4 w-4 ml-2" /> : <ChevronDown className="h-4 w-4 ml-2" />}
+                <Filter className="h-4 w-4 flex-shrink-0" />
+                <span className="text-sm font-medium">Filtros</span>
+                {showFilters ? <ChevronUp className="h-4 w-4 flex-shrink-0" /> : <ChevronDown className="h-4 w-4 flex-shrink-0" />}
+                {/* Bordas animadas */}
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-yellow-500/20 to-transparent animate-pulse"></div>
               </button>
 
               {showFilters && (
@@ -1213,6 +1215,8 @@ export default function AnalyticsPage() {
           <button className="w-full sm:w-auto sm:min-w-[180px] h-12 flex items-center justify-center gap-2 px-3 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 relative overflow-hidden whitespace-nowrap">
             <Download className="h-4 w-4 flex-shrink-0" />
             <span className="text-sm font-medium">Baixar</span>
+            {/* Bordas animadas */}
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-purple-500/20 to-transparent animate-pulse"></div>
           </button>
         </div>
       </div>
