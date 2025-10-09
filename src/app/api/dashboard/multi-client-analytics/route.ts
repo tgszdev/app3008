@@ -446,7 +446,9 @@ export async function GET(request: NextRequest) {
     let totalRatingSum = 0
     
         // Processar tickets de todos os clientes para calcular métricas
+        console.log('🔍 DEBUG: Iniciando processamento de métricas para', clientData.length, 'clientes')
         clientData.forEach((client, clientIndex) => {
+          console.log(`🔍 DEBUG: Processando cliente ${clientIndex + 1}: ${client.context.name} (${client.tickets.length} tickets)`)
           client.tickets.forEach((ticket, ticketIndex) => {
             // Contar por prioridade
             if (ticket.priority === 'low') priorityDistribution.low++
@@ -469,9 +471,11 @@ export async function GET(request: NextRequest) {
             
             // Calcular satisfação se ticket tem rating
             if (ticket.ratings && ticket.ratings.length > 0) {
+              console.log(`🔍 DEBUG: Ticket ${ticket.id} tem ${ticket.ratings.length} rating(s)`)
               ticket.ratings.forEach(rating => {
                 totalRatings++
                 totalRatingSum += rating.rating || 0
+                console.log(`  - Rating: ${rating.rating}, totalRatings: ${totalRatings}, totalRatingSum: ${totalRatingSum}`)
               })
             }
           })
