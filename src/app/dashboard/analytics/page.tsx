@@ -869,28 +869,7 @@ export default function AnalyticsPage() {
           usePointStyle: true,
           pointStyle: 'rect',
           maxWidth: 140,
-          generateLabels: function(chart: any) {
-            const data = chart.data;
-            if (data.labels.length && data.datasets.length) {
-              const dataset = data.datasets[0];
-              const total = dataset.data.reduce((a: number, b: number) => a + b, 0);
-              return data.labels.map((label: string, index: number) => {
-                const value = dataset.data[index];
-                const percentage = ((value / total) * 100).toFixed(1);
-                // Truncar labels muito longos
-                const truncatedLabel = label.length > 15 ? label.substring(0, 15) + '...' : label;
-                return {
-                  text: `${truncatedLabel} (${percentage}%)`,
-                  fillStyle: dataset.backgroundColor[index],
-                  strokeStyle: dataset.borderColor ? dataset.borderColor[index] : dataset.backgroundColor[index],
-                  lineWidth: dataset.borderWidth || 0,
-                  hidden: false,
-                  index: index
-                };
-              });
-            }
-            return [];
-          }
+          color: '#E5E7EB'
         }
       },
       tooltip: {
@@ -932,7 +911,8 @@ export default function AnalyticsPage() {
           boxWidth: 16,
           boxHeight: 16,
           usePointStyle: true,
-          pointStyle: 'rect'
+          pointStyle: 'rect',
+          color: '#E5E7EB'
         }
       },
       tooltip: {
