@@ -804,7 +804,7 @@ export default function AnalyticsPage() {
         ticks: {
           font: {
             size: 11,
-            color: getLegendTextColor()
+            color: textColor
           }
         }
       },
@@ -815,7 +815,7 @@ export default function AnalyticsPage() {
         ticks: {
           font: {
             size: 11,
-            color: getLegendTextColor()
+            color: textColor
           },
           maxRotation: 45,
           minRotation: 0
@@ -849,13 +849,34 @@ export default function AnalyticsPage() {
     }
   }
 
-  // Função para obter cor do texto baseada no tema
-  const getLegendTextColor = () => {
-    if (typeof window !== 'undefined') {
-      return document.documentElement.classList.contains('dark') ? '#E5E7EB' : '#374151'
+  // Estado para controlar a cor do texto
+  const [textColor, setTextColor] = useState('#374151') // fallback para SSR
+  
+  // Effect para detectar mudanças no tema e atualizar cor do texto
+  useEffect(() => {
+    const updateTextColor = () => {
+      if (typeof window !== 'undefined') {
+        const isDark = document.documentElement.classList.contains('dark')
+        setTextColor(isDark ? '#E5E7EB' : '#374151')
+      }
     }
-    return '#374151' // fallback para SSR
-  }
+    
+    // Atualizar cor inicial
+    updateTextColor()
+    
+    const observer = new MutationObserver(() => {
+      updateTextColor()
+    })
+    
+    if (typeof window !== 'undefined') {
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class']
+      })
+    }
+    
+    return () => observer.disconnect()
+  }, [])
 
   // Opções específicas para mobile com legenda mais compacta
   const pieOptionsMobile = {
@@ -873,14 +894,14 @@ export default function AnalyticsPage() {
           padding: 12,
           font: {
             size: 11,
-            color: getLegendTextColor()
+            color: textColor
           },
           boxWidth: 12,
           boxHeight: 12,
           usePointStyle: true,
           pointStyle: 'rect',
           maxWidth: 140,
-          color: getLegendTextColor()
+          color: textColor
         }
       },
       tooltip: {
@@ -917,13 +938,13 @@ export default function AnalyticsPage() {
           padding: 20,
           font: {
             size: 14,
-            color: getLegendTextColor()
+            color: textColor
           },
           boxWidth: 16,
           boxHeight: 16,
           usePointStyle: true,
           pointStyle: 'rect',
-          color: getLegendTextColor()
+          color: textColor
         }
       },
       tooltip: {
@@ -943,7 +964,7 @@ export default function AnalyticsPage() {
         ticks: {
           font: {
             size: 12,
-            color: getLegendTextColor()
+            color: textColor
           }
         }
       },
@@ -951,7 +972,7 @@ export default function AnalyticsPage() {
         ticks: {
           font: {
             size: 12,
-            color: getLegendTextColor()
+            color: textColor
           }
         }
       }
