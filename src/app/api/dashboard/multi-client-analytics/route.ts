@@ -487,6 +487,14 @@ export async function GET(request: NextRequest) {
     // Calcular taxa de satisfação
     const satisfactionRate = totalRatings > 0 ? Math.round((totalRatingSum / totalRatings / 5) * 100) : 0
     
+    console.log('🔍 DEBUG: Cálculo de satisfação FINAL:', {
+      totalRatings,
+      totalRatingSum,
+      avgRating: totalRatings > 0 ? totalRatingSum / totalRatings : 0,
+      satisfactionRate,
+      formula: totalRatings > 0 ? `(${totalRatingSum} / ${totalRatings} / 5) * 100 = ${satisfactionRate}%` : 'N/A'
+    })
+    
     const performanceMetrics = {
       firstResponseTime: 'N/A',
       resolutionRate: resolvedTicketsCount > 0 ? Math.round((resolvedTicketsCount / totalTickets) * 100) : 0,
