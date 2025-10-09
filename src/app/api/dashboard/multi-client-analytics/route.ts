@@ -144,8 +144,8 @@ export async function GET(request: NextRequest) {
             )
           `)
           .eq('context_id', contextId)
-          .gte('created_at', `${startDate}T00:00:00`)
-          .lte('created_at', `${endDate}T23:59:59.999`)
+          .gte('created_at', startDate)
+          .lte('created_at', endDate)
           .order('created_at', { ascending: false }) // Mais recente primeiro
 
         // Filtro por usuário se especificado
@@ -165,14 +165,6 @@ export async function GET(request: NextRequest) {
           continue
         }
 
-        console.log(`🔍 DEBUG: Contexto ${context.name} retornou ${tickets?.length || 0} tickets`)
-        
-        // Verificar quantos tickets têm ratings
-        const ticketsWithRatings = tickets?.filter(ticket => ticket.ratings && ticket.ratings.length > 0) || []
-        console.log(`🔍 DEBUG: Contexto ${context.name} tem ${ticketsWithRatings.length} tickets com ratings`)
-        ticketsWithRatings.forEach(ticket => {
-          console.log(`  - Ticket ${ticket.id}: ${ticket.ratings.length} rating(s)`)
-        })
         
         if (tickets && tickets.length > 0) {
           tickets.forEach(ticket => {
@@ -454,14 +446,7 @@ export async function GET(request: NextRequest) {
     let totalRatingSum = 0
     
         // Processar tickets de todos os clientes para calcular métricas
-        console.log(`🔍 DEBUG: Processando ${clientData.length} clientes para métricas`)
         clientData.forEach((client, clientIndex) => {
-          console.log(`🔍 DEBUG: Cliente ${clientIndex + 1} (${client.context.name}): ${client.tickets.length} tickets`)
-          
-          // Verificar se há tickets com ratings neste cliente
-          const ticketsWithRatings = client.tickets.filter(ticket => ticket.ratings && ticket.ratings.length > 0)
-          console.log(`🔍 DEBUG: Cliente ${client.context.name} tem ${ticketsWithRatings.length} tickets com ratings`)
-          
           client.tickets.forEach((ticket, ticketIndex) => {
             // Contar por prioridade
             if (ticket.priority === 'low') priorityDistribution.low++
@@ -484,11 +469,9 @@ export async function GET(request: NextRequest) {
             
             // Calcular satisfação se ticket tem rating
             if (ticket.ratings && ticket.ratings.length > 0) {
-              console.log(`🔍 DEBUG: Ticket ${ticket.id} tem ${ticket.ratings.length} rating(s):`, ticket.ratings)
               ticket.ratings.forEach(rating => {
                 totalRatings++
                 totalRatingSum += rating.rating || 0
-                console.log(`  - Rating: ${rating.rating}, totalRatings: ${totalRatings}, totalRatingSum: ${totalRatingSum}`)
               })
             }
           })
@@ -503,14 +486,6 @@ export async function GET(request: NextRequest) {
     
     // Calcular taxa de satisfação
     const satisfactionRate = totalRatings > 0 ? Math.round((totalRatingSum / totalRatings / 5) * 100) : 0
-    
-    console.log('🔍 DEBUG: Cálculo de satisfação:', {
-      totalRatings,
-      totalRatingSum,
-      avgRating: totalRatings > 0 ? totalRatingSum / totalRatings : 0,
-      satisfactionRate,
-      formula: totalRatings > 0 ? `(${totalRatingSum} / ${totalRatings} / 5) * 100 = ${satisfactionRate}%` : 'N/A'
-    })
     
     const performanceMetrics = {
       firstResponseTime: 'N/A',
