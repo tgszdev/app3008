@@ -450,36 +450,36 @@ export async function GET(request: NextRequest) {
         clientData.forEach((client, clientIndex) => {
           console.log(`🔍 DEBUG: Cliente ${clientIndex + 1} (${client.context.name}): ${client.tickets.length} tickets`)
           client.tickets.forEach((ticket, ticketIndex) => {
-        // Contar por prioridade
-        if (ticket.priority === 'low') priorityDistribution.low++
-        else if (ticket.priority === 'medium') priorityDistribution.medium++
-        else if (ticket.priority === 'high') priorityDistribution.high++
-        else if (ticket.priority === 'critical') priorityDistribution.critical++
-        
-        // Contar por hora
-        const hour = new Date(ticket.created_at).getHours()
-        peakHours[hour].count++
-        
-        // Calcular tempo de resolução se ticket foi resolvido
-        if (ticket.resolved_at) {
-          const created = new Date(ticket.created_at)
-          const resolved = new Date(ticket.resolved_at)
-          const diffHours = (resolved - created) / (1000 * 60 * 60) // em horas
-          totalResolutionTime += diffHours
-          resolvedTicketsCount++
-        }
-        
-        // Calcular satisfação se ticket tem rating
-        if (ticket.ratings && ticket.ratings.length > 0) {
-          console.log(`🔍 DEBUG: Ticket ${ticket.id} tem ${ticket.ratings.length} rating(s):`, ticket.ratings)
-          ticket.ratings.forEach(rating => {
-            totalRatings++
-            totalRatingSum += rating.rating || 0
-            console.log(`  - Rating: ${rating.rating}, totalRatings: ${totalRatings}, totalRatingSum: ${totalRatingSum}`)
+            // Contar por prioridade
+            if (ticket.priority === 'low') priorityDistribution.low++
+            else if (ticket.priority === 'medium') priorityDistribution.medium++
+            else if (ticket.priority === 'high') priorityDistribution.high++
+            else if (ticket.priority === 'critical') priorityDistribution.critical++
+            
+            // Contar por hora
+            const hour = new Date(ticket.created_at).getHours()
+            peakHours[hour].count++
+            
+            // Calcular tempo de resolução se ticket foi resolvido
+            if (ticket.resolved_at) {
+              const created = new Date(ticket.created_at)
+              const resolved = new Date(ticket.resolved_at)
+              const diffHours = (resolved - created) / (1000 * 60 * 60) // em horas
+              totalResolutionTime += diffHours
+              resolvedTicketsCount++
+            }
+            
+            // Calcular satisfação se ticket tem rating
+            if (ticket.ratings && ticket.ratings.length > 0) {
+              console.log(`🔍 DEBUG: Ticket ${ticket.id} tem ${ticket.ratings.length} rating(s):`, ticket.ratings)
+              ticket.ratings.forEach(rating => {
+                totalRatings++
+                totalRatingSum += rating.rating || 0
+                console.log(`  - Rating: ${rating.rating}, totalRatings: ${totalRatings}, totalRatingSum: ${totalRatingSum}`)
+              })
+            }
           })
-        }
-      })
-    })
+        })
     
     // Calcular tempo médio de resolução
     const avgResolutionHours = resolvedTicketsCount > 0 ? totalResolutionTime / resolvedTicketsCount : 0
