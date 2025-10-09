@@ -340,7 +340,7 @@ export async function GET(request: NextRequest) {
           },
           status_stats: statusStats,
           category_stats: categoryStats,
-          tickets: tickets?.slice(0, 10) || [] // Últimos 10 tickets
+          tickets: tickets || [] // Todos os tickets
         }
 
         console.log(`📊 Dados do cliente ${context.name}:`, {
