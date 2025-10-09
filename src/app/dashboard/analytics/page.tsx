@@ -804,7 +804,7 @@ export default function AnalyticsPage() {
         ticks: {
           font: {
             size: 11,
-            color: '#E5E7EB'
+            color: '#374151'
           }
         }
       },
@@ -815,7 +815,7 @@ export default function AnalyticsPage() {
         ticks: {
           font: {
             size: 11,
-            color: '#E5E7EB'
+            color: '#374151'
           },
           maxRotation: 45,
           minRotation: 0
@@ -865,14 +865,14 @@ export default function AnalyticsPage() {
           padding: 12,
           font: {
             size: 11,
-            color: '#E5E7EB'
+            color: '#374151'
           },
           boxWidth: 12,
           boxHeight: 12,
           usePointStyle: true,
           pointStyle: 'rect',
           maxWidth: 140,
-          color: '#E5E7EB'
+          color: '#374151'
         }
       },
       tooltip: {
@@ -909,13 +909,13 @@ export default function AnalyticsPage() {
           padding: 20,
           font: {
             size: 14,
-            color: '#E5E7EB'
+            color: '#374151'
           },
           boxWidth: 16,
           boxHeight: 16,
           usePointStyle: true,
           pointStyle: 'rect',
-          color: '#E5E7EB'
+          color: '#374151'
         }
       },
       tooltip: {
@@ -935,7 +935,7 @@ export default function AnalyticsPage() {
         ticks: {
           font: {
             size: 12,
-            color: '#E5E7EB'
+            color: '#374151'
           }
         }
       },
@@ -943,7 +943,7 @@ export default function AnalyticsPage() {
         ticks: {
           font: {
             size: 12,
-            color: '#E5E7EB'
+            color: '#374151'
           }
         }
       }

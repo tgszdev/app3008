@@ -39,3 +39,4 @@ async function testApiSatisfaction() {
 
 // Executar teste
 testApiSatisfaction()
+

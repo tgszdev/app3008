@@ -87,3 +87,4 @@ console.log('O problema principal é que usuários Matrix sem clientes seleciona
 console.log('não carregam dados nenhuns, ficando presos na tela de seleção.');
 console.log('A lógica precisa ser ajustada para sempre mostrar dados,');
 console.log('seja de todos os clientes ou de um cliente padrão.');
+

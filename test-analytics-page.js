@@ -119,3 +119,4 @@ async function runTests() {
 
 // Executar testes
 runTests().catch(console.error);
+

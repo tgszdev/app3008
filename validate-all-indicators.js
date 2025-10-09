@@ -170,3 +170,4 @@ async function validateAllIndicators() {
 
 // Executar validação
 validateAllIndicators()
+

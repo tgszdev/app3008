@@ -126,3 +126,4 @@ Após testar, me informe:
 4. Se os gráficos estão sendo preenchidos
 
 Com essas informações, poderei identificar exatamente onde está o problema e corrigi-lo.
+

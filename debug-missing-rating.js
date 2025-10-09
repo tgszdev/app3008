@@ -141,3 +141,4 @@ async function debugMissingRating() {
 
 // Executar investigação
 debugMissingRating()
+

@@ -109,3 +109,4 @@ async function debugSatisfactionCalculation() {
 
 // Executar debug
 debugSatisfactionCalculation()
+
