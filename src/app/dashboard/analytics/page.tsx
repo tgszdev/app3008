@@ -787,6 +787,57 @@ export default function AnalyticsPage() {
           padding: 15,
           font: {
             size: 12
+          },
+          boxWidth: 12,
+          boxHeight: 12,
+          usePointStyle: true,
+          pointStyle: 'rect'
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        padding: 12,
+        cornerRadius: 8
+      }
+    }
+  }
+
+  // Opções específicas para mobile com legenda mais compacta
+  const pieOptionsMobile = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom' as const,
+        labels: {
+          padding: 6,
+          font: {
+            size: 9
+          },
+          boxWidth: 8,
+          boxHeight: 8,
+          usePointStyle: true,
+          pointStyle: 'rect',
+          maxWidth: 100,
+          generateLabels: function(chart: any) {
+            const data = chart.data;
+            if (data.labels.length && data.datasets.length) {
+              const dataset = data.datasets[0];
+              const total = dataset.data.reduce((a: number, b: number) => a + b, 0);
+              return data.labels.map((label: string, index: number) => {
+                const value = dataset.data[index];
+                const percentage = ((value / total) * 100).toFixed(1);
+                return {
+                  text: `${label} (${percentage}%)`,
+                  fillStyle: dataset.backgroundColor[index],
+                  strokeStyle: dataset.borderColor ? dataset.borderColor[index] : dataset.backgroundColor[index],
+                  lineWidth: dataset.borderWidth || 0,
+                  hidden: false,
+                  index: index
+                };
+              });
+            }
+            return [];
           }
         }
       },
@@ -1103,8 +1154,8 @@ export default function AnalyticsPage() {
             </h2>
             <PieChart className="h-5 w-5 text-gray-400 flex-shrink-0" />
           </div>
-          <div className="h-64">
-            <Doughnut data={statusDistributionData} options={pieOptions} />
+          <div className={`${statusDistribution.filter(s => s.count > 0).length > 6 ? 'h-96' : 'h-80'} sm:h-64`}>
+            <Doughnut data={statusDistributionData} options={pieOptionsMobile} />
           </div>
         </div>
 
@@ -1129,8 +1180,8 @@ export default function AnalyticsPage() {
             </h2>
             <PieChart className="h-5 w-5 text-gray-400 flex-shrink-0" />
           </div>
-          <div className="h-64">
-            <Pie data={categoryDistributionData} options={pieOptions} />
+          <div className={`${categoryDistribution.filter(c => c.total > 0).length > 6 ? 'h-96' : 'h-80'} sm:h-64`}>
+            <Pie data={categoryDistributionData} options={pieOptionsMobile} />
           </div>
         </div>
       </div>
@@ -1269,26 +1320,26 @@ export default function AnalyticsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {quickInsights ? (
             <>
-              <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
+          <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
                 <p className="text-sm opacity-90 mb-1">Cliente mais ativo</p>
                 <p className="text-lg sm:text-xl font-bold truncate">{quickInsights.mostActiveClient.name}</p>
                 <p className="text-xs opacity-75 mt-1 truncate">{quickInsights.mostActiveClient.description}</p>
-              </div>
-              <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
-                <p className="text-sm opacity-90 mb-1">Categoria mais problemática</p>
+          </div>
+          <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
+            <p className="text-sm opacity-90 mb-1">Categoria mais problemática</p>
                 <p className="text-lg sm:text-xl font-bold truncate">{quickInsights.mostProblematicCategory.category}</p>
                 <p className="text-xs opacity-75 mt-1 truncate">{quickInsights.mostProblematicCategory.description}</p>
-              </div>
-              <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
-                <p className="text-sm opacity-90 mb-1">Técnico destaque</p>
+          </div>
+          <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
+            <p className="text-sm opacity-90 mb-1">Técnico destaque</p>
                 <p className="text-lg sm:text-xl font-bold truncate">{quickInsights.topTechnician.name}</p>
                 <p className="text-xs opacity-75 mt-1 truncate">{quickInsights.topTechnician.description}</p>
-              </div>
+          </div>
               <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
                 <p className="text-sm opacity-90 mb-1">Horário de pico</p>
                 <p className="text-lg sm:text-xl font-bold truncate">{quickInsights.peakHour.hour}</p>
                 <p className="text-xs opacity-75 mt-1 truncate">{quickInsights.peakHour.description}</p>
-              </div>
+        </div>
               <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
                 <p className="text-sm opacity-90 mb-1">Status mais comum</p>
                 <p className="text-lg sm:text-xl font-bold truncate">{quickInsights.mostCommonStatus.status}</p>
