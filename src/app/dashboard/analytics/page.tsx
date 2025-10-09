@@ -770,14 +770,26 @@ export default function AnalyticsPage() {
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    layout: {
+      padding: {
+        bottom: 10,
+        top: 10
+      }
+    },
     plugins: {
       legend: {
         display: false
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        padding: 12,
-        cornerRadius: 8
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        padding: 16,
+        cornerRadius: 8,
+        titleFont: {
+          size: 14
+        },
+        bodyFont: {
+          size: 12
+        }
       }
     },
     scales: {
@@ -785,11 +797,23 @@ export default function AnalyticsPage() {
         beginAtZero: true,
         grid: {
           color: 'rgba(0, 0, 0, 0.05)'
+        },
+        ticks: {
+          font: {
+            size: 11
+          }
         }
       },
       x: {
         grid: {
           display: false
+        },
+        ticks: {
+          font: {
+            size: 11
+          },
+          maxRotation: 45,
+          minRotation: 0
         }
       }
     }
@@ -824,19 +848,24 @@ export default function AnalyticsPage() {
   const pieOptionsMobile = {
     responsive: true,
     maintainAspectRatio: false,
+    layout: {
+      padding: {
+        bottom: 20
+      }
+    },
     plugins: {
       legend: {
         position: 'bottom' as const,
         labels: {
-          padding: 6,
+          padding: 12,
           font: {
-            size: 9
+            size: 11
           },
-          boxWidth: 8,
-          boxHeight: 8,
+          boxWidth: 12,
+          boxHeight: 12,
           usePointStyle: true,
           pointStyle: 'rect',
-          maxWidth: 100,
+          maxWidth: 140,
           generateLabels: function(chart: any) {
             const data = chart.data;
             if (data.labels.length && data.datasets.length) {
@@ -845,8 +874,10 @@ export default function AnalyticsPage() {
               return data.labels.map((label: string, index: number) => {
                 const value = dataset.data[index];
                 const percentage = ((value / total) * 100).toFixed(1);
+                // Truncar labels muito longos
+                const truncatedLabel = label.length > 15 ? label.substring(0, 15) + '...' : label;
                 return {
-                  text: `${label} (${percentage}%)`,
+                  text: `${truncatedLabel} (${percentage}%)`,
                   fillStyle: dataset.backgroundColor[index],
                   strokeStyle: dataset.borderColor ? dataset.borderColor[index] : dataset.backgroundColor[index],
                   lineWidth: dataset.borderWidth || 0,
@@ -860,9 +891,24 @@ export default function AnalyticsPage() {
         }
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        padding: 12,
-        cornerRadius: 8
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        padding: 16,
+        cornerRadius: 8,
+        titleFont: {
+          size: 14
+        },
+        bodyFont: {
+          size: 12
+        },
+        callbacks: {
+          label: function(context: any) {
+            const label = context.label || '';
+            const value = context.parsed;
+            const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
+            const percentage = ((value / total) * 100).toFixed(1);
+            return `${label}: ${value} (${percentage}%)`;
+          }
+        }
       }
     }
   }
@@ -1208,10 +1254,12 @@ export default function AnalyticsPage() {
             <LineChart className="h-5 w-5 text-gray-400 flex-shrink-0" />
           </div>
           <div 
-            className="h-48 sm:h-64 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors relative group"
+            className="h-48 sm:h-64 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors relative group overflow-hidden"
             onClick={() => openChartModal('Tendência de Tickets', 'line', ticketsTrendData, modalChartOptions)}
           >
+            <div className="w-full h-full min-h-0 chart-container">
             <Line data={ticketsTrendData} options={chartOptions} />
+            </div>
             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <Eye className="h-4 w-4 text-blue-600" />
             </div>
@@ -1227,10 +1275,12 @@ export default function AnalyticsPage() {
             <PieChart className="h-5 w-5 text-gray-400 flex-shrink-0" />
           </div>
           <div 
-            className={`${statusDistribution.filter(s => s.count > 0).length > 6 ? 'h-80' : 'h-64'} sm:h-64 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors relative group`}
+            className={`${statusDistribution.filter(s => s.count > 0).length > 6 ? 'h-96' : 'h-80'} sm:h-64 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors relative group overflow-hidden`}
             onClick={() => openChartModal('Distribuição por Status', 'doughnut', statusDistributionData, modalChartOptions)}
           >
-            <Doughnut data={statusDistributionData} options={pieOptionsMobile} />
+            <div className="w-full h-full min-h-0 chart-container">
+              <Doughnut data={statusDistributionData} options={pieOptionsMobile} />
+            </div>
             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <Eye className="h-4 w-4 text-blue-600" />
             </div>
@@ -1246,10 +1296,12 @@ export default function AnalyticsPage() {
             <BarChart3 className="h-5 w-5 text-gray-400 flex-shrink-0" />
           </div>
           <div 
-            className="h-48 sm:h-64 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors relative group"
+            className="h-48 sm:h-64 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors relative group overflow-hidden"
             onClick={() => openChartModal('Distribuição por Prioridade', 'bar', priorityDistributionData, modalChartOptions)}
           >
+            <div className="w-full h-full min-h-0 chart-container">
             <Bar data={priorityDistributionData} options={chartOptions} />
+            </div>
             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <Eye className="h-4 w-4 text-blue-600" />
             </div>
@@ -1265,10 +1317,12 @@ export default function AnalyticsPage() {
             <PieChart className="h-5 w-5 text-gray-400 flex-shrink-0" />
           </div>
           <div 
-            className={`${categoryDistribution.filter(c => c.total > 0).length > 6 ? 'h-80' : 'h-64'} sm:h-64 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors relative group`}
+            className={`${categoryDistribution.filter(c => c.total > 0).length > 6 ? 'h-96' : 'h-80'} sm:h-64 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors relative group overflow-hidden`}
             onClick={() => openChartModal('Tickets por Categoria', 'pie', categoryDistributionData, modalChartOptions)}
           >
-            <Pie data={categoryDistributionData} options={pieOptionsMobile} />
+            <div className="w-full h-full min-h-0 chart-container">
+              <Pie data={categoryDistributionData} options={pieOptionsMobile} />
+            </div>
             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <Eye className="h-4 w-4 text-blue-600" />
             </div>
@@ -1340,10 +1394,12 @@ export default function AnalyticsPage() {
             <Clock className="h-5 w-5 text-gray-400 flex-shrink-0" />
           </div>
           <div 
-            className="h-48 sm:h-64 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors relative group"
+            className="h-48 sm:h-64 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors relative group overflow-hidden"
             onClick={() => openChartModal('Horários de Pico', 'bar', peakHoursData, modalChartOptions)}
           >
+            <div className="w-full h-full min-h-0 chart-container">
             <Bar data={peakHoursData} options={chartOptions} />
+            </div>
             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <Eye className="h-4 w-4 text-blue-600" />
             </div>
