@@ -1585,7 +1585,7 @@ export default function AnalyticsPage() {
             {/* Layout específico para mobile - duas seções */}
             <div className="flex flex-col sm:block h-[75vh] sm:h-[70vh]">
               {/* Seção do Gráfico - 60% no mobile */}
-              <div className="flex-1 sm:flex-none p-2 sm:p-6 h-[60%] sm:h-full chart-container">
+              <div className="flex-1 sm:flex-none p-2 sm:p-6 h-[60%] sm:h-full chart-container flex items-center justify-center">
                 {selectedChart.type === 'line' && (
                   <Line data={selectedChart.data} options={selectedChart.options} />
                 )}
