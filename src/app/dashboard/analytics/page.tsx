@@ -306,8 +306,16 @@ export default function AnalyticsPage() {
   const [showFilters, setShowFilters] = useState(false)
   const [periodFilter, setPeriodFilter] = useState('30days')
   const [tempFilter, setTempFilter] = useState('30days')
+  const [showChartModal, setShowChartModal] = useState(false)
+  const [selectedChart, setSelectedChart] = useState<{
+    title: string
+    type: 'line' | 'bar' | 'pie' | 'doughnut'
+    data: any
+    options: any
+  } | null>(null)
   const clientPopupRef = useRef<HTMLDivElement>(null)
   const filtersPopupRef = useRef<HTMLDivElement>(null)
+  const chartModalRef = useRef<HTMLDivElement>(null)
   
   // Determinar se deve usar multi-client ou single-client
   const isMultiClient = isMatrixUser && selectedClients.length > 0
@@ -475,11 +483,21 @@ export default function AnalyticsPage() {
       if (filtersPopupRef.current && !filtersPopupRef.current.contains(target)) {
         setShowFilters(false)
       }
+      
+      // Verificar se clicou fora do modal do gráfico
+      if (chartModalRef.current && !chartModalRef.current.contains(target)) {
+        setShowChartModal(false)
+      }
     }
 
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  const openChartModal = (title: string, type: 'line' | 'bar' | 'pie' | 'doughnut', data: any, options: any) => {
+    setSelectedChart({ title, type, data, options })
+    setShowChartModal(true)
+  }
 
   if (loading || contextLoading) {
     return (
@@ -849,6 +867,54 @@ export default function AnalyticsPage() {
     }
   }
 
+  // Opções otimizadas para o modal (tela grande)
+  const modalChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'right' as const,
+        labels: {
+          padding: 20,
+          font: {
+            size: 14
+          },
+          boxWidth: 16,
+          boxHeight: 16,
+          usePointStyle: true,
+          pointStyle: 'rect'
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        padding: 16,
+        cornerRadius: 12,
+        titleFont: {
+          size: 16
+        },
+        bodyFont: {
+          size: 14
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: {
+          font: {
+            size: 12
+          }
+        }
+      },
+      y: {
+        ticks: {
+          font: {
+            size: 12
+          }
+        }
+      }
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -1141,8 +1207,14 @@ export default function AnalyticsPage() {
             </h2>
             <LineChart className="h-5 w-5 text-gray-400 flex-shrink-0" />
           </div>
-          <div className="h-64">
+          <div 
+            className="h-48 sm:h-64 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors relative group"
+            onClick={() => openChartModal('Tendência de Tickets', 'line', ticketsTrendData, modalChartOptions)}
+          >
             <Line data={ticketsTrendData} options={chartOptions} />
+            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <Eye className="h-4 w-4 text-blue-600" />
+            </div>
           </div>
         </div>
 
@@ -1154,8 +1226,14 @@ export default function AnalyticsPage() {
             </h2>
             <PieChart className="h-5 w-5 text-gray-400 flex-shrink-0" />
           </div>
-          <div className={`${statusDistribution.filter(s => s.count > 0).length > 6 ? 'h-96' : 'h-80'} sm:h-64`}>
+          <div 
+            className={`${statusDistribution.filter(s => s.count > 0).length > 6 ? 'h-80' : 'h-64'} sm:h-64 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors relative group`}
+            onClick={() => openChartModal('Distribuição por Status', 'doughnut', statusDistributionData, modalChartOptions)}
+          >
             <Doughnut data={statusDistributionData} options={pieOptionsMobile} />
+            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <Eye className="h-4 w-4 text-blue-600" />
+            </div>
           </div>
         </div>
 
@@ -1167,8 +1245,14 @@ export default function AnalyticsPage() {
             </h2>
             <BarChart3 className="h-5 w-5 text-gray-400 flex-shrink-0" />
           </div>
-          <div className="h-64">
+          <div 
+            className="h-48 sm:h-64 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors relative group"
+            onClick={() => openChartModal('Distribuição por Prioridade', 'bar', priorityDistributionData, modalChartOptions)}
+          >
             <Bar data={priorityDistributionData} options={chartOptions} />
+            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <Eye className="h-4 w-4 text-blue-600" />
+            </div>
           </div>
         </div>
 
@@ -1180,8 +1264,14 @@ export default function AnalyticsPage() {
             </h2>
             <PieChart className="h-5 w-5 text-gray-400 flex-shrink-0" />
           </div>
-          <div className={`${categoryDistribution.filter(c => c.total > 0).length > 6 ? 'h-96' : 'h-80'} sm:h-64`}>
+          <div 
+            className={`${categoryDistribution.filter(c => c.total > 0).length > 6 ? 'h-80' : 'h-64'} sm:h-64 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors relative group`}
+            onClick={() => openChartModal('Tickets por Categoria', 'pie', categoryDistributionData, modalChartOptions)}
+          >
             <Pie data={categoryDistributionData} options={pieOptionsMobile} />
+            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <Eye className="h-4 w-4 text-blue-600" />
+            </div>
           </div>
         </div>
       </div>
@@ -1249,8 +1339,14 @@ export default function AnalyticsPage() {
             </h2>
             <Clock className="h-5 w-5 text-gray-400 flex-shrink-0" />
           </div>
-          <div className="h-64">
+          <div 
+            className="h-48 sm:h-64 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors relative group"
+            onClick={() => openChartModal('Horários de Pico', 'bar', peakHoursData, modalChartOptions)}
+          >
             <Bar data={peakHoursData} options={chartOptions} />
+            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <Eye className="h-4 w-4 text-blue-600" />
+            </div>
           </div>
         </div>
 
@@ -1344,7 +1440,7 @@ export default function AnalyticsPage() {
                 <p className="text-sm opacity-90 mb-1">Status mais comum</p>
                 <p className="text-lg sm:text-xl font-bold truncate">{quickInsights.mostCommonStatus.status}</p>
                 <p className="text-xs opacity-75 mt-1 truncate">{quickInsights.mostCommonStatus.description}</p>
-              </div>
+      </div>
               <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
                 <p className="text-sm opacity-90 mb-1">Prioridade crítica</p>
                 <p className="text-lg sm:text-xl font-bold truncate">{quickInsights.criticalPriority.percentage}%</p>
@@ -1387,6 +1483,43 @@ export default function AnalyticsPage() {
           )}
         </div>
       </div>
+
+      {/* Modal do Gráfico */}
+      {showChartModal && selectedChart && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div 
+            ref={chartModalRef}
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden"
+          >
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                {selectedChart.title}
+              </h3>
+              <button
+                onClick={() => setShowChartModal(false)}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <X className="h-6 w-6 text-gray-500 dark:text-gray-400" />
+              </button>
+            </div>
+            
+            <div className="p-6 h-[70vh]">
+              {selectedChart.type === 'line' && (
+                <Line data={selectedChart.data} options={modalChartOptions} />
+              )}
+              {selectedChart.type === 'bar' && (
+                <Bar data={selectedChart.data} options={modalChartOptions} />
+              )}
+              {selectedChart.type === 'pie' && (
+                <Pie data={selectedChart.data} options={modalChartOptions} />
+              )}
+              {selectedChart.type === 'doughnut' && (
+                <Doughnut data={selectedChart.data} options={modalChartOptions} />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
