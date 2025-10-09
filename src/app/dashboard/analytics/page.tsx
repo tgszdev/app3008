@@ -1623,7 +1623,7 @@ export default function AnalyticsPage() {
                             {label}
                           </span>
                           <span className="text-sm font-medium text-gray-900 dark:text-white">
-                            {percentage}%
+                            {value} ({percentage}%)
                           </span>
                         </div>
                       )
