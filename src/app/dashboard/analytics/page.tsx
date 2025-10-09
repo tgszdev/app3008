@@ -719,16 +719,16 @@ export default function AnalyticsPage() {
   // Dynamic category distribution - only show categories with tickets
   const categoryDistributionData = {
     labels: categoryDistribution
-      .filter(c => c.count > 0) // Only show categories with tickets
+      .filter(c => c.total > 0) // Only show categories with tickets
       .map(c => c.name),
     datasets: [
       {
         label: 'Tickets por Categoria',
         data: categoryDistribution
-          .filter(c => c.count > 0) // Only show categories with tickets
-          .map(c => c.count),
+          .filter(c => c.total > 0) // Only show categories with tickets
+          .map(c => c.total),
         backgroundColor: categoryDistribution
-          .filter(c => c.count > 0) // Only show categories with tickets
+          .filter(c => c.total > 0) // Only show categories with tickets
           .map(c => c.color || '#6b7280'),
         borderWidth: 0
       }
