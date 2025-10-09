@@ -373,7 +373,7 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
       {isExpanded && (
         <div className="mt-6 space-y-4">
           {/* Cards de Categorias */}
-          {client.category_stats.length > 0 && (
+          {client.category_stats?.length > 0 && (
             <div>
               <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                 <PieChartIcon className="h-4 w-4" />
@@ -388,7 +388,7 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
           )}
 
           {/* Tickets Recentes - Protótipo 33 com Steps */}
-          {client.tickets.length > 0 && (
+          {client.tickets?.length > 0 && (
             <div>
               <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
                 Tickets Recentes
@@ -464,9 +464,9 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                     return () => window.removeEventListener('resize', checkMobile)
                   }, [])
                   
-                  const displayStatusHistory = isMobile && statusHistory.length > 5
+                  const displayStatusHistory = isMobile && statusHistory?.length > 5
                     ? statusHistory.slice(-5) 
-                    : statusHistory
+                    : statusHistory || []
 
 
                   const getPriorityColor = (priority: string) => {
@@ -560,7 +560,7 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
                             onClick={(e) => e.stopPropagation()}
                           >
                             {displayStatusHistory.map((historyItem, index) => {
-                              const isLast = index === displayStatusHistory.length - 1
+                              const isLast = index === (displayStatusHistory?.length || 0) - 1
                               const isCurrent = isLast
                               
                               // Buscar cor do status no cadastro
@@ -1120,7 +1120,7 @@ export default function HybridDashboard() {
         </div>
 
       {/* Resumo Consolidado - Protótipo 35 (Layout de Tabela) */}
-      {analyticsData && analyticsData.consolidated.status_stats.length > 0 && (
+      {analyticsData && analyticsData.consolidated?.status_stats?.length > 0 && (
         <div>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
             <BarChart className="h-5 w-5" />
@@ -1163,7 +1163,7 @@ export default function HybridDashboard() {
       )}
 
       {/* Cards por Cliente - Neural Network Layout */}
-      {analyticsData && analyticsData.clients.length > 0 && (
+      {analyticsData && analyticsData.clients?.length > 0 && (
         <div>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
             <Building className="h-5 w-5" />
@@ -1206,7 +1206,7 @@ export default function HybridDashboard() {
       )}
 
       {/* Estado sem dados */}
-      {selectedClients.length > 0 && (!analyticsData || analyticsData.clients.length === 0) && (
+      {selectedClients.length > 0 && (!analyticsData || !analyticsData.clients || analyticsData.clients.length === 0) && (
         <div className="text-center py-12">
           <BarChart className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
