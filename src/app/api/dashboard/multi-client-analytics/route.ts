@@ -440,7 +440,101 @@ export async function GET(request: NextRequest) {
     // Calcular tendência de tickets por dia
     const ticketsTrend = []
     const peakHours = Array.from({ length: 24 }, (_, hour) => ({ hour, count: 0 }))
-    const userActivity = []
+    
+    // Calcular atividade por usuário
+    const userActivityMap = new Map()
+    
+    // Processar todos os tickets para calcular atividade por usuário
+    clientData.forEach(client => {
+      client.tickets.forEach(ticket => {
+        // Processar usuário criador
+        if (ticket.created_by_user) {
+          const userId = ticket.created_by_user.id
+          if (!userActivityMap.has(userId)) {
+            userActivityMap.set(userId, {
+              id: userId,
+              name: ticket.created_by_user.name,
+              email: ticket.created_by_user.email,
+              ticketsCreated: 0,
+              ticketsResolved: 0,
+              totalResolutionTime: 0,
+              resolvedCount: 0
+            })
+          }
+          
+          const user = userActivityMap.get(userId)
+          user.ticketsCreated++
+          
+          // Se ticket foi resolvido, calcular tempo de resolução
+          if (ticket.resolved_at && (ticket.status === 'Resolvido' || ticket.status === 'Fechado')) {
+            const created = new Date(ticket.created_at)
+            const resolved = new Date(ticket.resolved_at)
+            const diffHours = (resolved - created) / (1000 * 60 * 60) // em horas
+            
+            user.ticketsResolved++
+            user.totalResolutionTime += diffHours
+            user.resolvedCount++
+          }
+        }
+        
+        // Processar usuário responsável (se diferente do criador)
+        if (ticket.assigned_to_user && ticket.assigned_to_user.id !== ticket.created_by_user?.id) {
+          const userId = ticket.assigned_to_user.id
+          if (!userActivityMap.has(userId)) {
+            userActivityMap.set(userId, {
+              id: userId,
+              name: ticket.assigned_to_user.name,
+              email: ticket.assigned_to_user.email,
+              ticketsCreated: 0,
+              ticketsResolved: 0,
+              totalResolutionTime: 0,
+              resolvedCount: 0
+            })
+          }
+          
+          const user = userActivityMap.get(userId)
+          
+          // Se ticket foi resolvido, calcular tempo de resolução
+          if (ticket.resolved_at && (ticket.status === 'Resolvido' || ticket.status === 'Fechado')) {
+            const created = new Date(ticket.created_at)
+            const resolved = new Date(ticket.resolved_at)
+            const diffHours = (resolved - created) / (1000 * 60 * 60) // em horas
+            
+            user.ticketsResolved++
+            user.totalResolutionTime += diffHours
+            user.resolvedCount++
+          }
+        }
+      })
+    })
+    
+    // Converter para array e calcular tempo médio
+    const userActivity = Array.from(userActivityMap.values())
+      .map(user => {
+        const avgTime = user.resolvedCount > 0 
+          ? (user.totalResolutionTime / user.resolvedCount / 24).toFixed(1) + ' dias'
+          : 'N/A'
+        
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          ticketsCreated: user.ticketsCreated,
+          ticketsResolved: user.ticketsResolved,
+          avgTime: avgTime
+        }
+      })
+      .sort((a, b) => b.ticketsCreated - a.ticketsCreated) // Ordenar por tickets criados
+    
+    console.log('🔍 DEBUG: Atividade por usuário calculada:', {
+      totalUsers: userActivity.length,
+      users: userActivity.map(u => ({
+        name: u.name,
+        created: u.ticketsCreated,
+        resolved: u.ticketsResolved,
+        avgTime: u.avgTime
+      }))
+    })
     
     // Agrupar tickets por data de criação
     const ticketsByDate = new Map()
