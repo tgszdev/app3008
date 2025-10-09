@@ -492,12 +492,16 @@ export async function GET(request: NextRequest) {
       critical: 0
     }
     
-    // Calcular tempo médio de resolução e satisfação
-    let totalResolutionTime = 0
-    let resolvedTicketsCount = 0
-    let totalRatings = 0
-    let totalRatingSum = 0
-    
+        // Calcular métricas de performance
+        let totalResolutionTime = 0
+        let resolvedTicketsCount = 0
+        let totalRatings = 0
+        let totalRatingSum = 0
+        let totalFirstResponseTime = 0
+        let ticketsWithFirstResponse = 0
+        let reopenedTicketsCount = 0
+        let escalatedTicketsCount = 0
+
         // Processar tickets de todos os clientes para calcular métricas
         console.log('🔍 DEBUG: Iniciando processamento de métricas para', clientData.length, 'clientes')
         clientData.forEach((client, clientIndex) => {
@@ -531,6 +535,59 @@ export async function GET(request: NextRequest) {
                 console.log(`  - Rating: ${rating.rating}, totalRatings: ${totalRatings}, totalRatingSum: ${totalRatingSum}`)
               })
             }
+            
+            // Calcular tempo de primeira resposta baseado no histórico
+            if (ticket.ticket_history && ticket.ticket_history.length > 0) {
+              // Ordenar histórico por data de criação
+              const sortedHistory = ticket.ticket_history.sort((a, b) => 
+                new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+              )
+              
+              // Encontrar primeira mudança de status (primeira resposta)
+              const firstStatusChange = sortedHistory.find(h => h.action_type === 'status_changed')
+              if (firstStatusChange) {
+                const created = new Date(ticket.created_at)
+                const firstResponse = new Date(firstStatusChange.created_at)
+                const diffHours = (firstResponse - created) / (1000 * 60 * 60) // em horas
+                totalFirstResponseTime += diffHours
+                ticketsWithFirstResponse++
+              }
+            }
+            
+            // Verificar se ticket foi reaberto (está aberto mas foi fechado antes)
+            if (ticket.status === 'Aberto' && ticket.ticket_history) {
+              const statusHistory = ticket.ticket_history
+                .filter(h => h.action_type === 'status_changed')
+                .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+              
+              // Verificar se houve mudança para status fechado e depois voltou para aberto
+              let wasClosed = false
+              for (const history of statusHistory) {
+                if (history.new_value === 'Fechado' || history.new_value === 'Resolvido') {
+                  wasClosed = true
+                } else if (wasClosed && history.new_value === 'Aberto') {
+                  reopenedTicketsCount++
+                  break
+                }
+              }
+            }
+            
+            // Verificar se ticket foi escalonado (mudou para alta prioridade)
+            if (ticket.priority === 'high' || ticket.priority === 'critical') {
+              if (ticket.ticket_history) {
+                const priorityHistory = ticket.ticket_history
+                  .filter(h => h.field_changed === 'priority')
+                  .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+                
+                // Verificar se houve mudança para alta prioridade
+                const escalated = priorityHistory.some(h => 
+                  h.new_value === 'high' || h.new_value === 'critical'
+                )
+                if (escalated) {
+                  escalatedTicketsCount++
+                }
+              }
+            }
           })
         })
     
@@ -552,13 +609,39 @@ export async function GET(request: NextRequest) {
       formula: totalRatings > 0 ? `(${totalRatingSum} / ${totalRatings} / 5) * 100 = ${satisfactionRate}%` : 'N/A'
     })
     
+    // Calcular tempo médio de primeira resposta
+    const avgFirstResponseHours = ticketsWithFirstResponse > 0 ? totalFirstResponseTime / ticketsWithFirstResponse : 0
+    const avgFirstResponseDays = avgFirstResponseHours / 24
+    const firstResponseTime = ticketsWithFirstResponse > 0 
+      ? avgFirstResponseDays < 1 
+        ? `${Math.round(avgFirstResponseHours)}h`
+        : `${avgFirstResponseDays.toFixed(1)} dias`
+      : 'N/A'
+
+    // Calcular taxas
+    const resolutionRate = resolvedTicketsCount > 0 ? Math.round((resolvedTicketsCount / totalTickets) * 100) : 0
+    const reopenRate = resolvedTicketsCount > 0 ? Math.round((reopenedTicketsCount / resolvedTicketsCount) * 100) : 0
+    const escalationRate = totalTickets > 0 ? Math.round((escalatedTicketsCount / totalTickets) * 100) : 0
+
     const performanceMetrics = {
-      firstResponseTime: 'N/A',
-      resolutionRate: resolvedTicketsCount > 0 ? Math.round((resolvedTicketsCount / totalTickets) * 100) : 0,
+      firstResponseTime: firstResponseTime,
+      resolutionRate: resolutionRate,
       satisfactionRate: satisfactionRate,
-      reopenRate: 0,
-      escalationRate: 0
+      reopenRate: reopenRate,
+      escalationRate: escalationRate
     }
+
+    console.log('🔍 DEBUG: Métricas de Performance calculadas:', {
+      totalTickets,
+      resolvedTicketsCount,
+      ticketsWithFirstResponse,
+      reopenedTicketsCount,
+      escalatedTicketsCount,
+      firstResponseTime,
+      resolutionRate,
+      reopenRate,
+      escalationRate
+    })
 
     const response = {
       clients: clientData,
