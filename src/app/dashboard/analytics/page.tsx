@@ -643,6 +643,7 @@ export default function AnalyticsPage() {
   const peakHours = isMultiClient ? multiClientData?.consolidated.peak_hours || [] : analyticsData?.peakHours || []
   const userActivity = isMultiClient ? multiClientData?.consolidated.user_activity || [] : analyticsData?.userActivity || []
   const performanceMetrics = isMultiClient ? multiClientData?.consolidated.performance_metrics : analyticsData?.performanceMetrics
+  const quickInsights = isMultiClient ? multiClientData?.consolidated.quick_insights : null
 
   // Debug logs
   console.log('🔍 DEBUG: Chart data mapping:', {
@@ -1265,22 +1266,74 @@ export default function AnalyticsPage() {
           <Zap className="h-6 w-6 mr-2" />
           <h2 className="text-lg font-semibold">Insights Rápidos</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
-            <p className="text-sm opacity-90 mb-1">Melhor dia da semana</p>
-            <p className="text-xl font-bold">Segunda-feira</p>
-            <p className="text-xs opacity-75 mt-1">Menor volume de tickets</p>
-          </div>
-          <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
-            <p className="text-sm opacity-90 mb-1">Categoria mais problemática</p>
-            <p className="text-xl font-bold">Hardware</p>
-            <p className="text-xs opacity-75 mt-1">35% dos tickets</p>
-          </div>
-          <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
-            <p className="text-sm opacity-90 mb-1">Técnico destaque</p>
-            <p className="text-xl font-bold">João Silva</p>
-            <p className="text-xs opacity-75 mt-1">98% taxa de resolução</p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {quickInsights ? (
+            <>
+              <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
+                <p className="text-sm opacity-90 mb-1">Melhor dia da semana</p>
+                <p className="text-xl font-bold">{quickInsights.bestDay.day}</p>
+                <p className="text-xs opacity-75 mt-1">{quickInsights.bestDay.description}</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
+                <p className="text-sm opacity-90 mb-1">Categoria mais problemática</p>
+                <p className="text-xl font-bold">{quickInsights.mostProblematicCategory.category}</p>
+                <p className="text-xs opacity-75 mt-1">{quickInsights.mostProblematicCategory.description}</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
+                <p className="text-sm opacity-90 mb-1">Técnico destaque</p>
+                <p className="text-xl font-bold">{quickInsights.topTechnician.name}</p>
+                <p className="text-xs opacity-75 mt-1">{quickInsights.topTechnician.description}</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
+                <p className="text-sm opacity-90 mb-1">Horário de pico</p>
+                <p className="text-xl font-bold">{quickInsights.peakHour.hour}</p>
+                <p className="text-xs opacity-75 mt-1">{quickInsights.peakHour.description}</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
+                <p className="text-sm opacity-90 mb-1">Status mais comum</p>
+                <p className="text-xl font-bold">{quickInsights.mostCommonStatus.status}</p>
+                <p className="text-xs opacity-75 mt-1">{quickInsights.mostCommonStatus.description}</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
+                <p className="text-sm opacity-90 mb-1">Prioridade crítica</p>
+                <p className="text-xl font-bold">{quickInsights.criticalPriority.percentage}%</p>
+                <p className="text-xs opacity-75 mt-1">{quickInsights.criticalPriority.description}</p>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
+                <p className="text-sm opacity-90 mb-1">Melhor dia da semana</p>
+                <p className="text-xl font-bold">N/A</p>
+                <p className="text-xs opacity-75 mt-1">Dados não disponíveis</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
+                <p className="text-sm opacity-90 mb-1">Categoria mais problemática</p>
+                <p className="text-xl font-bold">N/A</p>
+                <p className="text-xs opacity-75 mt-1">Dados não disponíveis</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
+                <p className="text-sm opacity-90 mb-1">Técnico destaque</p>
+                <p className="text-xl font-bold">N/A</p>
+                <p className="text-xs opacity-75 mt-1">Dados não disponíveis</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
+                <p className="text-sm opacity-90 mb-1">Horário de pico</p>
+                <p className="text-xl font-bold">N/A</p>
+                <p className="text-xs opacity-75 mt-1">Dados não disponíveis</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
+                <p className="text-sm opacity-90 mb-1">Status mais comum</p>
+                <p className="text-xl font-bold">N/A</p>
+                <p className="text-xs opacity-75 mt-1">Dados não disponíveis</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur rounded-2xl p-4">
+                <p className="text-sm opacity-90 mb-1">Prioridade crítica</p>
+                <p className="text-xl font-bold">N/A</p>
+                <p className="text-xs opacity-75 mt-1">Dados não disponíveis</p>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

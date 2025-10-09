@@ -737,6 +737,108 @@ export async function GET(request: NextRequest) {
       escalationRate
     })
 
+    // Função para calcular insights rápidos
+    function calculateQuickInsights(clientData, totalTickets, peakHours, priorityDistribution, userActivity, performanceMetrics) {
+      // 1. Melhor dia da semana (menor volume de tickets)
+      const dayStats = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 } // 0=domingo, 1=segunda, etc.
+      const dayNames = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado']
+      
+      clientData.forEach(client => {
+        client.tickets.forEach(ticket => {
+          const dayOfWeek = new Date(ticket.created_at).getDay()
+          dayStats[dayOfWeek]++
+        })
+      })
+      
+      const bestDay = Object.entries(dayStats)
+        .sort(([,a], [,b]) => a - b)[0] // Menor volume
+      const bestDayName = dayNames[parseInt(bestDay[0])]
+      const bestDayCount = bestDay[1]
+      
+      // 2. Categoria mais problemática (mais tickets)
+      const categoryStats = new Map()
+      clientData.forEach(client => {
+        client.tickets.forEach(ticket => {
+          if (ticket.categories) {
+            const category = Array.isArray(ticket.categories) ? ticket.categories[0] : ticket.categories
+            if (category) {
+              const key = category.name
+              categoryStats.set(key, (categoryStats.get(key) || 0) + 1)
+            }
+          }
+        })
+      })
+      
+      const mostProblematicCategory = Array.from(categoryStats.entries())
+        .sort(([,a], [,b]) => b - a)[0] || ['N/A', 0]
+      const categoryPercentage = totalTickets > 0 ? Math.round((mostProblematicCategory[1] / totalTickets) * 100) : 0
+      
+      // 3. Técnico destaque (melhor performance)
+      const topTechnician = userActivity.length > 0 ? userActivity[0] : { name: 'N/A', ticketsResolved: 0, ticketsCreated: 0 }
+      const technicianResolutionRate = topTechnician.ticketsCreated > 0 
+        ? Math.round((topTechnician.ticketsResolved / topTechnician.ticketsCreated) * 100)
+        : 0
+      
+      // 4. Horário de pico
+      const peakHour = peakHours.reduce((max, hour) => hour.count > max.count ? hour : max, { hour: 0, count: 0 })
+      const peakHourFormatted = `${peakHour.hour}h`
+      
+      // 5. Status mais comum
+      const statusStats = new Map()
+      clientData.forEach(client => {
+        client.tickets.forEach(ticket => {
+          const status = ticket.status
+          statusStats.set(status, (statusStats.get(status) || 0) + 1)
+        })
+      })
+      
+      const mostCommonStatus = Array.from(statusStats.entries())
+        .sort(([,a], [,b]) => b - a)[0] || ['N/A', 0]
+      const statusPercentage = totalTickets > 0 ? Math.round((mostCommonStatus[1] / totalTickets) * 100) : 0
+      
+      // 6. Prioridade crítica
+      const criticalTickets = priorityDistribution.critical + priorityDistribution.high
+      const criticalPercentage = totalTickets > 0 ? Math.round((criticalTickets / totalTickets) * 100) : 0
+      
+      return {
+        bestDay: {
+          day: bestDayName,
+          count: bestDayCount,
+          description: 'Menor volume de tickets'
+        },
+        mostProblematicCategory: {
+          category: mostProblematicCategory[0],
+          percentage: categoryPercentage,
+          description: `${categoryPercentage}% dos tickets`
+        },
+        topTechnician: {
+          name: topTechnician.name,
+          resolutionRate: technicianResolutionRate,
+          description: `${technicianResolutionRate}% taxa de resolução`
+        },
+        peakHour: {
+          hour: peakHourFormatted,
+          count: peakHour.count,
+          description: 'Maior volume de tickets'
+        },
+        mostCommonStatus: {
+          status: mostCommonStatus[0],
+          percentage: statusPercentage,
+          description: `${statusPercentage}% dos tickets`
+        },
+        criticalPriority: {
+          percentage: criticalPercentage,
+          count: criticalTickets,
+          description: `${criticalTickets} tickets críticos/altos`
+        }
+      }
+    }
+
+    // Calcular insights rápidos
+    const quickInsights = calculateQuickInsights(clientData, totalTickets, peakHours, priorityDistribution, userActivity, performanceMetrics)
+    
+    console.log('🔍 DEBUG: Insights rápidos calculados:', quickInsights)
+
     const response = {
       clients: clientData,
       consolidated: {
@@ -752,7 +854,8 @@ export async function GET(request: NextRequest) {
         tickets_trend: ticketsTrend,
         peak_hours: peakHours,
         user_activity: userActivity,
-        performance_metrics: performanceMetrics
+        performance_metrics: performanceMetrics,
+        quick_insights: quickInsights
       }
     }
 
