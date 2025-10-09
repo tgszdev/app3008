@@ -418,21 +418,23 @@ export async function GET(request: NextRequest) {
       })
     })
 
-    console.log('🔍 DEBUG: consolidatedCategoryMap size:', consolidatedCategoryMap.size)
-    console.log('🔍 DEBUG: consolidatedCategoryMap entries:', Array.from(consolidatedCategoryMap.entries()))
-    
     const consolidatedCategoryStats = Array.from(consolidatedCategoryMap.values())
       .map(category => {
         const percentage = totalTickets ? (category.total / totalTickets) * 100 : 0
         return {
-          ...category,
-          percentage: Math.round(percentage * 100) / 100
+          id: category.id,
+          name: category.name,
+          slug: category.slug,
+          color: category.color,
+          icon: category.icon,
+          is_global: category.is_global,
+          context_id: category.context_id,
+          total: category.total,
+          percentage: Math.round(percentage * 100) / 100,
+          status_breakdown: category.status_breakdown
         }
       })
       .sort((a, b) => b.total - a.total)
-      
-    console.log('🔍 DEBUG: consolidatedCategoryStats length:', consolidatedCategoryStats.length)
-    console.log('🔍 DEBUG: consolidatedCategoryStats:', consolidatedCategoryStats)
 
     // Calcular dados adicionais para os gráficos
     // Calcular tendência de tickets por dia
@@ -582,12 +584,6 @@ export async function GET(request: NextRequest) {
       totalTickets,
       consolidatedStatusCount: consolidatedStatusStats.length,
       consolidatedCategoryCount: consolidatedCategoryStats.length
-    })
-    
-    console.log('🔍 DEBUG: Response structure:', {
-      hasConsolidated: !!response.consolidated,
-      consolidatedKeys: response.consolidated ? Object.keys(response.consolidated) : 'N/A',
-      categoryDistributionLength: response.consolidated?.category_distribution?.length || 'N/A'
     })
 
     return NextResponse.json(response)
