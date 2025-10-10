@@ -790,7 +790,7 @@ export default function AnalyticsPage() {
     labels: peakHours.map(h => `${h.hour}h`),
     datasets: [
       {
-        label: 'Tickets por Hora',
+        label: 'Chamados por Hora',
         data: peakHours.map(h => h.count),
         backgroundColor: 'rgba(59, 130, 246, 0.5)',
         borderColor: 'rgb(59, 130, 246)',
