@@ -289,7 +289,7 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
           </div>
           <div>
             <h3 className="text-lg font-bold text-slate-800 dark:text-white">{client.context.name}</h3>
-            <p className="text-slate-600 dark:text-slate-300 text-sm">{client.context.type === 'organization' ? 'Cliente' : 'Departamento'} • {client.summary.total_tickets} tickets</p>
+            <p className="text-slate-600 dark:text-slate-300 text-sm">{client.context.type === 'organization' ? 'Cliente' : 'Departamento'} • {client.summary.total_tickets} chamados</p>
           </div>
         </div>
         <div className="text-right">
@@ -387,11 +387,11 @@ const ClientCard = ({ client, isExpanded, onToggle, analyticsData }: {
             </div>
           )}
 
-          {/* Tickets Recentes - Protótipo 33 com Steps */}
+          {/* Chamados Recentes - Protótipo 33 com Steps */}
           {client.tickets?.length > 0 && (
             <div>
               <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-                Tickets Recentes
+                Chamados Recentes
               </h4>
               <div className="space-y-3">
                 {client.tickets.slice(0, 5).map((ticket) => {
@@ -859,14 +859,14 @@ export default function HybridDashboard() {
       <div className="flex flex-col gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-            Dashboard {myTicketsOnly && '- Meus Tickets'} {selectedClients.length === 1 && '- Cliente Específico'}
+            Dashboard {myTicketsOnly && '- Meus Chamados'} {selectedClients.length === 1 && '- Cliente Específico'}
           </h1>
           <p className="mt-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
             Bem-vindo de volta, {session?.user?.name}!
             {myTicketsOnly 
-              ? ' Visualizando apenas seus tickets.'
+              ? ' Visualizando apenas seus chamados.'
               : selectedClients.length === 1 
-                ? ' Visualizando tickets do cliente selecionado.'
+                ? ' Visualizando chamados do cliente selecionado.'
                 : ' Visualizando todos os clientes agrupados.'
             }
           </p>
@@ -1009,7 +1009,7 @@ export default function HybridDashboard() {
             }`}
           >
             <User className="h-4 w-4 flex-shrink-0" />
-            <span className="text-sm font-medium">Meus Tickets</span>
+            <span className="text-sm font-medium">Meus Chamados</span>
             {/* Bordas animadas */}
             <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
           </button>
@@ -1106,14 +1106,14 @@ export default function HybridDashboard() {
             {formatDateShort(periodFilter.start_date)} até {formatDateShort(periodFilter.end_date)}
             </span>
             <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
-            • <strong>{analyticsData?.consolidated.total_tickets || 0}</strong> {myTicketsOnly ? 'seus tickets' : 'tickets'} no período
+            • <strong>{analyticsData?.consolidated.total_tickets || 0}</strong> {myTicketsOnly ? 'seus chamados' : 'chamados'} no período
           </span>
           <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
             • <strong>{selectedClients.length}</strong> clientes selecionados
             </span>
             {myTicketsOnly && (
               <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
-                • <span className="font-medium">Filtrado por: Meus Tickets</span>
+                • <span className="font-medium">Filtrado por: Meus Chamados</span>
               </span>
             )}
           </p>
@@ -1213,10 +1213,10 @@ export default function HybridDashboard() {
             Nenhum dado encontrado
                   </h3>
           <p className="text-gray-500 dark:text-gray-400 mb-4">
-            Não foram encontrados tickets para os clientes selecionados no período
+            Não foram encontrados chamados para os clientes selecionados no período
           </p>
           <p className="text-sm text-gray-400">
-            Verifique se há tickets criados para estes clientes ou tente um período diferente
+            Verifique se há chamados criados para estes clientes ou tente um período diferente
           </p>
         </div>
       )}
