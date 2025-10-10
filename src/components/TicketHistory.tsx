@@ -207,7 +207,7 @@ export default function TicketHistory({ ticketId, className = '', initiallyColla
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
             <History className="h-5 w-5 mr-2" />
-            Histórico do Ticket
+            Histórico do Chamado
             {collapsed ? (
               <ChevronRight className="h-4 w-4 ml-2 transition-transform" />
             ) : (

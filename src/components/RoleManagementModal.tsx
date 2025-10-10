@@ -868,7 +868,7 @@ export default function RoleManagementModal({ isOpen, onClose }: RoleManagementM
       tickets_view_internal: 'Ver Tickets Internos',
       tickets_export: 'Exportar Tickets',
       tickets_bulk_actions: 'Ações em Massa',
-      tickets_view_history: 'Ver Histórico do Ticket',
+      tickets_view_history: 'Ver Histórico do Chamado',
       
       // Knowledge Base
       kb_view: 'Visualizar Base de Conhecimento',
