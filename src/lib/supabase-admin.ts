@@ -1,10 +1,9 @@
 import { createClient } from '@supabase/supabase-js'
 
 // Cliente admin do Supabase para operações do servidor
-// Temporariamente usando anon key pois service role key está com problema
 export const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, // Temporário: usar anon key
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
   {
     auth: {
       autoRefreshToken: false,
