@@ -1036,25 +1036,19 @@ export default function AnalyticsPage() {
         </div>
         
         {/* Resumo de Filtros */}
-        <div className="bg-gray-800 rounded-2xl p-4 shadow-lg">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-white">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
-              <span className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                Período analisado: {getDateRangeStart(periodFilter) ? new Date(getDateRangeStart(periodFilter)).toLocaleDateString('pt-BR') : 'N/A'} até {getDateRangeEnd(periodFilter) ? new Date(getDateRangeEnd(periodFilter)).toLocaleDateString('pt-BR') : 'N/A'}
-              </span>
-              <span className="hidden sm:inline text-gray-400">•</span>
-              <span className="flex items-center gap-2">
-                <FileText className="w-4 h-4" />
-                <span><strong>{isMultiClient ? (multiClientData?.consolidated.total_tickets || 0) : (analyticsData?.overview.totalTickets || 0)}</strong> chamados no período</span>
-              </span>
-              <span className="hidden sm:inline text-gray-400">•</span>
-              <span className="flex items-center gap-2">
-                <Building className="w-4 h-4" />
-                <span><strong>{isMatrixUser ? selectedClients.length : 1}</strong> cliente{isMatrixUser && selectedClients.length !== 1 ? 's' : ''} selecionado{isMatrixUser && selectedClients.length !== 1 ? 's' : ''}</span>
-              </span>
-            </div>
-          </div>
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3">
+          <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-300">
+            <span className="font-medium block sm:inline">Período analisado:</span>
+            <span className="block sm:inline sm:ml-1">
+              {getDateRangeStart(periodFilter) ? new Date(getDateRangeStart(periodFilter)).toLocaleDateString('pt-BR') : 'N/A'} até {getDateRangeEnd(periodFilter) ? new Date(getDateRangeEnd(periodFilter)).toLocaleDateString('pt-BR') : 'N/A'}
+            </span>
+            <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
+              • <strong>{isMultiClient ? (multiClientData?.consolidated.total_tickets || 0) : (analyticsData?.overview.totalTickets || 0)}</strong> chamados no período
+            </span>
+            <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">
+              • <strong>{isMatrixUser ? selectedClients.length : 1}</strong> cliente{isMatrixUser && selectedClients.length !== 1 ? 's' : ''} selecionado{isMatrixUser && selectedClients.length !== 1 ? 's' : ''}
+            </span>
+          </p>
         </div>
         
         <div className="mt-4 sm:mt-0 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
