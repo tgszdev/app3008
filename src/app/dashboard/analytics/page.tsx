@@ -1253,7 +1253,7 @@ export default function AnalyticsPage() {
       {/* Key Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Total de Tickets"
+          title="Total de Chamados"
           value={isMultiClient ? (multiClientData?.consolidated.total_tickets || 0) : (analyticsData?.overview.totalTickets || 0)}
           icon={TicketIcon}
           trend={isMultiClient ? 'neutral' : (analyticsData?.overview.totalTicketsTrend || 0) > 0 ? 'up' : (analyticsData?.overview.totalTicketsTrend || 0) < 0 ? 'down' : 'neutral'}
