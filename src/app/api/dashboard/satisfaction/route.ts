@@ -105,7 +105,15 @@ export async function GET(request: NextRequest) {
     if (ticketIds.length > 0) {
       const { data: tickets, error: ticketsError } = await supabaseAdmin
         .from('tickets')
-        .select('id, ticket_number, title')
+        .select(`
+          id, 
+          ticket_number, 
+          title,
+          context_id,
+          contexts(
+            name
+          )
+        `)
         .in('id', ticketIds)
       
       if (ticketsError) {
@@ -186,6 +194,7 @@ export async function GET(request: NextRequest) {
           comment: r.comment,
           ticketNumber: ticket?.ticket_number ? `#${ticket.ticket_number}` : `#${r.ticket_id?.substring(0, 8)}`,
           ticketTitle: ticket?.title || 'Ticket sem título',
+          clientName: ticket?.contexts?.name || 'Cliente não identificado',
           createdAt: r.created_at
         }
       }) || []

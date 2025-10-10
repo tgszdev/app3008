@@ -24,6 +24,7 @@ interface SatisfactionData {
     comment: string
     ticketNumber: string
     ticketTitle: string
+    clientName: string
     createdAt: string
   }>
 }
@@ -390,6 +391,9 @@ export default function SatisfactionPage() {
                       </span>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         {comment.ticketTitle}
+                      </p>
+                      <p className="text-xs font-medium text-blue-600 dark:text-blue-400 mt-1">
+                        {comment.clientName}
                       </p>
                     </div>
                   </div>
