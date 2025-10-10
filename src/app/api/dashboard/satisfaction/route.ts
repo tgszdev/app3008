@@ -4,11 +4,10 @@ import { auth } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
-    // Temporariamente desabilitado para debug
-    // const session = await auth()
-    // if (!session) {
-    //   return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-    // }
+    const session = await auth()
+    if (!session) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
 
     const searchParams = request.nextUrl.searchParams
     const period = searchParams.get('period') || 'month'
