@@ -33,8 +33,7 @@ export async function GET(request: NextRequest) {
         break
     }
 
-    // Get current period ratings
-    // Use left join (without !inner) to include ratings even if ticket was deleted
+    // Get current period ratings with explicit JOIN
     const { data: currentRatings, error: currentError } = await supabaseAdmin
       .from('ticket_ratings')
       .select(`
@@ -43,7 +42,7 @@ export async function GET(request: NextRequest) {
         comment,
         created_at,
         ticket_id,
-        ticket:tickets(
+        tickets!inner(
           ticket_number,
           title,
           created_at
@@ -60,7 +59,7 @@ export async function GET(request: NextRequest) {
     console.log('🔍 DEBUG: Current ratings data:', {
       count: currentRatings?.length || 0,
       firstRating: currentRatings?.[0] || null,
-      ticketData: currentRatings?.[0]?.ticket || null
+      ticketData: currentRatings?.[0]?.tickets || null
     })
 
     // Get previous period ratings for trend calculation
@@ -109,8 +108,8 @@ export async function GET(request: NextRequest) {
       .map(r => ({
         rating: r.rating,
         comment: r.comment,
-        ticketNumber: r.ticket?.ticket_number ? `#${r.ticket.ticket_number}` : `#${r.ticket_id?.substring(0, 8)}`,
-        ticketTitle: r.ticket?.title || 'Ticket sem título',
+        ticketNumber: r.tickets?.ticket_number ? `#${r.tickets.ticket_number}` : `#${r.ticket_id?.substring(0, 8)}`,
+        ticketTitle: r.tickets?.title || 'Ticket sem título',
         createdAt: r.created_at
       })) || []
 
