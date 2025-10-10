@@ -69,7 +69,7 @@ interface Ticket {
   created_by_user: User
   assigned_to_user: User | null
   comment_count?: number
-  is_internal?: boolean // Novo campo para tickets internos
+  is_internal?: boolean // Novo campo para chamados internos
   created_at: string
   updated_at: string
   resolved_at?: string
@@ -393,14 +393,14 @@ export default function TicketsPage() {
       console.log('[TICKETS DEBUG] Tickets setados com sucesso')
     } catch (error: any) {
       console.error('[TICKETS DEBUG] Erro ao carregar:', error.response?.data || error.message)
-      toast.error('Erro ao carregar tickets')
+      toast.error('Erro ao carregar chamados')
     } finally {
       setLoading(false)
       setRefreshing(false)
     }
   }
 
-  // Buscar todos os tickets para contagem nos cards (COM FILTROS)
+  // Buscar todos os chamados para contagem nos cards (COM FILTROS)
   const fetchAllTickets = async () => {
     try {
       const userType = (session?.user as any)?.userType
@@ -438,7 +438,7 @@ export default function TicketsPage() {
   }
 
   useEffect(() => {
-    // Para usuários de contexto único (context type), buscar tickets sempre
+    // Para usuários de contexto único (context type), buscar chamados sempre
     // Para usuários multi-cliente (matrix type), só buscar se houver clientes selecionados
     const userType = (session?.user as any)?.userType
     
@@ -459,18 +459,18 @@ export default function TicketsPage() {
     }
     
     if (userType === 'context') {
-      // Usuário de contexto único: sempre buscar tickets do seu contexto
-      console.log('[TICKETS DEBUG] Usuário context: buscando tickets...')
+      // Usuário de contexto único: sempre buscar chamados do seu contexto
+      console.log('[TICKETS DEBUG] Usuário context: buscando chamados...')
       fetchTickets()
       fetchAllTickets()
     } else if (userType === 'matrix' && selectedClients.length > 0) {
       // Usuário multi-cliente: só buscar se houver clientes selecionados
-      console.log('[TICKETS DEBUG] Usuário matrix: buscando tickets...')
+      console.log('[TICKETS DEBUG] Usuário matrix: buscando chamados...')
       fetchTickets()
       fetchAllTickets()
     } else if (userType === 'matrix' && selectedClients.length === 0) {
       // Usuário multi-cliente sem seleção: não mostrar nada
-      console.log('[TICKETS DEBUG] Usuário matrix SEM seleção: limpando tickets')
+      console.log('[TICKETS DEBUG] Usuário matrix SEM seleção: limpando chamados')
       setTickets([])
       setAllTickets([])
       setLoading(false)
@@ -746,7 +746,7 @@ export default function TicketsPage() {
             }
           </span>
           <span>•</span>
-          <span>{filteredTickets.length} tickets no período</span>
+          <span>{filteredTickets.length} chamados no período</span>
           <span>•</span>
           <span>{selectedClients.length} {selectedClients.length === 1 ? 'cliente selecionado' : 'clientes selecionados'}</span>
         </div>
@@ -833,7 +833,7 @@ export default function TicketsPage() {
               className="w-full sm:w-auto px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-3xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">Todas as Prioridades</option>
-              {/* Only show priorities that have tickets (count > 0) */}
+              {/* Only show priorities that have chamados (count > 0) */}
               {prioritiesWithCount
                 .filter(priority => priority.count > 0)
                 .map((priority) => (
@@ -1053,10 +1053,10 @@ export default function TicketsPage() {
                     </span>
                   </div>
                   
-                  {/* Título do ticket */}
+                  {/* Título do chamado */}
                   <h3 className="font-medium text-gray-900 dark:text-white text-sm sm:text-base line-clamp-2">{ticket.title}</h3>
                   
-                  {/* Informações do ticket - Grid responsivo */}
+                  {/* Informações do chamado - Grid responsivo */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                     <div className="flex items-center gap-1">
                       <Calendar className="h-3 w-3 flex-shrink-0" />
