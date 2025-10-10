@@ -718,7 +718,7 @@ export default function AnalyticsPage() {
     }),
     datasets: [
       {
-        label: 'Tickets Criados',
+        label: 'Chamados Criados',
         data: ticketsTrend.map(t => t.count),
         borderColor: 'rgb(59, 130, 246)',
         backgroundColor: 'rgba(59, 130, 246, 0.1)',
