@@ -1306,13 +1306,13 @@ export default function AnalyticsPage() {
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate">
-              Tendência de Tickets
+              Tendência de Chamados
             </h2>
             <LineChart className="h-5 w-5 text-gray-400 flex-shrink-0" />
           </div>
           <div 
             className="h-48 sm:h-64 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors relative group overflow-hidden"
-            onClick={() => openChartModal('Tendência de Tickets', 'line', ticketsTrendData, modalChartOptions)}
+            onClick={() => openChartModal('Tendência de Chamados', 'line', ticketsTrendData, modalChartOptions)}
           >
             <div className="w-full h-full min-h-0 chart-container">
             <Line data={ticketsTrendData} options={chartOptions} />
