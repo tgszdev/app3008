@@ -1035,22 +1035,22 @@ export default function AnalyticsPage() {
         </div>
         
         {/* Resumo de Filtros */}
-        <div className="bg-gradient-to-r from-blue-900 to-blue-800 border border-blue-600 rounded-2xl p-4 shadow-lg">
+        <div className="bg-gray-800 rounded-2xl p-4 shadow-lg">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-white">
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
               <span className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
                 Período analisado: {getDateRangeStart(periodFilter) ? new Date(getDateRangeStart(periodFilter)).toLocaleDateString('pt-BR') : 'N/A'} até {getDateRangeEnd(periodFilter) ? new Date(getDateRangeEnd(periodFilter)).toLocaleDateString('pt-BR') : 'N/A'}
               </span>
-              <span className="hidden sm:inline">•</span>
+              <span className="hidden sm:inline text-gray-400">•</span>
               <span className="flex items-center gap-2">
-                <TicketIcon className="w-4 h-4" />
-                {isMultiClient ? (multiClientData?.consolidated.total_tickets || 0) : (analyticsData?.overview.totalTickets || 0)} chamados no período
+                <FileText className="w-4 h-4" />
+                <span><strong>{isMultiClient ? (multiClientData?.consolidated.total_tickets || 0) : (analyticsData?.overview.totalTickets || 0)}</strong> chamados no período</span>
               </span>
-              <span className="hidden sm:inline">•</span>
+              <span className="hidden sm:inline text-gray-400">•</span>
               <span className="flex items-center gap-2">
                 <Building className="w-4 h-4" />
-                {isMatrixUser ? selectedClients.length : 1} cliente{isMatrixUser && selectedClients.length !== 1 ? 's' : ''} selecionado{isMatrixUser && selectedClients.length !== 1 ? 's' : ''}
+                <span><strong>{isMatrixUser ? selectedClients.length : 1}</strong> cliente{isMatrixUser && selectedClients.length !== 1 ? 's' : ''} selecionado{isMatrixUser && selectedClients.length !== 1 ? 's' : ''}</span>
               </span>
             </div>
           </div>
