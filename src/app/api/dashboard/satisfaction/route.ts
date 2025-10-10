@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
         break
     }
 
-    // Get current period ratings with explicit JOIN
+    // Get current period ratings with JOIN
     const { data: currentRatings, error: currentError } = await supabaseAdmin
       .from('ticket_ratings')
       .select(`
@@ -42,10 +42,10 @@ export async function GET(request: NextRequest) {
         comment,
         created_at,
         ticket_id,
-        tickets!inner(
+        tickets(
           ticket_number,
           title,
-          created_at
+          status
         )
       `)
       .gte('created_at', startDate.toISOString().split('T')[0] + 'T00:00:00')
