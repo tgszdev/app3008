@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
         break
     }
 
-    // Get current period ratings with JOIN
+    // Get current period ratings
     const { data: currentRatings, error: currentError } = await supabaseAdmin
       .from('ticket_ratings')
       .select(`
@@ -41,12 +41,7 @@ export async function GET(request: NextRequest) {
         rating,
         comment,
         created_at,
-        ticket_id,
-        tickets(
-          ticket_number,
-          title,
-          status
-        )
+        ticket_id
       `)
       .gte('created_at', startDate.toISOString().split('T')[0] + 'T00:00:00')
       .order('created_at', { ascending: false })
@@ -58,9 +53,28 @@ export async function GET(request: NextRequest) {
 
     console.log('🔍 DEBUG: Current ratings data:', {
       count: currentRatings?.length || 0,
-      firstRating: currentRatings?.[0] || null,
-      ticketData: currentRatings?.[0]?.tickets || null
+      firstRating: currentRatings?.[0] || null
     })
+
+    // Get ticket data for each rating
+    const ticketIds = currentRatings?.map(r => r.ticket_id) || []
+    let ticketDataMap = new Map()
+    
+    if (ticketIds.length > 0) {
+      const { data: tickets, error: ticketsError } = await supabaseAdmin
+        .from('tickets')
+        .select('id, ticket_number, title')
+        .in('id', ticketIds)
+      
+      if (ticketsError) {
+        console.error('🔍 DEBUG: Error fetching tickets:', ticketsError)
+      } else {
+        console.log('🔍 DEBUG: Tickets found:', tickets?.length || 0)
+        tickets?.forEach(ticket => {
+          ticketDataMap.set(ticket.id, ticket)
+        })
+      }
+    }
 
     // Get previous period ratings for trend calculation
     const { data: previousRatings, error: previousError } = await supabaseAdmin
@@ -105,13 +119,16 @@ export async function GET(request: NextRequest) {
     const recentComments = currentRatings
       ?.filter(r => r.comment)
       .slice(0, 5)
-      .map(r => ({
-        rating: r.rating,
-        comment: r.comment,
-        ticketNumber: r.tickets?.ticket_number ? `#${r.tickets.ticket_number}` : `#${r.ticket_id?.substring(0, 8)}`,
-        ticketTitle: r.tickets?.title || 'Ticket sem título',
-        createdAt: r.created_at
-      })) || []
+      .map(r => {
+        const ticket = ticketDataMap.get(r.ticket_id)
+        return {
+          rating: r.rating,
+          comment: r.comment,
+          ticketNumber: ticket?.ticket_number ? `#${ticket.ticket_number}` : `#${r.ticket_id?.substring(0, 8)}`,
+          ticketTitle: ticket?.title || 'Ticket sem título',
+          createdAt: r.created_at
+        }
+      }) || []
 
     return NextResponse.json({
       averageRating: Number(averageRating.toFixed(1)),
