@@ -1,10 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Star, TrendingUp, TrendingDown, Calendar, Download, RefreshCw, Filter } from 'lucide-react'
+import { Star, TrendingUp, TrendingDown, Calendar, Download, RefreshCw, Filter, Building } from 'lucide-react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import { formatBrazilDateTime } from '@/lib/date-utils'
+import { useOrganization } from '@/contexts/OrganizationContext'
+import ClientSelector from '@/components/ClientSelector'
 
 interface SatisfactionData {
   averageRating: number
@@ -27,19 +29,59 @@ interface SatisfactionData {
 }
 
 export default function SatisfactionPage() {
+  const { availableContexts, isMatrixUser } = useOrganization()
   const [data, setData] = useState<SatisfactionData | null>(null)
   const [loading, setLoading] = useState(true)
   const [period, setPeriod] = useState('month')
   const [refreshing, setRefreshing] = useState(false)
+  const [selectedClients, setSelectedClients] = useState<string[]>([])
+
+  // Carregar seleções do localStorage na inicialização
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('satisfactionSelectedClients')
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved)
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setSelectedClients(parsed)
+          }
+        } catch (error) {
+          setSelectedClients([])
+        }
+      }
+    }
+  }, [])
+
+  // Salvar seleções no localStorage sempre que mudarem
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (selectedClients.length > 0) {
+        localStorage.setItem('satisfactionSelectedClients', JSON.stringify(selectedClients))
+      } else {
+        localStorage.removeItem('satisfactionSelectedClients')
+      }
+    }
+  }, [selectedClients])
 
   useEffect(() => {
     fetchSatisfactionData()
-  }, [period])
+  }, [period, selectedClients])
 
   const fetchSatisfactionData = async () => {
     try {
       setLoading(true)
-      const response = await axios.get(`/api/dashboard/satisfaction?period=${period}`)
+      
+      const params = new URLSearchParams({
+        period: period
+      })
+      
+      // Adicionar filtro de clientes se selecionados
+      if (selectedClients.length > 0) {
+        params.append('context_ids', selectedClients.join(','))
+      }
+      
+      const response = await axios.get(`/api/dashboard/satisfaction?${params}`)
       setData(response.data)
     } catch (error) {
       toast.error('Erro ao carregar dados de satisfação')
@@ -121,15 +163,32 @@ export default function SatisfactionPage() {
             </h1>
             <p className="text-gray-500 dark:text-gray-400 mt-1">
               Análise completa das avaliações e feedbacks dos clientes
+              {selectedClients.length > 0 && (
+                <span className="block mt-1 text-sm">
+                  {selectedClients.length === 1 
+                    ? `Filtrado para: ${availableContexts.find(c => c.id === selectedClients[0])?.name || 'Cliente selecionado'}`
+                    : `Filtrado para: ${selectedClients.length} clientes selecionados`
+                  }
+                </span>
+              )}
             </p>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            {/* Client Selector */}
+            <ClientSelector
+              selectedClients={selectedClients}
+              availableContexts={availableContexts}
+              onSelectionChange={setSelectedClients}
+              isMatrixUser={isMatrixUser}
+              className="w-full sm:w-auto"
+            />
+            
             {/* Period Selector */}
             <select
               value={period}
               onChange={(e) => setPeriod(e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+              className="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
             >
               <option value="week">Última Semana</option>
               <option value="month">Último Mês</option>
@@ -140,7 +199,7 @@ export default function SatisfactionPage() {
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="p-2 rounded-2xl border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="w-full sm:w-auto p-2 rounded-2xl border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
               <RefreshCw className={`h-5 w-5 text-gray-600 dark:text-gray-400 ${refreshing ? 'animate-spin' : ''}`} />
             </button>

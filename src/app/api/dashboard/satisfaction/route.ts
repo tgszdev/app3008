@@ -4,14 +4,14 @@ import { auth } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
-    // Temporariamente desabilitado para debug
-    // const session = await auth()
-    // if (!session) {
-    //   return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-    // }
+    const session = await auth()
+    if (!session) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
 
     const searchParams = request.nextUrl.searchParams
     const period = searchParams.get('period') || 'month'
+    const contextIds = searchParams.get('context_ids')?.split(',').filter(Boolean) || []
 
     // Calculate date range based on period
     const now = new Date()
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get current period ratings
-    const { data: currentRatings, error: currentError } = await supabaseAdmin
+    let query = supabaseAdmin
       .from('ticket_ratings')
       .select(`
         id,
@@ -45,6 +45,18 @@ export async function GET(request: NextRequest) {
       `)
       .gte('created_at', startDate.toISOString().split('T')[0] + 'T00:00:00')
       .order('created_at', { ascending: false })
+
+    // Se contextIds foram fornecidos, filtrar por contexto
+    if (contextIds.length > 0) {
+      query = query.in('ticket_id', 
+        supabaseAdmin
+          .from('tickets')
+          .select('id')
+          .in('context_id', contextIds)
+      )
+    }
+
+    const { data: currentRatings, error: currentError } = await query
 
     if (currentError) {
       console.error('🔍 DEBUG: Error fetching current ratings:', currentError)
@@ -77,11 +89,23 @@ export async function GET(request: NextRequest) {
     }
 
     // Get previous period ratings for trend calculation
-    const { data: previousRatings, error: previousError } = await supabaseAdmin
+    let previousQuery = supabaseAdmin
       .from('ticket_ratings')
       .select('rating')
       .gte('created_at', previousStartDate.toISOString().split('T')[0] + 'T00:00:00')
       .lt('created_at', startDate.toISOString().split('T')[0] + 'T00:00:00')
+
+    // Se contextIds foram fornecidos, filtrar por contexto
+    if (contextIds.length > 0) {
+      previousQuery = previousQuery.in('ticket_id', 
+        supabaseAdmin
+          .from('tickets')
+          .select('id')
+          .in('context_id', contextIds)
+      )
+    }
+
+    const { data: previousRatings, error: previousError } = await previousQuery
 
     if (previousError) {
       throw previousError
