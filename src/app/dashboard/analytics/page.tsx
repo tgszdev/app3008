@@ -1033,6 +1033,29 @@ export default function AnalyticsPage() {
             }
           </p>
         </div>
+        
+        {/* Resumo de Filtros */}
+        <div className="bg-gradient-to-r from-blue-900 to-blue-800 border border-blue-600 rounded-2xl p-4 shadow-lg">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-white">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
+              <span className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                Período analisado: {getDateRangeStart(periodFilter) ? new Date(getDateRangeStart(periodFilter)).toLocaleDateString('pt-BR') : 'N/A'} até {getDateRangeEnd(periodFilter) ? new Date(getDateRangeEnd(periodFilter)).toLocaleDateString('pt-BR') : 'N/A'}
+              </span>
+              <span className="hidden sm:inline">•</span>
+              <span className="flex items-center gap-2">
+                <TicketIcon className="w-4 h-4" />
+                {isMultiClient ? (multiClientData?.consolidated.total_tickets || 0) : (analyticsData?.overview.totalTickets || 0)} chamados no período
+              </span>
+              <span className="hidden sm:inline">•</span>
+              <span className="flex items-center gap-2">
+                <Building className="w-4 h-4" />
+                {isMatrixUser ? selectedClients.length : 1} cliente{isMatrixUser && selectedClients.length !== 1 ? 's' : ''} selecionado{isMatrixUser && selectedClients.length !== 1 ? 's' : ''}
+              </span>
+            </div>
+          </div>
+        </div>
+        
         <div className="mt-4 sm:mt-0 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           {/* Seletor de Clientes para usuários Matrix */}
           {isMatrixUser && (
