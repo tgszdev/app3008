@@ -33,7 +33,8 @@ import {
   ChevronDown,
   ChevronUp,
   X,
-  Check
+  Check,
+  FileText
 } from 'lucide-react'
 import { Line, Bar, Pie, Doughnut } from 'react-chartjs-2'
 import {
