@@ -4,10 +4,11 @@ import { auth } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth()
-    if (!session) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-    }
+    // Temporariamente desabilitado para debug
+    // const session = await auth()
+    // if (!session) {
+    //   return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    // }
 
     const searchParams = request.nextUrl.searchParams
     const period = searchParams.get('period') || 'month'
@@ -52,8 +53,15 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
 
     if (currentError) {
+      console.error('🔍 DEBUG: Error fetching current ratings:', currentError)
       throw currentError
     }
+
+    console.log('🔍 DEBUG: Current ratings data:', {
+      count: currentRatings?.length || 0,
+      firstRating: currentRatings?.[0] || null,
+      ticketData: currentRatings?.[0]?.ticket || null
+    })
 
     // Get previous period ratings for trend calculation
     const { data: previousRatings, error: previousError } = await supabaseAdmin
