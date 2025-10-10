@@ -72,14 +72,22 @@ export default function SatisfactionPage() {
     try {
       setLoading(true)
       
-      const params = new URLSearchParams({
-        period: period
-      })
-      
-      // Adicionar filtro de clientes se selecionados
-      if (selectedClients.length > 0) {
-        params.append('context_ids', selectedClients.join(','))
+      // Se não há clientes selecionados, não buscar dados
+      if (selectedClients.length === 0) {
+        setData({
+          averageRating: 0,
+          totalRatings: 0,
+          trend: 0,
+          distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+          recentComments: []
+        })
+        return
       }
+      
+      const params = new URLSearchParams({
+        period: period,
+        context_ids: selectedClients.join(',')
+      })
       
       const response = await axios.get(`/api/dashboard/satisfaction?${params}`)
       setData(response.data)
@@ -410,8 +418,28 @@ export default function SatisfactionPage() {
         </div>
       )}
 
-      {/* Empty State */}
-      {data.totalRatings === 0 && (
+      {/* Empty State - Nenhum cliente selecionado */}
+      {selectedClients.length === 0 && (
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-12">
+          <div className="text-center">
+            <Building className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              Nenhum cliente selecionado
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+              Selecione um ou mais clientes para visualizar os dados de satisfação.
+            </p>
+            {!isMatrixUser && (
+              <p className="text-sm text-gray-400 mt-2">
+                Apenas usuários matriz podem selecionar múltiplos clientes
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Empty State - Nenhuma avaliação */}
+      {selectedClients.length > 0 && data.totalRatings === 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-12">
           <div className="text-center">
             <Star className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />

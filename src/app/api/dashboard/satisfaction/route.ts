@@ -13,6 +13,17 @@ export async function GET(request: NextRequest) {
     const period = searchParams.get('period') || 'month'
     const contextIds = searchParams.get('context_ids')?.split(',').filter(Boolean) || []
 
+    // Se não há contextIds fornecidos, retornar dados vazios
+    if (contextIds.length === 0) {
+      return NextResponse.json({
+        averageRating: 0,
+        totalRatings: 0,
+        trend: 0,
+        distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+        recentComments: []
+      })
+    }
+
     // Calculate date range based on period
     const now = new Date()
     let startDate = new Date()
