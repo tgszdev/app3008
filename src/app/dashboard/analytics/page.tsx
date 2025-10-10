@@ -1021,11 +1021,6 @@ export default function AnalyticsPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             Analytics & Insights
-            {isMultiClient && (
-              <span className="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">
-                ({selectedClients.length} cliente{selectedClients.length !== 1 ? 's' : ''} selecionado{selectedClients.length !== 1 ? 's' : ''})
-              </span>
-            )}
           </h1>
           <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
             {isMultiClient 
