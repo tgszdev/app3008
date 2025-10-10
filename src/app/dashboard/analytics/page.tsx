@@ -758,7 +758,7 @@ export default function AnalyticsPage() {
     labels: priorityData.map(p => p.name),
     datasets: [
       {
-        label: 'Tickets por Prioridade',
+        label: 'Chamados por Prioridade',
         data: priorityData.map(p => p.value),
         backgroundColor: priorityData.map(p => p.color),
         borderColor: priorityData.map(p => p.borderColor),
