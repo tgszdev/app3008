@@ -49,12 +49,31 @@ export async function GET(request: NextRequest) {
 
     // Se contextIds foram fornecidos, filtrar por contexto
     if (contextIds.length > 0) {
-      query = query.in('ticket_id', 
-        supabaseAdmin
-          .from('tickets')
-          .select('id')
-          .in('context_id', contextIds)
-      )
+      // Primeiro buscar os IDs dos tickets que pertencem aos contextos
+      const { data: ticketsInContexts, error: ticketsError } = await supabaseAdmin
+        .from('tickets')
+        .select('id')
+        .in('context_id', contextIds)
+      
+      if (ticketsError) {
+        console.error('🔍 DEBUG: Error fetching tickets for contexts:', ticketsError)
+        throw ticketsError
+      }
+      
+      const ticketIds = ticketsInContexts?.map(t => t.id) || []
+      
+      if (ticketIds.length > 0) {
+        query = query.in('ticket_id', ticketIds)
+      } else {
+        // Se não há tickets nos contextos, retornar dados vazios
+        return NextResponse.json({
+          averageRating: 0,
+          totalRatings: 0,
+          trend: 0,
+          distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+          recentComments: []
+        })
+      }
     }
 
     const { data: currentRatings, error: currentError } = await query
@@ -98,12 +117,18 @@ export async function GET(request: NextRequest) {
 
     // Se contextIds foram fornecidos, filtrar por contexto
     if (contextIds.length > 0) {
-      previousQuery = previousQuery.in('ticket_id', 
-        supabaseAdmin
-          .from('tickets')
-          .select('id')
-          .in('context_id', contextIds)
-      )
+      // Usar os mesmos ticketIds já buscados anteriormente
+      const { data: ticketsInContexts, error: ticketsError } = await supabaseAdmin
+        .from('tickets')
+        .select('id')
+        .in('context_id', contextIds)
+      
+      if (!ticketsError && ticketsInContexts) {
+        const ticketIds = ticketsInContexts.map(t => t.id)
+        if (ticketIds.length > 0) {
+          previousQuery = previousQuery.in('ticket_id', ticketIds)
+        }
+      }
     }
 
     const { data: previousRatings, error: previousError } = await previousQuery
