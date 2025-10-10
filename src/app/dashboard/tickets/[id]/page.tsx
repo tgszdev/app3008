@@ -53,7 +53,7 @@ interface Ticket {
   category: string // Mantém compatibilidade
   category_id?: string
   category_info?: Category[] | Category // Pode vir como array ou objeto
-  is_internal?: boolean // Novo campo para tickets internos
+  is_internal?: boolean // Novo campo para chamados internos
   created_at: string
   updated_at: string
   due_date?: string
@@ -195,7 +195,7 @@ export default function TicketDetailsPage() {
       setNewStatus(response.data.status)
       setNewAssignee(response.data.assigned_to || '')
     } catch (error) {
-      toast.error('Erro ao carregar ticket')
+      toast.error('Erro ao carregar chamado')
       router.push('/dashboard/tickets')
     } finally {
       setLoading(false)
@@ -204,7 +204,7 @@ export default function TicketDetailsPage() {
 
   const fetchUsers = async () => {
     try {
-      // Buscar usuários que têm permissão para atribuir tickets
+      // Buscar usuários que têm permissão para atribuir chamados
       const response = await axios.get('/api/users/with-permission?permission=tickets_assign')
       setUsers(response.data)
     } catch (error) {
@@ -234,7 +234,7 @@ export default function TicketDetailsPage() {
 
     // Block users without permission from uploading to cancelled tickets
     if (ticket.status === 'cancelled' && !canDeleteTickets) {
-      toast.error('Você não tem permissão para anexar arquivos em tickets cancelados')
+      toast.error('Você não tem permissão para anexar arquivos em chamados cancelados')
       event.target.value = ''
       return
     }
@@ -291,7 +291,7 @@ export default function TicketDetailsPage() {
     // Check if trying to cancel - only admin can cancel
     if (newStatus === 'cancelled') {
       if (session?.user?.role !== 'admin') {
-        toast.error('Apenas administradores podem cancelar tickets')
+        toast.error('Apenas administradores podem cancelar chamados')
         setEditingStatus(false)
         return
       }
@@ -304,7 +304,7 @@ export default function TicketDetailsPage() {
     // Check if trying to change from cancelled - only admin can reactivate
     if (ticket.status === 'cancelled') {
       if (session?.user?.role !== 'admin') {
-        toast.error('Apenas administradores podem reativar tickets cancelados')
+        toast.error('Apenas administradores podem reativar chamados cancelados')
         setEditingStatus(false)
         return
       }
@@ -436,7 +436,7 @@ export default function TicketDetailsPage() {
 
     // Block non-admin users from changing assignee on cancelled tickets
     if (ticket.status === 'cancelled' && session?.user?.role !== 'admin') {
-      toast.error('Apenas administradores podem alterar o responsável de tickets cancelados')
+      toast.error('Apenas administradores podem alterar o responsável de chamados cancelados')
       setEditingAssignee(false)
       return
     }
@@ -462,7 +462,7 @@ export default function TicketDetailsPage() {
 
     // Block non-admin users from commenting on cancelled tickets
     if (ticket.status === 'cancelled' && session?.user?.role !== 'admin') {
-      toast.error('Apenas administradores podem comentar em tickets cancelados')
+      toast.error('Apenas administradores podem comentar em chamados cancelados')
       return
     }
 
@@ -619,7 +619,7 @@ export default function TicketDetailsPage() {
                   onClick={() => {
                     // Verificar permissões para alterar status
                     if (ticket.status === 'cancelled' && !canDeleteTickets) {
-                      toast.error('Você não tem permissão para alterar o status de tickets cancelados')
+                      toast.error('Você não tem permissão para alterar o status de chamados cancelados')
                       return
                     }
                     if (canEditThisTicket) {
@@ -836,12 +836,12 @@ export default function TicketDetailsPage() {
               )}
             </div>
 
-            {/* Add Comment Form - Disabled for cancelled tickets unless has delete permission */}
+            {/* Add Comment Form - Disabled for cancelled chamados unless has delete permission */}
             {ticket.status === 'cancelled' && !canDeleteTickets ? (
               <div className="border-t pt-4">
                 <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-2xl text-center">
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    🔒 Este ticket está cancelado. Apenas administradores podem adicionar comentários.
+                    🔒 Este chamado está cancelado. Apenas administradores podem adicionar comentários.
                   </p>
                 </div>
               </div>
@@ -939,13 +939,13 @@ export default function TicketDetailsPage() {
                     onClick={() => {
                       // Verificar permissões para atribuir ticket
                       if (ticket.status === 'cancelled' && !canDeleteTickets) {
-                        toast.error('Você não tem permissão para alterar o responsável de tickets cancelados')
+                        toast.error('Você não tem permissão para alterar o responsável de chamados cancelados')
                         return
                       }
                       if (canAssignTickets) {
                         setEditingAssignee(true)
                       } else {
-                        toast.error('Você não tem permissão para atribuir tickets')
+                        toast.error('Você não tem permissão para atribuir chamados')
                       }
                     }}
                     className={`${
@@ -1052,7 +1052,7 @@ export default function TicketDetailsPage() {
                 </button>
               )}
               
-              {/* File Upload - Disabled for cancelled tickets unless has delete permission */}
+              {/* File Upload - Disabled for cancelled chamados unless has delete permission */}
               {ticket.status === 'cancelled' && !canDeleteTickets ? (
                 <div className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
                   <Paperclip size={16} />
@@ -1087,20 +1087,20 @@ export default function TicketDetailsPage() {
                 </button>
               )}
               
-              {/* Mensagem especial para tickets cancelados */}
+              {/* Mensagem especial para chamados cancelados */}
               {ticket.status === 'cancelled' && session?.user?.role !== 'admin' && (
                 <div className="p-4 bg-red-100 dark:bg-red-900/20 rounded-2xl text-center border border-red-300 dark:border-red-800">
                   <p className="text-sm text-red-800 dark:text-red-300 font-semibold">
-                    🔒 Ticket Cancelado - Acesso Restrito
+                    🔒 Chamado Cancelado - Acesso Restrito
                   </p>
                   <p className="text-xs text-red-700 dark:text-red-400 mt-2">
-                    Este ticket foi cancelado e está bloqueado para alterações.
+                    Este chamado foi cancelado e está bloqueado para alterações.
                   </p>
                   <p className="text-xs text-red-600 dark:text-red-400 mt-1">
                     Apenas administradores podem:
                   </p>
                   <ul className="text-xs text-red-600 dark:text-red-400 mt-1">
-                    <li>• Reativar o ticket</li>
+                    <li>• Reativar o chamado</li>
                     <li>• Adicionar comentários</li>
                     <li>• Anexar arquivos</li>
                     <li>• Fazer alterações</li>
@@ -1122,7 +1122,7 @@ export default function TicketDetailsPage() {
             </div>
           </div>
 
-          {/* Rating Component - Show for FINAL status tickets (usando is_final do banco) */}
+          {/* Rating Component - Show for FINAL status chamados (usando is_final do banco) */}
           {(() => {
             // Usar dados REAIS do banco, não hardcoded!
             const currentStatusData = availableStatuses.find(s => s.slug === ticket.status)
