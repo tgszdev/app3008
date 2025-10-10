@@ -222,7 +222,7 @@ export default function NewTicketPage() {
             toast.error(`${failCount} arquivo(s) falharam no upload`)
           }
         } catch (uploadError) {
-          toast.error('Alguns arquivos não puderam ser anexados, mas o ticket foi criado')
+          toast.error('Alguns arquivos não puderam ser anexados, mas o chamado foi criado')
         }
       }
       
@@ -455,11 +455,11 @@ export default function NewTicketPage() {
                   <div className="flex items-center gap-2">
                     <Lock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                     <span className="font-medium text-gray-900 dark:text-white">
-                      Ticket Interno
+                      Chamado Interno
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Marque esta opção para tornar o ticket visível apenas para administradores e analistas.
+                    Marque esta opção para tornar o chamado visível apenas para administradores e analistas.
                   </p>
                 </div>
               </label>
