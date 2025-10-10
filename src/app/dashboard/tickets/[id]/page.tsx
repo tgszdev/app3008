@@ -387,12 +387,12 @@ export default function TicketDetailsPage() {
         is_internal: false
       })
 
-      toast.success('Ticket cancelado com sucesso!')
+      toast.success('Chamado cancelado com sucesso!')
       setShowCancelModal(false)
       setCancelReason('')
       fetchTicket()
     } catch (error: any) {
-      toast.error('Erro ao cancelar ticket')
+      toast.error('Erro ao cancelar chamado')
     }
   }
 
@@ -418,13 +418,13 @@ export default function TicketDetailsPage() {
         is_internal: false
       })
 
-      toast.success('Ticket reativado com sucesso!')
+      toast.success('Chamado reativado com sucesso!')
       setShowReactivateModal(false)
       setReactivateReason('')
       setNewStatus('')
       fetchTicket()
     } catch (error: any) {
-      toast.error('Erro ao reativar ticket')
+      toast.error('Erro ao reativar chamado')
     }
   }
 
@@ -1165,9 +1165,9 @@ export default function TicketDetailsPage() {
       {showCancelModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <h2 className="text-lg sm:text-xl font-bold mb-4">Cancelar Ticket</h2>
+            <h2 className="text-lg sm:text-xl font-bold mb-4">Cancelar Chamado</h2>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Para cancelar este ticket, você deve informar o motivo do cancelamento.
+              Para cancelar este chamado, você deve informar o motivo do cancelamento.
             </p>
             <textarea
               value={cancelReason}
@@ -1203,9 +1203,9 @@ export default function TicketDetailsPage() {
       {showReactivateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <h2 className="text-lg sm:text-xl font-bold mb-4">Reativar Ticket</h2>
+            <h2 className="text-lg sm:text-xl font-bold mb-4">Reativar Chamado</h2>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Para reativar este ticket cancelado, você deve informar o motivo da reativação.
+              Para reativar este chamado cancelado, você deve informar o motivo da reativação.
             </p>
             <textarea
               value={reactivateReason}
